@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-06T06:42:55.278Z",
+  "updatedAt": "2026-08-06T08:16:57.426Z",
   "items": [
     {
       "slug": "yt-sergey-levine-rl-for-robot-foundation-models-요약",
@@ -8,7 +8,7 @@
       "url": "https://hanminy.github.io/marktl-blog/marktl/s/5iazpp/",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-sergey-levine-rl-for-robot-foundation-models-%EC%9A%94%EC%95%BD/",
       "sourcePath": "clippings/yt_Sergey_Levine_RL_for_Robot_Foundation_Models_요약.md",
-      "artifactType": "faithful-note",
+      "artifactType": "slide-deck",
       "title": "Sergey Levine (UC Berkeley & PI): RL for Robot Foundation Models",
       "excerpt": "영상 정보 채널: Zhanpeng He 날짜: 20260608 길이: 32분 14초 행사: ICRA 2026 Workshop on RL in the Era of IL ($1) 링크: https://www.youtube.com/watch?v=u0WJXi8PC6Y <div style=\"position: relative; wi",
       "tags": [
@@ -19,16 +19,35 @@
         "강화학습",
         "파운데이션모델"
       ],
+      "updatedAt": "2026-08-06T08:16:57.426Z"
+    },
+    {
+      "slug": "yt-sergey-levine-rl-for-robot-foundation-models-ìì½",
+      "shortId": "5iazpp",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/5iazpp/",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-sergey-levine-rl-for-robot-foundation-models-%EC%9A%94%EC%95%BD/",
+      "sourcePath": "clippings/yt_Sergey_Levine_RL_for_Robot_Foundation_Models_ìì½.md",
+      "artifactType": "faithful-note",
+      "title": "Sergey Levine (UC Berkeley & PI): RL for Robot Foundation Models",
+      "excerpt": "ìì ì ë³´ ì±ë: Zhanpeng He ë ì§: 20260608 ê¸¸ì´: 32ë¶ 14ì´ íì¬: ICRA 2026 Workshop on RL in the Era of IL ($1) ë§í¬: https://www.youtube.com/watch?v=u0WJXi8PC6Y <div style=\"position: relative; wi",
+      "tags": [
+        "- youtube",
+        "youtube",
+        "ì°êµ¬ìë£",
+        "ë¡ë´",
+        "ê°ííìµ",
+        "íì´ë°ì´ìëª¨ë¸"
+      ],
       "updatedAt": "2026-08-06T06:42:55.278Z"
     },
     {
-      "slug": "2025-towards-fully-integrated-autonomous-excavation-ìì¸ë-ìì½",
+      "slug": "2025-towards-fully-integrated-autonomous-excavation-Ã¬ÂÂÃ¬ÂÂ¸Ã«ÂÂ-Ã¬ÂÂÃ¬ÂÂ½",
       "shortId": "l992hf",
       "url": "https://hanminy.github.io/marktl-blog/marktl/s/l992hf/",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/2025-towards-fully-integrated-autonomous-excavation-%EC%84%9C%EC%9A%B8%EB%8C%80-%EC%9A%94%EC%95%BD/",
-      "sourcePath": "02_research/íëë¡ë´/2025 Towards Fully Integrated Autonomous Excavation-ìì¸ë_ìì½.md",
+      "sourcePath": "02_research/Ã­ÂÂÃ«ÂÂÃ«Â¡ÂÃ«Â´Â/2025 Towards Fully Integrated Autonomous Excavation-Ã¬ÂÂÃ¬ÂÂ¸Ã«ÂÂ_Ã¬ÂÂÃ¬ÂÂ½.md",
       "artifactType": "faithful-note",
-      "title": "Towards Fully Integrated Autonomous Excavation - ìì½",
+      "title": "Towards Fully Integrated Autonomous Excavation - Ã¬ÂÂÃ¬ÂÂ½",
       "excerpt": "papertitle: \"Towards Fully Integrated Autonomous Excavation: Autonomous Excavator for Precise Earth Cutting and Onboard Landscape Inspection\" authors: Inkyu Jang Junha Kim Dongjae ",
       "tags": [],
       "updatedAt": "2026-07-16T02:49:19.516Z"
