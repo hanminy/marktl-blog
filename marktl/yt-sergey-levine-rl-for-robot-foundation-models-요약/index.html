@@ -1,32 +1,47 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Sergey Levine의 ICRA 2026 발표 ‘RL for Robot Foundation Models’를 정리한 프레젠테이션형 문서">
-  <meta name="theme-color" content="#101426">
-  <title>RL for Robot Foundation Models — Sergey Levine</title>
+  
+  
+  <title>로봇 파운데이션 모델의 다음 루프 — RL로 제너럴리스트와 스페셜리스트를 연결하는 법</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   <style>
     :root {
-      color-scheme: dark;
-      --bg: #0b0e19;
-      --surface: #121728;
-      --surface-2: #191f34;
-      --surface-3: #222a43;
-      --text: #f7f8fc;
-      --muted: #aab2ca;
-      --soft: #747f9e;
-      --line: rgba(255, 255, 255, 0.11);
-      --accent: #72e1c1;
-      --accent-2: #8aa8ff;
-      --accent-3: #ffbf69;
-      --danger: #ff7e8a;
-      --good: #7fe3a1;
-      --shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
-      --radius: 24px;
-      --sidebar: 260px;
-      --topbar: 64px;
-      --content: 1180px;
+      color-scheme: light;
+      --paper: #f6f4ef;
+      --surface: #fffefb;
+      --ink: #18201e;
+      --muted: #66706c;
+      --line: #d8ddd8;
+      --soft-line: #e8ebe7;
+      --green: #195f4a;
+      --green-dark: #104536;
+      --green-soft: #e4f0ea;
+      --mint: #c8e1d6;
+      --amber: #b66b23;
+      --amber-soft: #fff0db;
+      --blue: #315f91;
+      --blue-soft: #e7eff8;
+      --red: #a64d49;
+      --shadow: 0 18px 50px rgba(27, 46, 39, 0.09);
+      --radius: 22px;
+      --content: 760px;
+      --wide: 1120px;
     }
 
     * {
@@ -35,1307 +50,814 @@
 
     html {
       scroll-behavior: smooth;
-      scroll-padding-top: calc(var(--topbar) + 24px);
+      scroll-padding-top: 2rem;
     }
 
     body {
       margin: 0;
-      min-width: 320px;
       background:
-        radial-gradient(circle at 12% 8%, rgba(114, 225, 193, 0.09), transparent 28rem),
-        radial-gradient(circle at 88% 18%, rgba(138, 168, 255, 0.11), transparent 34rem),
-        var(--bg);
-      color: var(--text);
-      font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo",
-        Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      line-height: 1.65;
-      overflow-x: hidden;
+        radial-gradient(circle at 8% 3%, rgba(200, 225, 214, 0.55), transparent 28rem),
+        linear-gradient(180deg, #f1f6f2 0, var(--paper) 38rem);
+      color: var(--ink);
+      font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, -apple-system, sans-serif;
+      font-size: 17px;
+      line-height: 1.82;
+      word-break: keep-all;
+      overflow-wrap: break-word;
     }
 
     a {
-      color: var(--accent);
+      color: var(--green);
       text-decoration-thickness: 1px;
-      text-underline-offset: 0.2em;
+      text-underline-offset: 0.22em;
     }
 
-    a:hover {
-      color: #b6f5e3;
-    }
-
-    button,
-    a {
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    button:focus-visible,
-    a:focus-visible {
-      outline: 3px solid var(--accent);
-      outline-offset: 4px;
+    a:hover,
+    a:focus {
+      color: var(--amber);
     }
 
     img {
       display: block;
       max-width: 100%;
+      height: auto;
     }
 
-    .skip-link {
-      position: fixed;
-      top: 8px;
-      left: 8px;
-      z-index: 200;
-      padding: 10px 14px;
-      border-radius: 10px;
-      background: var(--text);
-      color: var(--bg);
-      transform: translateY(-150%);
-      transition: transform 160ms ease;
-    }
-
-    .skip-link:focus {
-      transform: translateY(0);
-    }
-
-    .topbar {
-      position: fixed;
-      inset: 0 0 auto 0;
-      z-index: 100;
-      height: var(--topbar);
-      display: grid;
-      grid-template-columns: var(--sidebar) minmax(0, 1fr) auto;
+    .site-bar {
+      width: min(calc(100% - 32px), var(--wide));
+      margin: 0 auto;
+      padding: 20px 0;
+      display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 20px;
-      padding: 0 24px;
-      border-bottom: 1px solid var(--line);
-      background: rgba(11, 14, 25, 0.84);
-      backdrop-filter: blur(18px);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      min-width: 0;
-      color: var(--text);
-      text-decoration: none;
-      font-size: 0.82rem;
-      font-weight: 760;
-      letter-spacing: 0.04em;
-    }
-
-    .brand-mark {
-      width: 30px;
-      height: 30px;
-      display: grid;
-      place-items: center;
-      flex: 0 0 auto;
-      border: 1px solid rgba(114, 225, 193, 0.35);
-      border-radius: 9px;
-      background: linear-gradient(145deg, rgba(114, 225, 193, 0.22), rgba(138, 168, 255, 0.15));
-      color: var(--accent);
-      font-size: 0.72rem;
-    }
-
-    .brand-text {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .progress-shell {
-      height: 4px;
-      max-width: 720px;
-      border-radius: 999px;
-      overflow: hidden;
-      background: rgba(255, 255, 255, 0.09);
-    }
-
-    .progress-bar {
-      width: 0%;
-      height: 100%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, var(--accent), var(--accent-2));
-      transition: width 140ms linear;
-    }
-
-    .top-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .action-button,
-    .slide-button {
-      appearance: none;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.055);
-      color: var(--text);
-      font: inherit;
-      font-size: 0.78rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition:
-        border-color 160ms ease,
-        background 160ms ease,
-        transform 160ms ease;
-    }
-
-    .action-button {
-      padding: 9px 14px;
-    }
-
-    .action-button:hover,
-    .slide-button:hover {
-      border-color: rgba(114, 225, 193, 0.5);
-      background: rgba(114, 225, 193, 0.1);
-      transform: translateY(-1px);
-    }
-
-    .layout {
-      display: grid;
-      grid-template-columns: var(--sidebar) minmax(0, 1fr);
-      min-height: 100vh;
-      padding-top: var(--topbar);
-    }
-
-    .sidebar {
-      position: fixed;
-      top: var(--topbar);
-      bottom: 0;
-      left: 0;
-      z-index: 40;
-      width: var(--sidebar);
-      padding: 22px 16px 26px;
-      border-right: 1px solid var(--line);
-      background: rgba(11, 14, 25, 0.68);
-      overflow-y: auto;
-      scrollbar-width: thin;
-      scrollbar-color: var(--surface-3) transparent;
-    }
-
-    .nav-label {
-      margin: 0 10px 12px;
-      color: var(--soft);
-      font-size: 0.68rem;
-      font-weight: 800;
-      letter-spacing: 0.14em;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 750;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
-    .deck-nav {
-      display: grid;
-      gap: 3px;
+    .site-mark {
+      color: var(--green-dark);
     }
 
-    .deck-nav a {
-      display: grid;
-      grid-template-columns: 28px minmax(0, 1fr);
-      gap: 7px;
-      align-items: start;
-      padding: 8px 9px;
-      border: 1px solid transparent;
-      border-radius: 11px;
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.75rem;
-      line-height: 1.35;
-      transition:
-        color 140ms ease,
-        background 140ms ease,
-        border-color 140ms ease;
+    .hero {
+      width: min(calc(100% - 32px), var(--wide));
+      margin: 12px auto 54px;
+      padding: clamp(34px, 7vw, 80px);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(25, 95, 74, 0.14);
+      border-radius: 32px;
+      background:
+        linear-gradient(120deg, rgba(255,255,255,0.96), rgba(236,246,240,0.92)),
+        var(--surface);
+      box-shadow: var(--shadow);
     }
 
-    .deck-nav a:hover {
-      color: var(--text);
-      background: rgba(255, 255, 255, 0.05);
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -8rem;
+      bottom: -10rem;
+      width: 27rem;
+      height: 27rem;
+      border: 4rem solid rgba(25, 95, 74, 0.06);
+      border-radius: 50%;
     }
 
-    .deck-nav a[aria-current="true"] {
-      border-color: rgba(114, 225, 193, 0.25);
-      background: rgba(114, 225, 193, 0.09);
-      color: var(--text);
+    .eyebrow {
+      position: relative;
+      z-index: 1;
+      margin: 0 0 20px;
+      color: var(--green);
+      font-size: 0.78rem;
+      font-weight: 850;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
     }
 
-    .nav-number {
-      color: var(--soft);
-      font-variant-numeric: tabular-nums;
+    h1 {
+      position: relative;
+      z-index: 1;
+      max-width: 890px;
+      margin: 0;
+      font-size: clamp(2.45rem, 7.3vw, 5.7rem);
+      line-height: 1.04;
+      letter-spacing: -0.065em;
+      font-weight: 900;
     }
 
-    .deck-nav a[aria-current="true"] .nav-number {
-      color: var(--accent);
+    .hero-deck {
+      position: relative;
+      z-index: 1;
+      max-width: 760px;
+      margin: 28px 0 0;
+      color: #44504c;
+      font-size: clamp(1.08rem, 2.2vw, 1.38rem);
+      line-height: 1.62;
+      letter-spacing: -0.02em;
     }
 
-    .sidebar-tip {
-      margin: 22px 9px 0;
-      padding-top: 17px;
+    .hero-deck strong {
+      color: var(--green-dark);
+    }
+
+    .byline {
+      position: relative;
+      z-index: 1;
+      margin-top: 34px;
+      padding-top: 22px;
       border-top: 1px solid var(--line);
-      color: var(--soft);
-      font-size: 0.68rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 22px;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .byline strong {
+      color: var(--ink);
+    }
+
+    .tag-row {
+      position: relative;
+      z-index: 1;
+      margin-top: 22px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      padding: 6px 11px;
+      border: 1px solid #bed5ca;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.72);
+      color: var(--green-dark);
+      font-size: 0.73rem;
+      font-weight: 750;
+    }
+
+    .layout {
+      width: min(calc(100% - 32px), var(--wide));
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 230px minmax(0, var(--content));
+      justify-content: space-between;
+      gap: 64px;
+      align-items: start;
+    }
+
+    .toc {
+      position: sticky;
+      top: 24px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 254, 251, 0.82);
+      backdrop-filter: blur(12px);
+      font-size: 0.78rem;
       line-height: 1.55;
     }
 
-    main {
-      grid-column: 2;
-      min-width: 0;
-    }
-
-    .slide {
-      position: relative;
-      min-height: calc(100svh - var(--topbar));
-      display: flex;
-      align-items: center;
-      padding: clamp(56px, 8vw, 112px) clamp(24px, 6vw, 90px);
-      border-bottom: 1px solid var(--line);
-      overflow: hidden;
-      scroll-margin-top: var(--topbar);
-    }
-
-    .slide::before {
-      content: "";
-      position: absolute;
-      width: 420px;
-      height: 420px;
-      right: -220px;
-      top: -210px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 50%;
-      box-shadow:
-        0 0 0 70px rgba(255, 255, 255, 0.015),
-        0 0 0 140px rgba(255, 255, 255, 0.01);
-      pointer-events: none;
-    }
-
-    .slide-inner {
-      position: relative;
-      z-index: 1;
-      width: min(100%, var(--content));
-      margin: 0 auto;
-    }
-
-    .slide-kicker {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 18px;
-      color: var(--accent);
-      font-size: 0.75rem;
-      font-weight: 820;
+    .toc-title {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 850;
       letter-spacing: 0.12em;
       text-transform: uppercase;
     }
 
-    .slide-kicker::before {
-      content: "";
-      width: 36px;
-      height: 2px;
-      border-radius: 999px;
-      background: currentColor;
-    }
-
-    h1,
-    h2,
-    h3,
-    p {
-      margin-top: 0;
-    }
-
-    h1,
-    h2,
-    h3 {
-      line-height: 1.16;
-      letter-spacing: -0.035em;
-    }
-
-    h1 {
-      max-width: 940px;
-      margin-bottom: 26px;
-      font-size: clamp(3rem, 7.2vw, 7.3rem);
-      font-weight: 860;
-    }
-
-    h2 {
-      max-width: 970px;
-      margin-bottom: 26px;
-      font-size: clamp(2.1rem, 4.6vw, 4.8rem);
-      font-weight: 830;
-    }
-
-    h3 {
-      margin-bottom: 12px;
-      font-size: clamp(1.15rem, 2vw, 1.65rem);
-      font-weight: 780;
-    }
-
-    .gradient-text {
-      color: transparent;
-      background: linear-gradient(110deg, var(--accent), #c0fff0 34%, var(--accent-2) 82%);
-      background-clip: text;
-      -webkit-background-clip: text;
-    }
-
-    .lead {
-      max-width: 900px;
-      margin-bottom: 32px;
-      color: var(--muted);
-      font-size: clamp(1.05rem, 1.65vw, 1.38rem);
-      line-height: 1.7;
-    }
-
-    .lead strong,
-    p strong,
-    li strong,
-    td strong {
-      color: var(--text);
-    }
-
-    .hero {
-      align-items: flex-end;
-      background:
-        linear-gradient(180deg, transparent 20%, rgba(11, 14, 25, 0.92)),
-        radial-gradient(circle at 85% 10%, rgba(138, 168, 255, 0.18), transparent 33rem);
-    }
-
-    .hero .slide-inner {
-      padding-bottom: clamp(15px, 5vh, 70px);
-    }
-
-    .eyebrow-row,
-    .metadata,
-    .tag-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .eyebrow-row {
-      margin-bottom: 24px;
-    }
-
-    .pill,
-    .tag,
-    .timestamp {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      border-radius: 999px;
-      white-space: nowrap;
-    }
-
-    .pill {
-      padding: 8px 12px;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.055);
-      color: var(--muted);
-      font-size: 0.76rem;
-      font-weight: 700;
-    }
-
-    .pill.accent {
-      border-color: rgba(114, 225, 193, 0.34);
-      background: rgba(114, 225, 193, 0.1);
-      color: var(--accent);
-    }
-
-    .hero-subtitle {
-      max-width: 770px;
-      margin-bottom: 32px;
-      color: var(--muted);
-      font-size: clamp(1.1rem, 2vw, 1.55rem);
-    }
-
-    .metadata {
-      color: var(--soft);
-      font-size: 0.79rem;
-    }
-
-    .metadata span:not(:last-child)::after {
-      content: "·";
-      margin-left: 8px;
-      color: #505a76;
-    }
-
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 32px;
-    }
-
-    .primary-link,
-    .secondary-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 44px;
-      padding: 10px 17px;
-      border-radius: 999px;
-      font-size: 0.82rem;
-      font-weight: 760;
-      text-decoration: none;
-    }
-
-    .primary-link {
-      background: var(--accent);
-      color: #071711;
-    }
-
-    .primary-link:hover {
-      background: #a1efd8;
-      color: #071711;
-    }
-
-    .secondary-link {
-      border: 1px solid var(--line);
-      color: var(--text);
-      background: rgba(255, 255, 255, 0.045);
-    }
-
-    .grid-2,
-    .grid-3,
-    .grid-4 {
-      display: grid;
-      gap: clamp(16px, 2.5vw, 28px);
-    }
-
-    .grid-2 {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .grid-3 {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .grid-4 {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-
-    .card {
-      min-width: 0;
-      padding: clamp(20px, 2.7vw, 32px);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018)),
-        var(--surface);
-      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.15);
-    }
-
-    .card p:last-child,
-    .card ul:last-child {
-      margin-bottom: 0;
-    }
-
-    .card-label {
-      margin-bottom: 10px;
-      color: var(--accent);
-      font-size: 0.69rem;
-      font-weight: 820;
-      letter-spacing: 0.11em;
-      text-transform: uppercase;
-    }
-
-    .card-number {
-      display: block;
-      margin-bottom: 18px;
-      color: var(--accent-2);
-      font-size: 2.6rem;
-      font-weight: 860;
-      line-height: 1;
-      letter-spacing: -0.06em;
-    }
-
-    .muted {
-      color: var(--muted);
-    }
-
-    .soft {
-      color: var(--soft);
-    }
-
-    .small {
-      font-size: 0.82rem;
-    }
-
-    .compact {
+    .toc ol {
       margin: 0;
-      padding-left: 1.2em;
+      padding-left: 1.3rem;
     }
 
-    .compact li + li {
+    .toc li + li {
       margin-top: 8px;
     }
 
-    .feature-card {
-      position: relative;
-      overflow: hidden;
+    .toc a {
+      color: #4c5753;
+      text-decoration: none;
     }
 
-    .feature-card::after {
-      content: "";
-      position: absolute;
-      inset: auto -60px -80px auto;
-      width: 170px;
-      height: 170px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(114, 225, 193, 0.12), transparent 68%);
-      pointer-events: none;
+    article {
+      min-width: 0;
     }
 
-    .callout {
-      padding: clamp(22px, 3vw, 36px);
-      border: 1px solid rgba(114, 225, 193, 0.25);
-      border-left: 4px solid var(--accent);
-      border-radius: 8px var(--radius) var(--radius) 8px;
-      background: linear-gradient(120deg, rgba(114, 225, 193, 0.09), rgba(138, 168, 255, 0.05));
+    section {
+      margin: 0 0 88px;
     }
 
-    .callout strong:first-child {
-      display: block;
-      margin-bottom: 8px;
-      color: var(--accent);
-      font-size: 0.75rem;
-      letter-spacing: 0.11em;
+    .section-kicker {
+      margin: 0 0 9px;
+      color: var(--amber);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
     }
 
-    .callout p:last-child {
+    h2 {
+      margin: 0 0 25px;
+      font-size: clamp(1.75rem, 4.2vw, 2.75rem);
+      line-height: 1.22;
+      letter-spacing: -0.045em;
+    }
+
+    h3 {
+      margin: 48px 0 15px;
+      font-size: clamp(1.2rem, 2.5vw, 1.55rem);
+      line-height: 1.35;
+      letter-spacing: -0.025em;
+    }
+
+    h4 {
+      margin: 28px 0 8px;
+      font-size: 1rem;
+    }
+
+    p {
+      margin: 0 0 1.3em;
+    }
+
+    .lead {
+      color: #34413d;
+      font-size: 1.1rem;
+      line-height: 1.86;
+    }
+
+    .dropcap::first-letter {
+      float: left;
+      margin: 0.1em 0.12em 0 0;
+      color: var(--green);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 4.4rem;
+      font-weight: 700;
+      line-height: 0.8;
+    }
+
+    .abstract {
+      padding: clamp(26px, 5vw, 42px);
+      border-left: 5px solid var(--green);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      background: var(--surface);
+      box-shadow: 0 12px 38px rgba(29, 55, 46, 0.07);
+    }
+
+    .abstract-label {
+      margin: 0 0 10px;
+      color: var(--green);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .abstract p:last-child {
       margin-bottom: 0;
     }
 
-    .big-quote {
-      max-width: 1000px;
-      margin: 0;
-      font-size: clamp(1.55rem, 3.6vw, 3.35rem);
-      font-weight: 760;
-      line-height: 1.38;
-      letter-spacing: -0.035em;
+    .key-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
     }
 
-    .big-quote em {
-      color: var(--accent);
+    .key-card {
+      min-height: 180px;
+      padding: 24px;
+      border: 1px solid var(--soft-line);
+      border-radius: 19px;
+      background: var(--surface);
+    }
+
+    .key-no {
+      display: inline-grid;
+      width: 32px;
+      height: 32px;
+      margin-bottom: 16px;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--green-soft);
+      color: var(--green);
+      font-size: 0.76rem;
+      font-weight: 900;
+    }
+
+    .key-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1.04rem;
+      line-height: 1.45;
+    }
+
+    .key-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.65;
+    }
+
+    .pullquote {
+      margin: 52px -48px;
+      padding: 34px 46px;
+      border-top: 1px solid var(--green);
+      border-bottom: 1px solid var(--green);
+      color: var(--green-dark);
+      font-family: Georgia, "Noto Serif KR", serif;
+      font-size: clamp(1.35rem, 3.6vw, 2.15rem);
+      font-weight: 700;
+      line-height: 1.55;
+      letter-spacing: -0.03em;
+      text-align: center;
+    }
+
+    .pullquote cite {
+      display: block;
+      margin-top: 14px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.7rem;
       font-style: normal;
+      font-weight: 600;
+      letter-spacing: 0.05em;
     }
 
-    .visual {
-      position: relative;
-      margin: 0;
+    .media-card {
+      margin: 34px 0;
       overflow: hidden;
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      background: #080a12;
-      box-shadow: var(--shadow);
+      background: var(--surface);
+      box-shadow: 0 12px 35px rgba(30, 49, 43, 0.07);
     }
 
-    .visual img {
+    .media-card img {
       width: 100%;
       aspect-ratio: 16 / 9;
       object-fit: cover;
+      background: #dfe5e1;
     }
 
-    .visual figcaption {
-      position: absolute;
-      inset: auto 0 0 0;
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 38px 17px 14px;
-      background: linear-gradient(transparent, rgba(3, 5, 12, 0.94));
-      color: #dfe4f4;
-      font-size: 0.72rem;
+    figcaption {
+      padding: 16px 20px 18px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.58;
     }
 
-    .timestamp {
-      padding: 4px 8px;
-      background: rgba(114, 225, 193, 0.16);
-      color: var(--accent);
-      font-size: 0.67rem;
-      font-weight: 800;
-      font-variant-numeric: tabular-nums;
+    figcaption strong {
+      color: var(--ink);
     }
 
-    .visual-grid {
+    .figure-grid {
+      margin: 34px 0;
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 16px;
     }
 
-    .visual-grid.three {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+    .figure-grid .media-card {
+      margin: 0;
     }
 
-    .visual-grid .visual {
-      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.24);
+    .evidence {
+      margin: 26px 0;
+      padding: 24px 26px;
+      border: 1px solid #c9dcd3;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #edf6f1, #fbfdfb);
     }
 
-    .visual-grid .visual figcaption {
-      padding: 32px 13px 11px;
+    .evidence-title {
+      margin: 0 0 10px;
+      color: var(--green);
+      font-size: 0.75rem;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
     }
 
-    .split-visual {
-      display: grid;
-      grid-template-columns: minmax(0, 0.92fr) minmax(420px, 1.25fr);
-      gap: clamp(26px, 5vw, 66px);
-      align-items: center;
+    .evidence ul,
+    .implication-list,
+    .source-list {
+      margin: 0;
+      padding-left: 1.25rem;
     }
 
-    .split-visual.reverse {
-      grid-template-columns: minmax(420px, 1.25fr) minmax(0, 0.92fr);
-    }
-
-    .split-visual.reverse .copy {
-      order: 2;
+    .evidence li + li,
+    .implication-list li + li,
+    .source-list li + li {
+      margin-top: 8px;
     }
 
     .metric-row {
+      margin: 32px 0;
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-      margin-top: 24px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
     }
 
     .metric {
-      padding: 20px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.035);
+      padding: 22px 14px;
+      border-radius: 16px;
+      background: var(--green-dark);
+      color: white;
+      text-align: center;
     }
 
     .metric-value {
       display: block;
-      margin-bottom: 7px;
-      color: var(--accent);
-      font-size: clamp(1.7rem, 3vw, 2.8rem);
-      font-weight: 860;
-      line-height: 1;
-      letter-spacing: -0.055em;
+      font-family: Georgia, serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      line-height: 1.1;
     }
 
     .metric-label {
-      color: var(--muted);
-      font-size: 0.78rem;
+      display: block;
+      margin-top: 9px;
+      color: #d8e9e2;
+      font-size: 0.7rem;
       line-height: 1.45;
     }
 
-    .comparison {
+    .table-wrap {
+      margin: 28px 0;
       overflow-x: auto;
       border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: rgba(255, 255, 255, 0.025);
+      border-radius: 16px;
+      background: var(--surface);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 620px;
-      font-size: 0.86rem;
+      font-size: 0.84rem;
+      line-height: 1.55;
     }
 
     th,
     td {
-      padding: 15px 18px;
-      border-bottom: 1px solid var(--line);
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--soft-line);
       text-align: left;
       vertical-align: top;
     }
 
     th {
-      color: var(--accent);
-      background: rgba(114, 225, 193, 0.06);
-      font-size: 0.72rem;
-      font-weight: 820;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      background: #edf3ef;
+      color: var(--green-dark);
+      font-size: 0.75rem;
+      font-weight: 850;
     }
 
     tr:last-child td {
       border-bottom: 0;
     }
 
-    .bad {
-      color: var(--danger);
+    .loop-diagram {
+      margin: 34px 0;
+      padding: clamp(22px, 5vw, 40px);
+      border-radius: 24px;
+      background: #132f27;
+      color: white;
     }
 
-    .good {
-      color: var(--good);
+    .loop-title {
+      margin: 0 0 24px;
+      color: #bfe2d3;
+      font-size: 0.75rem;
+      font-weight: 850;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
     }
 
-    .cycle {
+    .loop-track {
       display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: stretch;
-      gap: 18px;
-      margin-top: 34px;
+      grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+      gap: 10px;
+      align-items: center;
     }
 
-    .cycle-node {
-      position: relative;
+    .loop-node {
+      min-height: 132px;
+      padding: 18px;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      min-height: 230px;
-      padding: 30px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.17);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.07);
     }
 
-    .cycle-node.generalist {
-      background:
-        radial-gradient(circle at 90% 5%, rgba(138, 168, 255, 0.2), transparent 15rem),
-        var(--surface);
-    }
-
-    .cycle-node.specialist {
-      background:
-        radial-gradient(circle at 90% 5%, rgba(114, 225, 193, 0.19), transparent 15rem),
-        var(--surface);
-    }
-
-    .cycle-arrow {
-      display: grid;
-      place-items: center;
-      min-width: 125px;
-      color: var(--muted);
-      text-align: center;
-      font-size: 0.68rem;
-      font-weight: 780;
-      line-height: 1.45;
-    }
-
-    .cycle-arrow::before,
-    .cycle-arrow::after {
+    .loop-node strong {
       display: block;
-      color: var(--accent);
-      font-size: 2.1rem;
-      line-height: 1;
+      margin-bottom: 7px;
+      color: #fff;
+      font-size: 0.9rem;
     }
 
-    .cycle-arrow::before {
-      content: "→";
-      margin-bottom: 20px;
+    .loop-node span {
+      color: #c4d4ce;
+      font-size: 0.7rem;
+      line-height: 1.55;
     }
 
-    .cycle-arrow::after {
-      content: "←";
-      margin-top: 20px;
-      color: var(--accent-2);
+    .arrow {
+      color: #69c39c;
+      font-size: 1.5rem;
+      font-weight: 900;
+    }
+
+    .loop-return {
+      margin: 18px 0 0;
+      padding-top: 16px;
+      border-top: 1px dashed rgba(255,255,255,0.2);
+      color: #bfe2d3;
+      font-size: 0.76rem;
+      text-align: center;
     }
 
     .formula {
-      margin: 18px 0;
-      padding: 20px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: #090c16;
-      color: #e7ecff;
-      font-family: "Cambria Math", "STIX Two Math", Georgia, serif;
-      font-size: clamp(0.88rem, 1.3vw, 1.07rem);
-      line-height: 1.65;
+      margin: 24px 0;
+      padding: 20px 22px;
       overflow-x: auto;
-      white-space: nowrap;
+      border: 1px solid #d5dcd8;
+      border-radius: 14px;
+      background: #f8faf8;
+      color: #21332d;
+      font-family: "Cambria Math", Cambria, Georgia, serif;
+      font-size: 0.92rem;
+      line-height: 1.72;
+      white-space: pre-wrap;
+      word-break: normal;
     }
 
-    .formula.highlight {
-      border-color: rgba(114, 225, 193, 0.3);
-      color: var(--accent);
-      text-align: center;
-      font-size: clamp(1rem, 1.9vw, 1.4rem);
+    .analogy {
+      margin: 30px 0;
+      padding: 25px;
+      border-radius: 18px;
+      background: var(--amber-soft);
     }
 
-    .sequence {
-      display: grid;
-      gap: 12px;
-      counter-reset: sequence;
+    .analogy strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #7e471b;
     }
 
-    .sequence-item {
-      counter-increment: sequence;
-      display: grid;
-      grid-template-columns: 48px minmax(0, 1fr);
-      gap: 16px;
-      align-items: start;
-      padding: 18px 20px;
-      border: 1px solid var(--line);
-      border-radius: 17px;
-      background: rgba(255, 255, 255, 0.035);
-    }
-
-    .sequence-item::before {
-      content: counter(sequence, decimal-leading-zero);
-      display: grid;
-      place-items: center;
-      width: 42px;
-      height: 42px;
-      border-radius: 13px;
-      background: rgba(114, 225, 193, 0.11);
-      color: var(--accent);
-      font-size: 0.75rem;
-      font-weight: 850;
-    }
-
-    .sequence-item h3 {
-      margin: 1px 0 4px;
-      font-size: 1rem;
-      letter-spacing: -0.02em;
-    }
-
-    .sequence-item p {
+    .analogy p {
       margin: 0;
-      color: var(--muted);
-      font-size: 0.83rem;
+      color: #684728;
+      font-size: 0.91rem;
+    }
+
+    .note {
+      margin: 24px 0;
+      padding: 18px 20px;
+      border-left: 4px solid var(--amber);
+      background: #fff8ef;
+      color: #654629;
+      font-size: 0.87rem;
+    }
+
+    .note strong {
+      color: #743f12;
     }
 
     .timeline {
       position: relative;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px 28px;
+      margin: 32px 0 0;
+      padding-left: 30px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      top: 7px;
+      bottom: 7px;
+      left: 8px;
+      width: 2px;
+      background: var(--mint);
     }
 
     .timeline-item {
-      display: grid;
-      grid-template-columns: 54px minmax(0, 1fr);
-      gap: 13px;
-      padding: 11px 0;
-      border-bottom: 1px solid var(--line);
+      position: relative;
+      margin-bottom: 22px;
     }
 
-    .timeline-time {
-      color: var(--accent);
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      top: 0.55em;
+      left: -27px;
+      width: 10px;
+      height: 10px;
+      border: 3px solid var(--surface);
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 1px var(--green);
+    }
+
+    .time {
+      display: inline-block;
+      min-width: 56px;
+      color: var(--green);
       font-size: 0.75rem;
-      font-weight: 820;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .timeline-title {
-      color: var(--muted);
-      font-size: 0.8rem;
-    }
-
-    .takeaway-list {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .takeaway {
-      display: grid;
-      grid-template-columns: 32px minmax(0, 1fr);
-      gap: 13px;
-      padding: 20px;
-      border: 1px solid var(--line);
-      border-radius: 17px;
-      background: rgba(255, 255, 255, 0.032);
-    }
-
-    .takeaway-icon {
-      color: var(--accent);
       font-weight: 900;
     }
 
-    .takeaway p {
+    .timeline-item p {
+      display: inline;
       margin: 0;
-      color: var(--muted);
       font-size: 0.86rem;
     }
 
-    .feynman {
-      display: grid;
-      gap: 13px;
+    .takeaway-box {
+      padding: clamp(28px, 6vw, 50px);
+      border-radius: 26px;
+      background: linear-gradient(145deg, var(--green-dark), #1d7057);
+      color: white;
     }
 
-    details {
-      border: 1px solid var(--line);
-      border-radius: 17px;
-      background: rgba(255, 255, 255, 0.035);
-      overflow: hidden;
+    .takeaway-box h2 {
+      color: white;
     }
 
-    details[open] {
-      border-color: rgba(114, 225, 193, 0.24);
-      background: rgba(114, 225, 193, 0.045);
+    .takeaway-box p,
+    .takeaway-box li {
+      color: #e1eee9;
     }
 
-    summary {
-      position: relative;
-      padding: 18px 50px 18px 20px;
-      color: var(--text);
-      font-size: 0.92rem;
-      font-weight: 760;
-      cursor: pointer;
-      list-style: none;
+    .takeaway-box strong {
+      color: white;
     }
 
-    summary::-webkit-details-marker {
-      display: none;
+    .share-copy {
+      margin-top: 28px;
+      padding: 20px;
+      border: 1px solid rgba(255,255,255,0.23);
+      border-radius: 15px;
+      background: rgba(255,255,255,0.08);
+      color: #f5fffb;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      white-space: pre-wrap;
     }
 
-    summary::after {
-      content: "+";
-      position: absolute;
-      top: 50%;
-      right: 20px;
-      color: var(--accent);
-      font-size: 1.25rem;
-      transform: translateY(-50%);
-    }
-
-    details[open] summary::after {
-      content: "−";
-    }
-
-    .details-body {
-      padding: 0 20px 20px;
+    .source-note {
       color: var(--muted);
-      font-size: 0.86rem;
+      font-size: 0.84rem;
     }
 
-    .details-body p:last-child {
-      margin-bottom: 0;
+    .source-list a {
+      overflow-wrap: anywhere;
     }
 
-    .reference-list {
-      display: grid;
-      gap: 10px;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .reference-list li {
-      padding: 14px 16px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.025);
-      color: var(--muted);
-      font-size: 0.8rem;
-    }
-
-    .footer-slide {
-      min-height: 72svh;
-      background:
-        radial-gradient(circle at 50% 45%, rgba(114, 225, 193, 0.11), transparent 32rem),
-        var(--bg);
-      text-align: center;
-    }
-
-    .footer-slide .slide-inner {
-      display: grid;
-      justify-items: center;
-    }
-
-    .footer-slide .lead {
-      max-width: 720px;
-    }
-
-    .footer-note {
-      margin-top: 40px;
-      color: var(--soft);
-      font-size: 0.72rem;
-    }
-
-    .slide-controls {
-      position: fixed;
-      right: 22px;
-      bottom: 20px;
-      z-index: 80;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding: 6px;
-      border: 1px solid var(--line);
+    .watch-link {
+      display: inline-flex;
+      margin-top: 10px;
+      padding: 10px 15px;
       border-radius: 999px;
-      background: rgba(11, 14, 25, 0.84);
-      backdrop-filter: blur(14px);
-      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+      background: var(--green);
+      color: white;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-decoration: none;
     }
 
-    .slide-button {
-      width: 36px;
-      height: 36px;
-      padding: 0;
+    .watch-link:hover,
+    .watch-link:focus {
+      background: var(--amber);
+      color: white;
     }
 
-    .slide-count {
-      min-width: 48px;
+    footer {
+      width: min(calc(100% - 32px), var(--wide));
+      margin: 40px auto 0;
+      padding: 34px 0 48px;
+      border-top: 1px solid var(--line);
       color: var(--muted);
-      font-size: 0.72rem;
-      font-weight: 760;
+      font-size: 0.74rem;
       text-align: center;
-      font-variant-numeric: tabular-nums;
     }
 
-    .toast {
-      position: fixed;
-      top: calc(var(--topbar) + 14px);
-      right: 18px;
-      z-index: 150;
-      padding: 11px 15px;
-      border: 1px solid rgba(114, 225, 193, 0.35);
-      border-radius: 12px;
-      background: #14251f;
-      color: #c9f8ea;
-      font-size: 0.77rem;
-      font-weight: 720;
-      box-shadow: var(--shadow);
-      opacity: 0;
-      transform: translateY(-10px);
-      pointer-events: none;
-      transition: opacity 180ms ease, transform 180ms ease;
-    }
-
-    .toast.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .reveal {
-      opacity: 0;
-      transform: translateY(22px);
-      transition:
-        opacity 650ms ease,
-        transform 650ms cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    .reveal.visible {
-      opacity: 1;
-      transform: none;
-    }
-
-    @media (max-width: 1060px) {
-      :root {
-        --sidebar: 0px;
+    @media (max-width: 960px) {
+      .layout {
+        grid-template-columns: minmax(0, var(--content));
+        justify-content: center;
       }
 
-      .topbar {
-        grid-template-columns: minmax(150px, 1fr) minmax(90px, 0.8fr) auto;
-        padding-inline: 16px;
-      }
-
-      .sidebar {
+      .toc {
+        position: static;
         display: none;
       }
 
-      main {
-        grid-column: 1 / -1;
+      .pullquote {
+        margin-left: 0;
+        margin-right: 0;
       }
 
-      .split-visual,
-      .split-visual.reverse {
+      .loop-track {
         grid-template-columns: 1fr;
       }
 
-      .split-visual.reverse .copy {
-        order: initial;
-      }
-
-      .grid-4 {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .visual-grid.three {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+      .arrow {
+        transform: rotate(90deg);
+        text-align: center;
       }
     }
 
-    @media (max-width: 760px) {
-      :root {
-        --topbar: 58px;
-        --radius: 19px;
+    @media (max-width: 640px) {
+      body {
+        font-size: 16px;
+        line-height: 1.76;
       }
 
-      .topbar {
-        grid-template-columns: minmax(0, 1fr) 86px auto;
-        gap: 10px;
-      }
-
-      .brand-mark {
-        width: 28px;
-        height: 28px;
-      }
-
-      .brand-text {
-        max-width: 150px;
-      }
-
-      .action-button {
-        padding: 8px 10px;
-        font-size: 0.7rem;
-      }
-
-      .slide {
-        min-height: auto;
-        padding: 62px 19px 74px;
+      .site-bar {
+        padding-top: 15px;
       }
 
       .hero {
-        min-height: calc(100svh - var(--topbar));
+        margin-top: 4px;
+        margin-bottom: 42px;
+        padding: 30px 23px;
+        border-radius: 24px;
       }
 
-      h1 {
-        font-size: clamp(2.75rem, 14vw, 4.6rem);
+      .byline {
+        display: block;
       }
 
-      h2 {
-        font-size: clamp(2rem, 10vw, 3rem);
+      .byline span {
+        display: block;
+        margin-top: 6px;
       }
 
-      .grid-2,
-      .grid-3,
-      .grid-4,
-      .visual-grid,
-      .visual-grid.three,
-      .metric-row,
-      .takeaway-list,
-      .timeline {
+      .key-grid,
+      .figure-grid,
+      .metric-row {
         grid-template-columns: 1fr;
       }
 
-      .visual-grid .visual figcaption {
-        font-size: 0.66rem;
+      section {
+        margin-bottom: 68px;
       }
 
-      .cycle {
-        grid-template-columns: 1fr;
+      .pullquote {
+        padding: 28px 16px;
       }
 
-      .cycle-arrow {
-        min-height: 100px;
-      }
-
-      .cycle-arrow::before {
-        content: "↓";
-        margin: 0 0 5px;
-      }
-
-      .cycle-arrow::after {
-        content: "↑";
-        margin: 5px 0 0;
-      }
-
-      .formula {
-        font-size: 0.78rem;
-      }
-
-      .slide-controls {
-        right: 12px;
-        bottom: 12px;
-      }
-    }
-
-    @media (max-width: 470px) {
-      .topbar {
-        grid-template-columns: minmax(0, 1fr) auto;
-      }
-
-      .progress-shell {
-        position: absolute;
-        inset: auto 0 -1px;
-        max-width: none;
-      }
-
-      .brand-text {
-        max-width: 170px;
-      }
-
-      .action-button {
-        font-size: 0;
-        width: 38px;
-        height: 38px;
-        padding: 0;
-      }
-
-      .action-button::after {
-        content: "복사";
-        font-size: 0.66rem;
-      }
-
-      .metadata {
-        display: grid;
-      }
-
-      .metadata span::after {
-        display: none;
-      }
-
-      .sequence-item {
-        grid-template-columns: 40px minmax(0, 1fr);
-        padding: 16px;
-      }
-
-      .sequence-item::before {
-        width: 36px;
-        height: 36px;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      html {
-        scroll-behavior: auto;
-      }
-
-      *,
-      *::before,
-      *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
-
-      .reveal {
-        opacity: 1;
-        transform: none;
+      th,
+      td {
+        min-width: 130px;
+        padding: 12px;
       }
     }
 
     @media print {
-      :root {
-        color-scheme: light;
-        --bg: #fff;
-        --surface: #fff;
-        --surface-2: #f4f6fa;
-        --text: #10131d;
-        --muted: #3f485d;
-        --soft: #606a80;
-        --line: rgba(16, 19, 29, 0.16);
-      }
-
       body {
         background: white;
+        color: black;
       }
 
-      .topbar,
-      .sidebar,
-      .slide-controls,
-      .toast,
-      .skip-link {
-        display: none !important;
+      .site-bar,
+      .toc {
+        display: none;
       }
 
-      .layout,
-      main {
-        display: block;
-      }
-
-      .slide {
-        min-height: 100vh;
-        break-after: page;
-        padding: 44px;
-      }
-
-      .reveal {
-        opacity: 1;
-        transform: none;
-      }
-
-      .card,
-      .visual,
-      .cycle-node {
+      .hero,
+      .media-card,
+      .abstract,
+      .key-card {
         box-shadow: none;
+      }
+
+      .layout {
+        display: block;
+        width: 100%;
+      }
+
+      article,
+      .hero {
+        width: 100%;
+        max-width: none;
       }
 
       a {
         color: inherit;
+      }
+
+      figure,
+      table,
+      .key-card {
+        break-inside: avoid;
       }
     }
   </style>
@@ -1351,1388 +873,796 @@
 <link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/s/5iazpp/">
 </head>
 <body>
-  <a class="skip-link" href="#deck">본문으로 이동</a>
-
-  <header class="topbar">
-    <a class="brand" href="#cover" aria-label="첫 슬라이드로 이동">
-      <span class="brand-mark">RL</span>
-      <span class="brand-text">Robot Foundation Models</span>
-    </a>
-    <div class="progress-shell" aria-label="문서 읽기 진행도">
-      <div class="progress-bar" id="progressBar"></div>
+  <header>
+    <div class="site-bar">
+      <span class="site-mark">Robotics Research Brief</span>
+      <span>2026.08.06 · 약 18분 읽기</span>
     </div>
-    <div class="top-actions">
-      <button class="action-button" id="copySummary" type="button">핵심 요약 복사</button>
+
+    <div class="hero">
+      <p class="eyebrow">Research Report · Robot Learning</p>
+      <h1>로봇 파운데이션 모델의 다음 루프</h1>
+      <p class="hero-deck">
+        엔드투엔드 강화학습을 기다리는 대신, <strong>제너럴리스트는 탐색을 돕고
+        스페셜리스트는 경험을 돌려주는 순환 구조</strong>를 만들라. Sergey Levine의
+        ICRA 2026 발표가 제시한 로봇 RL의 현실적인 진화 경로를 해설한다.
+      </p>
+      <div class="byline">
+        <span><strong>발표</strong> Sergey Levine · UC Berkeley / Physical Intelligence</span>
+        <span><strong>행사</strong> ICRA 2026 Workshop on RL in the Era of IL</span>
+        <span><strong>영상</strong> 32분 14초</span>
+      </div>
+      <div class="tag-row" aria-label="주제 태그">
+        <span class="tag">로봇 강화학습</span>
+        <span class="tag">VLA</span>
+        <span class="tag">파운데이션 모델</span>
+        <span class="tag">실세계 RL</span>
+        <span class="tag">정책 증류</span>
+      </div>
     </div>
   </header>
 
-  <div class="layout">
-    <aside class="sidebar" aria-label="슬라이드 목차">
-      <p class="nav-label">Contents</p>
-      <nav class="deck-nav" id="deckNav"></nav>
-      <p class="sidebar-tip">
-        키보드의 ← → 또는 Page Up / Page Down으로 슬라이드를 이동할 수 있습니다.
-      </p>
-    </aside>
+  <main class="layout">
+    <nav class="toc" aria-label="문서 목차">
+      <p class="toc-title">Contents</p>
+      <ol>
+        <li><a href="#abstract">초록</a></li>
+        <li><a href="#findings">핵심 발견</a></li>
+        <li><a href="#problem">왜 RL이 필요한가</a></li>
+        <li><a href="#specialist">스페셜리스트 RL</a></li>
+        <li><a href="#rlt">제너럴리스트의 역지원</a></li>
+        <li><a href="#cfgrl">실패까지 쓰는 RL</a></li>
+        <li><a href="#loop">순환 구조</a></li>
+        <li><a href="#implications">실무적 함의</a></li>
+        <li><a href="#timeline">영상 타임라인</a></li>
+        <li><a href="#sources">출처와 방법</a></li>
+      </ol>
+    </nav>
 
-    <main id="deck">
-      <section class="slide hero" id="cover" data-title="표지">
-        <div class="slide-inner reveal">
-          <div class="eyebrow-row">
-            <span class="pill accent">ICRA 2026</span>
-            <span class="pill">32분 핵심 해설</span>
-            <span class="pill">Robot Learning</span>
-          </div>
-
-          <h1>
-            RL for Robot<br>
-            <span class="gradient-text">Foundation Models</span>
-          </h1>
-
-          <p class="hero-subtitle">
-            엔드투엔드 RL의 한계를 넘어, 제너럴리스트와 스페셜리스트를
-            양방향으로 순환시키는 로봇 학습 레시피.
+    <article>
+      <section id="abstract">
+        <div class="abstract">
+          <p class="abstract-label">Abstract</p>
+          <p>
+            로봇 파운데이션 모델을 대규모 강화학습으로 처음부터 끝까지 개선하는 일은
+            아직 계산량·샘플 효율·실세계 안전성의 벽에 부딪힌다. Levine이 제안하는
+            현실적 대안은 역할 분담이다. 작은 스페셜리스트 정책은 특정 병목 과제를
+            실세계 RL로 빠르게 숙달하고, 거대한 제너럴리스트 VLA는 사전학습된 표현과
+            행동 사전확률로 그 탐색을 돕는다. 이후 스페셜리스트가 수집한 성공·실패·복구
+            경험을 다시 제너럴리스트에 증류한다. 핵심은 어느 한 모델의 승리가 아니라
+            <strong>제너럴리스트와 스페셜리스트 사이에 데이터가 계속 순환하는 학습 시스템</strong>이다.
           </p>
+        </div>
 
-          <div class="metadata">
-            <span>Sergey Levine · UC Berkeley &amp; Physical Intelligence</span>
-            <span>ICRA 2026 Workshop on RL in the Era of IL</span>
-            <span>2026-06-08</span>
-          </div>
+        <figure class="media-card">
+          <img src="assets/u0wjxi8pc6y-ts-00-29-32.jpg" alt="제너럴리스트와 스페셜리스트 사이의 순환 학습 구조를 보여주는 결론 슬라이드" loading="eager">
+          <figcaption><strong>결론 슬라이드.</strong> 제너럴리스트의 지식이 스페셜리스트를 부트스트랩하고, 스페셜리스트의 자율 경험이 다시 제너럴리스트를 개선한다.</figcaption>
+        </figure>
 
-          <div class="hero-actions">
-            <a class="primary-link" href="#thesis">핵심 논지부터 읽기 ↓</a>
-            <a class="secondary-link" href="https://www.youtube.com/watch?v=u0WJXi8PC6Y" target="_blank" rel="noreferrer">원본 영상 ↗</a>
-          </div>
+        <a class="watch-link">원본 발표 영상 보기 →</a>
+      </section>
+
+      <section id="findings">
+        <p class="section-kicker">Executive Summary</p>
+        <h2>먼저 읽어야 할 다섯 가지 발견</h2>
+
+        <div class="key-grid">
+          <article class="key-card">
+            <span class="key-no">01</span>
+            <strong>사전학습은 지식을, RL은 숙달을 만든다.</strong>
+            <p>지도학습과 RL은 대체재가 아니다. 전자는 일반화와 언어 이해를, 후자는 성공률·속도·복구 능력을 담당한다.</p>
+          </article>
+          <article class="key-card">
+            <span class="key-no">02</span>
+            <strong>난점은 세 조건의 동시 충족이다.</strong>
+            <p>큰 모델, 샘플 효율적 RL, 근본적으로 새로운 전략이 필요한 어려운 과제. 셋 중 둘은 가능하지만 셋의 결합은 여전히 어렵다.</p>
+          </article>
+          <article class="key-card">
+            <span class="key-no">03</span>
+            <strong>작은 스페셜리스트는 이미 강력하다.</strong>
+            <p>RLPD·SERL 계열은 특정 환경에서 과제당 1~2시간의 실세계 데이터로 100% 성공률과 절반 이하의 사이클 타임을 보였다.</p>
+          </article>
+          <article class="key-card">
+            <span class="key-no">04</span>
+            <strong>파운데이션 모델은 더 좋은 탐색 공간이다.</strong>
+            <p>RL 토큰과 기본 정책의 액션 청크를 작은 actor·critic에 전달하면 무작위 흔들기보다 훨씬 의미 있는 탐색이 가능하다.</p>
+          </article>
+          <article class="key-card">
+            <span class="key-no">05</span>
+            <strong>실패 데이터도 버리지 않는다.</strong>
+            <p>CFGRL은 좋은 데이터와 나쁜 데이터를 모두 학습한 뒤, 추론 시 guidance로 좋은 행동의 모드를 증폭한다.</p>
+          </article>
+          <article class="key-card">
+            <span class="key-no">→</span>
+            <strong>최종 제품은 모델이 아니라 순환 시스템이다.</strong>
+            <p>제너럴리스트 → 스페셜리스트 RL → 자율 데이터 → 증류 → 더 나은 제너럴리스트라는 플라이휠이 핵심 자산이 된다.</p>
+          </article>
         </div>
       </section>
 
-      <section class="slide" id="thesis" data-title="한 장 요약">
-        <div class="slide-inner">
-          <div class="slide-kicker reveal">Executive summary</div>
-          <h2 class="reveal">핵심은 모델 하나가 아니라<br><span class="gradient-text">학습의 순환</span>이다.</h2>
+      <section id="problem">
+        <p class="section-kicker">Part I · The Gap</p>
+        <h2>“알고 있다”와 “해낼 수 있다” 사이</h2>
 
-          <blockquote class="big-quote reveal">
-            로봇 파운데이션 모델을 RL로 <em>엔드투엔드</em> 학습하기는 아직 어렵다.
-            대신 제너럴리스트는 탐색을 돕고, 스페셜리스트는 숙련 데이터를 돌려준다.
-          </blockquote>
+        <p class="lead dropcap">
+          대규모 언어 모델에게 “집을 청소하고, 빨래를 개고, 저녁을 차려 달라”고
+          부탁하면 훌륭한 실행 계획을 받을 수 있다. 그러나 계획이 물리 세계에서
+          행동으로 이어지지는 않는다. 로봇 파운데이션 모델이 해결해야 하는 문제는
+          단순한 pick-and-place가 아니다. 처음 보는 물체와 환경에서도 긴 지시를
+          단계적으로 해석하고, 실수에서 복구하며, 인간이 납득할 속도로 끝내야 한다.
+        </p>
 
-          <div class="cycle reveal" aria-label="제너럴리스트와 스페셜리스트의 순환 구조">
-            <article class="cycle-node generalist">
-              <p class="card-label">Generalist · VLA</p>
-              <h3>넓게 알고, 일반화한다</h3>
-              <p class="muted">
-                대규모 데이터에서 지식·언어 이해·행동 사전확률을 습득한다.
-                RL 토큰과 기본 액션을 통해 스페셜리스트의 탐색을 부트스트랩한다.
-              </p>
-            </article>
+        <figure class="media-card">
+          <img src="assets/u0wjxi8pc6y-ts-00-02-25.jpg" alt="집안일을 실제로 수행하는 물리 세계 파운데이션 모델의 필요성을 설명하는 슬라이드" loading="lazy">
+          <figcaption><strong>02:25.</strong> 텍스트 계획만 반환하는 LLM과 실제 작업을 수행해야 하는 로봇 사이의 간극.</figcaption>
+        </figure>
 
-            <div class="cycle-arrow">
-              RL 토큰 · 행동 prior<br>
-              숙련 롤아웃 · 증류
-            </div>
+        <h3>LLM의 학습 레시피를 로봇으로 옮기기</h3>
+        <p>
+          일반 파운데이션 모델의 학습은 크게 두 단계다. 대규모 데이터로 사실과 패턴을
+          흡수하는 <strong>pre-training</strong>, 그리고 그 지식을 실제 과제 해결에 배치하는
+          <strong>post-training</strong>이다. 로봇에서도 구조는 비슷하다. 다양한 로봇 데모로
+          VLA를 사전학습한 뒤, SFT와 자동화된 RL로 특정 과제의 성공률과 속도를 끌어올린다.
+          다만 구현 조건은 LLM과 현저히 다르다. 로봇의 한 번의 토큰 생성은 실제 모터
+          움직임이고, 실패는 시간과 장비 비용을 만든다.
+        </p>
 
-            <article class="cycle-node specialist">
-              <p class="card-label">Specialist · RL</p>
-              <h3>좁게 파고들어, 완벽해진다</h3>
-              <p class="muted">
-                실제 환경에서 샘플효율 RL로 병목 과제를 빠르고 견고하게 숙달한다.
-                성공·실수·복구 경험을 제너럴리스트에 되돌린다.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section class="slide" id="motivation" data-title="왜 로봇인가">
-        <div class="slide-inner">
-          <div class="split-visual">
-            <div class="copy reveal">
-              <div class="slide-kicker">01 · Motivation</div>
-              <h2>텍스트 계획을 넘어<br>물리 세계로</h2>
-              <p class="lead">
-                “집을 청소하고, 빨래를 개고, 저녁을 차려줘”라는 요청에 LLM은
-                실행 계획을 설명한다. 우리가 원하는 답은 설명이 아니라
-                <strong>“On it!”과 실제 수행</strong>이다.
-              </p>
-              <div class="callout">
-                <strong>필요한 능력</strong>
-                <p>
-                  새로운 환경·물체·시나리오로 일반화하면서,
-                  다단계의 오픈엔디드 지시를 끝까지 수행해야 한다.
-                </p>
-              </div>
-            </div>
-
-            <figure class="visual reveal">
-              <img src="assets/u0wjxi8pc6y-ts-00-02-25.jpg" alt="LLM의 텍스트 답변과 실제 집안일을 수행하는 로봇을 대비한 발표 슬라이드">
-              <figcaption>
-                <span>물리 세계의 파운데이션 모델이 필요한 이유</span>
-                <span class="timestamp">02:25</span>
-              </figcaption>
-            </figure>
-          </div>
-        </div>
-      </section>
-
-      <section class="slide" id="foundation-recipe" data-title="파운데이션 모델 레시피">
-        <div class="slide-inner">
-          <div class="slide-kicker reveal">02 · Foundation model recipe</div>
-          <h2 class="reveal">Pre-training은 지식,<br>post-training은 배치 능력</h2>
-
-          <div class="grid-2 reveal">
-            <article class="card feature-card">
-              <span class="card-number">01</span>
-              <p class="card-label">Pre-training</p>
-              <h3>많이 보고, 많이 안다</h3>
-              <p class="muted">
-                Common Crawl·Wikipedia 같은 대규모 데이터를 선별하고 학습해
-                사실과 패턴을 폭넓게 축적한다. 특정 과제를 푸는 것보다
-                <strong>지식의 기반</strong>을 만드는 단계다.
-              </p>
-            </article>
-
-            <article class="card feature-card">
-              <span class="card-number">02</span>
-              <p class="card-label">Post-training / Alignment</p>
-              <h3>아는 것을 과제에 쓴다</h3>
-              <p class="muted">
-                고품질 SFT 데이터와 RLHF 같은 알고리즘을 통해 지식을 실제
-                문제 해결에 배치한다. 로봇에서는 이 단계가
-                <strong>속도와 숙련도</strong>를 결정한다.
-              </p>
-            </article>
-          </div>
-
-          <div class="visual-grid reveal" style="margin-top: 22px;">
-            <figure class="visual">
-              <img src="assets/u0wjxi8pc6y-ts-00-04-20.jpg" alt="일반 파운데이션 모델의 사전학습과 사후학습 구조">
-              <figcaption>
-                <span>일반 파운데이션 모델의 표준 레시피</span>
-                <span class="timestamp">04:20</span>
-              </figcaption>
-            </figure>
-
-            <figure class="visual">
-              <img src="assets/u0wjxi8pc6y-ts-00-04-50.jpg" alt="로봇 VLA의 사전학습과 강화학습 사후학습 구조">
-              <figcaption>
-                <span>로봇으로 옮긴 유사 레시피</span>
-                <span class="timestamp">04:50</span>
-              </figcaption>
-            </figure>
-          </div>
-        </div>
-      </section>
-
-      <section class="slide" id="supervised-ceiling" data-title="지도학습의 한계">
-        <div class="slide-inner">
-          <div class="slide-kicker reveal">03 · The supervised ceiling</div>
-          <h2 class="reveal">“여러 가지를 그럭저럭”에서<br>멈추는 이유</h2>
-
-          <div class="split-visual reverse">
-            <div class="copy reveal">
-              <div class="grid-2">
-                <article class="card">
-                  <p class="card-label good">Supervised pre-training</p>
-                  <h3>넓이</h3>
-                  <ul class="compact muted">
-                    <li>많은 것을 안다</li>
-                    <li>새로운 입력으로 일반화한다</li>
-                    <li>언어 지시를 따른다</li>
-                  </ul>
-                </article>
-                <article class="card">
-                  <p class="card-label bad">Remaining gap</p>
-                  <h3>깊이</h3>
-                  <ul class="compact muted">
-                    <li>성공률이 “OK” 수준에 머문다</li>
-                    <li>실수와 복구 때문에 느리다</li>
-                    <li>정밀 과제를 완전히 숙달하지 못한다</li>
-                  </ul>
-                </article>
-              </div>
-
-              <div class="callout" style="margin-top: 18px;">
-                <strong>상보 관계</strong>
-                <p>
-                  지도학습은 지식과 일반화를, RL은 특정 과제의 숙달과 속도를 준다.
-                  둘은 대체재가 아니라 서로 다른 결핍을 채운다.
-                </p>
-              </div>
-            </div>
-
-            <figure class="visual reveal">
-              <img src="assets/u0wjxi8pc6y-ts-00-06-50.jpg" alt="지도학습 사전학습의 장점과 느리고 완벽하지 못한 단점을 정리한 발표 슬라이드">
-              <figcaption>
-                <span>지도학습 정책의 명시적 장단점</span>
-                <span class="timestamp">06:50</span>
-              </figcaption>
-            </figure>
-          </div>
-        </div>
-      </section>
-
-      <section class="slide" id="real-world" data-title="왜 실세계 RL인가">
-        <div class="slide-inner">
-          <div class="split-visual">
-            <div class="copy reveal">
-              <div class="slide-kicker">04 · Why real-world RL</div>
-              <h2>실세계 과제는<br>실세계에서 배워야 한다</h2>
-              <p class="lead">
-                샌드박스에서 학습하면 결국 샌드박스에 입력된 세계를 학습한다.
-                마지막 성능을 결정하는 post-training일수록 분포 변화에 더 민감하다.
-              </p>
-
-              <div class="comparison">
-                <table>
-                  <thead>
-                    <tr>
-                      <th></th>
-                      <th>실세계 RL</th>
-                      <th>시뮬레이션 / 샌드박스</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><strong>장점</strong></td>
-                      <td>실제 마찰·변형·오차를 직접 학습</td>
-                      <td>병렬화와 계산량 확장이 쉬움</td>
-                    </tr>
-                    <tr>
-                      <td><strong>제약</strong></td>
-                      <td>극도로 높은 샘플효율 필요</td>
-                      <td>시뮬레이터가 표현한 것만 학습</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="reveal">
-              <figure class="visual">
-                <img src="assets/u0wjxi8pc6y-ts-00-09-30.jpg" alt="큰 모델, 샘플효율 강화학습, 어려운 과제의 세 요소를 보여주는 벤 다이어그램">
-                <figcaption>
-                  <span>어려움의 본질: 세 요소의 결합</span>
-                  <span class="timestamp">09:30</span>
-                </figcaption>
-              </figure>
-
-              <div class="metric-row">
-                <div class="metric">
-                  <span class="metric-value">Big</span>
-                  <span class="metric-label">파운데이션 모델 규모</span>
-                </div>
-                <div class="metric">
-                  <span class="metric-value">Efficient</span>
-                  <span class="metric-label">실세계 샘플 효율</span>
-                </div>
-                <div class="metric">
-                  <span class="metric-value">Hard</span>
-                  <span class="metric-label">새 전략이 필요한 과제</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="slide" id="specialist-recipe" data-title="스페셜리스트 RL">
-        <div class="slide-inner">
-          <div class="slide-kicker reveal">05 · Specialist recipe</div>
-          <h2 class="reveal">작은 모델 + 샘플효율 RL은<br>이미 강력하다</h2>
-
-          <div class="grid-3 reveal">
-            <article class="card">
-              <p class="card-label">Algorithm</p>
-              <h3>RLPD</h3>
-              <p class="muted">
-                Soft Actor-Critic 기반의 off-policy 방식. 데모를 리플레이 버퍼에
-                섞어 실제 로봇에서도 빠르게 학습한다.
-              </p>
-            </article>
-            <article class="card">
-              <p class="card-label">Observation &amp; reward</p>
-              <h3>이미지 중심</h3>
-              <p class="muted">
-                손목 카메라와 사전학습 비전 인코더를 사용하고,
-                이진 이미지 분류기로 과제 완료 보상을 준다.
-              </p>
-            </article>
-            <article class="card">
-              <p class="card-label">Optional boost</p>
-              <h3>인간 개입</h3>
-              <p class="muted">
-                사람이 교정한 행동도 리플레이 버퍼에 바로 추가할 수 있어
-                초기 탐색과 실패 복구를 크게 돕는다.
-              </p>
-            </article>
-          </div>
-
-          <div class="visual-grid reveal" style="margin-top: 22px;">
-            <figure class="visual">
-              <img src="assets/u0wjxi8pc6y-ts-00-10-20.jpg" alt="RLPD 기반 실세계 로봇 강화학습 구성">
-              <figcaption>
-                <span>RLPD 스페셜리스트 학습 구성</span>
-                <span class="timestamp">10:20</span>
-              </figcaption>
-            </figure>
-            <figure class="visual">
-              <img src="assets/u0wjxi8pc6y-ts-00-11-45.jpg" alt="SERL로 자동차 부품 조립을 학습하고 실행하는 로봇">
-              <figcaption>
-                <span>SERL: 몇 시간 안에 배우는 정밀 조립</span>
-                <span class="timestamp">11:45</span>
-              </figcaption>
-            </figure>
-          </div>
-        </div>
-      </section>
-
-      <section class="slide" id="specialist-results" data-title="스페셜리스트 성과와 한계">
-        <div class="slide-inner">
-          <div class="split-visual">
-            <div class="copy reveal">
-              <div class="slide-kicker">06 · Specialist results</div>
-              <h2>완벽하고 빠르다.<br>하지만 좁다.</h2>
-
-              <div class="metric-row">
-                <div class="metric">
-                  <span class="metric-value">1–2h</span>
-                  <span class="metric-label">과제당 실세계 이미지 학습</span>
-                </div>
-                <div class="metric">
-                  <span class="metric-value">100%</span>
-                  <span class="metric-label">학습된 환경에서 성공률</span>
-                </div>
-                <div class="metric">
-                  <span class="metric-value">≤ ½</span>
-                  <span class="metric-label">BC 대비 사이클 타임</span>
-                </div>
-              </div>
-
-              <div class="comparison" style="margin-top: 18px;">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>과제</th>
-                      <th>RL</th>
-                      <th>BC</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>물체 재배치</td>
-                      <td class="good"><strong>7.53초</strong></td>
-                      <td>18.94초</td>
-                    </tr>
-                    <tr>
-                      <td>케이블 라우팅</td>
-                      <td class="good"><strong>4.08초</strong></td>
-                      <td>13.58초</td>
-                    </tr>
-                    <tr>
-                      <td>PCB 부품 삽입</td>
-                      <td class="good"><strong>5.22초</strong></td>
-                      <td>10.14초</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="reveal">
-              <figure class="visual">
-                <img src="assets/u0wjxi8pc6y-ts-00-12-45.jpg" alt="여러 정밀 로봇 조립 과제와 강화학습 성능 결과">
-                <figcaption>
-                  <span>교란 후에도 복구하는 스페셜리스트 정책</span>
-                  <span class="timestamp">12:45</span>
-                </figcaption>
-              </figure>
-
-              <div class="callout" style="margin-top: 18px; border-left-color: var(--danger);">
-                <strong style="color: var(--danger);">한계</strong>
-                <p>
-                  사전학습 기반이 없으므로 학습 환경 밖으로 일반화하지 못한다.
-                  뛰어난 숙련자지만, 새로운 과제에는 다시 학습해야 한다.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="slide" id="rldg" data-title="스페셜리스트에서 제너럴리스트로">
-        <div class="slide-inner">
-          <div class="slide-kicker reveal">07 · RLDG</div>
-          <h2 class="reveal">숙련을 증류하면<br>일반화가 생긴다</h2>
-
-          <div class="sequence reveal">
-            <article class="sequence-item">
-              <div>
-                <h3>커넥터별 RL 스페셜리스트 학습</h3>
-                <p>Ethernet·VGA·USB 삽입 정책을 각 환경에서 정밀하게 숙달한다.</p>
-              </div>
-            </article>
-            <article class="sequence-item">
-              <div>
-                <h3>스페셜리스트 롤아웃 수집</h3>
-                <p>성공 결과뿐 아니라 상태에 따른 폐루프 행동 경험을 데이터로 만든다.</p>
-              </div>
-            </article>
-            <article class="sequence-item">
-              <div>
-                <h3>OpenVLA와 Octo에 증류</h3>
-                <p>OpenVLA는 LoRA, Octo는 전체 파인튜닝으로 흡수해 보지 못한 커넥터에도 일반화한다.</p>
-              </div>
-            </article>
-          </div>
-
-          <div class="visual-grid reveal" style="margin-top: 22px;">
-            <figure class="visual">
-              <img src="assets/u0wjxi8pc6y-ts-00-13-55.jpg" alt="RL 스페셜리스트 데이터를 OpenVLA와 Octo에 증류하는 RLDG 절차">
-              <figcaption>
-                <span>RLDG: RL 정책에서 제너럴리스트로</span>
-                <span class="timestamp">13:55</span>
-              </figcaption>
-            </figure>
-            <figure class="visual">
-              <img src="assets/u0wjxi8pc6y-ts-00-15-10.jpg" alt="스페셜리스트에서 제너럴리스트로 향하는 단방향 화살표의 한계를 보여주는 슬라이드">
-              <figcaption>
-                <span>남은 문제: 아직 화살표가 한 방향뿐</span>
-                <span class="timestamp">15:10</span>
-              </figcaption>
-            </figure>
-          </div>
-
-          <div class="callout reveal" style="margin-top: 22px;">
-            <strong>중요한 관찰</strong>
-            <p>
-              RL 롤아웃은 같은 개수의 성공한 인간 데모보다 파운데이션 모델 학습에
-              더 효과적이었다. RL 정책은 상태 변화에 반응하는
-              <strong>마르코프 정책의 경험</strong>을 제공하기 때문이다.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section class="slide" id="rlt" data-title="RL 토큰">
-        <div class="slide-inner">
-          <div class="slide-kicker reveal">08 · RLT — RL Token</div>
-          <h2 class="reveal">제너럴리스트의 관점을<br>스페셜리스트에게 건넨다</h2>
-
-          <div class="split-visual reverse">
-            <div class="copy reveal">
-              <div class="sequence">
-                <article class="sequence-item">
-                  <div>
-                    <h3>내부 표현 압축</h3>
-                    <p>π*0.6의 이미지 표현을 cross-attention 오토인코더로 1×2048 RL 토큰에 압축한다.</p>
-                  </div>
-                </article>
-                <article class="sequence-item">
-                  <div>
-                    <h3>행동 의도까지 전달</h3>
-                    <p>RL actor·critic은 RL 토큰과 VLA가 제안한 액션 청크를 함께 입력받는다.</p>
-                  </div>
-                </article>
-                <article class="sequence-item">
-                  <div>
-                    <h3>BC 정규화</h3>
-                    <p>더 좋은 행동을 아직 찾지 못했다면 기본 모델과 비슷하게 행동하도록 묶어 둔다.</p>
-                  </div>
-                </article>
-              </div>
-            </div>
-
-            <figure class="visual reveal">
-              <img src="assets/u0wjxi8pc6y-ts-00-16-35.jpg" alt="VLA의 내부 표현을 RL 토큰으로 압축하고 작은 actor critic에 입력하는 RLT 아키텍처">
-              <figcaption>
-                <span>RLT 구조: 표현 + 기본 액션 + 작은 RL 모델</span>
-                <span class="timestamp">16:35</span>
-              </figcaption>
-            </figure>
-          </div>
-
-          <div class="callout reveal" style="margin-top: 22px;">
-            <strong>직관</strong>
-            <p>
-              신입에게 무작정 탐색시키는 대신 베테랑이 “나는 지금 이렇게 보고,
-              이렇게 행동하려 한다”고 계속 알려준다. 신입은 모를 때 따라가고,
-              더 나은 해법을 발견했을 때만 벗어난다.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section class="slide" id="bottleneck-rl" data-title="병목 단계만 RL">
-        <div class="slide-inner">
-          <div class="slide-kicker reveal">09 · Precision where it matters</div>
-          <h2 class="reveal">긴 과제 전체가 아니라<br>가장 어려운 한 단계만</h2>
-          <p class="lead reveal">
-            상위 정책이 장기 과제를 단계로 분해하고, 기본 모델을 먼저 실행한다.
-            나사 조이기·케이블 타이 끼우기·커넥터 삽입처럼
-            <strong>정밀도가 병목인 구간</strong>만 RL로 파인튜닝한다.
-          </p>
-
-          <div class="visual-grid reveal">
-            <figure class="visual">
-              <img src="assets/u0wjxi8pc6y-ts-00-17-45.jpg" alt="긴 과제에서 가장 정밀한 단계만 강화학습으로 개선하는 실험 설계">
-              <figcaption>
-                <span>상위 정책의 단계 분할과 선택적 RL</span>
-                <span class="timestamp">17:45</span>
-              </figcaption>
-            </figure>
-            <figure class="visual">
-              <img src="assets/u0wjxi8pc6y-ts-00-18-30.jpg" alt="나사 조이기, 케이블 타이, 이더넷 삽입 등 RLT 대상 과제">
-              <figcaption>
-                <span>RLT 대상: 미세하고 실패하기 쉬운 구간</span>
-                <span class="timestamp">18:30</span>
-              </figcaption>
-            </figure>
-          </div>
-        </div>
-      </section>
-
-      <section class="slide" id="rlt-results" data-title="RLT 결과">
-        <div class="slide-inner">
-          <div class="split-visual">
-            <div class="copy reveal">
-              <div class="slide-kicker">10 · RLT results</div>
-              <h2>15분의 데이터로<br>사람보다 빠르게</h2>
-
-              <div class="metric-row">
-                <div class="metric">
-                  <span class="metric-value">66</span>
-                  <span class="metric-label">RLT 성공 에피소드 중앙값</span>
-                </div>
-                <div class="metric">
-                  <span class="metric-value">146</span>
-                  <span class="metric-label">사람 원격조작 timesteps</span>
-                </div>
-                <div class="metric">
-                  <span class="metric-value">228</span>
-                  <span class="metric-label">Base policy timesteps</span>
-                </div>
-              </div>
-
-              <div class="comparison" style="margin-top: 18px;">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>제거 항목</th>
-                      <th>관찰된 결과</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>BC regularizer</td>
-                      <td class="bad">기본 모델 수준에서 개선 실패</td>
-                    </tr>
-                    <tr>
-                      <td>Action chunking</td>
-                      <td class="bad">개선 실패</td>
-                    </tr>
-                    <tr>
-                      <td>RL token</td>
-                      <td class="bad">거의 작동하지 않음</td>
-                    </tr>
-                    <tr>
-                      <td>FM action pass-through</td>
-                      <td>동일 성능에 도달하지만 훨씬 느림</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="reveal">
-              <figure class="visual">
-                <img src="assets/u0wjxi8pc6y-ts-00-20-25.jpg" alt="RLT 처리량, 에피소드 길이, 구성요소 제거 실험 결과">
-                <figcaption>
-                  <span>처리량·에피소드 길이·어블레이션</span>
-                  <span class="timestamp">20:25</span>
-                </figcaption>
-              </figure>
-
-              <div class="callout" style="margin-top: 18px; border-left-color: var(--accent-3);">
-                <strong style="color: var(--accent-3);">15분의 함정</strong>
-                <p>
-                  RL에 투입된 <strong>행동 데이터</strong>가 15분이라는 뜻이다.
-                  환경 리셋과 나머지 단계 실행까지 포함한 실제 학습은 몇 시간이 걸린다.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="slide" id="data-dilemma" data-title="RL 데이터의 딜레마">
-        <div class="slide-inner">
-          <div class="slide-kicker reveal">11 · The data dilemma</div>
-          <h2 class="reveal">좋은 데이터만 쓸까,<br>실패까지 모두 쓸까?</h2>
-
-          <div class="grid-2 reveal">
-            <article class="card">
-              <p class="card-label">Final policy only</p>
-              <h3>깨끗하지만 작다</h3>
-              <ul class="compact muted">
-                <li class="good">모든 샘플이 좋은 행동</li>
-                <li>단순 BC로 학습 가능</li>
-                <li class="bad">RL 중 수집한 대부분의 경험을 버림</li>
-              </ul>
-            </article>
-            <article class="card">
-              <p class="card-label">Entire RL buffer</p>
-              <h3>풍부하지만 지저분하다</h3>
-              <ul class="compact muted">
-                <li class="good">변동성·실수·복구를 모두 포함</li>
-                <li>일반화와 회복력에 유리</li>
-                <li class="bad">대부분은 품질이 낮은 행동</li>
-              </ul>
-            </article>
-          </div>
-
-          <figure class="visual reveal" style="margin-top: 22px;">
-            <img src="assets/u0wjxi8pc6y-ts-00-22-00.jpg" alt="최종 정책 데이터와 전체 강화학습 데이터 사용의 장단점을 비교한 발표 슬라이드">
-            <figcaption>
-              <span>모든 데이터를 쓰면서 좋은 행동을 선택할 수 있는가?</span>
-              <span class="timestamp">22:00</span>
-            </figcaption>
+        <div class="figure-grid">
+          <figure class="media-card">
+            <img src="assets/u0wjxi8pc6y-ts-00-04-20.jpg" alt="일반 파운데이션 모델의 사전학습과 사후학습 구조" loading="lazy">
+            <figcaption><strong>04:20.</strong> Pre-training은 넓은 지식을, post-training은 과제 수행 능력을 형성한다.</figcaption>
           </figure>
-
-          <div class="callout reveal" style="margin-top: 22px;">
-            <strong>목표</strong>
-            <p>
-              좋은 데이터와 나쁜 데이터를 함께 학습할 수 있다면 별도 작은 actor 없이
-              <strong>로봇 파운데이션 모델 자체를 RL actor</strong>로 사용할 수 있다.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section class="slide" id="cfgrl-math" data-title="CFGRL 수학">
-        <div class="slide-inner">
-          <div class="slide-kicker reveal">12 · CFGRL</div>
-          <h2 class="reveal">Diffusion guidance를<br>정책 개선 연산자로</h2>
-
-          <div class="grid-2">
-            <div class="reveal">
-              <p class="muted">
-                “좋은” 데이터 정책 π<sub>θ</sub>를 모든 데이터의 참조 정책 π̂에
-                가깝게 유지하면서 보상을 높이는 KL 정규화 목적함수:
-              </p>
-
-              <div class="formula">
-                J(π<sub>θ</sub>) = E<sub>τ∼p(τ|πθ)</sub>[Σ<sub>t</sub> γ<sup>t</sup>r(s<sub>t</sub>,a<sub>t</sub>)]
-                − βE<sub>s∼pπ</sub>[D<sub>KL</sub>(π<sub>θ</sub>(a|s) ‖ π̂(a|s))]
-              </div>
-
-              <p class="muted">수렴 해는 advantage가 높은 행동을 지수적으로 강조한다.</p>
-
-              <div class="formula highlight">
-                π(a|s) ∝ π̂(a|s) · exp(A(s,a))<sup>1/β</sup>
-              </div>
-            </div>
-
-            <div class="reveal">
-              <figure class="visual">
-                <img src="assets/u0wjxi8pc6y-ts-00-24-15.jpg" alt="KL 정규화 강화학습과 classifier-free guidance의 관계를 유도하는 수식 슬라이드">
-                <figcaption>
-                  <span>발표의 유일한 수식 슬라이드</span>
-                  <span class="timestamp">24:15</span>
-                </figcaption>
-              </figure>
-            </div>
-          </div>
-
-          <div class="grid-2 reveal" style="margin-top: 22px;">
-            <div class="card">
-              <p class="card-label">Optimality variable</p>
-              <div class="formula" style="margin-bottom: 0;">
-                p(o|s,a) = f(A(s,a)) / Z(s)<br>
-                π(a|s) ∝ π̂(a|s) · p(o|s,a)
-              </div>
-            </div>
-            <div class="card">
-              <p class="card-label">Guided policy</p>
-              <div class="formula highlight" style="margin-bottom: 0;">
-                π̂(a|s) · p(o|s,a)<sup>w</sup>
-              </div>
-            </div>
-          </div>
-
-          <p class="lead reveal" style="margin-top: 24px; margin-bottom: 0;">
-            스코어 함수 분해와 베이즈 재배열을 거치면 정확히 CFG 형태가 된다.
-            핵심은 CFG가 별도 학습 알고리즘이 아니라
-            <strong>추론 시점의 정책 개선 방법</strong>이라는 점이다.
-          </p>
-        </div>
-      </section>
-
-      <section class="slide" id="cfgrl-intuition" data-title="CFGRL 직관">
-        <div class="slide-inner">
-          <div class="split-visual reverse">
-            <div class="copy reveal">
-              <div class="slide-kicker">13 · Intuition</div>
-              <h2>좋은 데이터의 모드로<br>더 세게 줌인한다</h2>
-
-              <div class="comparison">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>분포</th>
-                      <th>수식</th>
-                      <th>의미</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Unconditional</td>
-                      <td>π̂(a|s)</td>
-                      <td>좋은 것과 나쁜 것을 포함한 전체 경험</td>
-                    </tr>
-                    <tr>
-                      <td>Conditioned</td>
-                      <td>π̂(a|s,o)</td>
-                      <td>최적성 조건을 만족하는 분포</td>
-                    </tr>
-                    <tr>
-                      <td>Guided</td>
-                      <td>π̂(a|s)p(o|s,a)<sup>w</sup></td>
-                      <td><strong>좋은 행동의 중심부를 증폭</strong></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <div class="callout" style="margin-top: 18px;">
-                <strong>왜 AWR보다 안정적인가</strong>
-                <p>
-                  AWR은 배치의 많은 샘플에 사실상 0의 가중치를 준다.
-                  CFGRL은 모든 샘플을 사용하면서 품질 조건과 guidance weight로
-                  좋은 행동을 선택하므로 데이터 낭비가 적다.
-                </p>
-              </div>
-            </div>
-
-            <figure class="visual reveal">
-              <img src="assets/u0wjxi8pc6y-ts-00-25-50.jpg" alt="전체 행동 분포에서 classifier-free guidance로 좋은 데이터의 모드에 집중하는 시각화">
-              <figcaption>
-                <span>전체 분포에서 좋은 데이터의 모드로 이동</span>
-                <span class="timestamp">25:50</span>
-              </figcaption>
-            </figure>
-          </div>
-        </div>
-      </section>
-
-      <section class="slide" id="pistar06" data-title="π*0.6">
-        <div class="slide-inner">
-          <div class="slide-kicker reveal">14 · π*0.6</div>
-          <h2 class="reveal">Advantage conditioning을<br>대규모 VLA로 확장</h2>
-
-          <div class="grid-2 reveal">
-            <article class="card">
-              <p class="card-label">Policy</p>
-              <h3>π*0.6 VLA</h3>
-              <p class="muted">
-                SigLIP 400M + Gemma 4B + action expert 860M.
-                언어 서브태스크, 웹 데이터, chain-of-thought와 함께
-                이산·연속 액션을 출력한다.
-              </p>
-            </article>
-            <article class="card">
-              <p class="card-label">Value model</p>
-              <h3>별도 사전학습 VLM</h3>
-              <p class="muted">
-                SigLIP 400M + Gemma 270M + value head로 진행도를 추정한다.
-                실수 시 value가 급락하고 복구 시 다시 상승한다.
-              </p>
-            </article>
-          </div>
-
-          <div class="formula highlight reveal">
-            A(o,a) = r<sub>t:N</sub> + V(o<sub>t+N</sub>) − V(o<sub>t</sub>)
-            &nbsp;→&nbsp; 𝟙[A(o,a) &gt; ε]
-          </div>
-
-          <div class="visual-grid reveal">
-            <figure class="visual">
-              <img src="assets/u0wjxi8pc6y-ts-00-26-35.jpg" alt="언어와 advantage를 함께 조건으로 사용하는 π*0.6 정책 학습 구성">
-              <figcaption>
-                <span>CFGRL을 대규모 정책 추출에 적용</span>
-                <span class="timestamp">26:35</span>
-              </figcaption>
-            </figure>
-            <figure class="visual">
-              <img src="assets/u0wjxi8pc6y-ts-00-27-05.jpg" alt="π*0.6 정책과 가치함수의 전체 아키텍처 및 셔츠 접기 value 변화">
-              <figcaption>
-                <span>π*0.6 아키텍처와 해석 가능한 value</span>
-                <span class="timestamp">27:05</span>
-              </figcaption>
-            </figure>
-          </div>
-        </div>
-      </section>
-
-      <section class="slide" id="pistar06-results" data-title="π*0.6 결과">
-        <div class="slide-inner">
-          <div class="split-visual">
-            <div class="copy reveal">
-              <div class="slide-kicker">15 · Long-horizon results</div>
-              <h2>장기 과제 4개 중<br>3개에서 처리량 2배</h2>
-              <p class="lead">
-                빨래 개기 2종, 에스프레소 만들기, 박스 조립에서
-                pretrain → offline RL → SFT → 반복 RL을 비교했다.
-              </p>
-
-              <div class="grid-2">
-                <article class="card">
-                  <p class="card-label">Throughput</p>
-                  <h3>시간당 성공 횟수</h3>
-                  <p class="muted">
-                    최종 RL 반복 정책은 네 과제 중 세 과제에서 처리량을 약 2배로 끌어올렸다.
-                  </p>
-                </article>
-                <article class="card">
-                  <p class="card-label">Reliability</p>
-                  <h3>연속 무중단 실행</h3>
-                  <p class="muted">
-                    에스프레소와 박스 접기 데모는 몇 시간 동안 연속으로 작동했다.
-                  </p>
-                </article>
-              </div>
-            </div>
-
-            <figure class="visual reveal">
-              <img src="assets/u0wjxi8pc6y-ts-00-27-50.jpg" alt="π*0.6의 빨래 개기, 에스프레소, 박스 조립 처리량 비교 그래프">
-              <figcaption>
-                <span>π*0.6 장기 과제 정량 결과</span>
-                <span class="timestamp">27:50</span>
-              </figcaption>
-            </figure>
-          </div>
-        </div>
-      </section>
-
-      <section class="slide" id="pi07" data-title="π0.7 통합 모델">
-        <div class="slide-inner">
-          <div class="split-visual reverse">
-            <div class="copy reveal">
-              <div class="slide-kicker">16 · π0.7</div>
-              <h2>모든 스페셜리스트를<br>하나의 모델로 증류</h2>
-              <p class="lead">
-                데모와 모든 스페셜리스트의 자율 데이터를 함께 학습하고,
-                에피소드 품질과 길이까지 조건으로 사용한다.
-              </p>
-
-              <div class="sequence">
-                <article class="sequence-item">
-                  <div>
-                    <h3>통합 데이터</h3>
-                    <p>인간 데모 + 성공·실패·복구를 포함한 스페셜리스트 자율 롤아웃.</p>
-                  </div>
-                </article>
-                <article class="sequence-item">
-                  <div>
-                    <h3>풍부한 조건</h3>
-                    <p>언어 지시, 서브골 이미지, 품질 별점, 에피소드 길이를 학습 입력으로 제공.</p>
-                  </div>
-                </article>
-                <article class="sequence-item">
-                  <div>
-                    <h3>원하는 행동을 프롬프팅</h3>
-                    <p>추론 시 상위 정책·월드 모델·원하는 메타데이터로 행동 특성을 선택.</p>
-                  </div>
-                </article>
-              </div>
-            </div>
-
-            <figure class="visual reveal">
-              <img src="assets/u0wjxi8pc6y-ts-00-28-15.jpg" alt="데모와 스페셜리스트 자율 데이터를 통합하고 메타데이터로 조건화하는 π0.7 구조">
-              <figcaption>
-                <span>π0.7: 증류 중심 로봇 파운데이션 모델</span>
-                <span class="timestamp">28:15</span>
-              </figcaption>
-            </figure>
-          </div>
-        </div>
-      </section>
-
-      <section class="slide" id="takeaways" data-title="핵심 결론">
-        <div class="slide-inner">
-          <div class="slide-kicker reveal">17 · Takeaways</div>
-          <h2 class="reveal">네 문장으로 정리하면</h2>
-
-          <div class="takeaway-list reveal">
-            <article class="takeaway">
-              <span class="takeaway-icon">01</span>
-              <p>
-                로봇 파운데이션 모델의 <strong>엔드투엔드 RL</strong>은 아직
-                큰 모델·샘플효율·어려운 과제를 동시에 만족하기 어렵다.
-              </p>
-            </article>
-            <article class="takeaway">
-              <span class="takeaway-icon">02</span>
-              <p>
-                RL은 새로운 전략이 필요한 정밀 과제를
-                <strong>개별 스페셜리스트가 숙달</strong>하는 데 매우 잘 작동한다.
-              </p>
-            </article>
-            <article class="takeaway">
-              <span class="takeaway-icon">03</span>
-              <p>
-                제너럴리스트는 RL 토큰과 행동 prior로
-                <strong>스페셜리스트의 탐색</strong>을 빠르게 만든다.
-              </p>
-            </article>
-            <article class="takeaway">
-              <span class="takeaway-icon">04</span>
-              <p>
-                스페셜리스트의 롤아웃은 증류를 통해
-                <strong>제너럴리스트의 성능과 일반화</strong>를 끌어올린다.
-              </p>
-            </article>
-          </div>
-
-          <figure class="visual reveal" style="margin-top: 22px;">
-            <img src="assets/u0wjxi8pc6y-ts-00-29-15.jpg" alt="로봇 파운데이션 모델 강화학습의 핵심 결론을 요약한 발표 슬라이드">
-            <figcaption>
-              <span>발표자의 Takeaways</span>
-              <span class="timestamp">29:15</span>
-            </figcaption>
+          <figure class="media-card">
+            <img src="assets/u0wjxi8pc6y-ts-00-04-50.jpg" alt="로봇 VLA의 사전학습과 강화학습 사후학습 구조" loading="lazy">
+            <figcaption><strong>04:50.</strong> 다양한 데모로 학습한 VLA 위에 실세계 RL을 결합하는 로봇용 레시피.</figcaption>
           </figure>
         </div>
-      </section>
 
-      <section class="slide" id="final-cycle" data-title="최종 순환 레시피">
-        <div class="slide-inner">
-          <div class="slide-kicker reveal">18 · The flywheel</div>
-          <h2 class="reveal">제너럴리스트 ↔ 스페셜리스트<br><span class="gradient-text">증류 플라이휠</span></h2>
+        <div class="pullquote">
+          “Pre-training은 많은 것을 알게 한다.<br>
+          RL post-training은 하나의 일을 완전히 익히게 한다.”
+          <cite>발표의 논지를 요약한 편집 문장</cite>
+        </div>
 
-          <div class="split-visual">
-            <div class="copy reveal">
-              <div class="sequence">
-                <article class="sequence-item">
-                  <div>
-                    <h3>대규모 offline RL</h3>
-                    <p>다양한 데이터로 로봇 파운데이션 모델의 일반적 행동 prior를 강화한다.</p>
-                  </div>
-                </article>
-                <article class="sequence-item">
-                  <div>
-                    <h3>스페셜리스트 부트스트랩</h3>
-                    <p>제너럴리스트의 표현과 기본 행동으로 복잡한 실제 과제를 빠르게 탐색한다.</p>
-                  </div>
-                </article>
-                <article class="sequence-item">
-                  <div>
-                    <h3>실세계 숙련</h3>
-                    <p>작은 샘플효율 정책이 병목 과제를 높은 성공률과 속도로 숙달한다.</p>
-                  </div>
-                </article>
-                <article class="sequence-item">
-                  <div>
-                    <h3>제너럴리스트로 재증류</h3>
-                    <p>성공·실수·복구 경험을 통합 모델에 넣고 다음 순환의 출발점을 높인다.</p>
-                  </div>
-                </article>
-              </div>
-            </div>
+        <h3>지도학습의 천장: 그럭저럭 잘하지만 느리다</h3>
+        <p>
+          사전학습 정책은 많은 과제에 “OK” 수준으로 대응하지만, 한 과제를 안정적으로
+          마스터하지는 못한다. 속도가 느린 이유도 단순한 관절 속도 제한이 아니다.
+          작은 실수와 재시도, 복구 행동이 누적돼 전체 사이클 타임이 길어진다. 따라서
+          RL의 목표는 더 과격하게 움직이는 것이 아니라 <strong>불필요한 실수 없이 과제를
+          끝내는 정책</strong>을 찾는 데 있다.
+        </p>
 
-            <figure class="visual reveal">
-              <img src="assets/u0wjxi8pc6y-ts-00-29-32.jpg" alt="제너럴리스트와 스페셜리스트가 서로 데이터를 주고받는 순환 학습 구조">
-              <figcaption>
-                <span>미래의 학습 레시피: 반복할수록 강해지는 순환</span>
-                <span class="timestamp">29:32</span>
-              </figcaption>
-            </figure>
-          </div>
+        <figure class="media-card">
+          <img src="assets/u0wjxi8pc6y-ts-00-06-50.jpg" alt="지도학습 정책의 장점과 낮은 숙련도 및 느린 속도라는 한계" loading="lazy">
+          <figcaption><strong>06:50.</strong> 일반화와 언어 이해는 강하지만, 성공률과 실행 속도는 과제별 숙련 정책에 미치지 못한다.</figcaption>
+        </figure>
+
+        <h3>왜 시뮬레이션만으로는 충분하지 않은가</h3>
+        <p>
+          Levine의 주장은 단호하다. 목표가 실세계 과제를 완벽히 수행하는 것이라면,
+          최종 학습도 실세계에서 이루어져야 한다. 시뮬레이터는 대규모 병렬화와 복잡한
+          알고리즘을 허용하지만, 모델은 결국 시뮬레이터에 표현된 물리만 배운다.
+          접촉, 마찰, 휘어지는 재료, 카메라 노이즈처럼 마지막 몇 퍼센트의 성공률을
+          결정하는 요소는 실제 환경에서 드러난다.
+        </p>
+
+        <figure class="media-card">
+          <img src="assets/u0wjxi8pc6y-ts-00-09-30.jpg" alt="큰 모델, 샘플 효율 RL, 어려운 과제의 세 조건을 보여주는 슬라이드" loading="lazy">
+          <figcaption><strong>09:30.</strong> 핵심 문제는 big model × sample-efficient RL × hard task의 삼중 결합이다.</figcaption>
+        </figure>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>학습 환경</th>
+                <th>강점</th>
+                <th>구조적 한계</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>실세계 RL</td>
+                <td>배포 환경의 물리와 오차를 직접 학습</td>
+                <td>샘플 비용이 높아 극도로 효율적인 알고리즘이 필요</td>
+              </tr>
+              <tr>
+                <td>시뮬레이션·샌드박스</td>
+                <td>병렬화와 안전한 대규모 탐색 가능</td>
+                <td>시뮬레이터에 포함된 현상 밖으로 일반화하기 어려움</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
-      <section class="slide" id="engineering" data-title="엔지니어링 체크리스트">
-        <div class="slide-inner">
-          <div class="slide-kicker reveal">19 · Engineering implications</div>
-          <h2 class="reveal">실제로 적용한다면<br>무엇을 우선할까</h2>
+      <section id="specialist">
+        <p class="section-kicker">Part II · Specialist First</p>
+        <h2>작은 정책으로 어려운 한 가지를 끝까지 익힌다</h2>
 
-          <div class="grid-3 reveal">
-            <article class="card">
-              <p class="card-label">Scope</p>
-              <h3>병목만 최적화</h3>
-              <p class="muted">
-                장기 과제 전체보다 정밀도·복구가 성능을 제한하는 구간을 먼저 찾는다.
-              </p>
-            </article>
-            <article class="card">
-              <p class="card-label">Prior</p>
-              <h3>기본 정책을 보존</h3>
-              <p class="muted">
-                BC 정규화와 pass-through로 사전학습 행동 근처에서 탐색을 시작한다.
-              </p>
-            </article>
-            <article class="card">
-              <p class="card-label">Temporal structure</p>
-              <h3>액션 청킹 유지</h3>
-              <p class="muted">
-                정밀 조작에서 액션 청킹 제거는 개선 실패로 이어졌다.
-              </p>
-            </article>
-            <article class="card">
-              <p class="card-label">Reward</p>
-              <h3>보상은 단순하게</h3>
-              <p class="muted">
-                과제 완료 여부를 판별하는 이진 이미지 분류기부터 시작한다.
-              </p>
-            </article>
-            <article class="card">
-              <p class="card-label">Data</p>
-              <h3>실패도 버리지 않기</h3>
-              <p class="muted">
-                품질 조건과 guidance를 사용해 실패·복구 경험까지 학습 신호로 만든다.
-              </p>
-            </article>
-            <article class="card">
-              <p class="card-label">Evaluation</p>
-              <h3>성공률 + 처리량</h3>
-              <p class="muted">
-                성공 여부뿐 아니라 사이클 타임, 복구 능력, 시간당 성공 횟수를 함께 측정한다.
-              </p>
-            </article>
+        <p>
+          엔드투엔드 RL이 어렵다고 해서 RL 자체가 작동하지 않는 것은 아니다.
+          파운데이션 모델을 사용하지 않는 스페셜리스트 정책은 이미 상당히 높은 수준의
+          실세계 성능을 낸다. 대표적인 기준선은 soft actor-critic 계열의
+          <strong>RLPD</strong>다. 사람 데모를 리플레이 버퍼에 섞고, wrist 카메라와
+          사전학습 비전 인코더를 사용하며, 과제 완료 여부는 이진 이미지 분류기로
+          판정한다.
+        </p>
+
+        <figure class="media-card">
+          <img src="assets/u0wjxi8pc6y-ts-00-10-20.jpg" alt="RLPD를 이용한 실세계 스페셜리스트 강화학습 구성" loading="lazy">
+          <figcaption><strong>10:20.</strong> 데모·희소 보상·off-policy actor-critic을 결합한 샘플 효율적 실세계 RL 레시피.</figcaption>
+        </figure>
+
+        <div class="evidence">
+          <p class="evidence-title">스페셜리스트 학습 구성</p>
+          <ul>
+            <li><strong>관측:</strong> wrist 카메라 이미지와 사전학습 비전 표현</li>
+            <li><strong>보상:</strong> 과제 완료 이미지를 판별하는 이진 분류기</li>
+            <li><strong>데이터:</strong> 초기 데모와 자율 롤아웃을 동일한 리플레이 버퍼에서 재사용</li>
+            <li><strong>개입:</strong> 사람이 교정한 행동도 off-policy 데이터로 즉시 편입</li>
+          </ul>
+        </div>
+
+        <h3>SERL이 보여준 것: 몇 시간 안에 산업 작업을 숙달한다</h3>
+        <p>
+          오픈소스 프레임워크 SERL은 자동차 대시보드 커넥터 조립처럼 접촉 정밀도가
+          높은 작업을 반복 학습한다. 초기에는 정렬과 삽입에 실패하지만, 몇 시간의
+          실세계 상호작용 뒤에는 일관된 자율 실행이 가능해진다.
+        </p>
+
+        <div class="figure-grid">
+          <figure class="media-card">
+            <img src="assets/u0wjxi8pc6y-ts-00-11-45.jpg" alt="SERL로 자동차 부품 조립을 학습하는 로봇" loading="lazy">
+            <figcaption><strong>11:45.</strong> 자동차 대시보드 조립을 반복 연습한 뒤 자율 수행하는 SERL 데모.</figcaption>
+          </figure>
+          <figure class="media-card">
+            <img src="assets/u0wjxi8pc6y-ts-00-12-45.jpg" alt="여러 정밀 조립 과제에서 스페셜리스트 RL의 결과" loading="lazy">
+            <figcaption><strong>12:45.</strong> 교란에서 복구하면서 타이밍벨트·케이블·PCB 삽입을 수행하는 정책.</figcaption>
+          </figure>
+        </div>
+
+        <div class="metric-row" aria-label="스페셜리스트 RL 주요 수치">
+          <div class="metric">
+            <span class="metric-value">1–2시간</span>
+            <span class="metric-label">과제별 실세계 이미지 데이터</span>
+          </div>
+          <div class="metric">
+            <span class="metric-value">100%</span>
+            <span class="metric-label">학습된 특정 환경에서의 성공률</span>
+          </div>
+          <div class="metric">
+            <span class="metric-value">&lt; ½</span>
+            <span class="metric-label">BC 대비 일부 과제의 사이클 타임</span>
           </div>
         </div>
-      </section>
 
-      <section class="slide" id="feynman" data-title="직관으로 이해하기">
-        <div class="slide-inner">
-          <div class="slide-kicker reveal">20 · Feynman explanations</div>
-          <h2 class="reveal">어려운 개념을<br>일상 언어로</h2>
-
-          <div class="feynman reveal">
-            <details open>
-              <summary>파운데이션 모델과 RL은 어떻게 다른가?</summary>
-              <div class="details-body">
-                요리학교에서 온갖 요리의 기본기를 배운 사람과 자기 가게에서 김밥 하나를
-                만 번 말아본 사람의 차이다. 전자는 무엇이든 그럭저럭 하고, 후자는 김밥만
-                매우 빠르고 완벽하게 만든다. 좋은 로봇은 두 과정을 모두 거쳐야 한다.
-              </div>
-            </details>
-
-            <details>
-              <summary>RL 토큰은 무엇을 해주는가?</summary>
-              <div class="details-body">
-                베테랑이 신입 옆에서 “지금 상황을 나는 이렇게 이해하고, 나라면 이렇게
-                행동하겠다”고 알려주는 압축된 힌트다. 신입은 처음부터 무작위로 헤매지 않고
-                합리적인 행동 근처에서 더 나은 방법을 찾는다.
-              </div>
-            </details>
-
-            <details>
-              <summary>Classifier-free guidance로 어떻게 RL을 하는가?</summary>
-              <div class="details-body">
-                잘한 시도와 못한 시도 모두에 품질 스티커를 붙여 학습한다. 실행할 때
-                “잘된 스티커 쪽으로 더 강하게 움직여 달라”고 guidance weight를 높이면,
-                모델이 좋은 행동이 모인 중심부를 선택한다. 실패도 “이 방향은 아니다”라는
-                정보이므로 버리지 않는다.
-              </div>
-            </details>
-
-            <details>
-              <summary>왜 실세계에서 연습해야 하는가?</summary>
-              <div class="details-body">
-                농구 자유투를 방 안에서 이미지 트레이닝만 해서는 실제 공의 무게와
-                체육관 바닥의 감각을 배울 수 없다. 시뮬레이터에서 잘하는 정책은 우선
-                시뮬레이터를 잘하는 정책이다. 마지막 정밀도는 실제 환경의 오차에서 배워야 한다.
-              </div>
-            </details>
-          </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>과제</th>
+                <th>RL 정책</th>
+                <th>BC 기준선</th>
+                <th>해석</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>물체 재배치</td>
+                <td>7.53초</td>
+                <td>18.94초</td>
+                <td>재시도와 불필요한 이동 감소</td>
+              </tr>
+              <tr>
+                <td>케이블 라우팅</td>
+                <td>4.08초</td>
+                <td>13.58초</td>
+                <td>접촉 구간에서 더 직접적인 궤적</td>
+              </tr>
+              <tr>
+                <td>PCB 부품 삽입</td>
+                <td>5.22초</td>
+                <td>10.14초</td>
+                <td>삽입 정렬과 복구 행동 개선</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </section>
 
-      <section class="slide" id="qa" data-title="Q&A: 탐색">
-        <div class="slide-inner">
-          <div class="slide-kicker reveal">21 · Q&amp;A</div>
-          <h2 class="reveal">로봇의 탐색은 왜<br>사람처럼 보이지 않는가?</h2>
+        <h3>한계를 뒤집는 방법: 스페셜리스트의 경험을 증류한다</h3>
+        <p>
+          스페셜리스트 정책은 높은 성공률을 얻지만 학습 환경 밖으로 나가지 못한다.
+          RLDG는 이 한계를 데이터 문제로 바꾼다. Ethernet·VGA·USB 커넥터마다 RL
+          스페셜리스트를 학습하고, 이들의 롤아웃을 OpenVLA와 Octo에 증류한다.
+          개별 정책은 한 커넥터만 알지만, 통합 모델은 처음 보는 커넥터에도 일반화한다.
+        </p>
 
-          <div class="grid-2">
-            <article class="card reveal">
-              <p class="card-label">Question</p>
-              <h3>무작위 떨림 대신 구멍을 보고 다가갈 수 없나?</h3>
-              <p class="muted">
-                USB를 삽입할 때 사람은 목표를 보고 접근하지만 RL 정책은 궤적 전체에서
-                액션을 무작위로 흔드는 경우가 많다. play data나 world model이 필요한가?
-              </p>
-            </article>
+        <figure class="media-card">
+          <img src="assets/u0wjxi8pc6y-ts-00-13-55.jpg" alt="RL 스페셜리스트의 경험을 로봇 제너럴리스트에 증류하는 RLDG 과정" loading="lazy">
+          <figcaption><strong>13:55.</strong> 과제별 RL 정책 → 자율 롤아웃 → OpenVLA·Octo 증류로 이어지는 RLDG.</figcaption>
+        </figure>
 
-            <article class="card reveal">
-              <p class="card-label">Answer</p>
-              <h3>제너럴리스트를 행동 prior로 사용하라</h3>
-              <p class="muted">
-                RLT의 BC 항처럼 모를 때는 파운데이션 모델과 유사하게 탐색하도록 한다.
-                기본 모델이 이미 많이 안다면, 참조 행동 근처는 매우 좋은 탐색 공간이다.
-              </p>
-            </article>
-          </div>
-
-          <div class="callout reveal" style="margin-top: 22px;">
-            <strong>한 단계 더</strong>
-            <p>
-              액션 값을 무작위로 흔드는 대신 언어 입력을 바꾸며
-              <strong>의미 공간에서 탐색</strong>할 수 있다. “조금 비스듬히 접근해”
-              같은 의미적 변화는 원시 액션 노이즈보다 구조적인 탐색을 제공한다.
-            </p>
-          </div>
-
-          <blockquote class="big-quote reveal" style="margin-top: 38px;">
-            제너럴리스트는 탐색을 위한 훌륭한 <em>행동 사전확률</em>이다.
-            우리는 그것을 활용해야 한다.
-          </blockquote>
-        </div>
-      </section>
-
-      <section class="slide" id="timeline" data-title="발표 타임라인">
-        <div class="slide-inner">
-          <div class="slide-kicker reveal">22 · Timeline</div>
-          <h2 class="reveal">32분 발표의 흐름</h2>
-
-          <div class="timeline reveal">
-            <div class="timeline-item"><span class="timeline-time">00:59</span><span class="timeline-title">동기: 텍스트가 아니라 실제 집안일</span></div>
-            <div class="timeline-item"><span class="timeline-time">03:22</span><span class="timeline-title">Pre-training과 post-training</span></div>
-            <div class="timeline-item"><span class="timeline-time">05:38</span><span class="timeline-title">지도학습의 “그럭저럭” 문제</span></div>
-            <div class="timeline-item"><span class="timeline-time">07:16</span><span class="timeline-title">왜 실세계 RL인가</span></div>
-            <div class="timeline-item"><span class="timeline-time">09:06</span><span class="timeline-title">Big × efficient × hard</span></div>
-            <div class="timeline-item"><span class="timeline-time">09:49</span><span class="timeline-title">RLPD 스페셜리스트 레시피</span></div>
-            <div class="timeline-item"><span class="timeline-time">10:55</span><span class="timeline-title">SERL 실세계 데모</span></div>
-            <div class="timeline-item"><span class="timeline-time">12:19</span><span class="timeline-title">100% 성공률과 속도 개선</span></div>
-            <div class="timeline-item"><span class="timeline-time">13:02</span><span class="timeline-title">RLDG 증류</span></div>
-            <div class="timeline-item"><span class="timeline-time">14:57</span><span class="timeline-title">RLT 구조</span></div>
-            <div class="timeline-item"><span class="timeline-time">17:18</span><span class="timeline-title">병목 단계만 RL</span></div>
-            <div class="timeline-item"><span class="timeline-time">18:33</span><span class="timeline-title">RLT 정량 결과</span></div>
-            <div class="timeline-item"><span class="timeline-time">21:07</span><span class="timeline-title">RL 데이터 선택 문제</span></div>
-            <div class="timeline-item"><span class="timeline-time">22:09</span><span class="timeline-title">KL 정규화에서 CFG로</span></div>
-            <div class="timeline-item"><span class="timeline-time">25:43</span><span class="timeline-title">Guidance의 시각적 해석</span></div>
-            <div class="timeline-item"><span class="timeline-time">26:25</span><span class="timeline-title">π*0.6 advantage conditioning</span></div>
-            <div class="timeline-item"><span class="timeline-time">27:55</span><span class="timeline-title">π0.7 통합 모델</span></div>
-            <div class="timeline-item"><span class="timeline-time">28:56</span><span class="timeline-title">순환 레시피 결론</span></div>
-            <div class="timeline-item"><span class="timeline-time">29:38</span><span class="timeline-title">Q&amp;A: 탐색 문제</span></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="slide" id="references" data-title="참고 자료">
-        <div class="slide-inner">
-          <div class="slide-kicker reveal">23 · References</div>
-          <h2 class="reveal">연구와 리소스</h2>
-
-          <div class="grid-2 reveal">
-            <ul class="reference-list">
-              <li><strong>SERL</strong> — Luo*, Hu*, Xu et al. <em>A Software Suite for Sample-Efficient Robotic Reinforcement Learning</em>, 2024.</li>
-              <li><strong>HIL-SERL</strong> — Luo*, Xu*, Wu, Levine. <em>Precise and Dexterous Robotic Manipulation via Human-in-the-Loop Reinforcement Learning</em>, 2025.</li>
-              <li><strong>RLDG</strong> — Charles Xu*, Qiyang Li, Jianlan Luo, Sergey Levine. <em>Robotic Generalist Policy Distillation via Reinforcement Learning</em>.</li>
-              <li><strong>CFGRL</strong> — Kevin Frans, Seohong Park, Pieter Abbeel, Sergey Levine. <em>Diffusion Guidance Is a Controllable Policy Improvement Operator</em>.</li>
-            </ul>
-
-            <ul class="reference-list">
-              <li><strong>RLT</strong> — <a href="https://pi.website/research/rlt" target="_blank" rel="noreferrer">pi.website/research/rlt ↗</a></li>
-              <li><strong>π*0.6</strong> — <a href="https://www.pi.website/blog/pistar06" target="_blank" rel="noreferrer">pi.website/blog/pistar06 ↗</a></li>
-              <li><strong>π0.7</strong> — <a href="https://pi.website/blog/pi07" target="_blank" rel="noreferrer">pi.website/blog/pi07 ↗</a></li>
-              <li><strong>워크샵</strong> — <a href="https://rl4il-icra.github.io/" target="_blank" rel="noreferrer">ICRA 2026 Workshop on RL in the Era of IL ↗</a></li>
-              <li><strong>발표 영상</strong> — <a href="https://www.youtube.com/watch?v=u0WJXi8PC6Y" target="_blank" rel="noreferrer">YouTube 원본 ↗</a></li>
-            </ul>
-          </div>
-
-          <div class="callout reveal" style="margin-top: 24px;">
-            <strong>노트 생성 정보</strong>
-            <p>
-              YouTube 자동생성 영어 자막을 기반으로 정리했으며,
-              RLPD·SERL·RLDG·CFGRL·π*0.6·π0.7 등 고유명사는
-              발표 슬라이드 화면과 교차 검증했다.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section class="slide footer-slide" id="close" data-title="마무리">
-        <div class="slide-inner reveal">
-          <div class="slide-kicker">Final thought</div>
-          <h2>
-            넓게 배우고,<br>
-            <span class="gradient-text">좁게 숙달하고, 다시 합친다.</span>
-          </h2>
-          <p class="lead">
-            로봇 파운데이션 모델의 다음 단계는 모든 것을 한 번에 해결하는
-            단일 알고리즘보다, 일반화와 숙련을 반복적으로 교환하는 학습 시스템에 가깝다.
+        <div class="evidence">
+          <p class="evidence-title">중요한 데이터 발견</p>
+          <p>
+            같은 수의 성공 사례를 비교했을 때, <strong>RL 정책이 생성한 데이터가 사람의
+            성공 데모보다 파운데이션 모델 학습에 더 효과적</strong>이었다. RL 롤아웃은
+            단순히 정답 궤적을 모방하지 않고, 여러 상태에서 일관된 행동을 선택하는
+            마르코프 정책의 분포를 더 충실히 반영하기 때문이다.
           </p>
-          <a class="primary-link" href="#cover">처음으로 돌아가기 ↑</a>
-          <p class="footer-note">정리 기준일 · 2026-08-06</p>
         </div>
       </section>
-    </main>
-  </div>
 
-  <div class="slide-controls" aria-label="슬라이드 이동">
-    <button class="slide-button" id="prevSlide" type="button" aria-label="이전 슬라이드">←</button>
-    <span class="slide-count" id="slideCount" aria-live="polite">1 / 24</span>
-    <button class="slide-button" id="nextSlide" type="button" aria-label="다음 슬라이드">→</button>
-  </div>
+      <section id="rlt">
+        <p class="section-kicker">Part III · Reverse the Arrow</p>
+        <h2>이번에는 제너럴리스트가 스페셜리스트를 돕는다</h2>
 
-  <div class="toast" id="toast" role="status" aria-live="polite">핵심 요약을 복사했습니다.</div>
+        <p>
+          증류만으로는 화살표가 한 방향이다. 새로운 과제를 만날 때마다 스페셜리스트
+          RL은 다시 무지한 상태에서 탐색을 시작해야 한다. RLT는 이 화살표를 되돌린다.
+          거대한 VLA의 내부 표현과 제안 행동을 작은 RL 모델에 전달해, 파운데이션
+          모델이 이미 아는 것을 탐색의 출발점으로 삼는다.
+        </p>
 
-  <script>
-    (() => {
-      const slides = [...document.querySelectorAll(".slide")];
-      const nav = document.getElementById("deckNav");
-      const progressBar = document.getElementById("progressBar");
-      const slideCount = document.getElementById("slideCount");
-      const copyButton = document.getElementById("copySummary");
-      const toast = document.getElementById("toast");
-      let currentIndex = 0;
-      let toastTimer;
+        <figure class="media-card">
+          <img src="assets/u0wjxi8pc6y-ts-00-15-10.jpg" alt="제너럴리스트와 스페셜리스트 사이의 역방향 지원 필요성" loading="lazy">
+          <figcaption><strong>15:10.</strong> 증류만으로는 다음 RL 과제가 쉬워지지 않는다. 필요한 것은 양방향 연결이다.</figcaption>
+        </figure>
 
-      slides.forEach((slide, index) => {
-        const link = document.createElement("a");
-        link.href = `#${slide.id}`;
-        link.innerHTML = `
-          <span class="nav-number">${String(index + 1).padStart(2, "0")}</span>
-          <span>${slide.dataset.title || `슬라이드 ${index + 1}`}</span>
-        `;
-        link.setAttribute("aria-label", `${index + 1}. ${slide.dataset.title}`);
-        nav.appendChild(link);
-      });
+        <h3>RL 토큰: 거대한 모델의 판단을 작은 정책에 압축하기</h3>
+        <p>
+          Physical Intelligence의 RLT는 π*0.6 VLA의 이미지 표현을 cross-attention
+          인코더·디코더로 압축해 <strong>1×2048 크기의 RL 토큰</strong>을 만든다. 작은
+          actor와 critic은 이 토큰뿐 아니라 VLA가 제안한 액션 청크도 함께 입력받는다.
+          즉 RL은 “기본 모델이 현재 상황을 어떻게 보고, 무엇을 하려 하는지”를 알고
+          시작한다.
+        </p>
 
-      const navLinks = [...nav.querySelectorAll("a")];
+        <figure class="media-card">
+          <img src="assets/u0wjxi8pc6y-ts-00-16-35.jpg" alt="VLA 표현을 RL 토큰으로 압축해 작은 actor와 critic에 전달하는 RLT 구조" loading="lazy">
+          <figcaption><strong>16:35.</strong> VLA 내부 표현과 기본 액션 청크를 스페셜리스트 RL에 주입하는 RLT 아키텍처.</figcaption>
+        </figure>
 
-      function setCurrent(index) {
-        currentIndex = Math.max(0, Math.min(slides.length - 1, index));
-        navLinks.forEach((link, linkIndex) => {
-          if (linkIndex === currentIndex) {
-            link.setAttribute("aria-current", "true");
-          } else {
-            link.removeAttribute("aria-current");
-          }
-        });
+        <div class="analogy">
+          <strong>쉽게 말하면: 베테랑을 옆자리에 앉힌 신입</strong>
+          <p>
+            신입에게 무작정 시도하라고 하는 대신, 베테랑이 “지금 상황은 이렇고,
+            나라면 이렇게 하겠다”고 계속 알려준다. 신입은 모를 때 베테랑을 따르고,
+            더 좋은 방법을 실제로 발견했을 때만 그 행동에서 벗어난다.
+          </p>
+        </div>
 
-        slideCount.textContent = `${currentIndex + 1} / ${slides.length}`;
-        progressBar.style.width = `${((currentIndex + 1) / slides.length) * 100}%`;
-      }
+        <h3>긴 과제를 모두 학습하지 말고, 가장 어려운 한 단계만</h3>
+        <p>
+          RLT는 긴 작업 전체를 RL로 다시 배우지 않는다. 상위 정책이 과제를 단계로
+          분할하고, 나사 조이기·zip tie 삽입·Ethernet 연결처럼 성공률을 결정하는
+          정밀 병목에만 RL을 적용한다. 이 설계는 RL이 필요한 상태 분포를 줄이고,
+          환경 리셋과 보상 판정도 단순하게 만든다.
+        </p>
 
-      function goToSlide(index) {
-        const safeIndex = Math.max(0, Math.min(slides.length - 1, index));
-        slides[safeIndex].scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+        <div class="figure-grid">
+          <figure class="media-card">
+            <img src="assets/u0wjxi8pc6y-ts-00-17-45.jpg" alt="긴 과제 중 가장 정밀한 병목 단계만 강화학습하는 실험 설계" loading="lazy">
+            <figcaption><strong>17:45.</strong> 기본 모델이 장기 과제를 수행하고, 가장 정밀한 구간만 RL로 파인튜닝한다.</figcaption>
+          </figure>
+          <figure class="media-card">
+            <img src="assets/u0wjxi8pc6y-ts-00-18-30.jpg" alt="나사 조이기, 케이블 타이, 이더넷 삽입 등 RLT 대상 과제" loading="lazy">
+            <figcaption><strong>18:30.</strong> 접촉과 정렬 오차에 민감한 RLT 실험 과제들.</figcaption>
+          </figure>
+        </div>
 
-      document.getElementById("prevSlide").addEventListener("click", () => {
-        goToSlide(currentIndex - 1);
-      });
+        <h3>처리량은 늘고, 성공 궤적은 짧아졌다</h3>
+        <figure class="media-card">
+          <img src="assets/u0wjxi8pc6y-ts-00-20-25.jpg" alt="RLT 처리량과 에피소드 길이 및 구성 요소 제거 실험 결과" loading="lazy">
+          <figcaption><strong>20:25.</strong> 처리량·성공 에피소드 길이·학습 데이터량·어블레이션을 함께 비교한 정량 결과.</figcaption>
+        </figure>
 
-      document.getElementById("nextSlide").addEventListener("click", () => {
-        goToSlide(currentIndex + 1);
-      });
+        <div class="metric-row" aria-label="RLT 에피소드 길이 중앙값">
+          <div class="metric">
+            <span class="metric-value">66</span>
+            <span class="metric-label">RLT 성공 에피소드 중앙값</span>
+          </div>
+          <div class="metric">
+            <span class="metric-value">146</span>
+            <span class="metric-label">사람 원격조작 중앙값</span>
+          </div>
+          <div class="metric">
+            <span class="metric-value">228</span>
+            <span class="metric-label">기본 정책 중앙값</span>
+          </div>
+        </div>
 
-      window.addEventListener("keydown", (event) => {
-        const tag = document.activeElement?.tagName;
-        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>제거한 구성</th>
+                <th>관찰된 결과</th>
+                <th>의미</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>BC regularizer</td>
+                <td>기본 정책 수준에서 개선 실패</td>
+                <td>학습 초기에 행동 prior를 유지해야 함</td>
+              </tr>
+              <tr>
+                <td>Action chunking</td>
+                <td>개선 실패</td>
+                <td>시간적으로 일관된 동작 단위가 필수</td>
+              </tr>
+              <tr>
+                <td>RL token</td>
+                <td>거의 작동하지 않음</td>
+                <td>VLA의 내부 표현이 핵심 정보원</td>
+              </tr>
+              <tr>
+                <td>Action pass-through</td>
+                <td>같은 성능까지 훨씬 느리게 도달</td>
+                <td>기본 정책의 제안 행동이 탐색을 가속</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-        if (event.key === "ArrowRight" || event.key === "PageDown") {
-          event.preventDefault();
-          goToSlide(currentIndex + 1);
-        } else if (event.key === "ArrowLeft" || event.key === "PageUp") {
-          event.preventDefault();
-          goToSlide(currentIndex - 1);
-        } else if (event.key === "Home") {
-          event.preventDefault();
-          goToSlide(0);
-        } else if (event.key === "End") {
-          event.preventDefault();
-          goToSlide(slides.length - 1);
-        }
-      });
+        <div class="note">
+          <strong>“15분 데이터”를 실제 15분 학습으로 읽으면 안 된다.</strong>
+          RL 업데이트에 사용된 행동 데이터는 최대 15분 분량이지만, 환경 리셋과
+          전체 과제의 나머지 단계를 포함한 실제 벽시계 시간은 수 시간이다.
+        </div>
+      </section>
 
-      const slideObserver = new IntersectionObserver(
-        (entries) => {
-          const visible = entries
-            .filter((entry) => entry.isIntersecting)
-            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      <section id="cfgrl">
+        <p class="section-kicker">Part IV · Learn from Everything</p>
+        <h2>성공만 골라 쓰지 않고, 실패까지 학습하는 법</h2>
 
-          if (visible) {
-            setCurrent(slides.indexOf(visible.target));
-          }
-        },
-        {
-          rootMargin: "-20% 0px -55% 0px",
-          threshold: [0.05, 0.25, 0.5, 0.75]
-        }
-      );
+        <p>
+          스페셜리스트의 경험을 제너럴리스트로 되돌릴 때 또 하나의 딜레마가 생긴다.
+          최종 정책의 성공 데이터만 쓰면 품질은 좋지만 RL 과정의 대부분을 버리게 된다.
+          반대로 전체 데이터를 쓰면 실수·복구·경계 상태까지 얻지만 나쁜 행동이 압도적으로
+          많다. CFGRL은 이 선택을 없앤다. 모든 데이터를 학습하되, 추론 시점에 좋은
+          행동 쪽으로 분포를 밀어낸다.
+        </p>
 
-      slides.forEach((slide) => slideObserver.observe(slide));
+        <figure class="media-card">
+          <img src="assets/u0wjxi8pc6y-ts-00-22-00.jpg" alt="최종 성공 데이터와 RL 전체 데이터 사이의 선택 문제" loading="lazy">
+          <figcaption><strong>22:00.</strong> 깨끗하지만 적은 최종 정책 데이터와, 풍부하지만 나쁜 행동이 섞인 전체 RL 데이터의 딜레마.</figcaption>
+        </figure>
 
-      const revealObserver = new IntersectionObserver(
-        (entries, observer) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add("visible");
-              observer.unobserve(entry.target);
-            }
-          });
-        },
-        { threshold: 0.12 }
-      );
+        <h3>KL 정규화 RL과 diffusion guidance의 연결</h3>
+        <p>
+          CFGRL의 출발점은 참조 정책에서 너무 멀어지지 않으면서 보상을 높이는
+          KL 정규화 목적함수다.
+        </p>
 
-      document.querySelectorAll(".reveal").forEach((element) => {
-        revealObserver.observe(element);
-      });
+        <div class="formula" role="math" aria-label="KL 정규화 강화학습 목적함수">J(πθ) =
+Eτ∼p(τ|πθ) [ Σt γᵗ r(st, at) ]
+− β Es∼pπ(s) [ DKL(πθ(a|s) ∥ π̂(a|s)) ]</div>
 
-      function showToast(message) {
-        toast.textContent = message;
-        toast.classList.add("visible");
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => toast.classList.remove("visible"), 2200);
-      }
+        <p>이 목적함수의 최적 정책은 참조 정책을 어드밴티지에 따라 재가중한 형태다.</p>
 
-      async function copyText(text) {
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(text);
-          return;
-        }
+        <div class="formula" role="math" aria-label="KL 정규화 목적함수의 수렴 정책">π(a|s) ∝ π̂(a|s) · exp(A(s,a))^(1/β)</div>
 
-        const area = document.createElement("textarea");
-        area.value = text;
-        area.style.position = "fixed";
-        area.style.opacity = "0";
-        document.body.appendChild(area);
-        area.select();
-        document.execCommand("copy");
-        area.remove();
-      }
+        <p>
+          이진 최적성 변수 <em>o</em>를 도입하면 개선 정책은 전체 데이터 정책과
+          “이 행동이 좋은가”라는 조건의 곱으로 나타난다.
+        </p>
 
-      copyButton.addEventListener("click", async () => {
-        const summary = [
-          "RL for Robot Foundation Models — 핵심 요약",
-          "",
-          "로봇 파운데이션 모델을 RL로 엔드투엔드 학습하기는 아직 어렵다.",
-          "제너럴리스트 VLA는 RL 토큰과 행동 prior로 스페셜리스트의 탐색을 돕고,",
-          "스페셜리스트는 실세계 샘플효율 RL로 병목 과제를 숙달한 뒤 롤아웃을 제너럴리스트에 증류한다.",
-          "",
-          "핵심 포인트:",
-          "1. 지도학습은 지식·일반화, RL은 숙달·속도를 제공한다.",
-          "2. Big model × sample-efficient RL × hard task의 결합이 핵심 난제다.",
-          "3. RLPD/SERL 스페셜리스트는 과제당 1~2시간에 높은 성공률과 짧은 사이클타임을 달성한다.",
-          "4. RLT는 VLA 표현과 기본 액션을 작은 RL actor에 주입해 탐색을 부트스트랩한다.",
-          "5. CFGRL은 좋은 데이터와 나쁜 데이터를 모두 학습하고 추론 시 guidance로 좋은 행동을 증폭한다.",
-          "6. 최종 구조는 제너럴리스트 ↔ 스페셜리스트의 반복적 증류 순환이다.",
-          "",
-          "출처: https://www.youtube.com/watch?v=u0WJXi8PC6Y"
-        ].join("\n");
+        <div class="formula" role="math" aria-label="이진 최적성 변수를 이용한 정책 표현">p(o|s,a) = f(A(s,a)) / Z(s)
+π(a|s) ∝ π̂(a|s) · p(o|s,a)</div>
 
-        try {
-          await copyText(summary);
-          showToast("핵심 요약을 복사했습니다.");
-        } catch {
-          showToast("복사하지 못했습니다.");
-        }
-      });
+        <p>
+          스코어 함수를 분해하고 베이즈 정리로 재배열하면 이 형태는 diffusion 모델의
+          classifier-free guidance와 동형이 된다. 정책 자체를 반복 업데이트하는 대신,
+          전체 데이터로 조건부·무조건부 분포를 학습하고 샘플링할 때 최적성 방향을
+          증폭할 수 있다는 뜻이다.
+        </p>
 
-      setCurrent(0);
-    })();
-  </script>
+        <figure class="media-card">
+          <img src="assets/u0wjxi8pc6y-ts-00-24-15.jpg" alt="KL 정규화 정책 개선과 classifier-free guidance의 수학적 관계" loading="lazy">
+          <figcaption><strong>24:15.</strong> Diffusion guidance를 제어 가능한 정책 개선 연산자로 해석하는 발표의 핵심 수식.</figcaption>
+        </figure>
+
+        <h3>좋은 데이터의 모드로 ‘줌인’한다</h3>
+        <div class="formula" role="math" aria-label="최적성 guidance가 적용된 정책">Optimality-guided policy:
+π̂(a|s) · p(o|s,a)ʷ</div>
+
+        <p>
+          학습 중 최적성 조건을 무작위로 드롭하면 하나의 모델이 전체 데이터 분포와
+          좋은 데이터의 조건부 분포를 모두 배운다. 추론 시 guidance weight
+          <em>w</em>를 높이면 단순히 “좋은 행동으로 조건화”하는 것을 넘어, 좋은
+          데이터가 밀집한 모드를 더 강하게 선택한다.
+        </p>
+
+        <figure class="media-card">
+          <img src="assets/u0wjxi8pc6y-ts-00-25-50.jpg" alt="전체 행동 분포에서 좋은 행동의 모드로 guidance하는 시각적 설명" loading="lazy">
+          <figcaption><strong>25:50.</strong> 무조건부 정책에서 최적 행동이 밀집한 모드로 줌인하는 CFGRL의 시각적 해석.</figcaption>
+        </figure>
+
+        <div class="analogy">
+          <strong>실패가 “버릴 데이터”가 아닌 이유</strong>
+          <p>
+            잘한 시도와 못한 시도에 각각 품질 스티커를 붙여 모두 학습한다. 실제로
+            행동할 때 “잘된 쪽으로 더 세게 밀어 달라”고 요청하면 모델은 성공 사례가
+            밀집한 영역을 선택한다. 실패는 이쪽으로 가면 안 된다는 경계 정보를 제공한다.
+          </p>
+        </div>
+
+        <p>
+          이 방식이 advantage-weighted regression보다 안정적인 이유도 데이터 사용량에
+          있다. AWR은 낮은 어드밴티지 샘플에 사실상 0에 가까운 가중치를 주지만,
+          CFGRL은 모든 샘플을 조건 학습에 활용한다.
+        </p>
+
+        <h3>π*0.6: guidance를 대규모 VLA 정책 추출로 확장</h3>
+        <p>
+          π*0.6은 언어 서브태스크, 멀티모달 웹 데이터, 다양한 로봇 궤적과 함께
+          advantage 조건을 학습한다. 정책은 SigLIP 400M, Gemma 4B, action expert
+          860M으로 구성되고, 별도의 작은 VLM과 value head가 진행도를 평가한다.
+        </p>
+
+        <div class="figure-grid">
+          <figure class="media-card">
+            <img src="assets/u0wjxi8pc6y-ts-00-26-35.jpg" alt="언어와 advantage 조건을 함께 이용하는 pi star 0.6 모델" loading="lazy">
+            <figcaption><strong>26:35.</strong> CFGRL의 조건화 원리를 대규모 디퓨전 VLA 정책에 적용한 π*0.6.</figcaption>
+          </figure>
+          <figure class="media-card">
+            <img src="assets/u0wjxi8pc6y-ts-00-27-05.jpg" alt="pi star 0.6 정책과 가치함수의 전체 구조" loading="lazy">
+            <figcaption><strong>27:05.</strong> 정책 VLA, 별도 가치함수, 이진화된 advantage 조건으로 구성된 전체 아키텍처.</figcaption>
+          </figure>
+        </div>
+
+        <div class="formula" role="math" aria-label="pi star 0.6의 어드밴티지 계산식">A(o,a) = rₜ:ₙ + V(oₜ₊ₙ) − V(oₜ)
+condition = 𝟙[A(o,a) &gt; ε]</div>
+
+        <p>
+          가치함수는 단순한 내부 보조 신호를 넘어 해석 가능한 진행도 지표로 작동한다.
+          셔츠를 접다가 이미 접은 부분을 흐트러뜨리면 값이 급락하고, 복구한 뒤 다시
+          접으면 값이 회복된다.
+        </p>
+
+        <figure class="media-card">
+          <img src="assets/u0wjxi8pc6y-ts-00-27-50.jpg" alt="장기 과제에서 pi star 0.6 RL 반복의 처리량 결과" loading="lazy">
+          <figcaption><strong>27:50.</strong> 빨래 접기·에스프레소 만들기·박스 조립 등 장기 과제에서 4개 중 3개의 처리량이 약 2배 향상됐다.</figcaption>
+        </figure>
+      </section>
+
+      <section id="loop">
+        <p class="section-kicker">Part V · The Flywheel</p>
+        <h2>파이프라인이 아니라 순환 구조로</h2>
+
+        <p>
+          π0.7은 앞선 조각들을 통합한다. 사람 데모뿐 아니라 모든 스페셜리스트의 자율
+          데이터를 함께 학습하고, 언어 지시·서브골 이미지·에피소드 품질·길이를 조건으로
+          사용한다. 추론 시 원하는 메타데이터를 프롬프트하면 하나의 모델이 여러
+          스페셜리스트 과제를 비슷한 수준으로 수행한다.
+        </p>
+
+        <figure class="media-card">
+          <img src="assets/u0wjxi8pc6y-ts-00-28-15.jpg" alt="데모와 스페셜리스트 데이터를 통합해 학습하는 pi 0.7 구조" loading="lazy">
+          <figcaption><strong>28:15.</strong> 데모·자율 데이터·품질 메타데이터를 하나의 제너럴리스트로 증류하는 π0.7.</figcaption>
+        </figure>
+
+        <div class="loop-diagram" role="img" aria-label="제너럴리스트와 스페셜리스트 사이의 순환 학습 과정">
+          <p class="loop-title">Generalist–Specialist Learning Flywheel</p>
+          <div class="loop-track">
+            <div class="loop-node">
+              <strong>① 제너럴리스트</strong>
+              <span>대규모 offline RL과 다양한 로봇·웹 데이터로 넓은 지식과 행동 prior 확보</span>
+            </div>
+            <div class="arrow" aria-hidden="true">→</div>
+            <div class="loop-node">
+              <strong>② 병목 RL</strong>
+              <span>RL 토큰과 기본 행동을 이용해 새로운 정밀 과제를 빠르게 탐색</span>
+            </div>
+            <div class="arrow" aria-hidden="true">→</div>
+            <div class="loop-node">
+              <strong>③ 자율 경험</strong>
+              <span>성공·실패·교란 복구·속도 최적화 궤적을 모두 수집</span>
+            </div>
+            <div class="arrow" aria-hidden="true">→</div>
+            <div class="loop-node">
+              <strong>④ 증류</strong>
+              <span>품질과 advantage를 조건으로 전체 경험을 제너럴리스트에 통합</span>
+            </div>
+          </div>
+          <p class="loop-return">↺ 더 나아진 제너럴리스트가 다음 스페셜리스트의 탐색을 다시 가속한다.</p>
+        </div>
+
+        <div class="figure-grid">
+          <figure class="media-card">
+            <img src="assets/u0wjxi8pc6y-ts-00-29-15.jpg" alt="로봇 파운데이션 모델 강화학습 발표의 핵심 요점" loading="lazy">
+            <figcaption><strong>29:15.</strong> 엔드투엔드 RL의 어려움과 양방향 지원이라는 발표의 핵심 요약.</figcaption>
+          </figure>
+          <figure class="media-card">
+            <img src="assets/u0wjxi8pc6y-ts-00-29-32.jpg" alt="스페셜리스트와 제너럴리스트의 순환 증류 결론" loading="lazy">
+            <figcaption><strong>29:32.</strong> 빠른 스페셜리스트 학습과 대규모 제너럴리스트 학습을 반복 연결하는 최종 비전.</figcaption>
+          </figure>
+        </div>
+
+        <div class="pullquote">
+          미래의 로봇 학습에서 경쟁력은<br>
+          가장 큰 단일 모델보다 가장 빠른 학습 순환에서 나온다.
+        </div>
+      </section>
+
+      <section id="implications">
+        <p class="section-kicker">Implications</p>
+        <h2>연구와 제품 개발에 주는 의미</h2>
+
+        <h3>1. 전체 정책보다 병목을 먼저 정의하라</h3>
+        <p>
+          장기 과제 전체를 RL로 최적화하는 대신, 성공률과 처리량을 제한하는 한두 개의
+          정밀 구간을 찾는 편이 효과적이다. 상위 정책은 이미 잘하는 단계를 유지하고,
+          RL은 접촉·정렬·복구처럼 데이터 가치가 높은 구간에 집중한다.
+        </p>
+
+        <h3>2. 행동 prior는 탐색 알고리즘의 일부다</h3>
+        <p>
+          파운데이션 모델은 단지 초기 가중치가 아니다. 내부 표현, 액션 청크, 언어
+          조건을 작은 RL 정책에 노출하면 탐색 공간 자체가 달라진다. 무작위 액션
+          노이즈 대신 “구멍에 접근한다”, “그립을 다시 잡는다” 같은 의미적 행동 주변을
+          탐색할 수 있다.
+        </p>
+
+        <h3>3. 실패와 복구를 데이터 자산으로 관리하라</h3>
+        <p>
+          최종 성공 궤적만 보존하면 실제 배포에서 필요한 복구 능력을 잃는다. 데이터에는
+          성공 여부뿐 아니라 에피소드 길이, 품질, 개입 시점, 어드밴티지, 실패 유형 같은
+          메타데이터가 함께 기록되어야 한다.
+        </p>
+
+        <h3>4. 단일 성공률보다 처리량을 측정하라</h3>
+        <p>
+          성공률이 같아도 반복 시도와 느린 복구로 인해 실제 생산성은 크게 달라진다.
+          시간당 성공 횟수, 성공 에피소드 길이, 사람 개입 횟수, 리셋 시간을 함께
+          측정해야 제품 수준의 개선을 확인할 수 있다.
+        </p>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>설계 질문</th>
+                <th>권장 판단 기준</th>
+                <th>관련 접근</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>어디에 RL을 적용할까?</td>
+                <td>전체 성공률을 제한하는 정밀 병목 단계</td>
+                <td>RLT, 계층적 과제 분할</td>
+              </tr>
+              <tr>
+                <td>탐색을 어떻게 안정화할까?</td>
+                <td>VLA 표현·기본 액션·BC regularizer 유지</td>
+                <td>RL Token, action pass-through</td>
+              </tr>
+              <tr>
+                <td>어떤 데이터를 증류할까?</td>
+                <td>성공뿐 아니라 실패와 복구를 품질 조건과 함께 사용</td>
+                <td>CFGRL, advantage conditioning</td>
+              </tr>
+              <tr>
+                <td>성능을 무엇으로 볼까?</td>
+                <td>성공률 + 처리량 + 에피소드 길이 + 개입 비용</td>
+                <td>SERL·RLT 평가 방식</td>
+              </tr>
+              <tr>
+                <td>장기적으로 무엇을 축적할까?</td>
+                <td>과제별 모델보다 재사용 가능한 자율 경험과 메타데이터</td>
+                <td>RLDG, π0.7식 증류</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Q&amp;A에서 드러난 다음 연구 문제: 의미 공간의 탐색</h3>
+        <p>
+          “USB를 구멍에 넣을 때 사람은 구멍을 보고 접근하지만, 현재 RL 정책은 궤적
+          전체에서 무작위로 흔들린다”는 질문에 Levine은 제너럴리스트를 행동
+          사전확률로 사용할 것을 강조했다. RLT의 BC 항은 잘 모를 때 기본 모델과
+          비슷하게 움직이도록 한다. 더 나아가 언어 입력을 변화시키며 의미 공간에서
+          탐색할 수 있다. 이는 연속 액션 값에 노이즈를 더하는 방식보다 훨씬 구조화된
+          탐색 공간을 제공한다.
+        </p>
+
+        <div class="evidence">
+          <p class="evidence-title">평가를 위한 체크리스트</p>
+          <ul class="implication-list">
+            <li>□ 파운데이션 모델 없이도 학습 가능한 명확한 병목 단계가 정의됐는가?</li>
+            <li>□ 기본 정책의 표현과 액션을 RL actor에 전달할 수 있는가?</li>
+            <li>□ 보상을 자동 판정할 단순하고 신뢰할 수 있는 신호가 있는가?</li>
+            <li>□ 실패·복구·사람 개입 데이터를 버리지 않고 기록하는가?</li>
+            <li>□ 성공률뿐 아니라 처리량과 실제 벽시계 학습 시간을 보고하는가?</li>
+            <li>□ 새 경험을 다음 제너럴리스트 버전으로 되돌리는 증류 경로가 있는가?</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="timeline">
+        <p class="section-kicker">Video Guide</p>
+        <h2>32분 발표 타임라인</h2>
+
+        <div class="timeline">
+          <div class="timeline-item"><span class="time">0:00</span><p>발표자 소개</p></div>
+          <div class="timeline-item"><span class="time">0:59</span><p>LLM의 텍스트 계획과 물리적 실행 사이의 간극</p></div>
+          <div class="timeline-item"><span class="time">2:15</span><p>로봇 파운데이션 모델 분야의 현황</p></div>
+          <div class="timeline-item"><span class="time">3:22</span><p>Pre-training과 post-training의 역할</p></div>
+          <div class="timeline-item"><span class="time">5:38</span><p>지도학습 정책의 숙련도·속도 한계</p></div>
+          <div class="timeline-item"><span class="time">7:16</span><p>실세계 RL이 필요한 이유</p></div>
+          <div class="timeline-item"><span class="time">9:06</span><p>Big model × sample-efficient RL × hard task</p></div>
+          <div class="timeline-item"><span class="time">9:49</span><p>RLPD 스페셜리스트 학습 레시피</p></div>
+          <div class="timeline-item"><span class="time">10:55</span><p>SERL 실세계 데모와 결과</p></div>
+          <div class="timeline-item"><span class="time">13:02</span><p>RLDG: 스페셜리스트 경험의 제너럴리스트 증류</p></div>
+          <div class="timeline-item"><span class="time">14:57</span><p>RLT와 RL Token 구조</p></div>
+          <div class="timeline-item"><span class="time">17:18</span><p>장기 과제 중 병목 단계만 RL로 개선</p></div>
+          <div class="timeline-item"><span class="time">18:33</span><p>처리량·에피소드 길이·어블레이션 결과</p></div>
+          <div class="timeline-item"><span class="time">21:07</span><p>전체 RL 데이터를 제너럴리스트에 넣는 문제</p></div>
+          <div class="timeline-item"><span class="time">22:09</span><p>KL 정규화 목적함수와 classifier-free guidance</p></div>
+          <div class="timeline-item"><span class="time">25:43</span><p>좋은 행동의 모드로 줌인하는 시각적 해석</p></div>
+          <div class="timeline-item"><span class="time">26:25</span><p>π*0.6과 대규모 advantage conditioning</p></div>
+          <div class="timeline-item"><span class="time">27:55</span><p>π0.7 통합 증류 모델</p></div>
+          <div class="timeline-item"><span class="time">28:56</span><p>제너럴리스트↔스페셜리스트 순환 결론</p></div>
+          <div class="timeline-item"><span class="time">29:38</span><p>행동 prior와 의미 공간 탐색에 관한 Q&amp;A</p></div>
+        </div>
+      </section>
+
+      <section>
+        <div class="takeaway-box">
+          <p class="section-kicker">Reader’s Ending</p>
+          <h2>한 문장으로 남기면</h2>
+          <p>
+            <strong>로봇 파운데이션 모델의 다음 도약은 모든 것을 한 번에 학습하는 데서가
+            아니라, 넓게 아는 모델과 깊게 숙달한 모델이 서로를 반복해서 개선하는 데서
+            시작된다.</strong>
+          </p>
+          <p>
+            엔드투엔드 RL은 장기 목표로 남겠지만, 그때도 스페셜리스트는 사라지지 않을
+            가능성이 크다. 작은 정책은 더 빠르게 배우고, 위험을 격리하며, 병목에 집중할
+            수 있기 때문이다. 중요한 질문은 “어느 모델이 최종 승자인가”가 아니라
+            “새 과제에서 얻은 경험이 다음 모델을 얼마나 빠르게 더 낫게 만드는가”다.
+          </p>
+          <div class="share-copy" aria-label="공유용 요약 문구">공유용 요약
+
+로봇 파운데이션 모델의 엔드투엔드 RL은 아직 어렵다. 현실적인 해법은 제너럴리스트가 RL 탐색을 돕고, 스페셜리스트가 만든 성공·실패·복구 경험을 다시 제너럴리스트에 증류하는 것. 모델보다 중요한 것은 이 양방향 학습 루프다.
+
+#로봇 #강화학습 #VLA #FoundationModels</div>
+        </div>
+      </section>
+
+      <section id="sources">
+        <p class="section-kicker">Sources &amp; Method</p>
+        <h2>출처와 연구 노트</h2>
+
+        <p class="source-note">
+          이 글은 YouTube 자동 생성 영어 자막과 발표 슬라이드 23장을 대조해 구성했다.
+          RLPD, SERL, RLDG, CFGRL, π*0.6, π0.7 등 고유명사는 화면 표기와 연결된
+          연구 페이지를 기준으로 정리했다. 정량 수치는 발표 슬라이드에 제시된 범위와
+          조건을 유지했으며, 특정 환경에서의 결과를 일반적인 로봇 성능으로 확대 해석하지 않았다.
+        </p>
+
+        <ul class="source-list">
+          <li><a>Sergey Levine — RL for Robot Foundation Models, 발표 영상</a></li>
+          <li><a>ICRA 2026 Workshop on RL in the Era of IL</a></li>
+          <li>Luo, Hu, Xu et al. <cite>SERL: A Software Suite for Sample-Efficient Robotic Reinforcement Learning</cite>, 2024.</li>
+          <li>Luo, Xu, Wu, Levine. <cite>Precise and Dexterous Robotic Manipulation via Human-in-the-Loop Reinforcement Learning</cite>, 2025.</li>
+          <li>Xu, Li, Luo, Levine. <cite>RLDG: Robotic Generalist Policy Distillation via Reinforcement Learning</cite>.</li>
+          <li>Frans, Park, Abbeel, Levine. <cite>Diffusion Guidance Is a Controllable Policy Improvement Operator</cite>.</li>
+          <li><a>Physical Intelligence — RLT: RL Token</a></li>
+          <li><a>Physical Intelligence — π*0.6</a></li>
+          <li><a>Physical Intelligence — π0.7</a></li>
+        </ul>
+      </section>
+    </article>
+  </main>
+
+  <footer>
+    <p>Research report · Published 2026-08-06 · Source presentation dated 2026-06-08</p>
+  </footer>
 </body>
 </html>
