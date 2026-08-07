@@ -1,7 +1,22 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-07T15:32:50.924Z",
+  "updatedAt": "2026-08-07T15:41:10.366Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-david-held-rl-case-study-robot-assisted-dressing-%EC%9A%94%EC%95%BD/",
+      "excerpt": "David Held (CMU): A Case Study of RL — Robot Assisted Dressing 영상 정보 채널 : Zhanpeng He (ICRA 2026 RL4IL 워크샵) 게시일 : 2026 06 08 길이 : 28분 50초 링크 : https://www.youtube.com/watch?v=qgTLr3h6BuA <div style=\"position: relative; width: 100%; padding ",
+      "shortId": "12ifdub",
+      "slug": "yt-david-held-rl-case-study-robot-assisted-dressing-요약",
+      "sourcePath": "clippings/yt_David_Held_RL_Case_Study_Robot_Assisted_Dressing_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료"
+      ],
+      "title": "David Held (CMU): A Case Study of RL — Robot Assisted Dressing",
+      "updatedAt": "2026-08-07T15:41:10.366Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/12ifdub/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-pulkit-agrawal-on-rl-and-il-%EC%9A%94%EC%95%BD/",

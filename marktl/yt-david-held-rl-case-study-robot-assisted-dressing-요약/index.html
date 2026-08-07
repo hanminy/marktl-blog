@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>David Held (CMU): A Case Study of RL — Robot Assisted Dressing</title>
+<style>
+      body { margin: 0; font-family: Georgia, "Times New Roman", serif; color: #202124; background: #faf7f2; }
+      main { max-width: 900px; margin: 0 auto; padding: 56px 36px 80px; box-sizing: border-box; }
+      article { background: #fffdf8; border: 1px solid #e6ddcf; padding: 44px; }
+      h1 { font-size: 44px; line-height: 1.05; margin-top: 0; }
+      h2 { margin-top: 42px; border-top: 1px solid #dfd5c8; padding-top: 24px; }
+      p, li { font-size: 18px; line-height: 1.75; }
+      a { color: #8b3a2b; }
+      pre { overflow: auto; padding: 18px; background: #25211d; color: #f7efe4; border-radius: 6px; }
+      table { width: 100%; border-collapse: collapse; margin: 22px 0; background: #fff; }
+      th, td { border-bottom: 1px solid #e6ddcf; padding: 10px 12px; }
+      img { max-width: 100%; height: auto; display: block; margin: 24px auto; }
+      .frontmatter { white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: #f1eadf; padding: 14px; color: #5f574f; }
+      .callout { border: 1px solid #d8b98c; background: #fff6e5; padding: 16px 18px; margin: 24px 0; }
+      .callout-title { font-family: ui-sans-serif, system-ui, sans-serif; font-weight: 800; text-transform: uppercase; font-size: 12px; letter-spacing: .08em; }
+    </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="David Held (CMU): A Case Study of RL — Robot Assisted Dressing">
+<meta property="og:description" content="David Held (CMU): A Case Study of RL — Robot Assisted Dressing 영상 정보 채널 : Zhanpeng He (ICRA 2026 RL4IL 워크샵) 게시일 : 2026 06 08 길이 : 28분 50초 링크 : https://www.youtube.com/watch?v=qgTLr3h6BuA &lt;div style=&quot;position: relative; width: 100%; padding ">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/12ifdub/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/12ifdub/assets/qgtlr3h6bua-ts-00-02-20.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="David Held (CMU): A Case Study of RL — Robot Assisted Dressing">
+<meta name="twitter:description" content="David Held (CMU): A Case Study of RL — Robot Assisted Dressing 영상 정보 채널 : Zhanpeng He (ICRA 2026 RL4IL 워크샵) 게시일 : 2026 06 08 길이 : 28분 50초 링크 : https://www.youtube.com/watch?v=qgTLr3h6BuA &lt;div style=&quot;position: relative; width: 100%; padding ">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/12ifdub/assets/qgtlr3h6bua-ts-00-02-20.jpg">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-david-held-rl-case-study-robot-assisted-dressing-%EC%9A%94%EC%95%BD/">
+</head>
+<body>
+<main data-template="editorial">
+<article>
+<pre class="frontmatter">title: &quot;David Held (CMU): A Case Study of RL — Robot Assisted Dressing&quot;
+tags:
+  - youtube
+  - 연구자료
+source: &quot;https://www.youtube.com/watch?v=qgTLr3h6BuA&quot;
+channel: &quot;Zhanpeng He&quot;
+video_id: &quot;qgTLr3h6BuA&quot;
+date: 2026-08-08</pre>
+<h1>David Held (CMU): A Case Study of RL — Robot Assisted Dressing</h1>
+<h2>영상 정보</h2>
+<ul><li><strong>채널</strong>: Zhanpeng He (ICRA 2026 RL4IL 워크샵)</li><li><strong>게시일</strong>: 2026-06-08</li><li><strong>길이</strong>: 28분 50초</li><li><strong>링크</strong>: https://www.youtube.com/watch?v=qgTLr3h6BuA</li></ul>
+<p>&lt;div relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;&quot;&gt; &lt;iframe absolute; top: 0; left: 0; width: 100%; height: 100%;&quot; src=&quot;https://www.youtube.com/embed/qgTLr3h6BuA&quot; frameborder=&quot;0&quot; allowfullscreen&gt;&lt;/iframe&gt; &lt;/div&gt;</p>
+<h2>한줄 요약</h2>
+<p>착의 보조라는 단일 과제를 수년간 끝까지 밀어붙인 케이스 스터디다. 시뮬레이션은 체형·자세·의복 일반화를 주지만 <strong>힘이 부정확하고 물리가 불안정</strong>하다는 벽에 부딪혔고, 그 해법으로 <strong>비전은 시뮬에서, 힘은 실세계에서</strong> 배운 뒤 결합하는 경로를 단계적으로 만들어간다. 보상이 없는 실세계 문제는 <strong>VLM에게 두 장면을 비교시켜</strong> 푼다.</p>
+<h2>핵심 장면 분석</h2>
+<h3>00:02:20 — 왜 착의 보조인가</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-02-20.jpg" alt="qgTLr3h6BuA_ts_00-02-20.jpg"> 과제 선정의 근거가 통계로 제시된다. <strong>요양시설 거주자와 재택 간병 환자의 92%가 착의에 도움을 필요로 한다.</strong> 로봇이 이를 대신하면 간병 부담이 크게 줄어든다. 동시에 매우 어려운 과제이기도 하다. 의복이 변형체이고 착의 과정에서 반드시 변형되어야 하며, 상대인 사람 역시 변형체이고 안전하게 다뤄야 하며, 다양한 의복·자세·체형에 일반화해야 한다.</p>
+<h3>00:03:10 — 시뮬레이션으로 다양성 확보</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-03-10.jpg" alt="qgTLr3h6BuA_ts_00-03-10.jpg"> 실세계에서 그만한 다양성의 데이터를 모으기는 어렵기 때문에 시뮬레이션을 택했다. <strong>6,000개가 넘는 인체 메시와 5종의 의복</strong>으로 데이터셋을 구성한다.</p>
+<h3>00:05:00 — 표준 RL은 다양성 앞에서 무너진다</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-05-00.jpg" alt="qgTLr3h6BuA_ts_00-05-00.jpg"> 설정은 평범하다. 분할된 포인트 클라우드(의복·팔·엔드이펙터)를 입력받고, 시뮬레이터의 ground truth로 &quot;팔을 얼마나 입혔는가&quot;를 보상으로 삼아 SAC로 엔드이펙터 행동을 학습한다. <strong>한 사람에 대해서는 작동한다.</strong> 그러나 여러 자세와 체형으로 확장하는 순간 <strong>관측 공간과 보상의 분산이 너무 커져 수렴하지 않는다.</strong></p>
+<h3>00:06:10 — 정책 증류로 우회</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-06-10.jpg" alt="qgTLr3h6BuA_ts_00-06-10.jpg"> 해법은 분할 정복이다. 인체 자세를 N개 범주로 나누고 <strong>범주마다 교사 정책을 RL로 따로 학습</strong>한다. 각 교사의 과제 공간이 좁아지므로 수렴한다. 그런 다음 <strong>행동 복제로 하나의 학생 정책에 증류</strong>해 모든 자세를 처리하게 만든다.</p>
+<h3>00:06:50 — 실세계 검증</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-06-50.jpg" alt="qgTLr3h6BuA_ts_00-06-50.jpg"> <strong>참가자 17명, 1인당 30회, 의복 5종</strong>으로 실험했다. 열마다 다른 의복, 다른 자세에 대해 착의가 성공한다. 사용자 설문에서 증류 정책은 &quot;옷이 제대로 입혀졌다&quot;는 항목에 높은 점수를 받았고, 증류를 쓰지 않은 기준선은 동의를 얻지 못했다.</p>
+<h3>00:07:35 — 소매가 길수록 어려워진다</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-07-35.jpg" alt="qgTLr3h6BuA_ts_00-07-35.jpg"> 의복별 성능을 보면 경향이 뚜렷하다. <strong>짧은 소매는 쉽고, 길고 좁은 소매로 갈수록 어려워진다.</strong> 이유는 뒤에서 밝혀지는데, 긴 소매일수록 가림(occlusion)이 심해 로봇이 상황을 볼 수 없기 때문이다.</p>
+<h3>00:08:30 — &quot;로봇이 나와 싸우는 것 같다&quot;</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-08-30.jpg" alt="qgTLr3h6BuA_ts_00-08-30.jpg"> 발표의 전환점이다. 심한 가림 상황에서 참가자가 남긴 말이 슬라이드에 그대로 인용된다. <strong>&quot;로봇이 나와 싸우는 것 같아서 불편하다.&quot;</strong> 원인은 명확하다. <strong>이 정책에는 힘이라는 개념이 아예 없고 비전만으로 문제를 풀려 한다.</strong> 오른쪽 그래프는 실세계에서 측정한 힘과 시뮬레이션에서 같은 동작을 재현했을 때의 힘이 <strong>일치하지 않음</strong>을 보여준다. 온갖 방식으로 조정해봤지만 맞출 수 없었다. 시뮬레이터는 천의 일반적인 동역학은 잘 재현했지만 <strong>힘 측정값만큼은 전이 가능한 수준이 아니었다.</strong></p>
+<h3>00:09:20 — 사람이 팔을 움직이면 멈춘다</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-09-20.jpg" alt="qgTLr3h6BuA_ts_00-09-20.jpg"> 두 번째 실패 모드. 착의 도중 사람이 팔을 움직이면 그 팔이 가려져 있기 때문에 <strong>순수 비전 정책은 대응하지 못하고 끼인다.</strong> 시뮬레이션에서 사람 팔을 움직여 학습시키려 했더니 <strong>물리가 불안정해지고 천이 폭발</strong>하는 문제가 이어졌다.</p>
+<h3>00:09:50 — 시뮬레이션의 장부와 단점</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-09-50.jpg" alt="qgTLr3h6BuA_ts_00-09-50.jpg"> 중간 정산이다. 시뮬레이션은 <strong>대량의 데이터와 체형·자세·의복 전반의 일반화</strong>를 준다. 그러나 <strong>힘이 부정확하고 물리가 불안정</strong>하다. 실세계 모방학습은 힘 쪽은 낫지만, 모든 체형·자세·의복을 아우를 만큼 데이터를 모으기 어렵다.</p>
+<h3>00:12:10 — 해법 1: 힘 제약 시각 정책(FCVP)</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-12-10.jpg" alt="qgTLr3h6BuA_ts_00-12-10.jpg"> 두 세계를 결합한다. <strong>비전 기반 정책은 시뮬레이션에서, 힘 동역학 모델은 실세계에서</strong> 학습한다. 정책이 행동 분포를 내면 여러 개를 샘플링하고, 실세계에서 학습한 힘 동역학 모델(힘 이력 + 포인트 클라우드 → 다음 힘 예측)로 각 행동이 유발할 힘을 예측해 <strong>임계값을 넘는 행동을 걸러낸다.</strong> 남은 것 중 정책 확률이 가장 높은 행동을 최종 선택한다. 핵심 이점은 학습 비용이다. <strong>동역학 모델은 정책보다 훨씬 빨리 학습되므로 실세계 데이터가 적게 든다.</strong></p>
+<h3>00:13:00 — 힘 위반은 줄고 착의율은 유지된다</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-13-00.jpg" alt="qgTLr3h6BuA_ts_00-13-00.jpg"> 시뮬레이션 파라미터 세트 A로 정책을, 세트 B로 힘 모델을 학습시켜 sim-to-real 적응의 대리 실험을 구성했다. 가로축은 평균 힘 위반(왼쪽이 좋음), 세로축은 팔 착의 비율(위가 좋음)이다. <strong>FCVP는 다른 방법보다 힘 위반이 훨씬 적으면서 착의 비율은 거의 동등</strong>하다. 실세계 사용자 연구에서도 비전 전용 기준선은 끼여서 멈추는 반면, FCVP는 힘 신호를 읽고 행동을 조정해 빠져나온다. 흥미로운 것은 힘 제약을 걸었는데도 <strong>착의 비율이 오히려 더 높다</strong>는 점이다. 힘을 인지하는 것 자체가 정책을 더 성공적인 행동으로 유도한다.</p>
+<h3>00:14:30 — 다음 벽: 보상 설계</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-14-30.jpg" alt="qgTLr3h6BuA_ts_00-14-30.jpg"> &quot;실세계에서 RL을 하면 더 잘할 수 있지 않을까&quot;로 넘어가면 곧바로 보상 설계 문제를 만난다. 블록 밀기처럼 단순한 과제조차 사람들은 꽤 복잡한 보상(그리퍼가 블록 근처로, 블록이 목표 방향으로, 최종적으로 목표 도달)을 설계한다.</p>
+<h3>00:15:10 — 실세계에는 코드가 없다</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-15-10.jpg" alt="qgTLr3h6BuA_ts_00-15-10.jpg"> LLM에게 보상 코드를 짜게 하는 접근이 시뮬레이션에서는 통한다. 그러나 실세계 착의에는 적용할 수 없다. 붉은 문장이 이유다. <strong>&quot;실세계에서는 코드에 접근할 수 없고 원시 관측만 얻는다.&quot;</strong> 이전 연구에서 쓰던 시뮬레이터의 특권 정보 기반 보상도 이제 쓸 수 없다.</p>
+<h3>00:16:00 — CLIP 계열 보상의 한계</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-16-00.jpg" alt="qgTLr3h6BuA_ts_00-16-00.jpg"> 이미지와 목표 이미지를 임베딩해 특징을 비교하는 CLIP 계열 보상이 대안으로 제시되어 왔다. 그러나 CLIP 학습 데이터(언어-이미지 쌍)의 범위에 갇히고, 이미지 정합 기반이라 <strong>보상이 상당히 노이즈가 많다.</strong></p>
+<h3>00:16:50 — 사람도 절대 점수는 일관되지 않다</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-16-50.jpg" alt="qgTLr3h6BuA_ts_00-16-50.jpg"> 발상의 전환이 여기서 나온다. 같은 장면들에 사람에게 점수를 매기게 하면 <strong>사람마다, 심지어 같은 사람도 시점마다 숫자가 달라진다.</strong> 그러나 <strong>순서(어느 쪽이 더 진행됐는가)는 일관</strong>된다. 그렇다면 VLM에게도 숫자를 묻지 말고 <strong>두 이미지를 비교시켜야 한다.</strong></p>
+<h3>00:17:30 — RL-VLM-F 파이프라인</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-17-30.jpg" alt="qgTLr3h6BuA_ts_00-17-30.jpg"> 전체 구조다. 관측 두 개와 과제 설명(&quot;천을 대각선으로 접어라&quot;)을 VLM에 주고 <strong>어느 쪽이 더 진행됐는지</strong> 묻는다. 그 선호 라벨로 보상 모델을 학습하고, 그 보상으로 정책을 개선한다. <strong>사람이 제공하는 것은 과제 설명 한 줄뿐이고 나머지는 자동이다.</strong></p>
+<h3>00:18:10 — Bradley-Terry로 선호를 보상으로</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-18-10.jpg" alt="qgTLr3h6BuA_ts_00-18-10.jpg"> RLHF의 표준 도구를 그대로 쓴다. 사람 또는 VLM이 한 궤적을 다른 궤적보다 선호하면 그쪽 보상이 높아지도록 <strong>Bradley-Terry 모델</strong>을 선호 데이터에 대한 MLE로 학습한다.</p>
+<h3>00:19:00 — 비교가 원시 점수를 이긴다</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-19-00.jpg" alt="qgTLr3h6BuA_ts_00-19-00.jpg"> 학습 곡선 비교다. CLIP Score, BLIP-2 Score, RoboCLIP, 그리고 <strong>VLM에게 원시 점수를 물은 경우</strong>를 모두 제치고 <strong>RL-VLM-F(빨강)</strong> 가 앞선다. 수작업으로 설계한 ground truth 보상과 비교해도 격차가 크지 않다. 참고로 <strong>2단계 프롬프팅</strong>이 효과적이었다. 먼저 두 이미지와 그 차이를 서술하게 하고, 그다음에 어느 쪽이 더 진행됐는지(또는 &quot;둘 다 아님&quot;) 라벨을 매기게 한다.</p>
+<h3>00:20:20 — 무라벨 실세계 데이터에 보상을 붙이다</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-20-20.jpg" alt="qgTLr3h6BuA_ts_00-20-20.jpg"> 실세계 적용 구조. <strong>보상이 없는 준최적 데이터셋</strong>에서 관측쌍을 뽑아 VLM에 비교시키고, 학습된 보상 모델로 <strong>데이터셋 전체에 보상을 라벨링</strong>한 뒤, 그것으로 오프라인 RL(IQL)을 돌린다.</p>
+<h3>00:21:00 — 준최적 데이터에서 준최적을 넘어서기</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-21-00.jpg" alt="qgTLr3h6BuA_ts_00-21-00.jpg"> ViperX 300s 로봇과 마네킹 실험 결과다. 같은 준최적 데이터를 모방학습한 <strong>DP3보다 오프라인 RL-VLM-F의 착의 비율이 뚜렷하게 높다.</strong> 준최적 데이터를 모방하면 준최적에 머물지만, 보상을 붙여 오프라인 RL을 하면 그것을 넘어선다.</p>
+<h3>00:22:00 — 비전은 시뮬, 힘은 실세계</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-22-00.jpg" alt="qgTLr3h6BuA_ts_00-22-00.jpg"> 최종 통합의 밑그림. 시뮬레이션에서 비전 정책을, 실세계에서 힘 정보를 얻어 결합한다는 구도가 다시 확인된다.</p>
+<h3>00:23:30 — FMVP: FiLM으로 힘을 사후 주입</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-23-30.jpg" alt="qgTLr3h6BuA_ts_00-23-30.jpg"> 구현의 핵심이다. 시뮬에서 학습한 비전 정책에 <strong>FiLM 조건화 레이어를 나중에 덧붙여</strong> 힘 정보를 주입하고, 전체를 오프라인 RL로 미세조정한다. 시뮬 초기화가 좋기 때문에 <strong>실세계 데이터가 많이 들지 않는다.</strong> 보상은 두 종류를 합친다. <strong>힘 최소화</strong>는 실세계 힘 센서로 임계값 이하를 유지하면 되고, <strong>착의 성능</strong>은 앞서 만든 RL-VLM-F가 제공한다. 화살표가 목표를 요약한다. <strong>힘은 낮추고 착의는 높인다.</strong></p>
+<h3>00:24:20 — 움직이는 사람을 상대로</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-24-20.jpg" alt="qgTLr3h6BuA_ts_00-24-20.jpg"> 난이도를 한 단계 올린 사람 연구다. <strong>참가자 8명, 192회 시행</strong>이며, 참가자는 착의 도중 팔 올리기·굽히기·펴기·물병 받기·전화 받기·머리 긁기 등 <strong>의도적으로 움직인다.</strong> 학습에 사용된 동작과 사용되지 않은 동작을 모두 평가한다.</p>
+<h3>00:25:00 — 더 편안하고 더 잘 입힌다</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-25-00.jpg" alt="qgTLr3h6BuA_ts_00-25-00.jpg"> 결과는 두 지표 모두에서 우세하다. <strong>편안함에 대한 리커트 점수가 비전 전용 대비 유의하게 높고(p &lt; 0.05), 팔 착의 비율도 높다.</strong> 학습하지 않은 동작에 대해서도 적응해 과제를 완수한다.</p>
+<h3>00:26:20 — 그래서 무엇을 해야 하는가</h3>
+<p><img src="assets/qgtlr3h6bua-ts-00-26-20.jpg" alt="qgTLr3h6BuA_ts_00-26-20.jpg"> 워크샵 주제에 대한 답을 정리한다. <strong>실세계 모방학습</strong>만으로는 체형·자세·의복 전반의 데이터를 충분히 모을 수 없다. <strong>시뮬레이션 기반 학습</strong>만으로는 변형체 의복과 움직이는 사람 앞에서 힘이 부정확하고 물리가 불안정하다. <strong>답은 결합이다.</strong> 대규모 시뮬레이션 데이터로 일반성을 얻고, 실세계 데이터 수집과 오프라인 RL로 성능을 마저 끌어올린다.</p>
+<h2>주요 내용 요약</h2>
+<h3>핵심 포인트</h3>
+<ul><li><strong>하나의 과제를 끝까지 미는 연구 형태</strong>의 사례다. 각 단계의 실패가 다음 방법을 규정한다. 표준 RL 실패 → 정책 증류, 힘 부재 → FCVP, 보상 부재 → RL-VLM-F, 통합 필요 → FMVP.</li><li><strong>시뮬레이션의 한계가 &quot;정확도&quot;가 아니라 &quot;무엇이 부정확한가&quot;로 특정된다.</strong> 천의 일반 동역학은 쓸 만했지만 <strong>힘 측정값</strong>은 전이 불가였고, 사람이 움직이면 물리가 발산했다. 이 구체성이 해법을 결정했다.</li><li><strong>&quot;로봇이 나와 싸우는 것 같다&quot;</strong> 는 참가자 발언이 정량 지표보다 강한 문제 정의로 작동했다. 착의율이 높아도 사람이 불편하면 실패다.</li><li><strong>힘 제약이 성능을 깎지 않고 오히려 높였다.</strong> 힘 인지가 정책을 더 성공적인 행동으로 유도한다는 결과는 안전-성능 트레이드오프의 통념을 뒤집는다.</li><li><strong>VLM에게 점수 대신 비교를 묻는다.</strong> 사람의 절대 점수가 일관되지 않고 순서만 일관되다는 관찰에서 나온 설계이며, CLIP 계열과 VLM 원시 점수를 모두 앞선다.</li><li><strong>역할 분담이 일관된다.</strong> 시뮬레이션은 일반화, 실세계는 물리적 접촉. 이 분담이 네 편의 연구를 관통한다.</li></ul>
+<h3>기술적 내용</h3>
+<ul><li><strong>데이터</strong>: 인체 메시 6,000+ / 의복 5종. 관측은 의복·팔·엔드이펙터로 분할된 포인트 클라우드. 행동은 엔드이펙터 변위. 알고리즘은 SAC.</li><li><strong>정책 증류</strong>: 자세를 N개 범주로 분할 → 범주별 교사 정책 RL 학습 → 행동 복제로 단일 학생 정책에 증류. 관측 분산 문제를 우회하는 표준 기법.</li><li><strong>FCVP(Force-Constrained Visual Policy)</strong>: 힘 동역학 모델 f(힘 이력, 포인트 클라우드) → 다음 힘. 정책 샘플 행동 중 예측 힘이 임계값 이하인 것들 가운데 정책 확률 최대를 선택. 동역학 모델은 정책보다 표본 효율이 높아 실세계 학습이 가능.</li><li><strong>RL-VLM-F</strong>: (관측₁, 관측₂, 과제 설명) → VLM 선호 → Bradley-Terry 보상 모델 → 정책 학습. 2단계 프롬프팅(서술 후 라벨링)이 1단계보다 우수. 실세계에서는 무라벨 데이터셋 전체를 라벨링해 <strong>오프라인 RL(IQL)</strong> 로 사용.</li><li><strong>FMVP(Force-Modulated Vision Policy, CoRL)</strong>: 시뮬 학습 비전 정책 + <strong>FiLM 조건화로 힘 사후 주입</strong> + 오프라인 RL 미세조정. 보상 = 힘 임계 보상 + RL-VLM-F 착의 보상.</li><li><strong>평가</strong>: 사용자 연구 17명×30회(초기), 8명×192회(FMVP, 팔 동작 포함). 지표는 팔 착의 비율과 리커트 편안함 점수.</li></ul>
+<h3>Q&amp;A 요지</h3>
+<ul><li><strong>힘과 비전을 결합하는 최선의 방식은?</strong> 현재는 FiLM 조건화를 쓰지만, Held가 생각하는 이상은 <strong>힘을 장면에 접지(ground)</strong> 시키는 것이다. &quot;이 힘이 어떤 물체가 무엇에 눌리거나 쓸려서 생겼는가&quot;를 <strong>정책이 시각적으로 추론</strong>할 수 있어야 한다. 그런 아키텍처가 어떤 모습일지는 아직 모른다고 인정하며, 질문자가 제안한 &quot;비주얼 월드 모델의 힘 조건화&quot;라는 방향에 동의한다.</li></ul>
+<h2>시사점과 한계</h2>
+<h3>한계</h3>
+<ul><li>힘 동역학 모델과 FMVP 모두 <strong>실세계 데이터 수집이 여전히 필요</strong>하다. 줄어든 것은 양이지 필요 자체가 아니다.</li><li><strong>오프라인 RL에 의존</strong>하므로 수집된 데이터의 분포를 크게 벗어나는 상황은 다루기 어렵다.</li><li>VLM 선호 기반 보상은 <strong>VLM이 장면을 오판하는 경우</strong>에 대한 방어책이 제시되지 않았다(발표에서 관련 분석은 시간 관계상 생략).</li><li>힘과 비전의 결합이 <strong>FiLM이라는 비교적 얕은 결합</strong>에 머물러 있음을 본인이 Q&amp;A에서 인정한다.</li></ul>
+<h3>현장 적용 관점에서의 시사점</h3>
+<ul><li><strong>&quot;시뮬레이션은 일반화, 실세계는 힘&quot;이라는 역할 분담은 굴착기에 거의 그대로 적용된다.</strong> 지형·기하 다양성은 시뮬로 커버하고, 토양 반력처럼 시뮬이 못 맞추는 물리는 실세계 데이터로 보정하는 구조가 자연스럽다.</li><li><strong>힘 동역학 모델만 실세계에서 학습한다는 절충이 특히 실용적이다.</strong> 정책 전체를 실기에서 학습시키는 것은 중장비에서 불가능에 가깝지만, &quot;이 행동이 얼마나 큰 반력을 유발할지&quot; 예측하는 모델은 훨씬 적은 데이터로 학습할 수 있고 <strong>안전 필터로 바로 쓸 수 있다.</strong> 예측 힘이 임계값을 넘는 행동을 사전에 걸러내는 구조는 중장비 안전 요건과도 잘 맞는다.</li><li><strong>힘 제약이 성능을 깎지 않았다는 결과</strong>는 안전 필터 도입을 설득할 때 쓸 수 있는 근거다.</li><li><strong>VLM 비교 기반 보상</strong>은 굴착처럼 &quot;완료 상태를 수치로 정의하기 어려운&quot; 작업에 유효할 수 있다. 다만 굴착 현장 영상에 대한 VLM의 판단 신뢰도는 별도 검증이 필요하다.</li><li><strong>사용자 편안함을 1급 지표로 둔 점</strong>은 협업 작업 기계에 시사점이 있다. 굴착기 주변 작업자나 동승 오퍼레이터의 체감 안정성은 착의 보조의 &quot;편안함&quot;과 같은 역할을 한다.</li><li>다만 이 연구는 <strong>저속·저출력 매니퓰레이터</strong>를 전제한다. 사람과 접촉하며 힘을 낮추는 문제와, 수 톤급 하중을 다루며 힘을 조절하는 문제는 안전 여유의 규모가 다르다.</li></ul>
+<h2>관련 노트</h2>
+<ul><li>[[yt_Pulkit_Agrawal_On_RL_and_IL_요약]] — 같은 워크샵. &quot;시뮬레이션을 사전학습으로 보라&quot;, &quot;접촉과 힘을 최적화하라&quot;는 주장이 이 발표의 실증과 정확히 맞물린다.</li><li>[[yt_Jason_Ma_RL_for_Real-World_Production_Robotics_요약]] — 같은 워크샵. 실세계 데이터 수집을 어디에 집중할지의 문제의식이 공통된다.</li></ul>
+</article>
+</main>
+
+</body>
+</html>
