@@ -3,8 +3,8 @@
 This folder is a static MarkTL HTML export bundle.
 
 - Source note: 02_research/필드로봇/2025 Towards Fully Integrated Autonomous Excavation-서울대_요약.md
-- Artifact goal: read
-- Artifact type: faithful-note
+- Artifact goal: publish
+- Artifact type: research-report
 - Template: editorial
 - Preview security: sanitized
 
