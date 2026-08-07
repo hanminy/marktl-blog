@@ -3,34 +3,43 @@
 <head>
   
   
+  <title>30톤 굴착기가 스스로 깎고 검사한다 — 완전 통합 자율 굴착 시스템 연구</title>
   
-  <title>Towards Fully Integrated Autonomous Excavation — 요약</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
   <style>
     :root {
-      color-scheme: light;
-      --canvas: #eef2f3;
-      --paper: #fffefa;
-      --ink: #182324;
-      --muted: #647273;
-      --line: #dce4e3;
-      --line-strong: #c9d5d3;
-      --accent: #136f68;
-      --accent-dark: #0b514c;
-      --accent-soft: #e1f1ed;
-      --blue: #225f8f;
-      --blue-soft: #e8f2fa;
-      --gold: #9b671c;
-      --gold-soft: #fff4d9;
-      --red: #a3473d;
-      --red-soft: #fbeae7;
-      --violet: #6553a3;
-      --violet-soft: #efecfb;
-      --code: #172727;
-      --code-ink: #dcebea;
-      --shadow: 0 22px 60px rgba(27, 48, 48, 0.09);
-      --radius-lg: 24px;
-      --radius-md: 15px;
-      --content: 850px;
+      --ink: #17211f;
+      --muted: #65716e;
+      --paper: #f7f5ef;
+      --surface: #fffdf8;
+      --surface-2: #eef3ef;
+      --green: #173b37;
+      --green-2: #28675e;
+      --mint: #dcece5;
+      --amber: #c47b31;
+      --amber-soft: #f6e7cf;
+      --blue-soft: #e3edf4;
+      --violet-soft: #ece7f4;
+      --red-soft: #f5e2dd;
+      --line: #d9ddd8;
+      --shadow: 0 20px 55px rgba(28, 48, 43, 0.09);
+      --radius: 20px;
+      --content: 780px;
+      --wide: 1180px;
     }
 
     * {
@@ -39,31 +48,21 @@
 
     html {
       scroll-behavior: smooth;
-      scroll-padding-top: 2rem;
     }
 
     body {
       margin: 0;
-      background:
-        radial-gradient(circle at 10% 0%, rgba(19, 111, 104, 0.09), transparent 28rem),
-        linear-gradient(180deg, #f6f8f7 0%, var(--canvas) 100%);
       color: var(--ink);
-      font-family: Inter, Pretendard, "Noto Sans KR", "Apple SD Gothic Neo",
-        "Malgun Gothic", system-ui, sans-serif;
-      font-size: 16px;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(220, 236, 229, 0.9), transparent 28rem),
+        linear-gradient(180deg, #fbfaf6 0%, var(--paper) 38%, #f2f1eb 100%);
+      font-family:
+        Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic",
+        system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 17px;
       line-height: 1.78;
       word-break: keep-all;
       overflow-wrap: break-word;
-    }
-
-    a {
-      color: var(--accent-dark);
-      text-underline-offset: 0.2em;
-      text-decoration-thickness: 1px;
-    }
-
-    a:hover {
-      color: var(--accent);
     }
 
     img {
@@ -72,202 +71,241 @@
       height: auto;
     }
 
+    a {
+      color: var(--green-2);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.22em;
+    }
+
+    a:hover {
+      color: var(--amber);
+    }
+
     code,
     pre,
-    .equation {
-      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    .formula {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
     }
 
     .skip-link {
-      position: fixed;
-      top: 0.75rem;
-      left: 0.75rem;
-      z-index: 100;
-      padding: 0.65rem 0.9rem;
-      border-radius: 9px;
-      background: var(--ink);
+      position: absolute;
+      top: -5rem;
+      left: 1rem;
+      z-index: 20;
+      padding: 0.7rem 1rem;
       color: white;
-      transform: translateY(-160%);
-      transition: transform 0.15s ease;
+      background: var(--green);
+      border-radius: 0 0 10px 10px;
     }
 
     .skip-link:focus {
-      transform: translateY(0);
+      top: 0;
     }
 
-    .site-header {
-      position: relative;
-      overflow: hidden;
-      border-bottom: 1px solid rgba(19, 111, 104, 0.15);
-      background:
-        linear-gradient(120deg, rgba(255, 255, 255, 0.94), rgba(232, 244, 240, 0.9)),
-        var(--paper);
+    .masthead {
+      border-bottom: 1px solid rgba(23, 59, 55, 0.13);
+      background: rgba(255, 253, 248, 0.84);
     }
 
-    .site-header::after {
-      position: absolute;
-      right: -8rem;
-      bottom: -11rem;
-      width: 32rem;
-      height: 32rem;
-      border: 5rem solid rgba(19, 111, 104, 0.055);
-      border-radius: 50%;
-      content: "";
-      pointer-events: none;
+    .masthead-inner {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: 0 auto;
+      min-height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand {
+      color: var(--green);
+      font-family: Georgia, "Noto Serif KR", serif;
+      font-size: 0.96rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .masthead-meta {
+      color: var(--muted);
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
     }
 
     .hero {
       position: relative;
+      overflow: hidden;
+      padding: clamp(4rem, 9vw, 8.5rem) 1rem 4.2rem;
+      color: #f7faf7;
+      background:
+        linear-gradient(115deg, rgba(14, 44, 40, 0.98), rgba(27, 77, 68, 0.94)),
+        var(--green);
+    }
+
+    .hero::before,
+    .hero::after {
+      position: absolute;
+      content: "";
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero::before {
+      width: 38rem;
+      height: 38rem;
+      right: -13rem;
+      top: -20rem;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      box-shadow:
+        0 0 0 5rem rgba(255, 255, 255, 0.025),
+        0 0 0 10rem rgba(255, 255, 255, 0.018);
+    }
+
+    .hero::after {
+      width: 14rem;
+      height: 14rem;
+      left: -6rem;
+      bottom: -8rem;
+      background: rgba(196, 123, 49, 0.2);
+    }
+
+    .hero-inner {
+      position: relative;
       z-index: 1;
-      max-width: 1160px;
+      width: min(100%, 1040px);
       margin: 0 auto;
-      padding: clamp(3.5rem, 8vw, 7rem) clamp(1.25rem, 4vw, 3.5rem);
     }
 
     .eyebrow {
-      margin: 0 0 1rem;
-      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      margin-bottom: 1.25rem;
+      color: #d8e9e2;
       font-size: 0.78rem;
       font-weight: 800;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
     }
 
-    h1,
-    h2,
-    h3,
-    h4 {
-      line-height: 1.3;
-      text-wrap: balance;
+    .eyebrow::before {
+      width: 2.4rem;
+      height: 2px;
+      content: "";
+      background: #e5a65e;
     }
 
     h1 {
-      max-width: 950px;
+      max-width: 920px;
       margin: 0;
-      font-family: "Iowan Old Style", "Noto Serif KR", "NanumMyeongjo",
-        Georgia, serif;
-      font-size: clamp(2.25rem, 6vw, 4.8rem);
-      font-weight: 700;
-      letter-spacing: -0.045em;
+      font-family: Georgia, "Noto Serif KR", "Batang", serif;
+      font-size: clamp(2.6rem, 7vw, 5.8rem);
+      line-height: 1.06;
+      letter-spacing: -0.055em;
+      text-wrap: balance;
     }
 
-    h1 span {
-      display: block;
-      margin-top: 0.4rem;
-      color: var(--accent);
-      font-family: Inter, Pretendard, "Noto Sans KR", sans-serif;
-      font-size: 0.43em;
-      font-weight: 800;
+    .hero-deck {
+      max-width: 780px;
+      margin: 1.7rem 0 0;
+      color: #d9e6e1;
+      font-size: clamp(1.08rem, 2.2vw, 1.42rem);
+      line-height: 1.7;
       letter-spacing: -0.02em;
     }
 
+    .hero-deck strong {
+      color: #fff2dc;
+    }
+
     .byline {
-      max-width: 930px;
-      margin: 1.75rem 0 0;
-      color: #405151;
-      font-size: 1.04rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.2rem;
+      align-items: center;
+      margin-top: 2rem;
+      color: #bcd1ca;
+      font-size: 0.86rem;
     }
 
-    .byline strong {
-      color: var(--ink);
+    .byline span + span {
+      position: relative;
+      padding-left: 1.2rem;
     }
 
-    .metadata {
+    .byline span + span::before {
+      position: absolute;
+      left: 0;
+      color: #6f9a90;
+      content: "•";
+    }
+
+    .hero-stats {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 1px;
-      max-width: 950px;
-      margin: 2.25rem 0 0;
+      margin-top: 3.4rem;
       overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: var(--radius-md);
-      background: var(--line);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.14);
     }
 
-    .metadata > div {
-      min-width: 0;
-      padding: 1rem 1.15rem;
-      background: rgba(255, 255, 255, 0.8);
+    .hero-stat {
+      min-height: 128px;
+      padding: 1.35rem;
+      background: rgba(8, 34, 30, 0.7);
     }
 
-    .metadata dt {
-      margin-bottom: 0.18rem;
-      color: var(--muted);
-      font-size: 0.72rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+    .hero-stat strong {
+      display: block;
+      color: #fff5e6;
+      font-family: Georgia, "Noto Serif KR", serif;
+      font-size: clamp(1.45rem, 3vw, 2.1rem);
+      line-height: 1.15;
     }
 
-    .metadata dd {
-      margin: 0;
-      color: var(--ink);
-      font-size: 0.92rem;
-      font-weight: 650;
-    }
-
-    .source-links,
-    .tag-list,
-    .keyword-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.45rem;
-      margin: 1.1rem 0 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .source-links a,
-    .tag,
-    .keyword-list code {
-      display: inline-flex;
-      align-items: center;
-      min-height: 2rem;
-      padding: 0.3rem 0.7rem;
-      border: 1px solid var(--line-strong);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.72);
-      color: #405151;
-      font-size: 0.79rem;
-      font-weight: 700;
-      text-decoration: none;
-    }
-
-    .tag::before {
-      margin-right: 0.18rem;
-      color: var(--accent);
-      content: "#";
+    .hero-stat span {
+      display: block;
+      margin-top: 0.55rem;
+      color: #bad0c8;
+      font-size: 0.78rem;
+      line-height: 1.45;
     }
 
     .page-shell {
-      display: grid;
-      grid-template-columns: 230px minmax(0, var(--content));
-      gap: clamp(2rem, 5vw, 5rem);
-      justify-content: center;
-      align-items: start;
-      max-width: 1220px;
+      width: min(calc(100% - 2rem), var(--wide));
       margin: 0 auto;
-      padding: 3rem 1.25rem 6rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 245px;
+      gap: clamp(2.5rem, 6vw, 5.5rem);
+      align-items: start;
+      padding: 4.5rem 0 7rem;
+    }
+
+    article {
+      min-width: 0;
     }
 
     .toc {
       position: sticky;
-      top: 1.25rem;
-      max-height: calc(100vh - 2.5rem);
-      overflow: auto;
-      padding: 1.25rem 1rem;
+      top: 1.5rem;
+      padding: 1.25rem 1.2rem;
       border: 1px solid var(--line);
-      border-radius: var(--radius-md);
-      background: rgba(255, 254, 250, 0.88);
-      box-shadow: 0 12px 35px rgba(32, 54, 54, 0.055);
-      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      background: rgba(255, 253, 248, 0.88);
+      box-shadow: 0 12px 35px rgba(31, 53, 48, 0.05);
+      backdrop-filter: blur(8px);
     }
 
-    .toc h2 {
-      margin: 0 0 0.85rem;
-      color: var(--muted);
-      font-size: 0.75rem;
-      letter-spacing: 0.11em;
+    .toc-title {
+      margin: 0 0 0.7rem;
+      color: var(--green);
+      font-size: 0.74rem;
+      font-weight: 850;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
     }
 
@@ -275,644 +313,805 @@
       margin: 0;
       padding: 0;
       list-style: none;
+      counter-reset: toc;
     }
 
-    .toc li + li {
-      margin-top: 0.16rem;
+    .toc li {
+      counter-increment: toc;
+      border-top: 1px solid #e7e9e5;
+    }
+
+    .toc li:first-child {
+      border-top: 0;
     }
 
     .toc a {
-      display: block;
-      padding: 0.42rem 0.55rem;
-      border-radius: 8px;
-      color: #526160;
-      font-size: 0.82rem;
-      line-height: 1.38;
+      display: grid;
+      grid-template-columns: 1.7rem 1fr;
+      gap: 0.25rem;
+      padding: 0.66rem 0;
+      color: #50605c;
+      font-size: 0.77rem;
+      line-height: 1.35;
       text-decoration: none;
     }
 
-    .toc a:hover,
-    .toc a:focus-visible {
-      background: var(--accent-soft);
-      color: var(--accent-dark);
+    .toc a::before {
+      color: #9b6b39;
+      font-family: Georgia, serif;
+      content: "0" counter(toc);
     }
 
-    main {
-      min-width: 0;
+    .lede {
+      margin: 0 0 4.5rem;
+      padding-bottom: 3.4rem;
+      border-bottom: 1px solid var(--line);
     }
 
-    section {
-      scroll-margin-top: 1.5rem;
-    }
-
-    .summary-card {
-      position: relative;
-      margin-bottom: 3.5rem;
-      padding: clamp(1.5rem, 4vw, 2.4rem);
-      overflow: hidden;
-      border: 1px solid #bcd9d3;
-      border-radius: var(--radius-lg);
-      background: linear-gradient(135deg, #f9fffd 0%, var(--accent-soft) 100%);
-      box-shadow: var(--shadow);
-    }
-
-    .summary-card::before {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 7px;
-      height: 100%;
-      background: var(--accent);
-      content: "";
-    }
-
-    .summary-card h2 {
-      margin: 0 0 0.75rem;
-      color: var(--accent-dark);
-      font-size: 0.82rem;
-      letter-spacing: 0.11em;
+    .abstract-label,
+    .section-kicker {
+      display: block;
+      margin-bottom: 0.7rem;
+      color: var(--amber);
+      font-size: 0.72rem;
+      font-weight: 850;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
     }
 
-    .summary-card p {
+    .abstract {
       margin: 0;
-      font-family: "Iowan Old Style", "Noto Serif KR", "NanumMyeongjo",
-        Georgia, serif;
-      font-size: clamp(1.22rem, 3vw, 1.68rem);
-      font-weight: 650;
-      line-height: 1.65;
-    }
-
-    .chapter {
-      margin: 0 0 4.5rem;
-      padding: clamp(1.45rem, 4vw, 2.5rem);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-lg);
-      background: var(--paper);
-      box-shadow: var(--shadow);
-    }
-
-    .chapter > h2 {
-      display: flex;
-      gap: 0.75rem;
-      align-items: baseline;
-      margin: 0 0 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 2px solid var(--ink);
-      font-family: "Iowan Old Style", "Noto Serif KR", "NanumMyeongjo",
-        Georgia, serif;
-      font-size: clamp(1.65rem, 4vw, 2.35rem);
+      color: #25322f;
+      font-family: Georgia, "Noto Serif KR", "Batang", serif;
+      font-size: clamp(1.3rem, 3vw, 1.8rem);
+      line-height: 1.75;
       letter-spacing: -0.025em;
     }
 
-    .chapter > h2 .num {
-      color: var(--accent);
-      font-family: Inter, Pretendard, sans-serif;
-      font-size: 0.72em;
-      font-weight: 850;
+    .one-line {
+      margin-top: 2rem;
+      padding: 1.25rem 1.4rem;
+      border-left: 4px solid var(--amber);
+      border-radius: 0 12px 12px 0;
+      background: var(--amber-soft);
+      color: #4c3724;
+      font-size: 0.97rem;
+    }
+
+    .one-line strong {
+      color: #2f2a24;
+    }
+
+    section {
+      scroll-margin-top: 2rem;
+      margin-top: 5.5rem;
+    }
+
+    .section-head {
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      margin: 0;
+      color: var(--green);
+      font-family: Georgia, "Noto Serif KR", "Batang", serif;
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      line-height: 1.22;
+      letter-spacing: -0.045em;
     }
 
     h3 {
-      margin: 2.6rem 0 1rem;
-      color: var(--accent-dark);
-      font-size: 1.28rem;
-      letter-spacing: -0.015em;
+      margin: 3rem 0 1rem;
+      color: #213c37;
+      font-family: Georgia, "Noto Serif KR", "Batang", serif;
+      font-size: clamp(1.35rem, 3vw, 1.85rem);
+      line-height: 1.35;
+      letter-spacing: -0.025em;
     }
 
     h4 {
-      margin: 2rem 0 0.75rem;
-      font-size: 1.05rem;
+      margin: 2.2rem 0 0.75rem;
+      color: #293b37;
+      font-size: 1.06rem;
     }
 
     p {
-      margin: 0.8rem 0;
+      margin: 0.8rem 0 1.3rem;
     }
 
-    ul,
-    ol {
-      padding-left: 1.35rem;
+    .section-intro {
+      max-width: 720px;
+      color: #53615e;
+      font-size: 1.08rem;
     }
 
-    li + li {
-      margin-top: 0.38rem;
+    .findings-grid,
+    .card-grid,
+    .limits-grid {
+      display: grid;
+      gap: 1rem;
     }
 
-    strong {
-      color: #102b2a;
+    .findings-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .lead-label {
-      display: inline-flex;
-      margin-bottom: 0.45rem;
-      padding: 0.22rem 0.6rem;
-      border-radius: 999px;
-      background: var(--accent-soft);
-      color: var(--accent-dark);
-      font-size: 0.76rem;
-      font-weight: 800;
-    }
-
-    figure {
-      margin: 2rem 0;
-      padding: 0.7rem;
+    .finding {
+      position: relative;
+      min-height: 190px;
+      padding: 1.6rem;
+      overflow: hidden;
       border: 1px solid var(--line);
-      border-radius: var(--radius-md);
-      background: #f6f8f7;
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: 0 12px 35px rgba(31, 53, 48, 0.045);
     }
 
-    figure img {
+    .finding-number {
+      display: block;
+      color: #a46a31;
+      font-family: Georgia, serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+    }
+
+    .finding h3 {
+      margin: 0.75rem 0 0.55rem;
+      font-size: 1.25rem;
+    }
+
+    .finding p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.65;
+    }
+
+    .finding::after {
+      position: absolute;
+      right: -2rem;
+      bottom: -3.2rem;
+      width: 8rem;
+      height: 8rem;
+      content: "";
+      border-radius: 50%;
+      background: var(--mint);
+      opacity: 0.55;
+    }
+
+    .figure {
+      margin: 2.3rem 0 3rem;
+    }
+
+    .figure-frame {
+      padding: clamp(0.55rem, 2vw, 1.1rem);
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .figure img {
       width: 100%;
-      max-height: 720px;
-      margin: 0 auto;
-      border-radius: 10px;
+      border-radius: calc(var(--radius) - 8px);
       object-fit: contain;
-      background: white;
     }
 
     figcaption {
-      padding: 0.75rem 0.45rem 0.2rem;
+      max-width: 700px;
+      margin: 0.8rem auto 0;
       color: var(--muted);
-      font-size: 0.83rem;
+      font-size: 0.78rem;
       line-height: 1.55;
       text-align: center;
     }
 
-    .figure-narrow {
-      max-width: 580px;
-      margin-right: auto;
-      margin-left: auto;
+    .pullquote {
+      position: relative;
+      margin: 3.2rem 0;
+      padding: 2.1rem clamp(1.5rem, 4vw, 2.8rem);
+      color: #eef7f3;
+      border-radius: var(--radius);
+      background: var(--green);
+      box-shadow: var(--shadow);
+    }
+
+    .pullquote::before {
+      position: absolute;
+      top: 0.2rem;
+      left: 1.2rem;
+      color: rgba(255, 255, 255, 0.14);
+      font-family: Georgia, serif;
+      font-size: 6rem;
+      line-height: 1;
+      content: "“";
+    }
+
+    .pullquote p {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      font-family: Georgia, "Noto Serif KR", serif;
+      font-size: clamp(1.25rem, 3vw, 1.8rem);
+      line-height: 1.6;
+      letter-spacing: -0.025em;
+    }
+
+    .pullquote cite {
+      display: block;
+      margin-top: 1rem;
+      color: #b9d1c9;
+      font-size: 0.75rem;
+      font-style: normal;
     }
 
     .table-wrap {
-      width: 100%;
-      margin: 1.35rem 0 2rem;
+      margin: 1.5rem 0 2.8rem;
       overflow-x: auto;
       border: 1px solid var(--line);
-      border-radius: var(--radius-md);
+      border-radius: 16px;
+      background: var(--surface);
+      box-shadow: 0 10px 30px rgba(31, 53, 48, 0.035);
     }
 
     table {
       width: 100%;
-      min-width: 570px;
+      min-width: 630px;
       border-collapse: collapse;
-      background: white;
-      font-size: 0.91rem;
+      font-size: 0.86rem;
       line-height: 1.55;
     }
 
     caption {
-      padding: 0.8rem 1rem;
-      color: var(--muted);
-      font-size: 0.8rem;
+      padding: 1rem 1.15rem;
+      color: var(--green);
+      font-weight: 800;
       text-align: left;
+      background: var(--surface-2);
     }
 
     th,
     td {
-      padding: 0.78rem 0.9rem;
-      border-right: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
+      padding: 0.88rem 1rem;
+      border-bottom: 1px solid #e4e7e2;
       text-align: left;
       vertical-align: top;
     }
 
-    th:last-child,
-    td:last-child {
-      border-right: 0;
-    }
-
-    tbody tr:last-child td {
-      border-bottom: 0;
-    }
-
-    thead th {
-      background: #edf4f2;
-      color: #244442;
-      font-size: 0.8rem;
+    th {
+      color: #314740;
+      background: #f5f7f3;
+      font-size: 0.76rem;
       font-weight: 800;
       letter-spacing: 0.02em;
     }
 
-    tbody tr:nth-child(even) {
-      background: #fbfcfb;
+    tr:last-child td {
+      border-bottom: 0;
     }
 
     tbody tr:hover {
-      background: #f2f8f6;
+      background: #fafbf8;
     }
 
-    blockquote {
-      margin: 1.3rem 0;
-      padding: 1rem 1.2rem;
-      border-left: 4px solid var(--accent);
-      border-radius: 0 12px 12px 0;
-      background: var(--accent-soft);
-      color: #294644;
+    .highlight-row td {
+      color: #173b37;
+      font-weight: 750;
+      background: #eaf3ee;
     }
 
-    blockquote p:first-child {
-      margin-top: 0;
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.7rem;
+      margin: 2rem 0 2.8rem;
+      padding: 1.15rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
     }
 
-    blockquote p:last-child {
-      margin-bottom: 0;
-    }
-
-    .derivation {
-      margin: 1.5rem 0;
-      padding: 1.25rem;
-      border: 1px solid #d9cbea;
-      border-radius: var(--radius-md);
-      background: linear-gradient(135deg, #faf8ff, var(--violet-soft));
-    }
-
-    .derivation > strong:first-child {
-      display: block;
-      margin-bottom: 0.7rem;
-      color: #4e3f84;
-    }
-
-    .source-note {
-      color: var(--muted);
-      font-size: 0.82rem;
-      font-style: italic;
-    }
-
-    .equation {
-      margin: 1.2rem 0;
-      padding: 1rem 1.15rem;
-      overflow-x: auto;
-      border: 1px solid var(--line-strong);
-      border-radius: 12px;
-      background: #f7faf9;
-      color: #173837;
-      font-size: clamp(0.78rem, 2vw, 0.95rem);
-      line-height: 1.8;
+    .flow-step {
+      position: relative;
+      min-height: 106px;
+      padding: 1rem 0.8rem;
+      color: #29413b;
+      border-radius: 13px;
+      background: var(--surface-2);
       text-align: center;
-      white-space: nowrap;
     }
 
-    .math {
-      display: inline;
-      padding: 0.08em 0.25em;
-      border-radius: 4px;
-      background: #f1f5f4;
-      font-family: "STIX Two Text", Cambria, "Times New Roman", serif;
-      font-style: italic;
+    .flow-step:not(:last-child)::after {
+      position: absolute;
+      z-index: 2;
+      top: 50%;
+      right: -0.68rem;
+      color: var(--amber);
+      font-size: 1.15rem;
+      font-weight: 900;
+      line-height: 1;
+      content: "→";
+      transform: translateY(-50%);
+    }
+
+    .flow-step strong {
+      display: block;
+      margin-bottom: 0.35rem;
+      color: var(--green);
+      font-size: 0.87rem;
+    }
+
+    .flow-step span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.72rem;
+      line-height: 1.45;
+    }
+
+    .stepper {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.8rem;
+      margin: 1.5rem 0 2.5rem;
+      counter-reset: step;
+    }
+
+    .step {
+      counter-increment: step;
+      padding: 1.2rem;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--surface);
+    }
+
+    .step::before {
+      display: inline-grid;
+      width: 1.8rem;
+      height: 1.8rem;
+      margin-bottom: 0.7rem;
+      place-items: center;
+      color: white;
+      border-radius: 50%;
+      background: var(--green-2);
+      font-size: 0.72rem;
+      font-weight: 800;
+      content: counter(step);
+    }
+
+    .step strong,
+    .step span {
+      display: block;
+    }
+
+    .step strong {
+      color: var(--green);
+      font-size: 0.88rem;
+    }
+
+    .step span {
+      margin-top: 0.32rem;
+      color: var(--muted);
+      font-size: 0.74rem;
+      line-height: 1.5;
+    }
+
+    .note {
+      margin: 1.5rem 0;
+      padding: 1.2rem 1.35rem;
+      border: 1px solid #d6e4dc;
+      border-radius: 14px;
+      background: #edf6f1;
+      color: #334a43;
+      font-size: 0.91rem;
+    }
+
+    .note.warning {
+      border-color: #ead4b3;
+      background: #fbf1e2;
+      color: #574129;
+    }
+
+    .note strong {
+      color: var(--green);
+    }
+
+    .formula {
+      margin: 1.4rem 0;
+      padding: 1.2rem;
+      overflow-x: auto;
+      color: #213631;
+      border: 1px solid #dce2dd;
+      border-radius: 13px;
+      background: #f7f8f5;
+      font-size: clamp(0.79rem, 2vw, 0.96rem);
+      line-height: 1.7;
+      text-align: center;
       white-space: nowrap;
     }
 
     pre {
-      margin: 1.5rem 0;
-      padding: 1.2rem;
-      overflow: auto;
-      border: 1px solid #284342;
-      border-radius: var(--radius-md);
-      background: var(--code);
-      color: var(--code-ink);
-      box-shadow: inset 0 1px rgba(255, 255, 255, 0.06);
-      font-size: 0.82rem;
-      line-height: 1.7;
-      tab-size: 4;
-    }
-
-    pre code {
-      color: inherit;
-    }
-
-    .diagram {
-      margin: 1.6rem 0 2rem;
-      padding: clamp(1rem, 3vw, 1.5rem);
+      margin: 1.4rem 0 2.5rem;
+      padding: 1.35rem;
       overflow-x: auto;
+      color: #dbe8e3;
+      border-radius: 15px;
+      background: #152c28;
+      box-shadow: 0 14px 35px rgba(21, 44, 40, 0.12);
+      font-size: 0.78rem;
+      line-height: 1.65;
+      tab-size: 2;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      margin: 1.7rem 0 2.5rem;
+    }
+
+    .profile-card {
+      padding: 1.5rem;
       border: 1px solid var(--line);
-      border-radius: var(--radius-md);
-      background:
-        linear-gradient(rgba(19, 111, 104, 0.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(19, 111, 104, 0.035) 1px, transparent 1px),
-        #f9fbfa;
-      background-size: 22px 22px;
+      border-radius: var(--radius);
+      background: var(--surface);
     }
 
-    .flow {
-      display: flex;
-      min-width: max-content;
-      gap: 0.6rem;
-      align-items: stretch;
-      justify-content: center;
+    .profile-card:first-child {
+      border-top: 5px solid #b95646;
     }
 
-    .flow-node {
-      display: flex;
-      min-width: 125px;
-      max-width: 190px;
-      min-height: 76px;
-      padding: 0.75rem;
-      border: 1px solid #b8ccc8;
-      border-radius: 12px;
-      background: white;
-      color: #26413f;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.82rem;
-      line-height: 1.4;
-      text-align: center;
-      box-shadow: 0 7px 18px rgba(33, 58, 57, 0.06);
+    .profile-card:last-child {
+      border-top: 5px solid #44846f;
     }
 
-    .flow-node strong {
-      display: block;
-    }
-
-    .flow-node small {
-      display: block;
-      margin-top: 0.2rem;
+    .profile-card .tag {
       color: var(--muted);
-      font-size: 0.72rem;
+      font-size: 0.68rem;
+      font-weight: 850;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
     }
 
-    .flow-node.blue {
-      border-color: #bfd6e8;
-      background: var(--blue-soft);
-    }
-
-    .flow-node.gold {
-      border-color: #ead49f;
-      background: var(--gold-soft);
-    }
-
-    .flow-node.red {
-      border-color: #ecc6c0;
-      background: var(--red-soft);
-    }
-
-    .flow-node.violet {
-      border-color: #d1c9ee;
-      background: var(--violet-soft);
-    }
-
-    .flow-node.green {
-      border-color: #b9dacf;
-      background: #e6f6ef;
-    }
-
-    .arrow {
-      display: flex;
-      min-width: 28px;
-      color: var(--accent);
-      align-items: center;
-      justify-content: center;
+    .profile-card h3 {
+      margin: 0.45rem 0 0.7rem;
       font-size: 1.35rem;
+    }
+
+    .profile-card p,
+    .profile-card li {
+      color: #586460;
+      font-size: 0.86rem;
+    }
+
+    .profile-card ul {
+      margin: 0.8rem 0 0;
+      padding-left: 1.2rem;
+    }
+
+    .metric-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      margin: 2rem 0 3rem;
+    }
+
+    .metric {
+      padding: 1.35rem;
+      border-radius: 16px;
+      background: var(--green);
+      color: white;
+    }
+
+    .metric strong {
+      display: block;
+      color: #fff3dc;
+      font-family: Georgia, serif;
+      font-size: clamp(1.7rem, 4vw, 2.5rem);
+      line-height: 1.1;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 0.6rem;
+      color: #bad1c9;
+      font-size: 0.77rem;
+      line-height: 1.45;
+    }
+
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 1rem;
+      align-items: stretch;
+      margin: 1.8rem 0 2.8rem;
+    }
+
+    .comparison-card {
+      padding: 1.4rem;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+    }
+
+    .comparison-card strong {
+      display: block;
+      color: var(--green);
+      font-size: 1rem;
+    }
+
+    .comparison-card span {
+      display: block;
+      margin-top: 0.45rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .comparison-arrow {
+      align-self: center;
+      color: var(--amber);
+      font-size: 1.7rem;
+      font-weight: 900;
+    }
+
+    .limits-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-top: 1.5rem;
+    }
+
+    .limit-card {
+      padding: 1.35rem;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+    }
+
+    .limit-card .now,
+    .limit-card .next {
+      display: block;
+      font-size: 0.82rem;
+      line-height: 1.55;
+    }
+
+    .limit-card .now {
+      color: #735044;
+    }
+
+    .limit-card .now::before {
+      content: "현재 한계 · ";
       font-weight: 800;
     }
 
-    .diagram-caption {
-      margin: 0.9rem 0 0;
-      color: var(--muted);
-      font-size: 0.76rem;
-      line-height: 1.5;
-      text-align: center;
-    }
-
-    .diagram-notes {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0.55rem;
-      margin-top: 1rem;
-    }
-
-    .diagram-notes span {
-      padding: 0.65rem 0.8rem;
-      border: 1px dashed #bdd1cd;
-      border-radius: 9px;
-      background: rgba(255, 255, 255, 0.76);
-      color: #435c59;
-      font-size: 0.78rem;
-      text-align: center;
-    }
-
-    .decision-grid {
-      display: grid;
-      grid-template-columns: minmax(130px, 1fr) auto minmax(170px, 1.2fr);
-      gap: 0.65rem;
-      align-items: center;
-      max-width: 650px;
-      margin: 0 auto;
-    }
-
-    .branch-results {
-      display: grid;
-      gap: 0.55rem;
-    }
-
-    .mini-arrow {
-      color: var(--accent);
-      font-weight: 900;
-      text-align: center;
-    }
-
-    .mapping-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr);
-      gap: 0.65rem;
-      align-items: center;
-      max-width: 720px;
-      margin: 0 auto;
-    }
-
-    .mapping-grid .flow-node {
-      width: 100%;
-      max-width: none;
-      min-height: 64px;
-    }
-
-    .key-idea {
-      margin: 1.4rem 0;
-      padding: 1.15rem 1.25rem;
-      border: 1px solid #c6ddd8;
-      border-radius: var(--radius-md);
-      background: #f3faf8;
-    }
-
-    .key-idea strong:first-child {
-      color: var(--accent-dark);
-    }
-
-    .contribution-list {
-      counter-reset: contribution;
-      display: grid;
-      gap: 0.8rem;
-      padding: 0;
-      list-style: none;
-    }
-
-    .contribution-list li {
-      position: relative;
-      margin: 0;
-      padding: 0.9rem 1rem 0.9rem 3.3rem;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #fbfcfb;
-      counter-increment: contribution;
-    }
-
-    .contribution-list li::before {
-      position: absolute;
-      top: 0.82rem;
-      left: 0.9rem;
-      display: grid;
-      width: 1.75rem;
-      height: 1.75rem;
-      border-radius: 50%;
-      background: var(--accent);
-      color: white;
-      content: counter(contribution);
-      place-items: center;
-      font-size: 0.78rem;
-      font-weight: 850;
-    }
-
-    .result-line {
-      margin: 1.1rem 0;
-      padding: 0.85rem 1rem;
-      border-radius: 11px;
-      background: var(--gold-soft);
-      color: #654615;
-      font-weight: 750;
-    }
-
-    .closing-points {
-      display: grid;
-      gap: 0.8rem;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .closing-points li {
-      margin: 0;
-      padding: 1rem 1.1rem;
-      border-left: 4px solid var(--accent);
-      border-radius: 0 12px 12px 0;
-      background: #f5f9f8;
-    }
-
-    .opinion {
-      border-color: #dfd5b9;
-      background: linear-gradient(145deg, #fffefa, #fff9e9);
-    }
-
-    .opinion blockquote {
-      border-color: var(--gold);
-      background: var(--gold-soft);
-      color: #65532f;
-    }
-
-    .page-footer {
-      padding: 2.5rem 1.25rem 4rem;
+    .limit-card .next {
+      margin-top: 0.65rem;
+      padding-top: 0.65rem;
+      color: #345b4e;
       border-top: 1px solid var(--line);
+    }
+
+    .limit-card .next::before {
+      content: "연구 방향 · ";
+      font-weight: 800;
+    }
+
+    .takeaway {
+      margin-top: 5rem;
+      padding: clamp(1.6rem, 5vw, 3rem);
+      border-radius: 24px;
+      background: linear-gradient(145deg, #f6e7cf, #fff9ee);
+      box-shadow: var(--shadow);
+    }
+
+    .takeaway h2 {
+      color: #493522;
+      font-size: clamp(1.8rem, 4vw, 2.7rem);
+    }
+
+    .takeaway-list {
+      display: grid;
+      gap: 0.8rem;
+      margin: 1.6rem 0 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: takeaway;
+    }
+
+    .takeaway-list li {
+      display: grid;
+      grid-template-columns: 2.2rem 1fr;
+      gap: 0.8rem;
+      align-items: start;
+      color: #574431;
+    }
+
+    .takeaway-list li::before {
+      display: grid;
+      width: 2rem;
+      height: 2rem;
+      place-items: center;
+      color: white;
+      border-radius: 50%;
+      background: var(--amber);
+      font-size: 0.78rem;
+      font-weight: 800;
+      counter-increment: takeaway;
+      content: counter(takeaway);
+    }
+
+    .editorial-note {
+      margin-top: 4rem;
+      padding-top: 3rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .editorial-note ul {
+      padding-left: 1.25rem;
+    }
+
+    .editorial-note li {
+      margin: 0.6rem 0;
+    }
+
+    .share-box {
+      margin-top: 4.5rem;
+      padding: 1.7rem;
+      color: #eaf5f1;
+      border-radius: var(--radius);
+      background: var(--green);
+    }
+
+    .share-box h2 {
+      color: white;
+      font-size: 1.45rem;
+    }
+
+    .share-copy {
+      margin-top: 1rem;
+      padding: 1rem 1.1rem;
+      color: #263c36;
+      border-radius: 12px;
+      background: #f4f8f5;
+      font-size: 0.86rem;
+      line-height: 1.65;
+      user-select: all;
+    }
+
+    .source-notes {
+      margin-top: 4.5rem;
+      padding-top: 3rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .citation {
+      padding: 1.3rem;
+      border-left: 3px solid var(--green-2);
+      background: var(--surface);
+      color: #475550;
+      font-family: Georgia, "Noto Serif KR", serif;
+      font-size: 0.9rem;
+    }
+
+    .source-notes ol {
+      padding-left: 1.25rem;
       color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .source-notes li {
+      margin: 0.65rem 0;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 2rem;
+    }
+
+    .tag-chip {
+      padding: 0.38rem 0.7rem;
+      color: #355149;
+      border: 1px solid #ccd9d3;
+      border-radius: 999px;
+      background: #f5f9f6;
+      font-size: 0.72rem;
+    }
+
+    footer {
+      padding: 2rem 1rem;
+      color: #6b7773;
+      border-top: 1px solid var(--line);
+      background: #eeeee8;
+      font-size: 0.76rem;
       text-align: center;
     }
 
-    .back-to-top {
-      display: inline-flex;
-      padding: 0.6rem 0.9rem;
-      border: 1px solid var(--line-strong);
-      border-radius: 999px;
-      background: var(--paper);
-      font-size: 0.82rem;
-      font-weight: 750;
-      text-decoration: none;
-    }
-
-    :target {
-      scroll-margin-top: 1.5rem;
-    }
-
-    @media (max-width: 980px) {
-      .metadata {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .page-shell {
-        display: block;
+    @media (max-width: 940px) {
+      .layout {
+        grid-template-columns: 1fr;
       }
 
       .toc {
-        position: relative;
-        top: 0;
-        max-height: none;
-        margin-bottom: 2.5rem;
+        position: static;
+        order: -1;
       }
 
       .toc ol {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 0.25rem;
+        columns: 2;
+        column-gap: 1.5rem;
+      }
+
+      .hero-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 700px) {
       body {
-        font-size: 15px;
+        font-size: 16px;
         line-height: 1.72;
-        word-break: normal;
       }
 
       .hero {
-        padding-top: 3rem;
-        padding-bottom: 3rem;
+        padding-top: 4.4rem;
       }
 
-      h1 {
-        font-size: clamp(2rem, 11vw, 3.1rem);
-      }
-
-      .metadata {
+      .findings-grid,
+      .split,
+      .limits-grid,
+      .metric-strip {
         grid-template-columns: 1fr;
       }
 
-      .page-shell {
-        padding-right: 0.75rem;
-        padding-left: 0.75rem;
-      }
-
-      .toc ol {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .chapter {
-        padding: 1.15rem;
-        border-radius: 18px;
-      }
-
-      .chapter > h2 {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 0.15rem;
-      }
-
-      .diagram-notes {
+      .flow,
+      .stepper {
         grid-template-columns: 1fr;
       }
 
-      .decision-grid {
+      .flow-step:not(:last-child)::after {
+        top: auto;
+        right: 50%;
+        bottom: -0.8rem;
+        transform: translateX(50%) rotate(90deg);
+      }
+
+      .comparison {
         grid-template-columns: 1fr;
       }
 
-      .mini-arrow {
+      .comparison-arrow {
+        justify-self: center;
         transform: rotate(90deg);
       }
 
-      .mapping-grid {
-        grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr);
+      .toc ol {
+        columns: 1;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .masthead-meta {
+        display: none;
       }
 
-      pre {
-        margin-right: -0.35rem;
-        margin-left: -0.35rem;
-        font-size: 0.75rem;
+      .hero-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-stat {
+        min-height: auto;
+      }
+
+      .byline span {
+        width: 100%;
+      }
+
+      .byline span + span {
+        padding-left: 0;
+      }
+
+      .byline span + span::before {
+        display: none;
       }
     }
 
@@ -922,362 +1121,398 @@
         color: black;
       }
 
-      .site-header,
-      .chapter,
-      .summary-card {
-        box-shadow: none;
-      }
-
-      .page-shell {
-        display: block;
-        max-width: 100%;
-        padding: 1rem;
-      }
-
+      .masthead,
       .toc,
-      .skip-link,
-      .back-to-top {
+      .share-box {
         display: none;
       }
 
-      .chapter,
-      figure,
-      blockquote,
-      .table-wrap,
-      .diagram {
-        break-inside: avoid;
+      .hero {
+        color: black;
+        background: white;
+        border-bottom: 2px solid black;
       }
 
-      a {
-        color: inherit;
-        text-decoration: none;
+      .hero-deck,
+      .byline,
+      .hero-stat span {
+        color: #333;
+      }
+
+      .hero-stat {
+        color: black;
+        border: 1px solid #bbb;
+        background: white;
+      }
+
+      .hero-stat strong {
+        color: black;
+      }
+
+      .layout {
+        display: block;
+        padding-top: 2rem;
+      }
+
+      .figure-frame,
+      .finding,
+      .table-wrap {
+        box-shadow: none;
+      }
+
+      section,
+      figure,
+      table {
+        break-inside: avoid;
       }
     }
   </style>
 <meta property="og:type" content="article">
 <meta property="og:title" content="Towards Fully Integrated Autonomous Excavation - 요약">
-<meta property="og:description" content="papertitle: &quot;Towards Fully Integrated Autonomous Excavation: Autonomous Excavator for Precise Earth Cutting and Onboard Landscape Inspection&quot; authors: Inkyu Jang Junha Kim Dongjae ">
+<meta property="og:description" content="한줄 요약 30톤 실제 굴착기에서 지형 인식 → 굴착 경로 생성 → MPC 제어 → 정밀 지형 검사를 모두 온보드 센서만으로 수행하는 완전 통합 자율 굴착 시스템(AES) 을 제안하고, 45° 경사면 절토에서 cm 수준 정밀도를 달성했다. 1. 연구 배경 및 동기 문제 건설 현장의 노동력 부족, 인건비 상승, 안전 위험 ">
 <meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/l992hf/">
 <meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/l992hf/assets/figure1.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Towards Fully Integrated Autonomous Excavation - 요약">
-<meta name="twitter:description" content="papertitle: &quot;Towards Fully Integrated Autonomous Excavation: Autonomous Excavator for Precise Earth Cutting and Onboard Landscape Inspection&quot; authors: Inkyu Jang Junha Kim Dongjae ">
+<meta name="twitter:description" content="한줄 요약 30톤 실제 굴착기에서 지형 인식 → 굴착 경로 생성 → MPC 제어 → 정밀 지형 검사를 모두 온보드 센서만으로 수행하는 완전 통합 자율 굴착 시스템(AES) 을 제안하고, 45° 경사면 절토에서 cm 수준 정밀도를 달성했다. 1. 연구 배경 및 동기 문제 건설 현장의 노동력 부족, 인건비 상승, 안전 위험 ">
 <meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/l992hf/assets/figure1.png">
 <link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/s/l992hf/">
 </head>
-<body id="top">
-  <a class="skip-link" href="#main-content">본문으로 바로가기</a>
 
-  <header class="site-header">
-    <div class="hero">
-      <p class="eyebrow">IEEE Robotics &amp; Automation Magazine · 2024</p>
-      <h1>
-        Towards Fully Integrated Autonomous Excavation
-        <span>논문 요약</span>
-      </h1>
+<body>
+  <a class="skip-link" href="#article">본문으로 이동</a>
 
-      <p class="byline">
-        <strong>Inkyu Jang, Junha Kim, Dongjae Lee, Changhyeon Kim, Changsuk Oh,
-        Youngbum Kim, Sangwook Woo, Heejee Sung, H. Jin Kim</strong><br>
-        서울대학교
+  <header class="masthead">
+    <div class="masthead-inner">
+      <div class="brand">FIELD ROBOTICS REVIEW</div>
+      <div class="masthead-meta">Research Report · 2024 Paper Review</div>
+    </div>
+  </header>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">Autonomous Excavation</div>
+      <h1>30톤 굴착기가<br>스스로 깎고 검사한다</h1>
+      <p class="hero-deck">
+        지형 인식에서 굴착 경로 생성, 물리 제약을 고려한 제어, 정밀 검사까지.
+        서울대학교 연구진은 <strong>외부 측량 장비 없이 작동하는 완전 통합 자율 굴착 시스템</strong>을
+        실제 건설 장비 위에 구현했다.
       </p>
 
-      <dl class="metadata">
-        <div>
-          <dt>Journal</dt>
-          <dd>IEEE Robotics &amp; Automation Magazine</dd>
-        </div>
-        <div>
-          <dt>Year</dt>
-          <dd>2024</dd>
-        </div>
-        <div>
-          <dt>Affiliation</dt>
-          <dd>서울대학교</dd>
-        </div>
-        <div>
-          <dt>Created</dt>
-          <dd><time datetime="2026-03-11">2026-03-11</time></dd>
-        </div>
-      </dl>
-
-      <div class="source-links" aria-label="원문 자료">
-        <a href="2025%20Towards%20Fully%20Integrated%20Autonomous%20Excavation-%EC%84%9C%EC%9A%B8%EB%8C%80.md">원문 MD</a>
-        <a href="2025%20Towards%20Fully%20Integrated%20Autonomous%20Excavation-%EC%84%9C%EC%9A%B8%EB%8C%80.pdf">원본 PDF</a>
+      <div class="byline">
+        <span>Inkyu Jang 외 8인</span>
+        <span>서울대학교</span>
+        <span>IEEE Robotics &amp; Automation Magazine · 2024</span>
+        <span>리뷰 작성 2026.03.11</span>
       </div>
 
-      <ul class="tag-list" aria-label="태그">
-        <li class="tag">논문요약</li>
-        <li class="tag">자율굴착</li>
-        <li class="tag">필드로봇</li>
-      </ul>
+      <div class="hero-stats" aria-label="연구 핵심 수치">
+        <div class="hero-stat">
+          <strong>30톤</strong>
+          <span>Hyundai HX300AL<br>실물 굴착기 검증</span>
+        </div>
+        <div class="hero-stat">
+          <strong>7.4cm</strong>
+          <span>45° 경사면 절토<br>평균 지형 오차</span>
+        </div>
+        <div class="hero-stat">
+          <strong>&lt;1cm</strong>
+          <span>2-Step BA 기반<br>온보드 검사 정밀도</span>
+        </div>
+        <div class="hero-stat">
+          <strong>약 46×</strong>
+          <span>Trimble 측량 대비<br>검사 시간 단축</span>
+        </div>
+      </div>
     </div>
   </header>
 
   <div class="page-shell">
-    <nav class="toc" aria-label="문서 목차">
-      <h2>Contents</h2>
-      <ol>
-        <li><a href="#summary">한줄 요약</a></li>
-        <li><a href="#background">1. 연구 배경 및 동기</a></li>
-        <li><a href="#system">2. 시스템 구성</a></li>
-        <li><a href="#terrain">3. 실시간 지형 추정</a></li>
-        <li><a href="#motion">4. 굴착 모션 생성</a></li>
-        <li><a href="#mpc">5. MPC 기반 경로 추적</a></li>
-        <li><a href="#inspection">6. 정밀 지형 검사</a></li>
-        <li><a href="#results">7. 실험 결과</a></li>
-        <li><a href="#limitations">8. 한계 및 향후 연구</a></li>
-        <li><a href="#recap">한마디로 정리</a></li>
-        <li><a href="#keywords">핵심 키워드</a></li>
-        <li><a href="#opinion">나의 의견</a></li>
-      </ol>
-    </nav>
+    <div class="layout">
+      <main id="article">
+        <article>
+          <div class="lede">
+            <span class="abstract-label">Abstract</span>
+            <p class="abstract">
+              이 연구는 듀얼 라이다와 스테레오 카메라로 작업 지형을 인식하고,
+              기하학적 경로 계획과 제약식 MPC로 굴착기를 제어한 뒤,
+              멀티뷰 스테레오로 결과를 검사하는 Autonomous Excavation System,
+              즉 AES를 제안한다. 핵심은 개별 알고리즘의 성능보다
+              <em>절토와 검사를 하나의 온보드 폐루프로 묶었다는 점</em>에 있다.
+            </p>
 
-    <main id="main-content">
-      <section class="summary-card" id="summary">
-        <h2>한줄 요약</h2>
-        <p>
-          30톤 실제 굴착기에서 <strong>지형 인식 → 굴착 경로 생성 → MPC 제어 → 정밀 지형 검사</strong>를
-          모두 온보드 센서만으로 수행하는 <strong>완전 통합 자율 굴착 시스템(AES)</strong>을 제안하고,
-          45° 경사면 절토에서 cm 수준 정밀도를 달성했다.
-        </p>
-      </section>
-
-      <section class="chapter" id="background">
-        <h2><span class="num">01</span> 연구 배경 및 동기</h2>
-
-        <h3>문제</h3>
-        <ul>
-          <li>건설 현장의 <strong>노동력 부족</strong>, 인건비 상승, 안전 위험</li>
-          <li>대규모 절토 및 표면 그레이딩은 <strong>반복적이고 정밀한</strong> 작업 → 자동화에 적합</li>
-          <li>기존 작업 방식: 숙련 기사가 굴착 + 별도 측량팀이 검사 → <strong>비효율적</strong></li>
-        </ul>
-
-        <h3>기존 연구의 한계</h3>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">한계</th>
-                <th scope="col">설명</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>절토+검사 미통합</td>
-                <td>Zhang et al., Jelavic et al. 등은 절토만 수행, 사후 검사 미포함</td>
-              </tr>
-              <tr>
-                <td>센서 FOV 제한</td>
-                <td>캐빈 상단에만 라이다 배치 → 경사면 절토 시 ROI 미커버</td>
-              </tr>
-              <tr>
-                <td>물리적 제약 무시</td>
-                <td>기존 연구의 다수가 파워/유량 제약을 위반하거나 부분적으로만 고려</td>
-              </tr>
-              <tr>
-                <td>실기 검증 부재</td>
-                <td>물리적 제약을 고려한 연구도 시뮬레이션에서만 검증</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h3>본 연구의 기여</h3>
-        <ol class="contribution-list">
-          <li><strong>센서 구성:</strong> 어떤 경사에서도 ROI를 커버하는 듀얼 라이다 + 스테레오 카메라 배치</li>
-          <li><strong>지형 추정:</strong> 칼만 필터형 MAP 추정으로 실시간 2.5D 높이맵 업데이트</li>
-          <li><strong>모션 생성:</strong> 기하학적 + 물리적 제약을 모두 만족하는 2단계 모션 플래닝</li>
-          <li><strong>정밀 검사:</strong> 2-Step Bundle Adjustment로 서브 cm 정밀도의 온보드 지형 검사</li>
-        </ol>
-      </section>
-
-      <section class="chapter" id="system">
-        <h2><span class="num">02</span> 시스템 구성</h2>
-
-        <figure class="figure-narrow">
-          <img src="assets/figure1.png" alt="30톤 현대 HX300AL 자율 굴착기 외관 및 센서 배치 구성" loading="lazy">
-          <figcaption>30톤 현대 HX300AL 자율 굴착기 외관 및 센서 배치 구성</figcaption>
-        </figure>
-
-        <h3>전체 아키텍처</h3>
-
-        <figure>
-          <img src="assets/figure2.png" alt="센서 입력부터 지형 추정, 모션 생성, MPC 제어 및 검사로 이어지는 전체 시스템 아키텍처" loading="lazy">
-          <figcaption>전체 시스템 아키텍처: 센서 입력 → 지형 추정 → 모션 생성 → MPC 제어 → 검사 파이프라인</figcaption>
-        </figure>
-
-        <div class="diagram" role="img" aria-label="자율 굴착 시스템 전체 데이터 흐름">
-          <div class="flow">
-            <div class="flow-node blue">
-              <strong>센서 입력</strong>
-              <small>캐빈 라이다 · 붐 라이다 · 관절 각도 센서</small>
-            </div>
-            <span class="arrow" aria-hidden="true">→</span>
-            <div class="flow-node green">
-              <strong>실시간 지형 추정</strong>
-              <small>2.5D 높이맵</small>
-            </div>
-            <span class="arrow" aria-hidden="true">→</span>
-            <div class="flow-node gold">
-              <strong>굴착 경로 생성</strong>
-              <small>기하학적 경로</small>
-            </div>
-            <span class="arrow" aria-hidden="true">→</span>
-            <div class="flow-node violet">
-              <strong>MPC 경로 추적</strong>
-              <small>압력 센서 입력</small>
-            </div>
-            <span class="arrow" aria-hidden="true">→</span>
-            <div class="flow-node red">
-              <strong>유압 굴착기</strong>
-              <small>실린더 제어</small>
-            </div>
-          </div>
-          <div class="diagram-notes">
-            <span>유압 굴착기 → 반복 사이클 → 실시간 지형 추정</span>
-            <span>스테레오 카메라 + 캐빈/붐 라이다 → 정밀 지형 검사</span>
-          </div>
-        </div>
-
-        <section id="sensors">
-          <h3>2.1 센서 구성</h3>
-
-          <figure>
-            <img src="assets/figure3.png" alt="듀얼 라이다와 스테레오 카메라의 위치 및 시야 범위" loading="lazy">
-            <figcaption>듀얼 라이다(캐빈+붐)와 스테레오 카메라 배치, 각 센서의 FOV 커버리지</figcaption>
-          </figure>
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">센서</th>
-                  <th scope="col">위치</th>
-                  <th scope="col">역할</th>
-                  <th scope="col">정밀도</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>캐빈 라이다</td>
-                  <td>캐빈 측면 (기울임)</td>
-                  <td>원거리 일관 관측, 붐 움직임 무관</td>
-                  <td>~3cm</td>
-                </tr>
-                <tr>
-                  <td>붐 라이다</td>
-                  <td>붐 하단 (회전축 평행)</td>
-                  <td>경사면 밀집 스캔, 붐과 함께 이동</td>
-                  <td>~3cm</td>
-                </tr>
-                <tr>
-                  <td>스테레오 카메라</td>
-                  <td>붐 하단 (라이다 옆)</td>
-                  <td>정밀 검사용 고해상도 이미지</td>
-                  <td>&lt;1cm (BA 후)</td>
-                </tr>
-                <tr>
-                  <td>IMU</td>
-                  <td>각 관절</td>
-                  <td>팔 자세 측정</td>
-                  <td>0.1°</td>
-                </tr>
-                <tr>
-                  <td>로터리 엔코더</td>
-                  <td>스윙축</td>
-                  <td>캐빈 회전각</td>
-                  <td>2°</td>
-                </tr>
-                <tr>
-                  <td>압력 센서</td>
-                  <td>유압 실린더 내부</td>
-                  <td>MPC 파워 제약 계산</td>
-                  <td>—</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <p class="key-idea">
-            <strong>핵심 아이디어:</strong> 붐 하단에 라이다를 장착하여 붐 회전축과 평행하게 배치 →
-            붐이 어떤 각도에 있든 경사면을 밀집 스캔 가능. 기존 연구(캐빈 상단만 배치)의 경사면
-            FOV 한계를 해결. 드론 같은 외부 장비 불필요.
-          </p>
-        </section>
-
-        <section id="calibration">
-          <h3>2.2 센서 캘리브레이션 (4단계)</h3>
-
-          <div class="diagram" role="img" aria-label="C2C, L2C, L2L, S2V 순서의 센서 캘리브레이션">
-            <div class="flow">
-              <div class="flow-node blue"><strong>C2C</strong><small>카메라 ↔ 카메라</small></div>
-              <span class="arrow" aria-hidden="true">→</span>
-              <div class="flow-node gold"><strong>L2C</strong><small>라이다 ↔ 카메라</small></div>
-              <span class="arrow" aria-hidden="true">→</span>
-              <div class="flow-node violet"><strong>L2L</strong><small>라이다 ↔ 라이다</small></div>
-              <span class="arrow" aria-hidden="true">→</span>
-              <div class="flow-node green"><strong>S2V</strong><small>센서 ↔ 굴착기</small></div>
+            <div class="one-line">
+              <strong>한 줄 요약:</strong>
+              30톤 실제 굴착기에서 지형 인식 → 굴착 경로 생성 → MPC 제어 → 정밀 지형 검사를
+              모두 온보드 센서만으로 수행하고, 45° 경사면 절토에서 cm 수준의 정확도를 달성했다.
             </div>
           </div>
 
-          <ol>
-            <li><strong>C2C</strong> (Camera-to-Camera): 스테레오 카메라 내부 파라미터 - Zhang 방법 [17]</li>
-            <li><strong>L2C</strong> (Lidar-to-Camera): 라이다-카메라 외부 파라미터 - 자동 타겟 검출 + 리프로젝션 에러 최소화 [18]</li>
-            <li><strong>L2L</strong> (Lidar-to-Lidar): 두 라이다 간 외부 파라미터 - 동시 체커보드 관측 [18]</li>
-            <li><strong>S2V</strong> (Sensors-to-Vehicle): 전체 센서 → 굴착기 좌표계 정렬 - 관절 각도 센서와 결합</li>
-          </ol>
+          <section id="findings">
+            <div class="section-head">
+              <span class="section-kicker">Key Findings</span>
+              <h2>이 논문에서 먼저 볼 네 가지</h2>
+              <p class="section-intro">
+                자율 굴착의 여러 구성 요소를 따로 제안한 연구는 이미 존재했다.
+                이 논문이 한 걸음 더 나아간 지점은 센싱, 계획, 제어, 검사 사이의 단절을 실제 장비 위에서 연결한 데 있다.
+              </p>
+            </div>
 
-          <ul>
-            <li>체커보드 하나만 필요, 1~2명 작업자로 완료 가능</li>
-            <li>모든 센서 FOV가 ROI 근처 지면에서 겹침 → 사다리 등 추가 장비 불필요</li>
-          </ul>
-        </section>
-      </section>
+            <div class="findings-grid">
+              <article class="finding">
+                <span class="finding-number">FINDING 01</span>
+                <h3>절토와 검사의 통합</h3>
+                <p>숙련 기사의 굴착과 별도 측량팀의 사후 검사를 온보드 시스템 하나로 연결했다.</p>
+              </article>
 
-      <section class="chapter" id="terrain">
-        <h2><span class="num">03</span> 실시간 지형 추정</h2>
+              <article class="finding">
+                <span class="finding-number">FINDING 02</span>
+                <h3>경사면을 놓치지 않는 센서 배치</h3>
+                <p>캐빈과 붐에 라이다를 분산 배치해 붐 자세가 바뀌어도 관심 영역을 조밀하게 관측한다.</p>
+              </article>
 
-        <figure>
-          <img src="assets/figure4.png" alt="라이다 포인트 클라우드 필터링과 2.5D 높이맵 생성 및 업데이트 과정" loading="lazy">
-          <figcaption>실시간 지형 추정: 라이다 포인트 클라우드 필터링 → 2.5D 높이맵 생성·업데이트 과정</figcaption>
-        </figure>
+              <article class="finding">
+                <span class="finding-number">FINDING 03</span>
+                <h3>기하와 물리를 분리한 계획</h3>
+                <p>DFS·A*가 충돌 없는 경로를 찾고, MPC가 파워·유량·실린더 한계 안에서 시간을 배분한다.</p>
+              </article>
 
-        <section id="heightmap">
-          <h3>3.1 2.5D 높이맵</h3>
-          <p>
-            작업 영역을 <strong>40cm × 40cm 격자</strong>로 분할하고, 각 셀
-            <span class="math">c</span>에 높이의 <strong>기대값</strong>
-            <span class="math">x̂<sub>c</sub></span>과 <strong>분산</strong>
-            <span class="math">σ̂<sub>c</sub><sup>2</sup></span>을 관리한다. 전체 3D가 아닌
-            2.5D를 쓰는 이유는, 건설 지형은 각 수평 위치에 높이가 하나이므로 셀당 스칼라 높이면
-            충분하기 때문이다.
-          </p>
-        </section>
+              <article class="finding">
+                <span class="finding-number">FINDING 04</span>
+                <h3>서브 cm 온보드 검사</h3>
+                <p>2-Step Bundle Adjustment로 대규모 3D 복원의 계산 부담을 낮추면서 정밀도를 유지했다.</p>
+              </article>
+            </div>
+          </section>
 
-        <section id="point-filtering">
-          <h3>3.2 포인트 클라우드 필터링</h3>
-          <p>
-            굴착 중 버킷, 팔, 떨어지는 흙이 라이다에 잡히는 문제를
-            <strong>기구학 기반 필터링</strong>으로 해결한다.
-          </p>
+          <section id="context">
+            <div class="section-head">
+              <span class="section-kicker">01 · Context</span>
+              <h2>왜 굴착 자동화는 ‘통합’이 어려운가</h2>
+            </div>
 
-          <div class="diagram" role="img" aria-label="굴착기 부품 바운딩 박스에 포함된 라이다 점을 제거하는 흐름">
-            <div class="decision-grid">
-              <div class="flow-node blue"><strong>라이다 점</strong></div>
-              <span class="mini-arrow" aria-hidden="true">→</span>
-              <div class="branch-results">
-                <div class="flow-node gold">
-                  <strong>굴착기 부품 바운딩 박스 안?</strong>
-                </div>
-                <div class="flow-node red"><strong>Yes → 제거</strong></div>
-                <div class="flow-node green"><strong>No → 지면 점으로 사용</strong></div>
+            <p>
+              건설 현장은 노동력 부족, 인건비 상승, 안전 위험을 동시에 안고 있다.
+              특히 대규모 절토와 표면 그레이딩은 같은 동작을 반복하면서도 목표 형상을 정밀하게 맞춰야 하므로
+              자동화의 경제적 가치가 큰 작업이다.
+            </p>
+
+            <p>
+              그러나 굴착만 자동화해서는 작업이 끝나지 않는다. 실제 현장에서는 숙련 기사가 흙을 깎은 뒤
+              별도의 측량팀이 목표 지형과 결과를 비교한다. 오차가 크면 장비가 다시 투입된다.
+              자동화된 장비가 스스로 결과를 확인하지 못한다면 이 반복 구조는 그대로 남는다.
+            </p>
+
+            <div class="table-wrap">
+              <table>
+                <caption>기존 접근에서 남아 있던 간극</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">한계</th>
+                    <th scope="col">현장에서의 의미</th>
+                    <th scope="col">본 연구의 대응</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>절토와 검사 미통합</td>
+                    <td>굴착 이후 별도 장비와 인력이 필요</td>
+                    <td>온보드 멀티뷰 스테레오 검사</td>
+                  </tr>
+                  <tr>
+                    <td>센서 시야각 제한</td>
+                    <td>경사면에서 작업 영역이 붐이나 차체에 가려짐</td>
+                    <td>캐빈·붐 듀얼 라이다 구성</td>
+                  </tr>
+                  <tr>
+                    <td>물리적 제약의 부분적 고려</td>
+                    <td>계획 경로가 유압 장비의 파워·유량 한계를 초과할 수 있음</td>
+                    <td>압력 피드백을 포함한 제약식 MPC</td>
+                  </tr>
+                  <tr>
+                    <td>시뮬레이션 중심 검증</td>
+                    <td>토양과 유압계의 불확실성을 충분히 반영하지 못함</td>
+                    <td>30톤 상용 굴착기 실험</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <blockquote class="pullquote">
+              <p>
+                이 시스템의 진짜 단위는 알고리즘 하나가 아니라,
+                “보고, 깎고, 다시 측정하는” 전체 작업 사이클이다.
+              </p>
+              <cite>연구의 통합 구조를 요약한 편집자 해설</cite>
+            </blockquote>
+          </section>
+
+          <section id="system">
+            <div class="section-head">
+              <span class="section-kicker">02 · System</span>
+              <h2>센서에서 검사까지, 하나의 온보드 파이프라인</h2>
+              <p class="section-intro">
+                연구진은 30톤급 Hyundai HX300AL에 센서와 전자유압 제어 장치를 탑재했다.
+                드론이나 외부 측량 시스템 없이 장비 자체가 작업 지형을 인식하고 결과를 검사하도록 설계했다.
+              </p>
+            </div>
+
+            <figure class="figure">
+              <div class="figure-frame">
+                <img src="assets/figure1.png" alt="30톤 현대 HX300AL 자율 굴착기와 센서 배치" loading="lazy">
+              </div>
+              <figcaption>그림 1. 30톤 Hyundai HX300AL 기반 자율 굴착기 외관과 센서 구성.</figcaption>
+            </figure>
+
+            <div class="flow" aria-label="전체 자율 굴착 시스템 흐름">
+              <div class="flow-step">
+                <strong>센싱</strong>
+                <span>듀얼 라이다<br>관절·압력 센서</span>
+              </div>
+              <div class="flow-step">
+                <strong>지형 추정</strong>
+                <span>2.5D 높이맵<br>MAP 업데이트</span>
+              </div>
+              <div class="flow-step">
+                <strong>경로 계획</strong>
+                <span>DFS 굴착<br>A* 이동</span>
+              </div>
+              <div class="flow-step">
+                <strong>제어</strong>
+                <span>제약식 MPC<br>100Hz 저수준 제어</span>
+              </div>
+              <div class="flow-step">
+                <strong>검사</strong>
+                <span>멀티뷰 스테레오<br>2-Step BA</span>
               </div>
             </div>
-          </div>
 
-          <pre aria-label="포인트 클라우드 필터링 의사코드"><code># 포인트 클라우드 필터링 의사코드
-for point in lidar_points:
+            <figure class="figure">
+              <div class="figure-frame">
+                <img src="assets/figure2.png" alt="센서 입력부터 지형 검사까지 이어지는 전체 시스템 아키텍처" loading="lazy">
+              </div>
+              <figcaption>그림 2. 센서 입력, 지형 추정, 모션 생성, MPC 제어, 검사로 이어지는 전체 아키텍처.</figcaption>
+            </figure>
+
+            <h3>경사면을 보는 듀얼 라이다</h3>
+
+            <figure class="figure">
+              <div class="figure-frame">
+                <img src="assets/figure3.png" alt="캐빈 라이다, 붐 라이다, 스테레오 카메라의 위치와 시야 범위" loading="lazy">
+              </div>
+              <figcaption>그림 3. 캐빈 라이다와 붐 라이다, 스테레오 카메라의 배치 및 시야각.</figcaption>
+            </figure>
+
+            <div class="table-wrap">
+              <table>
+                <caption>센서 구성과 역할</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">센서</th>
+                    <th scope="col">위치</th>
+                    <th scope="col">주요 역할</th>
+                    <th scope="col">정밀도</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>캐빈 라이다</td>
+                    <td>캐빈 측면, 기울인 상태</td>
+                    <td>붐 움직임과 무관한 원거리 관측</td>
+                    <td>약 3cm</td>
+                  </tr>
+                  <tr>
+                    <td>붐 라이다</td>
+                    <td>붐 하단, 회전축과 평행</td>
+                    <td>경사면의 조밀한 근거리 스캔</td>
+                    <td>약 3cm</td>
+                  </tr>
+                  <tr>
+                    <td>스테레오 카메라</td>
+                    <td>붐 하단, 라이다 인접</td>
+                    <td>검사용 고해상도 영상 취득</td>
+                    <td>BA 이후 1cm 미만</td>
+                  </tr>
+                  <tr>
+                    <td>IMU·엔코더</td>
+                    <td>관절 및 스윙축</td>
+                    <td>팔 자세와 캐빈 회전각 측정</td>
+                    <td>관절 0.1°, 스윙 2°</td>
+                  </tr>
+                  <tr>
+                    <td>압력 센서</td>
+                    <td>유압 실린더 내부</td>
+                    <td>MPC의 파워 제약 계산</td>
+                    <td>장비 피드백</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="note">
+              <strong>설계의 핵심:</strong>
+              붐 하단 라이다는 붐과 함께 움직이며 경사면을 가까이에서 스캔한다.
+              캐빈 라이다만 사용할 때 생기는 사각을 보완하므로, 드론 같은 외부 관측 장비가 필요하지 않다.
+            </div>
+
+            <h3>한 장의 체커보드로 잇는 네 단계 캘리브레이션</h3>
+
+            <div class="stepper" aria-label="센서 캘리브레이션 네 단계">
+              <div class="step">
+                <strong>C2C</strong>
+                <span>카메라 간 내부·상대 파라미터 추정</span>
+              </div>
+              <div class="step">
+                <strong>L2C</strong>
+                <span>라이다와 카메라 사이 외부 파라미터 정렬</span>
+              </div>
+              <div class="step">
+                <strong>L2L</strong>
+                <span>두 라이다의 좌표계를 동시 체커보드 관측으로 정렬</span>
+              </div>
+              <div class="step">
+                <strong>S2V</strong>
+                <span>전체 센서를 굴착기 좌표계에 결합</span>
+              </div>
+            </div>
+
+            <p>
+              모든 센서의 시야가 작업 영역 근처에서 겹치도록 배치했기 때문에
+              하나의 체커보드와 1~2명의 작업자만으로 캘리브레이션을 수행할 수 있다.
+              높은 장비에 접근하기 위한 별도 사다리나 대형 타깃도 요구하지 않는다.
+            </p>
+          </section>
+
+          <section id="terrain">
+            <div class="section-head">
+              <span class="section-kicker">03 · Terrain Estimation</span>
+              <h2>흙이 계속 움직여도 지형을 놓치지 않는 법</h2>
+            </div>
+
+            <figure class="figure">
+              <div class="figure-frame">
+                <img src="assets/figure4.png" alt="라이다 포인트 필터링과 2.5D 높이맵 생성 과정" loading="lazy">
+              </div>
+              <figcaption>그림 4. 라이다 포인트 클라우드를 필터링하고 2.5D 높이맵을 갱신하는 과정.</figcaption>
+            </figure>
+
+            <h3>셀마다 높이와 불확실성을 함께 저장한다</h3>
+
+            <p>
+              작업 영역은 40cm × 40cm 격자로 나뉜다. 각 셀 <em>c</em>는 높이 추정값
+              <span aria-label="엑스 햇">x̂<sub>c</sub></span>뿐 아니라 추정 분산
+              <span aria-label="시그마 제곱">σ̂<sub>c</sub><sup>2</sup></span>도 가진다.
+              각 수평 위치에 하나의 대표 높이가 존재한다고 보는 2.5D 표현은
+              완전한 3D 지도보다 가볍고 굴착 경로 생성에 직접 사용할 수 있다.
+            </p>
+
+            <p>
+              굴착 중에는 버킷과 붐, 떨어지는 흙이 라이다에 함께 잡힌다.
+              시스템은 현재 관절각으로 장비 부품의 3D 바운딩 박스를 계산하고,
+              그 내부에 있는 포인트를 지형 관측에서 제외한다.
+            </p>
+
+            <pre aria-label="포인트 클라우드 필터링 의사코드"><code>for point in lidar_points:
     reject = False
     for part in [boom, stick, bucket]:
         bbox = compute_3D_bbox(part, current_joint_angles)
@@ -1286,918 +1521,774 @@ for point in lidar_points:
             break
     if not reject:
         assign_to_cell(point, heightmap)</code></pre>
-        </section>
 
-        <section id="map-estimation">
-          <h3>3.3 칼만 필터형 MAP 추정</h3>
+            <h3>칼만 필터형 MAP 업데이트</h3>
 
-          <p><strong>지형 동역학 모델 (식 1):</strong></p>
-          <p>지형의 높이가 시간에 따라 변할 수 있다고 가정하는 확률적 동역학 모델:</p>
-
-          <div class="equation" aria-label="지형 동역학 모델 식 1">
-            x_{k+1}^c =
-            \begin{cases}
-            x_{\text{bucket}}^c + u_k^c &amp; \text{(버킷이 지면 아래로 통과한 경우)} \\
-            x_k^c + w_k^c &amp; \text{(그 외)}
-            \end{cases}
-          </div>
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">기호</th>
-                  <th scope="col">의미</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><span class="math">x<sub>k</sub><sup>c</sup></span></td>
-                  <td>시각 <span class="math">t<sub>k</sub></span>에서 셀 <span class="math">c</span>의 높이</td>
-                </tr>
-                <tr>
-                  <td><span class="math">x<sub>bucket</sub><sup>c</sup></span></td>
-                  <td>버킷 팁이 지나간 높이 (굴착 시 지형이 깎임)</td>
-                </tr>
-                <tr>
-                  <td><span class="math">u<sub>k</sub><sup>c</sup></span></td>
-                  <td>굴착 후 노이즈 ~ <span class="math">𝒩(0, Q<sub>u</sub>)</span></td>
-                </tr>
-                <tr>
-                  <td><span class="math">w<sub>k</sub><sup>c</sup></span></td>
-                  <td>자연 변화 노이즈 ~ <span class="math">𝒩(0, Q<sub>w</sub>)</span> (미세 산사태 등)</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <blockquote>
             <p>
-              <strong>직관:</strong> <span class="math">Q<sub>u</sub></span>,
-              <span class="math">Q<sub>w</sub></span>가 작으면 “지형이 잘 안 변한다”고 가정 →
-              이전 추정값을 더 신뢰. <span class="math">Q<sub>u</sub></span>,
-              <span class="math">Q<sub>w</sub></span>가 크면 지형 변화가 잦다고 가정 →
-              최신 센서 측정값에 더 의존.
+              지형 모델은 버킷이 셀을 통과했는지에 따라 다르게 예측된다.
+              버킷이 지면 아래를 지나갔다면 버킷 팁 높이를 새 지형의 기준으로 삼고,
+              그렇지 않다면 이전 높이를 유지하면서 자연 변화에 해당하는 불확실성을 더한다.
             </p>
-          </blockquote>
 
-          <p><strong>측정 모델 (식 2):</strong></p>
-
-          <div class="equation" aria-label="측정 모델 식 2">
-            y \sim \mathcal{N}\!\left(x_k^c, \; v + C \cdot d^2\right)
-          </div>
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">기호</th>
-                  <th scope="col">의미</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><span class="math">y</span></td>
-                  <td>라이다 높이 측정값</td>
-                </tr>
-                <tr>
-                  <td><span class="math">x<sub>k</sub><sup>c</sup></span></td>
-                  <td>셀 <span class="math">c</span>의 실제 높이 (추정 대상)</td>
-                </tr>
-                <tr>
-                  <td><span class="math">v ≥ 0</span></td>
-                  <td>라이다 거리 측정 분산 (센서 스펙에서 제공)</td>
-                </tr>
-                <tr>
-                  <td><span class="math">C ≥ 0</span></td>
-                  <td>지형 최대 기울기 관련 파라미터</td>
-                </tr>
-                <tr>
-                  <td><span class="math">d</span></td>
-                  <td>라이다 점에서 셀 중심까지의 수평 거리</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <blockquote>
-            <p>
-              <strong>직관:</strong> 셀 중심에서 멀리 떨어진 점일수록 해당 셀의 높이를 대표하기 어렵다
-              (<span class="math">C · d<sup>2</sup></span> 항). 경사면에서는 40cm만 벗어나도
-              높이가 크게 달라질 수 있기 때문.
-            </p>
-          </blockquote>
-
-          <p><strong>MAP 추정 과정:</strong></p>
-          <p>
-            각 셀에 높이의 <strong>기대값</strong>과 <strong>추정 분산</strong>을 함께 관리한다
-            (초기값: 분산 무한대, 기대값 0). 매 업데이트마다, 이전 시점
-            <span class="math">t<sub>k</sub></span>의 추정값과
-            <span class="math">t<sub>k</sub> ~ t<sub>k+1</sub></span> 사이에 들어온 라이다
-            점들을 결합하여 <strong>MAP(최대 사후 확률) 추정</strong>을 수행한다. 이렇게 구한
-            MAP 평균 <span class="math">x̂<sub>k+1</sub><sup>c</sup></span>이 시각
-            <span class="math">t<sub>k+1</sub></span>에서의 지형 정보로 사용되어 충돌 회피 및
-            굴착 경로 생성에 활용된다.
-          </p>
-
-          <aside class="derivation">
-            <strong>📐 보충 수식 — 논문에 명시되지 않은 유도 수식</strong>
-            <p>
-              위 동역학(식 1) + 측정(식 2) 모델에 표준 칼만 필터 프레임워크를 적용하면,
-              MAP 업데이트는 다음과 같이 유도된다:
-            </p>
-            <div class="equation">
-              \hat{x}_{k+1}^c =
-              \frac{\frac{1}{\hat{\sigma}_k^2} \cdot \hat{x}_k + \sum_i w_i \cdot y_i}
-              {\frac{1}{\hat{\sigma}_k^2} + \sum_i w_i},
-              \quad w_i = \frac{1}{v + C \cdot d_i^2}
+            <div class="formula" role="img" aria-label="지형 동역학 모델">
+              x<sub>k+1</sub><sup>c</sup> =
+              { x<sub>bucket</sub><sup>c</sup> + u<sub>k</sub><sup>c</sup> &nbsp; if bucket swept cell;
+              &nbsp; x<sub>k</sub><sup>c</sup> + w<sub>k</sub><sup>c</sup> &nbsp; otherwise }
             </div>
-            <p>
-              이전 추정값과 새 측정값의 <strong>신뢰도(분산의 역수) 가중 평균</strong>으로,
-              셀 중심에 가까운 점(<span class="math">d<sub>i</sub>↓</span>)일수록 가중치
-              <span class="math">w<sub>i</sub></span>가 크다.
-            </p>
-            <p class="source-note">출처: 식 (1), (2)에 표준 칼만 필터 MAP 업데이트 규칙을 적용하여 유도</p>
-          </aside>
 
-          <pre aria-label="칼만 필터형 MAP 업데이트 의사코드"><code># 칼만 필터형 MAP 업데이트 의사코드
-for cell in heightmap:
-    # 예측 단계: 동역학 모델 (식 1) 적용
-    if bucket_swept_cell(cell, t_k, t_k1):
+            <p>
+              라이다 측정의 분산은 센서 고유 오차에 더해, 포인트와 셀 중심 사이 거리의 제곱에 비례해 커진다.
+              경사면에서는 같은 셀 안에서도 위치가 조금만 달라져 높이가 크게 달라질 수 있기 때문이다.
+            </p>
+
+            <div class="formula" role="img" aria-label="라이다 측정 모델">
+              y ∼ N(x<sub>k</sub><sup>c</sup>, v + C·d<sup>2</sup>)
+            </div>
+
+            <div class="note">
+              <strong>직관:</strong>
+              셀 중심에 가까운 측정은 더 큰 가중치를 받는다.
+              지형 변화 노이즈 Q<sub>u</sub>, Q<sub>w</sub>가 작으면 이전 추정을 더 신뢰하고,
+              값이 크면 최신 센서 측정에 더 빠르게 반응한다.
+            </div>
+
+            <div class="note warning">
+              <strong>보충 유도:</strong>
+              아래 가중 평균식은 논문에 그대로 제시된 식이 아니라,
+              논문의 동역학·측정 모델에 표준 칼만 필터 MAP 규칙을 적용해 정리한 형태다.
+            </div>
+
+            <div class="formula" role="img" aria-label="MAP 높이 추정의 보충 유도식">
+              x̂<sub>k+1</sub><sup>c</sup> =
+              [(1/σ̂<sub>k</sub><sup>2</sup>)x̂<sub>k</sub> + Σ w<sub>i</sub>y<sub>i</sub>]
+              ÷ [(1/σ̂<sub>k</sub><sup>2</sup>) + Σ w<sub>i</sub>],
+              &nbsp; w<sub>i</sub> = 1/(v + C·d<sub>i</sub><sup>2</sup>)
+            </div>
+
+            <pre aria-label="칼만 필터형 높이맵 업데이트 의사코드"><code>for cell in heightmap:
+    if bucket_swept_cell(cell):
         x_pred = bucket_tip_height(cell)
         var_pred = Q_u
     else:
-        x_pred = cell.height      # 이전 추정값 유지
-        var_pred = cell.variance + Q_w  # 불확실성 증가
+        x_pred = cell.height
+        var_pred = cell.variance + Q_w
 
-    # 업데이트 단계: 새 라이다 측정값들로 MAP 추정
-    for p in filtered_points_in_cell(cell):
-        d = horizontal_distance(p, cell.center)
-        R = v + C * d * d          # 측정 분산 (식 2)
-        K = var_pred / (var_pred + R)  # 칼만 게인
-        x_pred = x_pred + K * (p.z - x_pred)
-        var_pred = (1 - K) * var_pred
+    for point in filtered_points_in_cell(cell):
+        d = horizontal_distance(point, cell.center)
+        R = v + C * d * d
+        K = var_pred / (var_pred + R)
+        x_pred += K * (point.z - x_pred)
+        var_pred *= (1 - K)
 
-    cell.height, cell.variance = x_pred, var_pred</code></pre>
-        </section>
+    cell.height = x_pred
+    cell.variance = var_pred</code></pre>
 
-        <section id="terrain-performance">
-          <h3>3.4 성능 &amp; 로버스트니스</h3>
-          <ul>
-            <li>두 라이다 10Hz 입력 → 높이맵 <strong>5Hz</strong> 업데이트</li>
-            <li>굴착/덤핑 중에도 안정적으로 지형 변화 추적</li>
-            <li>파라미터(셀 크기, <span class="math">Q<sub>u</sub></span>, <span class="math">Q<sub>w</sub></span>, <span class="math">C</span>, <span class="math">δt</span>)에 크게 민감하지 않음 → “합리적 범위”이면 OK</li>
-          </ul>
-        </section>
-      </section>
-
-      <section class="chapter" id="motion">
-        <h2><span class="num">04</span> 굴착 모션 생성</h2>
-
-        <section id="two-stage">
-          <h3>4.1 2단계 구조</h3>
-          <p>
-            기하학적 제약(위치 관련)과 물리적 제약(속도/힘 관련)을
-            <strong>분리</strong>하여 효율적으로 해결한다.
-          </p>
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">단계</th>
-                  <th scope="col">목적</th>
-                  <th scope="col">방법</th>
-                  <th scope="col">제약 유형</th>
-                  <th scope="col">시간</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>경로 생성 (Path)</td>
-                  <td>기하학적 제약 만족</td>
-                  <td>DFS + A*</td>
-                  <td>충돌 회피, 버킷 자세 등</td>
-                  <td>~0.3s</td>
-                </tr>
-                <tr>
-                  <td>경로 추적 (Trajectory)</td>
-                  <td>물리적 제약 만족</td>
-                  <td>MPC</td>
-                  <td>파워, 유량, 변위 한계</td>
-                  <td>&lt;0.08s</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section id="dig-cycle">
-          <h3>4.2 5단계 굴착 사이클</h3>
-
-          <figure class="figure-narrow">
-            <img src="assets/figure5.png" alt="공격점 이동, 굴착, 들어올리기, 덤핑 이동, 덤핑으로 구성된 굴착 사이클" loading="lazy">
-            <figcaption>5단계 굴착 사이클: 공격점 이동 → 굴착 → 들어올리기 → 덤핑 이동 → 덤핑</figcaption>
-          </figure>
-
-          <div class="diagram" role="img" aria-label="5단계 굴착 사이클">
-            <div class="flow">
-              <div class="flow-node gold"><strong>Phase 1</strong><small>이동 → 공격점</small></div>
-              <span class="arrow" aria-hidden="true">→</span>
-              <div class="flow-node red"><strong>Phase 2</strong><small>굴착</small></div>
-              <span class="arrow" aria-hidden="true">→</span>
-              <div class="flow-node violet"><strong>Phase 3</strong><small>들어올리기</small></div>
-              <span class="arrow" aria-hidden="true">→</span>
-              <div class="flow-node blue"><strong>Phase 4</strong><small>덤핑 이동</small></div>
-              <span class="arrow" aria-hidden="true">→</span>
-              <div class="flow-node green"><strong>Phase 5</strong><small>덤핑</small></div>
-              <span class="arrow" aria-hidden="true">↺</span>
-            </div>
-            <p class="diagram-caption">Phase 5 완료 후 Phase 1부터 반복</p>
-          </div>
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">Phase</th>
-                  <th scope="col">동작</th>
-                  <th scope="col">핵심 제약</th>
-                  <th scope="col">알고리즘</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>초기 → 공격점 이동</td>
-                  <td>충돌 회피</td>
-                  <td>A* (4D: 스윙+3실린더)</td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td><strong>굴착 수행</strong></td>
-                  <td>스윙 고정, 과굴착 방지, 용량 제한</td>
-                  <td><strong>DFS</strong> (3D: 3실린더)</td>
-                </tr>
-                <tr>
-                  <td>3</td>
-                  <td>버킷 들어올리기</td>
-                  <td>충돌 회피</td>
-                  <td>A* (4D)</td>
-                </tr>
-                <tr>
-                  <td>4</td>
-                  <td>덤핑 위치로 이동</td>
-                  <td>흙 유출 방지 (버킷 방향 제약)</td>
-                  <td>A* (4D)</td>
-                </tr>
-                <tr>
-                  <td>5</td>
-                  <td>덤핑</td>
-                  <td>—</td>
-                  <td>A* (4D)</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section id="dig-profiles">
-          <h3>4.3 두 가지 굴착 프로파일</h3>
-
-          <div class="diagram" role="img" aria-label="일반 굴착에서 팁 그레이딩으로 전환되는 흐름">
-            <div class="flow">
-              <div class="flow-node blue"><strong>굴착 시작</strong></div>
-              <span class="arrow" aria-hidden="true">→</span>
-              <div class="flow-node red"><strong>Normal Digging</strong><small>최대 부피 굴착</small></div>
-              <span class="arrow" aria-hidden="true">→</span>
-              <div class="flow-node gold"><strong>높이 오차 ≤ 50cm?</strong><small>No → 일반 굴착 반복</small></div>
-              <span class="arrow" aria-hidden="true">→</span>
-              <div class="flow-node green"><strong>Tip Grading</strong><small>정밀 표면 마감</small></div>
-              <span class="arrow" aria-hidden="true">→</span>
-              <div class="flow-node blue"><strong>완료</strong></div>
-            </div>
-          </div>
-
-          <figure class="figure-narrow">
-            <img src="assets/figure6.png" alt="일반 굴착과 팁 그레이딩 경로 프로파일 비교" loading="lazy">
-            <figcaption>일반 굴착(위)과 팁 그레이딩(아래) 경로 프로파일 비교: 최대 부피 굴착 vs 정밀 표면 마감</figcaption>
-          </figure>
-
-          <h4>일반 굴착 (Normal Digging)</h4>
-          <ul>
-            <li><strong>목표:</strong> 매 사이클에서 버킷 용량(1m³)에 근접한 최대 부피 굴착</li>
-            <li><strong>방법:</strong> 3D 격자(붐/스틱/버킷 실린더 길이)에서 <strong>DFS(깊이 우선 탐색)</strong></li>
-            <li><strong>공격점(Point of Attack):</strong> 현재 지형과 팁 그레이딩 임계값의 교점 중 캐빈에서 가장 먼 점</li>
-            <li><strong>우선순위 휴리스틱:</strong> 예상 굴착 부피↑ + 예상 파워 소비↓ (하드웨어 특화)</li>
-            <li><strong>실행 가능성 체크:</strong> 버킷 용량 초과 여부, 절삭각(팁 경로와 버킷 각도), 팔 관통 여부</li>
-          </ul>
-
-          <pre aria-label="DFS 기반 일반 굴착 경로 탐색 의사코드"><code># DFS 기반 일반 굴착 경로 탐색 의사코드
-def find_digging_path(landscape, target):
-    root = find_point_of_attack(landscape, target)  # 가장 먼 교점
-    stack = [root]
-    while stack:
-        node = stack.pop()  # DFS: 후입선출
-        if is_feasible(node):  # 용량, 절삭각, 관통 체크
-            if excavated_volume(node) &gt;= target_volume:
-                return path_to(node)
-        children = expand(node)  # 실린더 길이 한 스텝 변경
-        children.sort(key=lambda n: heuristic(n))  # 부피↑ + 파워↓
-        stack.extend(children)</code></pre>
-
-          <figure class="figure-narrow">
-            <img src="assets/figure7.png" alt="목표 지형을 따라 버킷 팁으로 표면을 다듬는 팁 그레이딩 동작" loading="lazy">
-            <figcaption>팁 그레이딩 동작 상세: 목표 지형을 따라 버킷 팁으로 표면을 정밀하게 다듬는 과정</figcaption>
-          </figure>
-
-          <h4>팁 그레이딩 (Tip Grading)</h4>
-          <ul>
-            <li><strong>목표:</strong> 목표 지형을 따라 표면 정밀 다듬기</li>
-            <li><strong>방법:</strong> 목표 지형의 가장 먼 도달 가능 점에서 시작 → 일정 절삭각 유지하며 캐빈 방향으로 당김</li>
-            <li><strong>전환 조건:</strong> 높이 오차 ≤ 50cm</li>
-            <li>팁 그레이딩 후에도 오차가 크면 재굴착+재그레이딩 반복</li>
-          </ul>
-        </section>
-
-        <section id="astar">
-          <h3>4.4 A* 경로 계획 (Phase 1, 3, 4, 5)</h3>
-          <ul>
-            <li><strong>탐색 공간:</strong> 4D 격자 (스윙 각도 + 3 실린더)</li>
-            <li><strong>목적함수:</strong> 각 실린더의 유입/유출 유량 합 최소화 → 에너지 효율</li>
-            <li><strong>Phase 4 추가 제약:</strong> 버킷 개구부가 아래를 향하는 configuration → 장애물 취급 (흙 유출 방지)</li>
-          </ul>
-        </section>
-      </section>
-
-      <section class="chapter" id="mpc">
-        <h2><span class="num">05</span> MPC 기반 경로 추적</h2>
-
-        <section id="why-mpc">
-          <h3>5.1 왜 MPC가 필요한가</h3>
-          <p>
-            경로(Path)에는 <strong>시간 정보가 없다</strong>. “어디를 지나가라”만 있고
-            “얼마나 빨리”가 없다. MPC는 시간을 배분하면서 동시에
-            <strong>물리적 제약을 실시간으로 만족</strong>시킨다.
-          </p>
-
-          <div class="diagram" role="img" aria-label="참조 경로, 현재 상태 및 유압 압력을 입력으로 사용하는 MPC 피드백 흐름">
-            <div class="flow">
-              <div class="flow-node blue">
-                <strong>입력</strong>
-                <small>참조 경로 qᵣ · 현재 상태 q₀ · 유압 압력 fₚ</small>
-              </div>
-              <span class="arrow" aria-hidden="true">→</span>
-              <div class="flow-node violet"><strong>MPC 최적화</strong><small>&lt;0.08s</small></div>
-              <span class="arrow" aria-hidden="true">→</span>
-              <div class="flow-node gold"><strong>최적 제어 입력</strong><small>u*</small></div>
-              <span class="arrow" aria-hidden="true">→</span>
-              <div class="flow-node red"><strong>굴착기</strong></div>
-            </div>
-            <p class="diagram-caption">굴착기 상태가 현재 상태 q₀로 피드백되어 최적화를 반복</p>
-          </div>
-        </section>
-
-        <section id="dynamics">
-          <h3>5.2 동역학 모델 (식 3)</h3>
-          <p>1차 이산 시간 기구학 모델:</p>
-
-          <div class="equation">q_{k+1} = f_d(q_k, u_k)</div>
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">변수</th>
-                  <th scope="col">차원</th>
-                  <th scope="col">의미</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><span class="math">q</span></td>
-                  <td><span class="math">ℝ<sup>4</sup></span></td>
-                  <td>configuration: 스윙 각도 + 3개 실린더 길이</td>
-                </tr>
-                <tr>
-                  <td><span class="math">u</span></td>
-                  <td><span class="math">ℝ<sup>4</sup></span></td>
-                  <td>제어 입력: 스윙 속도 + 3개 실린더 신축 속도</td>
-                </tr>
-                <tr>
-                  <td><span class="math">f<sub>d</sub></span></td>
-                  <td>—</td>
-                  <td>이산 시간 상태 전이 함수</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <p>
-            기구학 관계:
-            <span class="math">q̇ = J(q) · u</span>, 여기서
-            <span class="math">J(q)</span>는 자코비안 행렬.
-          </p>
-
-          <blockquote>
             <p>
-              <strong>설계 선택:</strong> 고차 유압 동역학 모델(압력, 관성 포함)은
-              유온(oil temperature)/마찰 불확실성이 크고 비선형성이 강해 실시간 MPC 적용이 어렵다.
-              대신 1차 기구학 모델 + 충분한 성능의 저수준 제어기 조합이 실용적이며,
-              실험으로 유효성을 검증했다.
+              두 라이다는 10Hz로 입력되고 높이맵은 5Hz로 업데이트된다.
+              연구진은 굴착과 덤핑 중에도 지형 변화를 안정적으로 추적했으며,
+              셀 크기와 노이즈 파라미터가 합리적인 범위에 있다면 성능이 크게 흔들리지 않았다고 보고한다.
             </p>
-          </blockquote>
-        </section>
+          </section>
 
-        <section id="constraints">
-          <h3>5.3 물리적 제약 (식 4)</h3>
+          <section id="planning">
+            <div class="section-head">
+              <span class="section-kicker">04 · Motion Planning</span>
+              <h2>경로는 기하학으로, 실행은 물리학으로</h2>
+              <p class="section-intro">
+                시스템은 충돌과 버킷 자세 같은 기하학적 문제를 먼저 풀고,
+                파워·유량·속도 같은 물리적 문제를 MPC에 맡긴다.
+                이 분리는 복잡한 탐색을 실시간 수준으로 낮추는 실용적인 설계다.
+              </p>
+            </div>
 
-          <div class="equation">c(q_k, u_k, f_p) \leq 0</div>
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">기호</th>
-                  <th scope="col">의미</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><span class="math">f<sub>p</sub></span></td>
-                  <td>유압 실린더 내부 압력 측정값 (파워 제약 계산에 사용)</td>
-                </tr>
-                <tr>
-                  <td><span class="math">c(·)</span></td>
-                  <td>물리적 제약 함수 (3가지 제약을 벡터로 결합)</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <p>논문에서 고려하는 3가지 물리적 제약:</p>
-          <ol>
-            <li><strong>파워 한계</strong> (Power limit)</li>
-            <li><strong>실린더 변위 한계</strong> (Cylinder displacement limit)</li>
-            <li><strong>펌프 유량 한계</strong> (Pump flow rate limit)</li>
-          </ol>
-
-          <aside class="derivation">
-            <strong>📐 보충 수식 — 논문 [15]에 상세 정의, 본 논문에서는 c(·) ≤ 0으로만 기술</strong>
             <div class="table-wrap">
               <table>
+                <caption>두 단계 모션 생성 구조</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">단계</th>
+                    <th scope="col">목적</th>
+                    <th scope="col">방법</th>
+                    <th scope="col">주요 제약</th>
+                    <th scope="col">계산 시간</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>경로 생성</td>
+                    <td>기하학적으로 가능한 상태열 탐색</td>
+                    <td>DFS + A*</td>
+                    <td>충돌, 절삭각, 버킷 자세</td>
+                    <td>약 0.3초</td>
+                  </tr>
+                  <tr>
+                    <td>경로 추적</td>
+                    <td>경로에 시간을 배정해 실제 장비로 실행</td>
+                    <td>MPC</td>
+                    <td>파워, 유량, 실린더 변위</td>
+                    <td>0.08초 미만</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>하나의 굴착은 다섯 단계로 반복된다</h3>
+
+            <figure class="figure">
+              <div class="figure-frame">
+                <img src="assets/figure5.png" alt="공격점 이동, 굴착, 들어올리기, 덤핑 이동, 덤핑으로 구성된 굴착 사이클" loading="lazy">
+              </div>
+              <figcaption>그림 5. 공격점 접근에서 덤핑까지 이어지는 다섯 단계 굴착 사이클.</figcaption>
+            </figure>
+
+            <div class="flow" aria-label="다섯 단계 굴착 사이클">
+              <div class="flow-step">
+                <strong>Phase 1</strong>
+                <span>초기 위치에서<br>공격점으로 이동</span>
+              </div>
+              <div class="flow-step">
+                <strong>Phase 2</strong>
+                <span>스윙을 고정하고<br>굴착 수행</span>
+              </div>
+              <div class="flow-step">
+                <strong>Phase 3</strong>
+                <span>충돌을 피하며<br>버킷 들어올리기</span>
+              </div>
+              <div class="flow-step">
+                <strong>Phase 4</strong>
+                <span>흙을 흘리지 않고<br>덤핑 위치로 이동</span>
+              </div>
+              <div class="flow-step">
+                <strong>Phase 5</strong>
+                <span>덤핑 후<br>다음 사이클 준비</span>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <caption>단계별 탐색 공간과 제약</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">단계</th>
+                    <th scope="col">동작</th>
+                    <th scope="col">핵심 제약</th>
+                    <th scope="col">알고리즘</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Phase 1</td>
+                    <td>공격점 접근</td>
+                    <td>지형·장비 충돌 회피</td>
+                    <td>A*, 4D</td>
+                  </tr>
+                  <tr>
+                    <td>Phase 2</td>
+                    <td>굴착</td>
+                    <td>스윙 고정, 과굴착·용량 초과 방지</td>
+                    <td>DFS, 3D</td>
+                  </tr>
+                  <tr>
+                    <td>Phase 3</td>
+                    <td>버킷 상승</td>
+                    <td>충돌 회피</td>
+                    <td>A*, 4D</td>
+                  </tr>
+                  <tr>
+                    <td>Phase 4</td>
+                    <td>덤핑 위치 이동</td>
+                    <td>버킷 방향을 제한해 흙 유출 방지</td>
+                    <td>A*, 4D</td>
+                  </tr>
+                  <tr>
+                    <td>Phase 5</td>
+                    <td>덤핑</td>
+                    <td>목표 자세 도달</td>
+                    <td>A*, 4D</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>많이 퍼내기와 정밀하게 다듬기</h3>
+
+            <figure class="figure">
+              <div class="figure-frame">
+                <img src="assets/figure6.png" alt="일반 굴착과 팁 그레이딩의 경로 프로파일 비교" loading="lazy">
+              </div>
+              <figcaption>그림 6. 최대 부피를 목표로 하는 일반 굴착과 목표 표면을 따라가는 팁 그레이딩.</figcaption>
+            </figure>
+
+            <div class="split">
+              <article class="profile-card">
+                <span class="tag">Bulk Removal</span>
+                <h3>일반 굴착</h3>
+                <p>한 사이클마다 1m³ 버킷 용량에 가까운 흙을 퍼내는 단계다.</p>
+                <ul>
+                  <li>붐·스틱·버킷 실린더 길이의 3D 격자에서 DFS 탐색</li>
+                  <li>예상 굴착 부피가 크고 파워 소비가 낮은 후보를 우선</li>
+                  <li>버킷 용량, 절삭각, 팔의 지형 관통 여부를 검사</li>
+                </ul>
+              </article>
+
+              <article class="profile-card">
+                <span class="tag">Fine Grading</span>
+                <h3>팁 그레이딩</h3>
+                <p>목표 지형의 형상을 버킷 팁으로 정밀하게 다듬는 단계다.</p>
+                <ul>
+                  <li>목표 표면의 가장 먼 도달 가능점에서 시작</li>
+                  <li>일정한 절삭각을 유지하며 캐빈 방향으로 이동</li>
+                  <li>높이 오차가 50cm 이하가 되면 일반 굴착에서 전환</li>
+                </ul>
+              </article>
+            </div>
+
+            <figure class="figure">
+              <div class="figure-frame">
+                <img src="assets/figure7.png" alt="목표 지형을 따라 버킷 팁으로 표면을 다듬는 팁 그레이딩 과정" loading="lazy">
+              </div>
+              <figcaption>그림 7. 목표 지형을 따라 버킷 팁을 이동시키는 정밀 그레이딩 동작.</figcaption>
+            </figure>
+
+            <pre aria-label="DFS 기반 일반 굴착 경로 탐색 의사코드"><code>def find_digging_path(landscape, target):
+    root = find_point_of_attack(landscape, target)
+    stack = [root]
+
+    while stack:
+        node = stack.pop()
+
+        if is_feasible(node):
+            if excavated_volume(node) &gt;= target_volume:
+                return path_to(node)
+
+        children = expand(node)
+        children.sort(key=volume_up_power_down)
+        stack.extend(children)</code></pre>
+
+            <p>
+              Phase 1·3·4·5의 A* 탐색은 스윙 각도와 세 실린더 길이로 구성된 4D 격자에서 수행된다.
+              비용은 실린더 유입·유출 유량의 합을 줄이는 방향으로 설계된다.
+              덤핑 위치로 이동하는 Phase 4에서는 버킷 개구부가 아래를 향해 흙이 쏟아질 수 있는 자세를
+              장애물과 동일하게 취급한다.
+            </p>
+          </section>
+
+          <section id="mpc">
+            <div class="section-head">
+              <span class="section-kicker">05 · Control</span>
+              <h2>MPC는 ‘어디로’에 ‘얼마나 빠르게’를 더한다</h2>
+            </div>
+
+            <p>
+              경로 계획이 만든 결과에는 시간 정보가 없다. 경로는 장비가 통과해야 할 상태만 알려줄 뿐,
+              각 구간을 얼마나 빠르게 움직여야 하는지는 정하지 않는다.
+              MPC는 현재 상태와 유압 압력을 받아 경로에 시간을 배정하고,
+              장비의 물리적 한계를 넘지 않는 제어 입력을 반복 계산한다.
+            </p>
+
+            <div class="comparison">
+              <div class="comparison-card">
+                <strong>참조 경로 q<sub>r</sub></strong>
+                <span>스윙 각도와 세 실린더 길이로 표현된 기하학적 경로</span>
+              </div>
+              <div class="comparison-arrow" aria-hidden="true">→</div>
+              <div class="comparison-card">
+                <strong>최적 제어 입력 u*</strong>
+                <span>파워·유량·변위 제약을 만족하는 실시간 속도 명령</span>
+              </div>
+            </div>
+
+            <h3>가벼운 기구학 모델, 빠른 재계산</h3>
+
+            <div class="formula" role="img" aria-label="MPC 이산 시간 동역학">
+              q<sub>k+1</sub> = f<sub>d</sub>(q<sub>k</sub>, u<sub>k</sub>),
+              &nbsp; q ∈ R<sup>4</sup>, &nbsp; u ∈ R<sup>4</sup>
+            </div>
+
+            <p>
+              상태 q는 스윙 각도와 세 실린더 길이, 입력 u는 스윙 속도와 실린더 신축 속도다.
+              고차 유압 모델은 오일 온도와 마찰에 민감하고 비선형성이 커서 실시간 최적화가 어렵다.
+              연구진은 1차 기구학 모델과 충분히 빠른 저수준 제어기를 결합하는 실용적 구성을 택했다.
+            </p>
+
+            <h3>반드시 지켜야 하는 세 제약</h3>
+
+            <div class="table-wrap">
+              <table>
+                <caption>MPC가 고려하는 물리적 한계</caption>
                 <thead>
                   <tr>
                     <th scope="col">제약</th>
-                    <th scope="col">수식</th>
-                    <th scope="col">물리적 의미</th>
+                    <th scope="col">보충 표현</th>
+                    <th scope="col">의미</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <td>파워 한계</td>
-                    <td><span class="math">Σ<sub>i</sub> p<sub>i</sub> · l̇<sub>i</sub> ≤ P<sub>max</sub></span></td>
-                    <td>유압 펌프 최대 출력</td>
+                    <td>Σ p<sub>i</sub>·l̇<sub>i</sub> ≤ P<sub>max</sub></td>
+                    <td>유압 펌프의 최대 출력을 초과하지 않음</td>
                   </tr>
                   <tr>
                     <td>실린더 변위</td>
-                    <td><span class="math">l<sub>min</sub> ≤ l<sub>i</sub> ≤ l<sub>max</sub></span></td>
-                    <td>각 실린더 스트로크 범위</td>
+                    <td>l<sub>min</sub> ≤ l<sub>i</sub> ≤ l<sub>max</sub></td>
+                    <td>각 실린더의 물리적 스트로크 범위 유지</td>
                   </tr>
                   <tr>
                     <td>펌프 유량</td>
-                    <td><span class="math">Σ<sub>i</sub> A<sub>i</sub> · |l̇<sub>i</sub>| ≤ Q<sub>pump</sub></span></td>
-                    <td>전체 유량 합 ≤ 펌프 용량</td>
+                    <td>Σ A<sub>i</sub>|l̇<sub>i</sub>| ≤ Q<sub>pump</sub></td>
+                    <td>동시에 요구되는 전체 유량을 펌프 용량 이내로 제한</td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <p class="source-note">출처: 저자 이전 연구 [15]에서 상세 정의</p>
-          </aside>
-        </section>
 
-        <section id="mpc-optimization">
-          <h3>5.4 MPC 최적화 문제 (식 5)</h3>
-
-          <div class="equation">
-            \min_{q_{(\cdot)}, \, u_{(\cdot)}} J(q_r, u; \, q_{(\cdot)})
-          </div>
-
-          <p><strong>제약 조건:</strong></p>
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">제약</th>
-                  <th scope="col">수식</th>
-                  <th scope="col">의미</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>동역학 (식 3)</td>
-                  <td><span class="math">q<sub>k+1</sub> = f<sub>d</sub>(q<sub>k</sub>, u<sub>k</sub>)</span></td>
-                  <td>물리 법칙</td>
-                </tr>
-                <tr>
-                  <td>초기 상태</td>
-                  <td><span class="math">q<sub>0</sub> = q(t)</span></td>
-                  <td>현재 위치</td>
-                </tr>
-                <tr>
-                  <td>물리적 제약 (식 4)</td>
-                  <td><span class="math">c(q<sub>k</sub>, u<sub>k</sub>, f<sub>p</sub>) ≤ 0</span></td>
-                  <td>파워, 유량, 변위 한계</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <p>
-            비용함수 <span class="math">J</span>는 상태 오차
-            <span class="math">q − q<sub>r</sub></span>과 제어 입력
-            <span class="math">u</span>에 대한 <strong>이차 형식(quadratic)</strong>이며,
-            Augmented Lagrangian 방법 기반 제약 iLQR [20]로 실시간 풀이한다.
-          </p>
-
-          <aside class="derivation">
-            <strong>📐 보충 수식 — 논문에서 “quadratic with respect to q − qᵣ and u”로만 기술</strong>
-            <div class="equation">
-              J = \sum_{k=0}^{N-1}
-              \left[
-              (q_k - q_{r,k})^\top Q \, (q_k - q_{r,k})
-              + u_k^\top R \, u_k
-              \right]
+            <div class="note warning">
+              <strong>수식 출처 구분:</strong>
+              본 논문 본문은 물리 제약을 c(q<sub>k</sub>, u<sub>k</sub>, f<sub>p</sub>) ≤ 0으로 묶어 표현한다.
+              위의 개별 식은 저자들의 선행 연구 [15]에 기반해 의미를 풀어쓴 보충 표현이다.
             </div>
+
+            <h3>최적화 목표</h3>
+
+            <div class="formula" role="img" aria-label="표준 이차 비용함수로 나타낸 MPC 목적">
+              J = Σ [(q<sub>k</sub> − q<sub>r,k</sub>)<sup>T</sup>Q(q<sub>k</sub> − q<sub>r,k</sub>)
+              + u<sub>k</sub><sup>T</sup>Ru<sub>k</sub>]
+            </div>
+
+            <p>
+              Q는 참조 경로에서 벗어나는 오차를 벌점화하고, R은 과도한 제어 입력을 억제한다.
+              최적화는 Augmented Lagrangian 기반 제약 iLQR로 풀리며 한 번의 계산은 0.08초보다 짧다.
+              예측 구간의 유압 압력은 상수로 가정하지만, 빠른 재계산으로 실제 변화를 계속 반영한다.
+            </p>
+
+            <blockquote class="pullquote">
+              <p>
+                복잡한 유압계를 완벽하게 예측하는 대신,
+                충분히 단순한 모델을 빠르게 다시 푸는 쪽을 선택했다.
+              </p>
+              <cite>MPC 설계 선택에 대한 해설</cite>
+            </blockquote>
+          </section>
+
+          <section id="inspection">
+            <div class="section-head">
+              <span class="section-kicker">06 · Inspection</span>
+              <h2>수백만 점을 한꺼번에 풀지 않는 정밀 검사</h2>
+              <p class="section-intro">
+                굴착이 끝나면 붐을 고정하고 캐빈을 약 60° 회전시키며 연속 스테레오 영상을 촬영한다.
+                이 영상으로 목표 지형과 실제 결과를 비교할 수 있는 고밀도 3D 점군을 복원한다.
+              </p>
+            </div>
+
+            <figure class="figure">
+              <div class="figure-frame">
+                <img src="assets/figure8.png" alt="60도 스윙 촬영과 특징점 추적, 2-Step Bundle Adjustment 검사 과정" loading="lazy">
+              </div>
+              <figcaption>그림 8. 멀티뷰 스테레오 촬영과 2-Step Bundle Adjustment 기반 3D 복원.</figcaption>
+            </figure>
+
+            <div class="flow" aria-label="정밀 지형 검사 과정">
+              <div class="flow-step">
+                <strong>촬영</strong>
+                <span>붐 고정<br>60° 스윙</span>
+              </div>
+              <div class="flow-step">
+                <strong>추적</strong>
+                <span>Constrained<br>Affine KLT</span>
+              </div>
+              <div class="flow-step">
+                <strong>BA Step 1</strong>
+                <span>소수 점과<br>전체 포즈 최적화</span>
+              </div>
+              <div class="flow-step">
+                <strong>BA Step 2</strong>
+                <span>포즈 고정 후<br>전체 점 최적화</span>
+              </div>
+              <div class="flow-step">
+                <strong>결과</strong>
+                <span>서브 cm<br>고밀도 3D 점군</span>
+              </div>
+            </div>
+
+            <h3>왜 두 단계로 나누는가</h3>
+
+            <p>
+              Full Bundle Adjustment는 모든 카메라 포즈와 모든 3D 점을 동시에 최적화한다.
+              점이 수백만 개에 이르면 포즈와 점 사이의 커플링 항 때문에 계산량이 폭발한다.
+              하지만 카메라 포즈를 정확히 결정하는 데 수백만 점이 모두 필요한 것은 아니다.
+            </p>
+
+            <div class="table-wrap">
+              <table>
+                <caption>2-Step Bundle Adjustment의 역할 분담</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">단계</th>
+                    <th scope="col">최적화 대상</th>
+                    <th scope="col">사용 점</th>
+                    <th scope="col">카메라 포즈</th>
+                    <th scope="col">효과</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Step 1</td>
+                    <td>포즈 + 3D 점</td>
+                    <td>FAST 점수 상위 수천 개</td>
+                    <td>자유 변수</td>
+                    <td>적은 점으로 정확한 포즈 결정</td>
+                  </tr>
+                  <tr>
+                    <td>Step 2</td>
+                    <td>3D 점만</td>
+                    <td>수백만 개 전체</td>
+                    <td>고정</td>
+                    <td>포즈-점 커플링 제거로 고속 복원</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              카메라가 지형을 비스듬히 바라보기 때문에 일반 KLT의 수직 관측 가정은 잘 맞지 않는다.
+              연구진은 패치 변형을 아핀 변환으로 모델링한 Constrained Affine KLT를 사용한다.
+              라이다 높이맵은 특징점의 초기 3D 위치를 제공해 BA의 수렴 속도와 안정성을 높인다.
+            </p>
+
+            <figure class="figure">
+              <div class="figure-frame">
+                <img src="assets/figure9.png" alt="라이다, 단일뷰 스테레오, 2-Step BA 검사 결과 비교" loading="lazy">
+              </div>
+              <figcaption>그림 9. 라이다 단독, 단일뷰 스테레오, 제안한 2-Step BA의 3D 복원 결과 비교.</figcaption>
+            </figure>
+
+            <div class="split">
+              <figure class="figure">
+                <div class="figure-frame">
+                  <img src="assets/table1.png" alt="지형 검사 방법별 정밀도와 계산 시간 비교표" loading="lazy">
+                </div>
+                <figcaption>표 이미지 1. Trimble Total Station을 기준으로 한 검사 방법 비교.</figcaption>
+              </figure>
+
+              <figure class="figure">
+                <div class="figure-frame">
+                  <img src="assets/table2.png" alt="2-Step BA와 Full BA의 시간 및 정밀도 비교표" loading="lazy">
+                </div>
+                <figcaption>표 이미지 2. 2-Step BA와 Full BA의 계산량 및 정확도 비교.</figcaption>
+              </figure>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <caption>35m² 작업 영역의 검사 성능</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">방법</th>
+                    <th scope="col">정밀도</th>
+                    <th scope="col">시간</th>
+                    <th scope="col">속도</th>
+                    <th scope="col">특징</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Trimble Total Station</td>
+                    <td>약 mm</td>
+                    <td>1,192초</td>
+                    <td>34.2 s/m²</td>
+                    <td>별도 장비와 인력 필요</td>
+                  </tr>
+                  <tr>
+                    <td>3D 라이다</td>
+                    <td>약 3cm</td>
+                    <td>수 초</td>
+                    <td>0.1 s/m² 미만</td>
+                    <td>빠르지만 정밀 검사에는 부족</td>
+                  </tr>
+                  <tr>
+                    <td>단일뷰 스테레오</td>
+                    <td>약 2cm</td>
+                    <td>수 초</td>
+                    <td>0.1 s/m² 미만</td>
+                    <td>시야각과 관측 기하의 제약</td>
+                  </tr>
+                  <tr class="highlight-row">
+                    <td>제안 방법, 2-Step BA</td>
+                    <td>1cm 미만</td>
+                    <td>25.8초</td>
+                    <td>0.74 s/m²</td>
+                    <td>온보드 자동 검사</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="metric-strip">
+              <div class="metric">
+                <strong>&lt;1cm</strong>
+                <span>제안한 검사 파이프라인의 보고 정밀도</span>
+              </div>
+              <div class="metric">
+                <strong>25.8초</strong>
+                <span>35m² 점군의 검사 알고리즘 처리 시간</span>
+              </div>
+              <div class="metric">
+                <strong>0.74 s/m²</strong>
+                <span>면적당 검사 처리 속도</span>
+              </div>
+            </div>
+          </section>
+
+          <section id="results">
+            <div class="section-head">
+              <span class="section-kicker">07 · Field Results</span>
+              <h2>45° 경사면에서 확인한 실제 성능</h2>
+            </div>
+
+            <figure class="figure">
+              <div class="figure-frame">
+                <img src="assets/figure10.png" alt="45도 경사면 자율 굴착 전후의 지형과 목표 대비 오차" loading="lazy">
+              </div>
+              <figcaption>그림 10. 45° 상향 경사면 절토 실험의 작업 전후 지형과 목표 대비 오차.</figcaption>
+            </figure>
+
+            <div class="table-wrap">
+              <table>
+                <caption>실험 환경</caption>
+                <tbody>
+                  <tr>
+                    <th scope="row">장비</th>
+                    <td>Hyundai HX300AL, 30톤, 1m³ 버킷, 10cm 강철 이빨</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">작업</th>
+                    <td>45° 상향 경사면 절토, 폭 3.5m × 높이 1.5m</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">진행 방식</th>
+                    <td>세 위치에서 굴착기를 수평 이동시키며 반복 절토</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">저수준 제어</th>
+                    <td>전자유압 밸브 100Hz</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">온보드 컴퓨터</th>
+                    <td>쿼드코어 1.8GHz, RAM 8GB, GPU 없음</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="metric-strip">
+              <div class="metric">
+                <strong>7.4cm</strong>
+                <span>목표 지형 대비 절토 평균 오차, 표준편차 5.3cm</span>
+              </div>
+              <div class="metric">
+                <strong>85.8초</strong>
+                <span>촬영 60초와 계산 25.8초를 합친 전체 검사 시간</span>
+              </div>
+              <div class="metric">
+                <strong>0.08초↓</strong>
+                <span>한 번의 MPC 최적화에 필요한 계산 시간</span>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <caption>모듈별 계산 시간</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">모듈</th>
+                    <th scope="col">시간</th>
+                    <th scope="col">운영상 의미</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>지형 추정</td>
+                    <td>5Hz</td>
+                    <td>10Hz 라이다 입력으로 작업 중 변화 추적</td>
+                  </tr>
+                  <tr>
+                    <td>경로 생성</td>
+                    <td>약 0.3초</td>
+                    <td>덤핑과 복귀 중 다음 경로를 생성해 작업 중단 방지</td>
+                  </tr>
+                  <tr>
+                    <td>MPC</td>
+                    <td>0.08초 미만</td>
+                    <td>물리 제약 변화에 실시간 대응</td>
+                  </tr>
+                  <tr>
+                    <td>검사 알고리즘</td>
+                    <td>25.8초</td>
+                    <td>35m² 기준 0.74 s/m²</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              제안한 MPC는 실험 중 파워 제약을 지속적으로 만족했고 버킷 팁의 불안정한 흔들림도 나타나지 않았다.
+              반면 물리 제약을 포함하지 않은 기준 제어기는 파워 한계를 반복적으로 위반했다.
+              이는 경로가 기하학적으로 가능하다는 사실만으로 실제 유압 장비에서 안전하게 실행할 수 있는 것은 아니라는 점을 보여준다.
+            </p>
+          </section>
+
+          <section id="limits">
+            <div class="section-head">
+              <span class="section-kicker">08 · Limits &amp; Implications</span>
+              <h2>통합은 완성됐지만, 현장 일반화는 이제부터다</h2>
+            </div>
+
+            <div class="limits-grid">
+              <article class="limit-card">
+                <span class="now">카메라 검사가 조명과 날씨에 민감하다.</span>
+                <span class="next">열화상 등 백업 센서를 결합해 야간과 악천후 대응력을 높인다.</span>
+              </article>
+
+              <article class="limit-card">
+                <span class="now">지하 암반이나 매설 장애물을 직접 감지하지 못한다.</span>
+                <span class="next">유압 압력과 접촉 반응으로 지하 저항의 3D 지도를 추정한다.</span>
+              </article>
+
+              <article class="limit-card">
+                <span class="now">한 대의 굴착기와 단일 절토 작업에서 검증됐다.</span>
+                <span class="next">다중 장비 협업과 다양한 토질·작업 형상으로 검증 범위를 넓힌다.</span>
+              </article>
+
+              <article class="limit-card">
+                <span class="now">크롤러 이동과 작업 위치 선택은 자동 계획에 포함되지 않았다.</span>
+                <span class="next">상위 태스크 플래너가 이동, 작업 순서, 덤핑 위치까지 통합 결정한다.</span>
+              </article>
+            </div>
+
+            <h3>연구가 시사하는 세 가지</h3>
+
+            <p>
+              첫째, 건설 자동화의 경쟁력은 개별 인식이나 제어 알고리즘보다
+              작업 완료 여부를 스스로 판단하는 폐루프에 있다. 검사까지 통합되어야 장비가 다음 행동을 자율적으로 결정할 수 있다.
+            </p>
+
+            <p>
+              둘째, 7.4cm의 평균 절토 오차와 1cm 미만의 검사 정밀도는 서로 다른 지표다.
+              시스템은 결과를 매우 정밀하게 <em>측정</em>할 수 있지만,
+              실제로 흙을 목표 형상에 맞게 <em>가공</em>하는 정확도는 아직 개선 여지가 있다.
+              고정밀 마감 작업에 적용하려면 더 세밀한 제어와 토질 대응이 필요하다.
+            </p>
+
+            <p>
+              셋째, 저사양 온보드 컴퓨터와 GPU 없는 환경에서도 전체 파이프라인을 실행했다는 사실은 중요하다.
+              현장 장비에서는 최고 성능보다 계산 예측 가능성, 센서 유지보수성, 고장 시 복구 가능성이 더 직접적인 설계 조건이기 때문이다.
+            </p>
+          </section>
+
+          <section class="takeaway" id="takeaways">
+            <span class="section-kicker">Reader Takeaways</span>
+            <h2>읽고 나서 기억할 것</h2>
+            <ol class="takeaway-list">
+              <li>
+                <span><strong>핵심 방법:</strong> 칼만 필터형 2.5D 높이맵, DFS·A* 경로 생성, 물리 제약 MPC, 2-Step BA 검사를 하나의 온보드 시스템으로 통합했다.</span>
+              </li>
+              <li>
+                <span><strong>핵심 결과:</strong> 30톤 실물 굴착기로 45° 경사면을 평균 7.4cm 오차로 절토하고, 결과를 1cm 미만 정밀도로 자동 검사했다.</span>
+              </li>
+              <li>
+                <span><strong>핵심 설계 판단:</strong> 기하학적 경로와 물리적으로 실행 가능한 궤적을 분리해 계산 효율과 장비 안전성을 동시에 확보했다.</span>
+              </li>
+              <li>
+                <span><strong>남은 과제:</strong> 날씨와 조명, 지하 장애물, 토질 변화, 크롤러 이동, 다중 장비 협업까지 다뤄야 완전한 현장 자율화에 도달한다.</span>
+              </li>
+            </ol>
+          </section>
+
+          <section class="editorial-note" id="assessment">
+            <span class="section-kicker">Editorial Assessment</span>
+            <h2>적용 관점에서 본 다음 실험</h2>
+            <p>
+              이 연구를 재현하거나 확장한다면 거대한 전체 시스템부터 복제하기보다,
+              지형맵과 캘리브레이션을 독립적인 검증 단위로 분리하는 편이 현실적이다.
+            </p>
             <ul>
-              <li><strong>Q 행렬:</strong> 참조 경로 <span class="math">q<sub>r</sub></span>로부터의 편차 벌점 → 추적 정밀도 결정</li>
-              <li><strong>R 행렬:</strong> 과도한 제어 입력 억제 → 부드러운 동작 보장</li>
-              <li><strong><span class="math">f<sub>p</sub></span>:</strong> 유압 압력 측정값. 예측 구간 동안 <strong>상수로 가정</strong>하고 빠른 업데이트율(&lt;0.08s)로 보상</li>
+              <li>MAP 기반 2.5D 높이맵을 구현하고 토질 변화와 포인트 밀도에 따른 오차를 측정한다.</li>
+              <li>C2C, L2C, L2L, S2V 캘리브레이션을 반복 수행해 작업자와 설치 오차에 대한 민감도를 평가한다.</li>
+              <li>7.4cm 절토 오차가 목표 작업의 허용 공차를 충족하는지 용도별로 구분한다.</li>
+              <li>검사 정밀도와 실제 가공 정확도를 별도 KPI로 관리해 성능을 과대 해석하지 않는다.</li>
             </ul>
-            <p class="source-note">출처: 표준 이차 비용함수(LQR) 형태로 유도</p>
-          </aside>
-        </section>
+          </section>
 
-        <section id="time-allocation">
-          <h3>5.5 시간 배분</h3>
-          <ul>
-            <li>경로 세그먼트별 이동 시간 = 각 실린더의 기준 신축 속도를 초과하지 않는 <strong>최대 시간</strong>(느리게 갈수록 안전)</li>
-            <li>MPC가 이 기준 시간을 따르되, 물리적 제약에 의해 실시간 조절</li>
-          </ul>
-        </section>
-      </section>
-
-      <section class="chapter" id="inspection">
-        <h2><span class="num">06</span> 정밀 지형 검사</h2>
-
-        <figure>
-          <img src="assets/figure8.png" alt="60도 스윙 촬영과 특징점 추적 및 2-Step Bundle Adjustment를 통한 정밀 3D 복원" loading="lazy">
-          <figcaption>멀티뷰 스테레오 검사: 60° 스윙 촬영 → 특징점 추적 → 2-Step BA로 서브 cm 정밀도 3D 복원</figcaption>
-        </figure>
-
-        <section id="inspection-method">
-          <h3>6.1 방법: 멀티뷰 스테레오 + 2-Step Bundle Adjustment</h3>
-        </section>
-
-        <section id="inspection-process">
-          <h3>6.2 프로세스</h3>
-
-          <div class="diagram" role="img" aria-label="멀티뷰 스테레오 검사 프로세스">
-            <div class="flow">
-              <div class="flow-node blue"><strong>60° 스윙 촬영</strong><small>약 60초</small></div>
-              <span class="arrow" aria-hidden="true">→</span>
-              <div class="flow-node violet"><strong>Affine KLT</strong><small>특징점 추적</small></div>
-              <span class="arrow" aria-hidden="true">→</span>
-              <div class="flow-node gold"><strong>Step 1</strong><small>소수 점 + 전체 포즈 동시 최적화</small></div>
-              <span class="arrow" aria-hidden="true">→</span>
-              <div class="flow-node green"><strong>Step 2</strong><small>포즈 고정 + 전체 점 최적화</small></div>
-              <span class="arrow" aria-hidden="true">→</span>
-              <div class="flow-node blue"><strong>정밀 3D 점군</strong><small>&lt;1cm 정밀도</small></div>
+          <aside class="share-box" aria-labelledby="share-title">
+            <h2 id="share-title">공유할 때 이렇게 소개하세요</h2>
+            <div class="share-copy">
+              30톤 굴착기가 외부 측량 장비 없이 지형을 인식하고, 스스로 경로를 만들고,
+              물리 제약 안에서 굴착한 뒤 결과까지 검사했다. 서울대학교 연구진의 완전 통합 자율 굴착 시스템은
+              45° 경사면에서 평균 7.4cm 절토 오차와 1cm 미만 검사 정밀도를 기록했다.
             </div>
-          </div>
+          </aside>
 
-          <ol>
-            <li><strong>촬영:</strong> 붐 고정 + 60° 스윙 → 연속 스테레오 이미지 촬영 (~60초)</li>
-            <li><strong>특징점 추적:</strong> Constrained Affine KLT — 일반 KLT는 수직 관측을 가정하나, 굴착기 카메라는 비스듬히 보므로 아핀 변환으로 패치 변형을 모델링</li>
-            <li><strong>3D 복원:</strong> 2-Step Bundle Adjustment</li>
-          </ol>
-        </section>
+          <section class="source-notes" id="sources">
+            <span class="section-kicker">Source Notes</span>
+            <h2>논문 및 해설 범위</h2>
 
-        <section id="two-step-ba">
-          <h3>6.3 2-Step BA (핵심 혁신)</h3>
+            <p class="citation">
+              Inkyu Jang, Junha Kim, Dongjae Lee, Changhyeon Kim, Changsuk Oh,
+              Youngbum Kim, Sangwook Woo, Heejee Sung, and H. Jin Kim.
+              “Towards Fully Integrated Autonomous Excavation: Autonomous Excavator for
+              Precise Earth Cutting and Onboard Landscape Inspection.”
+              <em>IEEE Robotics &amp; Automation Magazine</em>, 2024.
+            </p>
 
-          <p>
-            <strong>문제:</strong> Full BA는 모든 카메라 포즈(6DoF × N장)와 모든 3D 점(3 × M개)을
-            동시 최적화. M이 수백만이면 <strong>포즈-점 커플링 항</strong>으로 계산 폭발.
-          </p>
-          <p>
-            <strong>핵심 통찰:</strong> 카메라 포즈를 정확히 결정하는 데 수백만 점은 필요 없다.
-            수천 개면 충분하다.
-          </p>
+            <ol>
+              <li>본문의 장비 구성, 알고리즘 구조, 실험 수치와 성능 평가는 제공된 논문 요약 노트를 기준으로 정리했다.</li>
+              <li>원문 노트에 표시된 참고문헌 번호 [15], [17], [18], [20]은 논문의 번호 체계를 따른다. 개별 서지정보는 제공 자료에 포함되지 않았다.</li>
+              <li>MAP 가중 평균식과 개별 유압 제약식, 이차 MPC 비용함수는 이해를 돕기 위한 보충 표현이며 논문에 동일한 형태로 직접 제시된 식이 아닐 수 있다.</li>
+              <li>“전문 기사 수준”, “건설 검수 기준 충족” 같은 적용 평가는 작업 종류와 현장 허용 공차에 따라 달라질 수 있으므로 실험 수치와 구분해 해석해야 한다.</li>
+              <li>원자료는 Obsidian 보관본의 원문 Markdown 및 PDF를 기반으로 한다.</li>
+            </ol>
 
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">Step</th>
-                  <th scope="col">최적화 대상</th>
-                  <th scope="col">점 개수</th>
-                  <th scope="col">포즈</th>
-                  <th scope="col">특징</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>포즈 + 점 동시</td>
-                  <td>~수천 (FAST score 상위)</td>
-                  <td>자유</td>
-                  <td>포즈 결정에 충분</td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td>점만</td>
-                  <td>수백만 전체</td>
-                  <td><strong>고정</strong></td>
-                  <td>커플링 없음 → 빠름</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+            <div class="tags" aria-label="핵심 키워드">
+              <span class="tag-chip">자율 굴착</span>
+              <span class="tag-chip">AES</span>
+              <span class="tag-chip">필드 로봇</span>
+              <span class="tag-chip">MPC</span>
+              <span class="tag-chip">2.5D 높이맵</span>
+              <span class="tag-chip">칼만 필터</span>
+              <span class="tag-chip">DFS</span>
+              <span class="tag-chip">A*</span>
+              <span class="tag-chip">Bundle Adjustment</span>
+              <span class="tag-chip">KLT</span>
+              <span class="tag-chip">멀티뷰 스테레오</span>
+              <span class="tag-chip">유압 굴착기</span>
+              <span class="tag-chip">온보드 검사</span>
+            </div>
+          </section>
+        </article>
+      </main>
 
-          <p>
-            정밀도 손실은 Full BA 대비 <strong>무시할 수 있는 수준</strong>이며,
-            계산 속도는 <strong>수십 배 향상</strong>.
-          </p>
-        </section>
-
-        <section id="lidar-prior">
-          <h3>6.4 라이다 사전 정보 활용</h3>
-          <p>
-            라이다 높이맵 → 특징점 3D 위치 <strong>초기값</strong> 제공 → BA 수렴 속도·안정성 향상.
-            라이다(대략적, 빠름) + 카메라(정밀, 느림)의 <strong>센서 퓨전</strong> 효과.
-          </p>
-        </section>
-
-        <section id="inspection-performance">
-          <h3>6.5 성능 비교</h3>
-
-          <figure>
-            <img src="assets/figure9.png" alt="라이다 단독, 단일뷰 스테레오 및 2-Step BA의 3D 복원 결과 비교" loading="lazy">
-            <figcaption>검사 정밀도 비교: 라이다 단독, 단일뷰 스테레오, 제안 방법(2-Step BA)의 3D 복원 결과</figcaption>
-          </figure>
-
-          <figure class="figure-narrow">
-            <img src="assets/table1.png" alt="검사 방법별 정밀도와 소요 시간 비교표" loading="lazy">
-            <figcaption>검사 방법별 정밀도 및 소요 시간 비교 (Trimble Total Station 대비)</figcaption>
-          </figure>
-
-          <figure class="figure-narrow">
-            <img src="assets/table2.png" alt="2-Step BA와 Full BA의 계산 시간 및 정밀도 비교표" loading="lazy">
-            <figcaption>2-Step BA vs Full BA 계산 시간 및 정밀도 비교</figcaption>
-          </figure>
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">방법</th>
-                  <th scope="col">정밀도</th>
-                  <th scope="col">시간 (35m²)</th>
-                  <th scope="col">속도 (s/m²)</th>
-                  <th scope="col">비고</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Trimble Total Station</td>
-                  <td>~mm</td>
-                  <td>1,192초</td>
-                  <td>34.2</td>
-                  <td>별도 장비+인력</td>
-                </tr>
-                <tr>
-                  <td>3D 라이다 단독</td>
-                  <td>~3cm</td>
-                  <td>수 초</td>
-                  <td>&lt;0.1</td>
-                  <td>정밀도 부족</td>
-                </tr>
-                <tr>
-                  <td>단일뷰 스테레오</td>
-                  <td>~2cm</td>
-                  <td>수 초</td>
-                  <td>&lt;0.1</td>
-                  <td>시야각 제한</td>
-                </tr>
-                <tr>
-                  <td><strong>제안 방법 (2-Step BA)</strong></td>
-                  <td><strong>&lt;1cm</strong></td>
-                  <td><strong>25.8초</strong></td>
-                  <td><strong>0.74</strong></td>
-                  <td><strong>온보드 자동</strong></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <p class="result-line">→ Trimble 대비 <strong>~46배 빠르면서</strong> 유사한 정밀도</p>
-        </section>
-      </section>
-
-      <section class="chapter" id="results">
-        <h2><span class="num">07</span> 실험 결과</h2>
-
-        <figure>
-          <img src="assets/figure10.png" alt="45도 경사면 자율 굴착 실험의 절토 전후 지형 변화 및 목표 대비 오차" loading="lazy">
-          <figcaption>45° 경사면 실제 자율 굴착 실험: 절토 전후 지형 변화 및 목표 대비 오차</figcaption>
-        </figure>
-
-        <h3>실험 설정</h3>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">항목</th>
-                <th scope="col">값</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>장비</td>
-                <td>Hyundai HX300AL (30톤), 버킷 1m³, 강철 이빨 10cm</td>
-              </tr>
-              <tr>
-                <td>작업</td>
-                <td>45° 상향 경사면 절토, 폭 3.5m × 높이 1.5m</td>
-              </tr>
-              <tr>
-                <td>방법</td>
-                <td>3개소에서 수평 이동하며 반복 굴착</td>
-              </tr>
-              <tr>
-                <td>제어 주파수</td>
-                <td>100Hz (전자유압 밸브)</td>
-              </tr>
-              <tr>
-                <td>온보드 컴퓨터</td>
-                <td>쿼드코어 1.8GHz, 8GB RAM (GPU 없음)</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h3>주요 결과</h3>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">지표</th>
-                <th scope="col">결과</th>
-                <th scope="col">의미</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>절토 평균 오차</td>
-                <td>7.4cm (σ = 5.3cm)</td>
-                <td>전문 기사 수준</td>
-              </tr>
-              <tr>
-                <td>검사 정밀도</td>
-                <td>&lt;1cm</td>
-                <td>건설 검수 기준 충족</td>
-              </tr>
-              <tr>
-                <td>검사 소요 시간</td>
-                <td>85.8초 (촬영 60 + 계산 25.8)</td>
-                <td>Trimble 대비 46배 빠름</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h3>계산 시간</h3>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">모듈</th>
-                <th scope="col">시간</th>
-                <th scope="col">비고</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>지형 추정</td>
-                <td>실시간 (5Hz)</td>
-                <td>라이다 10Hz 입력</td>
-              </tr>
-              <tr>
-                <td>경로 생성</td>
-                <td>~0.3초</td>
-                <td>덤핑-복귀 시간 내 완료 → 무중단 굴착</td>
-              </tr>
-              <tr>
-                <td>MPC</td>
-                <td>&lt;0.08초</td>
-                <td>실시간 물리적 제약 대응</td>
-              </tr>
-              <tr>
-                <td>검사 알고리즘</td>
-                <td>25.8초 (0.74 s/m²)</td>
-                <td>Trimble 대비 46배 빠름</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h3>MPC 제약 만족</h3>
-        <ul>
-          <li>제안 MPC: 파워 제약을 <strong>항상 만족</strong> → 안정적 굴착, 버킷 팁 흔들림 없음</li>
-          <li>제약 없는 베이스라인: 파워 제약 <strong>빈번히 위반</strong> → 장비 위험, 불안정 굴착</li>
-        </ul>
-      </section>
-
-      <section class="chapter" id="limitations">
-        <h2><span class="num">08</span> 한계 및 향후 연구</h2>
-
-        <h3>현재 한계</h3>
-        <ul>
-          <li>카메라 기반 검사 → <strong>야간/악천후 불가</strong></li>
-          <li>미감지 지하 장애물(암반) 대응 미흡</li>
-          <li>단일 굴착기, 단일 작업만 검증</li>
-          <li>크롤러 이동 계획 미포함</li>
-        </ul>
-
-        <h3>향후 연구 방향</h3>
-
-        <div class="diagram" role="img" aria-label="현재 한계와 대응하는 향후 연구 방향">
-          <div class="mapping-grid">
-            <div class="flow-node red"><strong>야간/악천후</strong></div>
-            <span class="mini-arrow" aria-hidden="true">→</span>
-            <div class="flow-node green"><strong>백업 센서</strong><small>열화상 등</small></div>
-
-            <div class="flow-node red"><strong>지하 장애물</strong></div>
-            <span class="mini-arrow" aria-hidden="true">→</span>
-            <div class="flow-node green"><strong>유압 압력 기반</strong><small>지하 3D 맵</small></div>
-
-            <div class="flow-node red"><strong>단일 굴착기</strong></div>
-            <span class="mini-arrow" aria-hidden="true">→</span>
-            <div class="flow-node green"><strong>다중 굴착기</strong><small>협업</small></div>
-
-            <div class="flow-node red"><strong>크롤러 이동 없음</strong></div>
-            <span class="mini-arrow" aria-hidden="true">→</span>
-            <div class="flow-node green"><strong>상위 태스크</strong><small>플래닝</small></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="chapter" id="recap">
-        <h2>한마디로 정리</h2>
-        <ul class="closing-points">
-          <li><strong>핵심 방법은?</strong> — 칼만 필터형 2.5D 높이맵 + DFS/A* 경로 생성 + MPC 물리 제약 추적 + 2-Step BA 검사를 온보드 통합 구현</li>
-          <li><strong>핵심 결과는?</strong> — 30톤 실기로 45° 경사면 7.4cm 정밀도 자율 절토, 서브 cm 온보드 검사 달성</li>
-          <li><strong>한계는?</strong> — 야간/악천후 미대응, 지하 장애물 미감지, 단일 작업·단일 굴착기만 검증</li>
-        </ul>
-      </section>
-
-      <section class="chapter" id="keywords">
-        <h2>핵심 키워드</h2>
-        <ul class="keyword-list" aria-label="핵심 키워드">
-          <li><code>자율 굴착</code></li>
-          <li><code>AES</code></li>
-          <li><code>MPC</code></li>
-          <li><code>번들 조정</code></li>
-          <li><code>2.5D 높이맵</code></li>
-          <li><code>칼만 필터</code></li>
-          <li><code>DFS</code></li>
-          <li><code>A*</code></li>
-          <li><code>KLT</code></li>
-          <li><code>멀티뷰 스테레오</code></li>
-          <li><code>유압 굴착기</code></li>
-          <li><code>온보드 센서</code></li>
-          <li><code>지형 검사</code></li>
-        </ul>
-      </section>
-
-      <section class="chapter opinion" id="opinion">
-        <h2>나의 의견</h2>
-        <blockquote>
-          <p><em>이 논문을 읽고 느낀 점, 우리 연구와의 연관성, 활용 가능성 등을 자유롭게 기록</em></p>
-        </blockquote>
-        <ul>
-          <li>우리도 MAP 기반 2.5D 지형맵 활용해서 구현해보기</li>
-          <li>C2C, L2C 등 센서 캘리브레이션도 구현해보기</li>
-          <li>절토 평균 오차가 7.4cm 이면 충분한 정확도는 아닌듯</li>
-        </ul>
-      </section>
-    </main>
+      <nav class="toc" aria-label="기사 목차">
+        <p class="toc-title">Contents</p>
+        <ol>
+          <li><a href="#findings">핵심 발견</a></li>
+          <li><a href="#context">연구 배경</a></li>
+          <li><a href="#system">시스템 구성</a></li>
+          <li><a href="#terrain">지형 추정</a></li>
+          <li><a href="#planning">모션 계획</a></li>
+          <li><a href="#mpc">MPC 제어</a></li>
+          <li><a href="#inspection">정밀 검사</a></li>
+          <li><a href="#results">실험 결과</a></li>
+          <li><a href="#limits">한계와 시사점</a></li>
+          <li><a href="#takeaways">핵심 정리</a></li>
+          <li><a href="#sources">출처 노트</a></li>
+        </ol>
+      </nav>
+    </div>
   </div>
 
-  <footer class="page-footer">
-    <a class="back-to-top" href="#top">맨 위로 ↑</a>
+  <footer>
+    Research-report edition · Standalone HTML · No scripts or external assets
   </footer>
 </body>
 </html>
