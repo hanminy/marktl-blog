@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-07T02:32:53.112Z",
+  "updatedAt": "2026-08-07T02:48:16.5651398Z",
   "items": [
     {
       "slug": "연구자를-위한-하네스-엔지니어링-1강-빌드캠프-4기-코난쌤-conanssam",
@@ -12,53 +12,46 @@
       "title": "[빌드캠프 4기] 연구자를 위한 하네스 엔지니어링 1강",
       "excerpt": "영상 정보 채널: 코난쌤 conanssam 날짜: 20260607 길이: 26분 26초 강사: 이우진(Woojin Lee) — ETRI 석사후연구원, 건국대 AI 석사 링크: https://www.youtube.com/watch?v=fvLSIHoYvMo 강좌 페이지: https://aifrenz.liveklass.com/",
       "tags": [
-        "- youtube",
         "youtube",
         "연구자료",
         "AI",
         "하네스엔지니어링"
       ],
-      "updatedAt": "2026-08-07T02:32:53.112Z"
+      "updatedAt": "08/07/2026 02:32:53"
     },
     {
-      "slug": "2025-towards-fully-integrated-autonomous-excavation-ìì¸ë-ìì½",
+      "slug": "2025-towards-fully-integrated-autonomous-excavation-서울대-요약",
       "shortId": "l992hf",
       "url": "https://hanminy.github.io/marktl-blog/marktl/s/l992hf/",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/2025-towards-fully-integrated-autonomous-excavation-%EC%84%9C%EC%9A%B8%EB%8C%80-%EC%9A%94%EC%95%BD/",
-      "sourcePath": "02_research/íëë¡ë´/2025 Towards Fully Integrated Autonomous Excavation-ìì¸ë_ìì½.md",
+      "sourcePath": "02_research/필드로봇/2025 Towards Fully Integrated Autonomous Excavation-서울대_요약.md",
       "artifactType": "research-report",
-      "title": "Towards Fully Integrated Autonomous Excavation - ìì½",
-      "excerpt": "íì¤ ìì½ 30í¤ ì¤ì  êµ´ì°©ê¸°ìì ì§í ì¸ì â êµ´ì°© ê²½ë¡ ìì± â MPC ì ì´ â ì ë° ì§í ê²ì¬ë¥¼ ëª¨ë ì¨ë³´ë ì¼ìë§ì¼ë¡ ìííë ìì  íµí© ìì¨ êµ´ì°© ìì¤í(AES) ì ì ìíê³ , 45Â° ê²½ì¬ë©´ ì í ìì cm ìì¤ ì ë°ëë¥¼ ë¬ì±íë¤. 1. ì°êµ¬ ë°°ê²½ ë° ëê¸° ë¬¸ì  ê±´ì¤ íì¥ì ë¸ëë ¥ ë¶ì¡±, ì¸ê±´ë¹ ìì¹, ìì  ìí ",
+      "title": "Towards Fully Integrated Autonomous Excavation - 요약",
+      "excerpt": "한줄 요약 30톤 실제 굴착기에서 지형 인식 → 굴착 경로 생성 → MPC 제어 → 정밀 지형 검사를 모두 온보드 센서만으로 수행하는 완전 통합 자율 굴착 시스템(AES) 을 제안하고, 45° 경사면 절토에서 cm 수준 정밀도를 달성했다. 1. 연구 배경 및 동기 문제 건설 현장의 노동력 부족, 인건비 상승, 안전 위험 ",
       "tags": [
-        "- ë¼ë¬¸ìì½",
-        "Inkyu Jang",
-        "Junha Kim",
-        "Dongjae Lee",
-        "Changhyeon Kim",
-        "Changsuk Oh",
-        "Youngbum Kim",
-        "Sangwook Woo"
+        "논문요약",
+        "자율굴착",
+        "필드로봇"
       ],
-      "updatedAt": "2026-08-07T01:52:30.926Z"
+      "updatedAt": "08/07/2026 01:52:30"
     },
     {
-      "slug": "yt-sergey-levine-rl-for-robot-foundation-models-Ã¬ÂÂÃ¬ÂÂ½",
+      "slug": "yt-sergey-levine-rl-for-robot-foundation-models-요약",
       "shortId": "5iazpp",
       "url": "https://hanminy.github.io/marktl-blog/marktl/s/5iazpp/",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-sergey-levine-rl-for-robot-foundation-models-%EC%9A%94%EC%95%BD/",
-      "sourcePath": "clippings/yt_Sergey_Levine_RL_for_Robot_Foundation_Models_Ã¬ÂÂÃ¬ÂÂ½.md",
+      "sourcePath": "clippings/yt_Sergey_Levine_RL_for_Robot_Foundation_Models_요약.md",
       "artifactType": "research-report",
       "title": "Sergey Levine (UC Berkeley & PI): RL for Robot Foundation Models",
-      "excerpt": "Ã¬ÂÂÃ¬ÂÂ Ã¬Â ÂÃ«Â³Â´ Ã¬Â±ÂÃ«ÂÂ: Zhanpeng He Ã«ÂÂ Ã¬Â§Â: 20260608 ÃªÂ¸Â¸Ã¬ÂÂ´: 32Ã«Â¶Â 14Ã¬Â´Â Ã­ÂÂÃ¬ÂÂ¬: ICRA 2026 Workshop on RL in the Era of IL ($1) Ã«Â§ÂÃ­ÂÂ¬: https://www.youtube.com/watch?v=u0WJXi8PC6Y <div style=\"position: relative; wi",
+      "excerpt": "영상 정보 채널: Zhanpeng He 날짜: 20260608 길이: 32분 14초 행사: ICRA 2026 Workshop on RL in the Era of IL (rl4ilicra.github.io) 링크: https://www.youtube.com/watch?v=u0WJXi8PC6Y <div style=\"posit",
       "tags": [
-        "- youtube",
         "youtube",
-        "Ã¬ÂÂ°ÃªÂµÂ¬Ã¬ÂÂÃ«Â£Â",
-        "Ã«Â¡ÂÃ«Â´Â",
-        "ÃªÂ°ÂÃ­ÂÂÃ­ÂÂÃ¬ÂÂµ",
-        "Ã­ÂÂÃ¬ÂÂ´Ã«ÂÂ°Ã¬ÂÂ´Ã¬ÂÃ«ÂªÂ¨Ã«ÂÂ¸"
+        "연구자료",
+        "로봇",
+        "강화학습",
+        "파운데이션모델"
       ],
-      "updatedAt": "2026-08-06T08:36:05.517Z"
+      "updatedAt": "08/06/2026 08:36:05"
     }
   ]
 }
