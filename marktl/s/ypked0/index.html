@@ -1,9 +1,12 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>20개의 점으로 12톤 굴착기를 가르치다 — 암석 굴착 강화학습 연구</title>
+  <title>20개의 점으로 바위를 들어 올리다 — 12톤 자율 굴착기의 암석 제거 실험</title>
+  
+  
+  
   
   
   
@@ -18,26 +21,33 @@
   
   <style>
     :root {
-      --ink: #18211d;
-      --muted: #657069;
-      --paper: #f8f5ee;
+      --paper: #f4f1e9;
+      --paper-deep: #ebe5d9;
       --surface: #fffdf8;
-      --surface-2: #f0eee6;
-      --line: #d9d7cd;
-      --green: #174d3b;
-      --green-2: #286c53;
-      --green-soft: #dcebe2;
-      --blue: #315b74;
-      --blue-soft: #e4edf2;
-      --amber: #a5651d;
-      --amber-soft: #f5e8ce;
-      --red: #9b453b;
-      --red-soft: #f4ded9;
-      --violet: #67527d;
-      --shadow: 0 20px 55px rgba(36, 44, 39, 0.10);
-      --radius: 18px;
-      --content: 780px;
-      --wide: 1120px;
+      --surface-blue: #edf4f5;
+      --ink: #172327;
+      --ink-soft: #526167;
+      --ink-faint: #7a8588;
+      --line: #d8d2c7;
+      --navy: #153c48;
+      --blue: #287488;
+      --blue-light: #dbecef;
+      --teal: #2b6f68;
+      --green: #376c57;
+      --green-light: #e1eee6;
+      --amber: #b66d29;
+      --amber-light: #f7ead8;
+      --red: #9f493f;
+      --red-light: #f4e2de;
+      --violet: #655a88;
+      --violet-light: #ebe7f3;
+      --shadow: 0 18px 50px rgba(31, 45, 48, 0.09);
+      --radius-lg: 28px;
+      --radius-md: 18px;
+      --radius-sm: 10px;
+      --sans: "Pretendard", "SUIT", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "Iowan Old Style", "Batang", Georgia, serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
     }
 
     * {
@@ -46,1162 +56,1545 @@
 
     html {
       scroll-behavior: smooth;
-      background: var(--paper);
+      scroll-padding-top: 88px;
     }
 
     body {
       margin: 0;
       color: var(--ink);
       background:
-        radial-gradient(circle at 12% 2%, rgba(40, 108, 83, 0.10), transparent 27rem),
-        radial-gradient(circle at 92% 18%, rgba(165, 101, 29, 0.08), transparent 24rem),
-        var(--paper);
-      font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        radial-gradient(circle at 10% 8%, rgba(40, 116, 136, 0.08), transparent 30rem),
+        linear-gradient(180deg, #f8f6f0 0, var(--paper) 38rem, var(--paper) 100%);
+      font-family: var(--sans);
       font-size: 17px;
-      line-height: 1.78;
+      line-height: 1.82;
       word-break: keep-all;
       overflow-wrap: break-word;
-    }
-
-    a {
-      color: var(--green-2);
-      text-decoration-thickness: 1px;
-      text-underline-offset: 0.2em;
-    }
-
-    a:hover,
-    a:focus-visible {
-      color: var(--green);
+      text-rendering: optimizeLegibility;
     }
 
     img {
       display: block;
-      width: 100%;
+      max-width: 100%;
       height: auto;
     }
 
-    strong {
-      color: #102019;
-      font-weight: 760;
+    a {
+      color: var(--blue);
+      text-underline-offset: 0.2em;
+    }
+
+    a:hover {
+      color: var(--navy);
+    }
+
+    ::selection {
+      color: var(--ink);
+      background: #cce3e7;
     }
 
     .skip-link {
-      position: absolute;
-      top: -4rem;
-      left: 1rem;
+      position: fixed;
       z-index: 100;
-      padding: 0.65rem 1rem;
+      top: 12px;
+      left: 12px;
+      padding: 10px 15px;
       color: white;
-      background: var(--green);
-      border-radius: 0 0 8px 8px;
+      background: var(--navy);
+      border-radius: 8px;
+      transform: translateY(-150%);
     }
 
     .skip-link:focus {
-      top: 0;
+      transform: translateY(0);
+    }
+
+    .site-header {
+      position: relative;
+      z-index: 10;
+      border-bottom: 1px solid rgba(21, 60, 72, 0.12);
+    }
+
+    .site-header__inner {
+      width: min(1180px, calc(100% - 40px));
+      min-height: 72px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .publication {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--navy);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .publication__mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: var(--navy);
+      border-radius: 50%;
+      font-family: var(--serif);
+      font-size: 1rem;
+      letter-spacing: 0;
+    }
+
+    .header-meta {
+      color: var(--ink-soft);
+      font-size: 0.78rem;
+      font-weight: 650;
+      letter-spacing: 0.04em;
     }
 
     .hero {
       position: relative;
-      min-height: 86vh;
-      display: grid;
-      align-items: end;
       overflow: hidden;
-      color: #f8f7f0;
-      background: #16271f;
+      padding: clamp(72px, 10vw, 138px) 0 78px;
     }
 
-    .hero-media {
-      position: absolute;
-      inset: 0;
-    }
-
-    .hero-media img {
-      height: 100%;
-      object-fit: cover;
-      object-position: center 43%;
-      filter: saturate(0.75) contrast(1.05);
-    }
-
-    .hero-media::after {
+    .hero::after {
       content: "";
       position: absolute;
-      inset: 0;
-      background:
-        linear-gradient(90deg, rgba(11, 25, 18, 0.94) 0%, rgba(11, 25, 18, 0.78) 42%, rgba(11, 25, 18, 0.22) 78%),
-        linear-gradient(0deg, rgba(11, 25, 18, 0.92) 0%, transparent 58%);
+      top: 24px;
+      right: max(-180px, calc((100vw - 1180px) / 2 - 200px));
+      width: 520px;
+      height: 520px;
+      border: 1px solid rgba(40, 116, 136, 0.16);
+      border-radius: 50%;
+      box-shadow:
+        0 0 0 58px rgba(40, 116, 136, 0.035),
+        0 0 0 116px rgba(40, 116, 136, 0.022);
+      pointer-events: none;
     }
 
-    .hero-inner {
+    .hero__inner {
       position: relative;
       z-index: 1;
-      width: min(var(--wide), calc(100% - 40px));
+      width: min(1040px, calc(100% - 40px));
       margin: 0 auto;
-      padding: 8rem 0 4.5rem;
     }
 
-    .eyebrow,
-    .section-kicker {
-      margin: 0 0 1rem;
-      color: #a8d2bc;
-      font-size: 0.76rem;
-      font-weight: 800;
-      letter-spacing: 0.14em;
-      line-height: 1.4;
+    .eyebrow {
+      margin: 0 0 20px;
+      color: var(--blue);
+      font-size: 0.74rem;
+      font-weight: 850;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
     }
 
-    .hero h1 {
-      max-width: 900px;
+    h1 {
+      max-width: 920px;
       margin: 0;
-      font-family: Georgia, "Noto Serif KR", "Batang", serif;
-      font-size: clamp(2.85rem, 7vw, 6.5rem);
-      font-weight: 680;
-      letter-spacing: -0.055em;
-      line-height: 1.03;
-      text-wrap: balance;
+      color: var(--navy);
+      font-family: var(--serif);
+      font-size: clamp(3rem, 8vw, 6.5rem);
+      font-weight: 750;
+      letter-spacing: -0.065em;
+      line-height: 1.04;
     }
 
-    .hero-deck {
-      max-width: 760px;
-      margin: 1.6rem 0 0;
-      color: rgba(248, 247, 240, 0.86);
-      font-family: Georgia, "Noto Serif KR", "Batang", serif;
-      font-size: clamp(1.1rem, 2vw, 1.42rem);
-      line-height: 1.62;
+    .hero__subtitle {
+      max-width: 850px;
+      margin: 28px 0 0;
+      color: var(--ink-soft);
+      font-size: clamp(1.08rem, 2vw, 1.35rem);
+      font-weight: 520;
+      line-height: 1.7;
     }
 
-    .hero-meta {
+    .hero__subtitle strong {
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .paper-title {
+      max-width: 850px;
+      margin: 25px 0 0;
+      padding-left: 16px;
+      color: var(--ink-faint);
+      border-left: 3px solid var(--blue);
+      font-family: var(--serif);
+      font-size: 0.93rem;
+      font-style: italic;
+      line-height: 1.55;
+    }
+
+    .byline {
+      margin-top: 38px;
       display: flex;
       flex-wrap: wrap;
-      gap: 0.65rem 1.4rem;
       align-items: center;
-      margin-top: 2rem;
-      color: rgba(248, 247, 240, 0.68);
-      font-size: 0.85rem;
+      gap: 10px 20px;
+      color: var(--ink-soft);
+      font-size: 0.84rem;
     }
 
-    .hero-meta span + span::before {
-      content: "·";
-      margin-right: 1.4rem;
-      color: #9bc7b0;
+    .byline strong {
+      color: var(--ink);
+    }
+
+    .byline__dot {
+      width: 4px;
+      height: 4px;
+      background: var(--blue);
+      border-radius: 50%;
+    }
+
+    .tag-row {
+      margin-top: 28px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      padding: 7px 12px;
+      color: var(--navy);
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(21, 60, 72, 0.15);
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 750;
+      letter-spacing: 0.02em;
+    }
+
+    .hero-stats {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto 92px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      background: var(--navy);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      overflow: hidden;
     }
 
     .hero-stat {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      max-width: 720px;
-      margin-top: 2.5rem;
-      border: 1px solid rgba(255, 255, 255, 0.19);
-      border-radius: 16px;
-      background: rgba(14, 32, 23, 0.55);
-      backdrop-filter: blur(6px);
-    }
-
-    .hero-stat div {
-      padding: 1rem 1.2rem;
-    }
-
-    .hero-stat div + div {
-      border-left: 1px solid rgba(255, 255, 255, 0.15);
-    }
-
-    .hero-stat strong {
-      display: block;
+      min-height: 170px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       color: white;
-      font-family: Georgia, serif;
-      font-size: clamp(1.7rem, 4vw, 2.6rem);
-      line-height: 1.15;
+      border-right: 1px solid rgba(255, 255, 255, 0.14);
     }
 
-    .hero-stat span {
-      color: rgba(248, 247, 240, 0.67);
-      font-size: 0.75rem;
-      line-height: 1.45;
+    .hero-stat:last-child {
+      border-right: 0;
     }
 
-    .page {
-      width: min(var(--wide), calc(100% - 40px));
+    .hero-stat__value {
+      font-family: var(--serif);
+      font-size: clamp(2.4rem, 4vw, 3.75rem);
+      font-weight: 750;
+      letter-spacing: -0.06em;
+      line-height: 1;
+    }
+
+    .hero-stat__label {
+      margin-top: 18px;
+      color: rgba(255, 255, 255, 0.76);
+      font-size: 0.78rem;
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .layout {
+      width: min(1180px, calc(100% - 40px));
       margin: 0 auto;
-    }
-
-    .article-grid {
       display: grid;
-      grid-template-columns: 230px minmax(0, var(--content));
-      gap: 70px;
+      grid-template-columns: 220px minmax(0, 790px);
       justify-content: center;
-      padding: 4.5rem 0 7rem;
+      gap: clamp(42px, 7vw, 88px);
+      align-items: start;
     }
 
     .toc {
-      align-self: start;
       position: sticky;
-      top: 1.5rem;
-      padding: 1.2rem 0;
-      font-size: 0.78rem;
-      line-height: 1.5;
+      top: 28px;
+      padding: 22px 0;
+      border-top: 2px solid var(--navy);
+      border-bottom: 1px solid var(--line);
     }
 
-    .toc-title {
-      margin: 0 0 0.85rem;
-      color: var(--muted);
-      font-size: 0.68rem;
+    .toc__title {
+      margin: 0 0 12px;
+      color: var(--navy);
+      font-size: 0.7rem;
       font-weight: 850;
-      letter-spacing: 0.13em;
+      letter-spacing: 0.17em;
       text-transform: uppercase;
     }
 
     .toc ol {
-      display: grid;
-      gap: 0.22rem;
       margin: 0;
       padding: 0;
       list-style: none;
+      counter-reset: toc;
+    }
+
+    .toc li {
+      counter-increment: toc;
     }
 
     .toc a {
-      display: block;
-      padding: 0.42rem 0.7rem;
-      color: var(--muted);
-      border-left: 2px solid var(--line);
+      display: grid;
+      grid-template-columns: 24px 1fr;
+      gap: 6px;
+      padding: 7px 0;
+      color: var(--ink-soft);
+      font-size: 0.75rem;
+      font-weight: 650;
+      line-height: 1.45;
       text-decoration: none;
     }
 
-    .toc a:hover,
-    .toc a:focus-visible {
-      color: var(--green);
-      border-color: var(--green-2);
-      background: linear-gradient(90deg, rgba(40, 108, 83, 0.08), transparent);
+    .toc a::before {
+      content: counter(toc, decimal-leading-zero);
+      color: var(--blue);
+      font-family: var(--mono);
+      font-size: 0.63rem;
+      line-height: 1.75;
     }
 
-    main {
+    .toc a:hover {
+      color: var(--navy);
+    }
+
+    article {
       min-width: 0;
     }
 
+    .section {
+      margin: 0 0 108px;
+      scroll-margin-top: 32px;
+    }
+
+    .section-number {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 13px;
+      color: var(--blue);
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .section-number::after {
+      content: "";
+      width: 58px;
+      height: 1px;
+      background: var(--blue);
+    }
+
+    h2 {
+      margin: 0 0 27px;
+      color: var(--navy);
+      font-family: var(--serif);
+      font-size: clamp(2rem, 4.5vw, 3.25rem);
+      font-weight: 750;
+      letter-spacing: -0.045em;
+      line-height: 1.2;
+    }
+
+    h3 {
+      margin: 54px 0 17px;
+      color: var(--ink);
+      font-size: clamp(1.25rem, 2.4vw, 1.55rem);
+      font-weight: 820;
+      letter-spacing: -0.025em;
+      line-height: 1.4;
+    }
+
+    h4 {
+      margin: 36px 0 10px;
+      color: var(--navy);
+      font-size: 1rem;
+      font-weight: 820;
+    }
+
+    p {
+      margin: 0 0 1.25em;
+    }
+
     .lead {
-      margin: 0 0 2.4rem;
-      color: #28332e;
-      font-family: Georgia, "Noto Serif KR", "Batang", serif;
-      font-size: clamp(1.23rem, 2.4vw, 1.58rem);
-      line-height: 1.72;
-      letter-spacing: -0.02em;
+      margin-bottom: 34px;
+      color: var(--ink);
+      font-family: var(--serif);
+      font-size: clamp(1.24rem, 2.6vw, 1.55rem);
+      font-weight: 540;
+      line-height: 1.78;
+    }
+
+    .dropcap::first-letter {
+      float: left;
+      margin: 0.06em 0.1em 0 0;
+      color: var(--navy);
+      font-family: var(--serif);
+      font-size: 4.6em;
+      font-weight: 750;
+      line-height: 0.8;
+    }
+
+    strong {
+      color: var(--navy);
+      font-weight: 800;
     }
 
     .abstract {
-      margin: 0 0 4.5rem;
-      padding: 1.7rem 1.8rem 1.8rem;
-      border: 1px solid #cbd9d0;
-      border-left: 5px solid var(--green-2);
-      border-radius: 4px var(--radius) var(--radius) 4px;
-      background: linear-gradient(135deg, #edf5f0, #f9faf6);
-      box-shadow: 0 12px 34px rgba(40, 108, 83, 0.07);
+      padding: clamp(28px, 5vw, 48px);
+      color: white;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.055), transparent 55%),
+        var(--navy);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
     }
 
-    .abstract h2 {
-      margin: 0 0 0.55rem;
-      color: var(--green);
-      font-family: inherit;
-      font-size: 0.75rem;
+    .abstract__label {
+      margin: 0 0 17px;
+      color: #a9d5dc;
+      font-size: 0.7rem;
       font-weight: 850;
-      letter-spacing: 0.13em;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
     }
 
     .abstract p {
       margin: 0;
-      font-family: Georgia, "Noto Serif KR", "Batang", serif;
-      font-size: 1.06rem;
-      line-height: 1.72;
+      font-family: var(--serif);
+      font-size: clamp(1.14rem, 2.4vw, 1.4rem);
+      font-weight: 600;
+      line-height: 1.8;
     }
 
-    section {
-      scroll-margin-top: 2rem;
-      margin-top: 5rem;
+    .abstract strong {
+      color: white;
     }
 
-    section > h2 {
-      position: relative;
-      margin: 0 0 1.7rem;
-      padding-top: 1rem;
-      font-family: Georgia, "Noto Serif KR", "Batang", serif;
-      font-size: clamp(2rem, 4vw, 3rem);
-      font-weight: 680;
-      letter-spacing: -0.045em;
-      line-height: 1.2;
-      text-wrap: balance;
-    }
-
-    section > h2::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 3rem;
-      height: 3px;
-      background: var(--green-2);
-    }
-
-    section h3 {
-      margin: 3rem 0 1rem;
-      font-family: Georgia, "Noto Serif KR", "Batang", serif;
-      font-size: clamp(1.35rem, 2vw, 1.75rem);
-      letter-spacing: -0.025em;
-      line-height: 1.35;
-    }
-
-    section h4 {
-      margin: 2rem 0 0.7rem;
-      font-size: 1rem;
-    }
-
-    p {
-      margin: 0 0 1.35rem;
-    }
-
-    ul,
-    ol {
-      padding-left: 1.35rem;
-    }
-
-    li {
-      margin: 0.45rem 0;
-      padding-left: 0.2rem;
-    }
-
-    .key-findings {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 1rem;
-      margin: 2rem 0 3rem;
-      padding: 0;
-      list-style: none;
-      counter-reset: findings;
-    }
-
-    .key-findings li {
-      counter-increment: findings;
-      position: relative;
-      min-height: 180px;
-      margin: 0;
-      padding: 1.35rem 1.35rem 1.25rem;
-      overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
+    .share-card {
+      margin: 28px 0 0;
+      padding: 26px 30px;
       background: var(--surface);
-      box-shadow: 0 10px 28px rgba(43, 52, 47, 0.06);
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--amber);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
     }
 
-    .key-findings li::after {
-      content: "0" counter(findings);
-      position: absolute;
-      right: 0.85rem;
-      bottom: -0.35rem;
-      color: rgba(40, 108, 83, 0.08);
-      font-family: Georgia, serif;
-      font-size: 4.5rem;
+    .share-card__label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--amber);
+      font-size: 0.68rem;
+      font-weight: 850;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .share-card blockquote {
+      margin: 0;
+      color: var(--navy);
+      font-family: var(--serif);
+      font-size: 1.08rem;
+      font-weight: 650;
+      line-height: 1.7;
+    }
+
+    .key-grid {
+      margin-top: 36px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .key-card {
+      padding: 25px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+    }
+
+    .key-card__index {
+      display: inline-grid;
+      width: 31px;
+      height: 31px;
+      place-items: center;
+      margin-bottom: 20px;
+      color: white;
+      background: var(--blue);
+      border-radius: 50%;
+      font-family: var(--mono);
+      font-size: 0.68rem;
       font-weight: 800;
-      line-height: 1;
     }
 
-    .key-findings strong {
-      display: block;
-      position: relative;
-      z-index: 1;
-      margin-bottom: 0.45rem;
-      color: var(--green);
-      font-size: 1.02rem;
+    .key-card h3 {
+      margin: 0 0 9px;
+      color: var(--navy);
+      font-family: var(--serif);
+      font-size: 1.1rem;
     }
 
-    .key-findings span {
-      position: relative;
-      z-index: 1;
-      display: block;
-      color: #455149;
-      font-size: 0.89rem;
-      line-height: 1.65;
-    }
-
-    .figure {
-      width: min(960px, calc(100vw - 40px));
-      margin: 3rem 0 3.5rem;
-    }
-
-    .figure.wide {
-      position: relative;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    .figure-frame {
-      overflow: hidden;
-      border: 1px solid #d7d5cc;
-      border-radius: 18px;
-      background: #e9e8e0;
-      box-shadow: var(--shadow);
-    }
-
-    .figure-frame img {
-      background: white;
-    }
-
-    figcaption {
-      max-width: 760px;
-      margin: 0.85rem auto 0;
-      color: var(--muted);
-      font-size: 0.77rem;
-      line-height: 1.55;
-      text-align: center;
-    }
-
-    figcaption strong {
-      color: #445048;
-      font-weight: 760;
+    .key-card p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 0.88rem;
+      line-height: 1.7;
     }
 
     .table-wrap {
-      width: min(940px, calc(100vw - 40px));
-      margin: 2.3rem 0 3rem;
+      margin: 30px 0;
       overflow-x: auto;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
       background: var(--surface);
-      box-shadow: 0 12px 35px rgba(38, 45, 41, 0.07);
-    }
-
-    .table-wrap.wide {
-      position: relative;
-      left: 50%;
-      transform: translateX(-50%);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      font-variant-numeric: tabular-nums;
-    }
-
-    caption {
-      padding: 1rem 1.2rem;
-      color: var(--muted);
-      background: #f4f2eb;
-      font-size: 0.75rem;
-      font-weight: 750;
-      text-align: left;
+      font-size: 0.86rem;
+      line-height: 1.55;
     }
 
     th,
     td {
-      padding: 0.9rem 1rem;
+      padding: 15px 18px;
       border-bottom: 1px solid var(--line);
       text-align: left;
       vertical-align: top;
     }
 
     th {
-      color: #32423a;
-      background: #f4f2eb;
-      font-size: 0.78rem;
-      font-weight: 800;
-    }
-
-    td {
-      font-size: 0.86rem;
+      color: var(--navy);
+      background: #eef2f0;
+      font-size: 0.75rem;
+      font-weight: 850;
+      letter-spacing: 0.02em;
     }
 
     tbody tr:last-child td {
       border-bottom: 0;
     }
 
-    tbody tr:hover {
-      background: #f7faf7;
+    td:first-child {
+      color: var(--navy);
+      font-weight: 760;
     }
 
-    .num {
+    .number {
+      font-variant-numeric: tabular-nums;
       text-align: right;
       white-space: nowrap;
     }
 
     .highlight-row td {
-      color: var(--green);
-      background: #edf5f0;
-      font-weight: 800;
+      color: var(--navy);
+      background: var(--blue-light);
+      font-weight: 850;
     }
 
-    .negative {
-      color: var(--red);
-      font-weight: 750;
+    .figure {
+      margin: 42px 0;
+    }
+
+    .figure--wide {
+      width: min(1040px, calc(100vw - 40px));
+      margin-left: max(calc((790px - min(1040px, calc(100vw - 40px))) / 2), -125px);
+    }
+
+    .figure__frame {
+      padding: 12px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      box-shadow: 0 10px 30px rgba(31, 45, 48, 0.06);
+      overflow: hidden;
+    }
+
+    .figure__frame img {
+      width: 100%;
+      border-radius: calc(var(--radius-md) - 7px);
+    }
+
+    figcaption {
+      max-width: 760px;
+      margin: 13px auto 0;
+      color: var(--ink-faint);
+      font-size: 0.74rem;
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    .source-tag {
+      color: var(--blue);
+      font-weight: 760;
     }
 
     .pullquote {
       position: relative;
-      width: min(930px, calc(100vw - 40px));
-      margin: 4.5rem 0;
-      padding: 2.8rem 3rem;
-      left: 50%;
-      transform: translateX(-50%);
-      color: #f8f5ec;
-      border-radius: 22px;
-      background:
-        linear-gradient(135deg, rgba(255,255,255,0.035), transparent 55%),
-        var(--green);
-      box-shadow: 0 24px 60px rgba(23, 77, 59, 0.2);
+      margin: 58px 0;
+      padding: 16px 0 16px 38px;
+      color: var(--navy);
+      border-left: 5px solid var(--blue);
+      font-family: var(--serif);
+      font-size: clamp(1.45rem, 3.4vw, 2.05rem);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.52;
     }
 
     .pullquote::before {
       content: "“";
       position: absolute;
-      top: -0.55rem;
-      left: 1.25rem;
-      color: rgba(255, 255, 255, 0.16);
-      font-family: Georgia, serif;
-      font-size: 7rem;
+      top: -22px;
+      left: 20px;
+      color: var(--blue-light);
+      font-size: 5.5rem;
       line-height: 1;
-    }
-
-    .pullquote p {
-      position: relative;
-      margin: 0;
-      font-family: Georgia, "Noto Serif KR", "Batang", serif;
-      font-size: clamp(1.45rem, 3.2vw, 2.25rem);
-      font-weight: 650;
-      letter-spacing: -0.03em;
-      line-height: 1.5;
-    }
-
-    .pullquote cite {
-      display: block;
-      margin-top: 1rem;
-      color: #bdd7c9;
-      font-size: 0.76rem;
-      font-style: normal;
+      z-index: -1;
     }
 
     .callout {
-      margin: 2.3rem 0;
-      padding: 1.45rem 1.55rem;
-      border-radius: 14px;
-      background: var(--blue-soft);
-      border-left: 4px solid var(--blue);
+      margin: 32px 0;
+      padding: 24px 26px;
+      border-radius: var(--radius-md);
     }
 
-    .callout.opinion {
-      background: var(--amber-soft);
-      border-left-color: var(--amber);
-    }
-
-    .callout.warning {
-      background: var(--red-soft);
-      border-left-color: var(--red);
-    }
-
-    .callout-label {
-      display: block;
-      margin-bottom: 0.45rem;
-      color: var(--blue);
-      font-size: 0.7rem;
+    .callout__title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 9px;
+      font-size: 0.77rem;
       font-weight: 850;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
-    .callout.opinion .callout-label {
-      color: #805015;
-    }
-
-    .callout.warning .callout-label {
-      color: var(--red);
+    .callout__title::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
     }
 
     .callout p:last-child {
       margin-bottom: 0;
     }
 
-    .system-flow,
-    .curriculum,
-    .behavior-flow {
-      width: min(1000px, calc(100vw - 40px));
-      position: relative;
-      left: 50%;
-      transform: translateX(-50%);
-      margin: 3rem 0;
-      padding: 1.5rem;
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      background: var(--surface);
-      box-shadow: 0 14px 38px rgba(38, 45, 41, 0.07);
+    .callout--important {
+      color: #164348;
+      background: var(--blue-light);
+      border: 1px solid #b9d9df;
     }
 
-    .diagram-title {
-      margin: 0 0 1.2rem;
-      color: var(--muted);
+    .callout--important .callout__title {
+      color: var(--blue);
+    }
+
+    .callout--important .callout__title::before {
+      background: var(--blue);
+    }
+
+    .callout--note {
+      color: #304c3f;
+      background: var(--green-light);
+      border: 1px solid #c4ddce;
+    }
+
+    .callout--note .callout__title {
+      color: var(--green);
+    }
+
+    .callout--note .callout__title::before {
+      background: var(--green);
+    }
+
+    .callout--opinion {
+      color: #514863;
+      background: var(--violet-light);
+      border: 1px solid #d8d0e9;
+    }
+
+    .callout--opinion .callout__title {
+      color: var(--violet);
+    }
+
+    .callout--opinion .callout__title::before {
+      background: var(--violet);
+    }
+
+    .diagram {
+      margin: 36px 0;
+      padding: clamp(22px, 4vw, 36px);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 10px 30px rgba(31, 45, 48, 0.05);
+    }
+
+    .diagram__title {
+      margin: 0 0 24px;
+      color: var(--navy);
       font-size: 0.72rem;
-      font-weight: 800;
-      letter-spacing: 0.1em;
+      font-weight: 850;
+      letter-spacing: 0.13em;
       text-transform: uppercase;
     }
 
-    .flow-row {
+    .system-map {
       display: grid;
-      grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
-      gap: 0.6rem;
-      align-items: stretch;
+      grid-template-columns: 1fr 34px 1fr 34px 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .system-map__sources {
+      display: grid;
+      gap: 10px;
     }
 
     .flow-node {
-      display: grid;
-      place-items: center;
-      min-height: 100px;
-      padding: 0.9rem;
-      border: 1px solid;
+      min-height: 84px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      color: var(--navy);
+      background: var(--surface-blue);
+      border: 1px solid #c5dce0;
       border-radius: 13px;
-      font-size: 0.78rem;
-      font-weight: 750;
+      font-size: 0.8rem;
+      font-weight: 760;
       line-height: 1.45;
       text-align: center;
     }
 
-    .flow-node.blue {
-      color: #24465a;
-      border-color: #b9cfdb;
-      background: var(--blue-soft);
-    }
-
-    .flow-node.violet {
-      color: #554169;
-      border-color: #cabcdc;
-      background: #eee9f3;
-    }
-
-    .flow-node.amber {
-      color: #75470f;
-      border-color: #e3c38b;
-      background: var(--amber-soft);
-    }
-
-    .flow-node.green {
-      color: var(--green);
-      border-color: #b7d2c3;
-      background: var(--green-soft);
-    }
-
-    .flow-node.red {
-      color: #7d372f;
-      border-color: #dfb1aa;
-      background: var(--red-soft);
-    }
-
-    .arrow {
-      display: grid;
-      place-items: center;
-      color: #8e9791;
-      font-size: 1.25rem;
-    }
-
-    .sensor-strip {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0.75rem;
-      margin-bottom: 0.75rem;
-    }
-
-    .sensor-strip .flow-node {
-      min-height: 72px;
-    }
-
-    .down-arrow {
-      color: #8e9791;
-      text-align: center;
-      line-height: 1;
-      font-size: 1.3rem;
-    }
-
-    .curriculum .flow-row {
-      grid-template-columns: repeat(9, auto);
-    }
-
-    .curriculum .flow-node {
-      min-width: 145px;
-    }
-
-    .behavior-grid {
-      display: grid;
-      grid-template-columns: 1fr 1.1fr 1fr;
-      gap: 0.8rem;
-      align-items: center;
-    }
-
-    .branch {
-      display: grid;
-      gap: 0.75rem;
-    }
-
-    .branch-label {
+    .flow-node small {
       display: block;
-      margin-bottom: 0.2rem;
-      color: var(--muted);
+      margin-top: 4px;
+      color: var(--ink-soft);
       font-size: 0.68rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
+      font-weight: 580;
+    }
+
+    .flow-node--violet {
+      background: var(--violet-light);
+      border-color: #d6cfe5;
+    }
+
+    .flow-node--amber {
+      background: var(--amber-light);
+      border-color: #ebd1ad;
+    }
+
+    .flow-node--green {
+      background: var(--green-light);
+      border-color: #c4dccd;
+    }
+
+    .flow-arrow {
+      color: var(--blue);
+      font-size: 1.45rem;
+      font-weight: 300;
       text-align: center;
-      text-transform: uppercase;
     }
 
-    .metric-band {
+    .feedback-loop {
+      margin-top: 14px;
+      padding-top: 14px;
+      color: var(--ink-soft);
+      border-top: 1px dashed var(--line);
+      font-size: 0.73rem;
+      text-align: center;
+    }
+
+    .spec-grid {
+      margin: 32px 0;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 1px;
-      margin: 2.5rem 0 3rem;
-      overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: 18px;
       background: var(--line);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      overflow: hidden;
     }
 
-    .metric {
-      padding: 1.35rem;
+    .spec {
+      padding: 22px;
       background: var(--surface);
     }
 
-    .metric strong {
-      display: block;
-      color: var(--green);
-      font-family: Georgia, serif;
-      font-size: 2.5rem;
-      line-height: 1;
+    .spec dt {
+      margin-bottom: 5px;
+      color: var(--blue);
+      font-size: 0.69rem;
+      font-weight: 850;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
     }
 
-    .metric span {
-      display: block;
-      margin-top: 0.55rem;
-      color: var(--muted);
-      font-size: 0.75rem;
-      line-height: 1.5;
+    .spec dd {
+      margin: 0;
+      color: var(--ink);
+      font-size: 0.86rem;
+      font-weight: 670;
+      line-height: 1.55;
     }
 
-    .formula {
-      margin: 1.8rem 0;
-      padding: 1.3rem 1.5rem;
-      overflow-x: auto;
-      color: #24352d;
+    .feature-list,
+    .limit-list {
+      margin: 26px 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: item;
+    }
+
+    .feature-list li,
+    .limit-list li {
+      position: relative;
+      margin-bottom: 12px;
+      padding: 20px 22px 20px 66px;
+      background: var(--surface);
       border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #f1efe8;
-      font-family: "Cambria Math", Cambria, Georgia, serif;
-      font-size: 1.05rem;
+      border-radius: var(--radius-md);
+      counter-increment: item;
+    }
+
+    .feature-list li::before,
+    .limit-list li::before {
+      content: counter(item, decimal-leading-zero);
+      position: absolute;
+      top: 21px;
+      left: 22px;
+      color: var(--blue);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .feature-list strong,
+    .limit-list strong {
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .limit-list li {
+      border-left: 4px solid #d9a69f;
+    }
+
+    .limit-list li::before {
+      color: var(--red);
+    }
+
+    .equation {
+      position: relative;
+      margin: 30px 0;
+      padding: 25px 64px 25px 25px;
+      overflow-x: auto;
+      color: var(--navy);
+      background: #eef1ee;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      font-family: var(--mono);
+      font-size: clamp(0.76rem, 1.8vw, 0.95rem);
       line-height: 1.7;
       text-align: center;
       white-space: nowrap;
     }
 
-    .formula .tag {
-      float: right;
-      color: var(--muted);
-      font-size: 0.82rem;
+    .equation__number {
+      position: absolute;
+      top: 50%;
+      right: 20px;
+      color: var(--ink-faint);
+      transform: translateY(-50%);
     }
 
-    .evidence-list {
+    .piecewise {
+      display: inline-grid;
+      grid-template-columns: auto auto;
+      gap: 3px 18px;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    .phase-strip {
+      margin: 34px 0;
       display: grid;
-      gap: 0.9rem;
-      margin: 1.5rem 0 2.5rem;
-      padding: 0;
-      list-style: none;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 9px;
     }
 
-    .evidence-list li {
-      display: grid;
-      grid-template-columns: 3.5rem 1fr;
-      gap: 1rem;
-      align-items: start;
-      margin: 0;
-      padding: 1rem 1.1rem;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .evidence-list strong {
-      color: var(--green);
-      font-family: Georgia, serif;
-      font-size: 1.2rem;
-      text-align: right;
-    }
-
-    .evidence-list span {
-      color: #465149;
-      font-size: 0.9rem;
-    }
-
-    .limitations {
-      display: grid;
-      gap: 0.8rem;
-      margin: 2rem 0;
-      padding: 0;
-      counter-reset: limitations;
-      list-style: none;
-    }
-
-    .limitations li {
-      counter-increment: limitations;
-      display: grid;
-      grid-template-columns: 2.5rem 1fr;
-      gap: 0.8rem;
-      margin: 0;
-      padding: 1.1rem 1.2rem;
-      border: 1px solid var(--line);
-      border-radius: 13px;
-      background: var(--surface);
-    }
-
-    .limitations li::before {
-      content: counter(limitations);
-      display: grid;
-      place-items: center;
-      width: 2rem;
-      height: 2rem;
-      color: white;
-      border-radius: 50%;
-      background: var(--red);
-      font-size: 0.75rem;
-      font-weight: 850;
-    }
-
-    .limitations strong {
-      display: block;
-      margin-bottom: 0.18rem;
-    }
-
-    .limitations span {
-      display: block;
-      color: #515a55;
-      font-size: 0.88rem;
-      line-height: 1.65;
-    }
-
-    .takeaway {
-      margin-top: 5rem;
-      padding: 2.5rem;
-      border-radius: 22px;
-      color: #f7f4eb;
-      background: #21352b;
-      box-shadow: var(--shadow);
-    }
-
-    .takeaway .section-kicker {
-      color: #9cc8b1;
-    }
-
-    .takeaway h2 {
-      margin: 0 0 1rem;
-      padding: 0;
-      color: white;
-      font-family: Georgia, "Noto Serif KR", "Batang", serif;
-      font-size: clamp(1.8rem, 4vw, 2.7rem);
-      letter-spacing: -0.04em;
-      line-height: 1.25;
-    }
-
-    .takeaway h2::before {
-      content: none;
-    }
-
-    .takeaway p {
-      color: rgba(247, 244, 235, 0.79);
-    }
-
-    .takeaway ul {
-      margin: 1.4rem 0 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .takeaway li {
+    .phase {
       position: relative;
-      margin: 0.75rem 0;
-      padding-left: 1.5rem;
-      color: rgba(247, 244, 235, 0.9);
+      min-height: 164px;
+      padding: 20px 16px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-top: 5px solid var(--blue);
+      border-radius: 13px;
     }
 
-    .takeaway li::before {
+    .phase:nth-child(2) {
+      border-top-color: #4d74a4;
+    }
+
+    .phase:nth-child(3) {
+      border-top-color: var(--violet);
+    }
+
+    .phase:nth-child(4) {
+      border-top-color: var(--amber);
+    }
+
+    .phase:nth-child(5) {
+      border-top-color: var(--green);
+    }
+
+    .phase__level {
+      display: block;
+      margin-bottom: 15px;
+      color: var(--ink-faint);
+      font-family: var(--mono);
+      font-size: 0.64rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .phase strong {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 0.83rem;
+    }
+
+    .phase p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 0.7rem;
+      line-height: 1.5;
+    }
+
+    .phase::after {
       content: "→";
       position: absolute;
-      left: 0;
-      color: #9cc8b1;
+      z-index: 2;
+      top: 50%;
+      right: -13px;
+      color: var(--blue);
+      font-weight: 800;
+      transform: translateY(-50%);
     }
 
-    .share-card {
-      margin: 4rem 0;
-      padding: 1.6rem;
-      border: 1px dashed #a9b9af;
-      border-radius: 16px;
-      background: #eef3ef;
+    .phase:last-child::after {
+      display: none;
     }
 
-    .share-card h2 {
-      margin: 0 0 0.5rem;
-      padding: 0;
-      font-family: inherit;
+    .parameter-note {
+      margin: 26px 0;
+      padding: 24px;
+      color: var(--ink-soft);
+      background: var(--paper-deep);
+      border-radius: var(--radius-md);
       font-size: 0.82rem;
+      line-height: 1.7;
+    }
+
+    .parameter-note strong {
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .bar-chart {
+      margin: 34px 0;
+      padding: 28px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+    }
+
+    .bar-chart__title {
+      margin: 0 0 24px;
+      color: var(--navy);
+      font-size: 0.75rem;
+      font-weight: 850;
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
-    .share-card h2::before {
-      content: none;
-    }
-
-    .share-copy {
-      margin: 0.9rem 0 0;
-      padding: 1rem 1.1rem;
-      color: #24352d;
-      border-radius: 10px;
-      background: white;
-      font-size: 0.88rem;
-      line-height: 1.7;
-      user-select: all;
-    }
-
-    .source-notes {
-      padding-top: 1rem;
-      border-top: 1px solid var(--line);
-    }
-
-    .bibliography {
+    .bar-row {
       display: grid;
-      grid-template-columns: 9rem 1fr;
-      margin: 1.5rem 0;
-      font-size: 0.86rem;
-    }
-
-    .bibliography dt,
-    .bibliography dd {
-      margin: 0;
-      padding: 0.65rem 0;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .bibliography dt {
-      color: var(--muted);
-      font-weight: 750;
-    }
-
-    .bibliography dd {
-      color: #38443e;
-    }
-
-    .note {
-      color: var(--muted);
+      grid-template-columns: minmax(115px, 1.2fr) 3fr 54px;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 15px;
       font-size: 0.77rem;
-      line-height: 1.65;
+      font-weight: 720;
     }
 
-    footer {
-      padding: 2.5rem 20px 3.5rem;
-      color: #7b847f;
-      border-top: 1px solid var(--line);
+    .bar-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .bar-track {
+      height: 12px;
+      background: #e5e4df;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      width: var(--value);
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue), #55a5b5);
+      border-radius: inherit;
+    }
+
+    .bar-fill--muted {
+      background: #9ba4a4;
+    }
+
+    .bar-fill--human {
+      background: var(--amber);
+    }
+
+    .bar-value {
+      color: var(--navy);
+      font-family: var(--mono);
       font-size: 0.75rem;
+      text-align: right;
+    }
+
+    .result-cards {
+      margin: 34px 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .result-card {
+      padding: 26px 22px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+    }
+
+    .result-card__value {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--blue);
+      font-family: var(--serif);
+      font-size: 2.4rem;
+      font-weight: 750;
+      letter-spacing: -0.055em;
+      line-height: 1;
+    }
+
+    .result-card__label {
+      color: var(--ink-soft);
+      font-size: 0.75rem;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .adaptation {
+      display: grid;
+      grid-template-columns: 1fr 46px 1fr;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .decision {
+      grid-column: 1 / -1;
+      width: min(360px, 100%);
+      margin: 0 auto 4px;
+      padding: 17px;
+      color: #533243;
+      background: #f4e5ec;
+      border: 1px solid #e7c8d6;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 800;
       text-align: center;
     }
 
+    .adaptation__branch {
+      padding: 22px;
+      border-radius: var(--radius-md);
+      text-align: center;
+    }
+
+    .adaptation__branch--hard {
+      background: var(--amber-light);
+      border: 1px solid #ebd0ad;
+    }
+
+    .adaptation__branch--soft {
+      background: var(--green-light);
+      border: 1px solid #c2dccb;
+    }
+
+    .adaptation__branch strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .adaptation__branch p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 0.76rem;
+      line-height: 1.55;
+    }
+
+    .adaptation__versus {
+      display: grid;
+      place-items: center;
+      color: var(--ink-faint);
+      font-family: var(--serif);
+      font-size: 0.8rem;
+      font-style: italic;
+    }
+
+    .implication-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 34px 0;
+    }
+
+    .implication-card {
+      padding: 25px;
+      color: white;
+      background: var(--navy);
+      border-radius: var(--radius-md);
+    }
+
+    .implication-card:nth-child(2) {
+      background: var(--teal);
+    }
+
+    .implication-card:nth-child(3) {
+      background: #5f6154;
+    }
+
+    .implication-card__index {
+      display: block;
+      margin-bottom: 26px;
+      color: rgba(255, 255, 255, 0.58);
+      font-family: var(--mono);
+      font-size: 0.68rem;
+    }
+
+    .implication-card h3 {
+      margin: 0 0 10px;
+      color: white;
+      font-family: var(--serif);
+      font-size: 1.05rem;
+    }
+
+    .implication-card p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 0.78rem;
+      line-height: 1.65;
+    }
+
+    .ending {
+      position: relative;
+      padding: clamp(34px, 6vw, 60px);
+      color: white;
+      background: var(--navy);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .ending::after {
+      content: "20";
+      position: absolute;
+      right: -10px;
+      bottom: -72px;
+      color: rgba(255, 255, 255, 0.055);
+      font-family: var(--serif);
+      font-size: 13rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .ending h2 {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+      color: white;
+    }
+
+    .ending p {
+      position: relative;
+      z-index: 1;
+      max-width: 650px;
+      margin-bottom: 0;
+      color: rgba(255, 255, 255, 0.82);
+      font-family: var(--serif);
+      font-size: 1.04rem;
+      line-height: 1.9;
+    }
+
+    .takeaway-list {
+      margin: 32px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .takeaway-list li {
+      display: grid;
+      grid-template-columns: 30px 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.86rem;
+    }
+
+    .takeaway-list li::before {
+      content: "✓";
+      display: grid;
+      width: 24px;
+      height: 24px;
+      place-items: center;
+      color: var(--navy);
+      background: #acd5ca;
+      border-radius: 50%;
+      font-size: 0.7rem;
+      font-weight: 900;
+    }
+
+    .source-card {
+      padding: 30px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+    }
+
+    .source-card dl {
+      margin: 0;
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 10px 20px;
+      font-size: 0.82rem;
+    }
+
+    .source-card dt {
+      color: var(--ink-faint);
+      font-weight: 750;
+    }
+
+    .source-card dd {
+      margin: 0;
+      color: var(--ink);
+      font-weight: 620;
+    }
+
+    .source-notes {
+      margin-top: 24px;
+      padding-left: 22px;
+      color: var(--ink-soft);
+      font-size: 0.78rem;
+      line-height: 1.7;
+    }
+
+    .source-notes li {
+      margin-bottom: 8px;
+      padding-left: 5px;
+    }
+
+    .evidence-legend {
+      margin-top: 28px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .evidence-pill {
+      padding: 7px 11px;
+      border-radius: 999px;
+      font-size: 0.67rem;
+      font-weight: 800;
+    }
+
+    .evidence-pill--paper {
+      color: var(--green);
+      background: var(--green-light);
+    }
+
+    .evidence-pill--analysis {
+      color: var(--violet);
+      background: var(--violet-light);
+    }
+
+    footer {
+      width: min(1180px, calc(100% - 40px));
+      margin: 36px auto 0;
+      padding: 38px 0 54px;
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      color: var(--ink-faint);
+      border-top: 1px solid var(--line);
+      font-size: 0.72rem;
+    }
+
+    footer a {
+      color: var(--ink-soft);
+      font-weight: 750;
+      text-decoration: none;
+    }
+
     @media (max-width: 980px) {
-      .article-grid {
-        grid-template-columns: minmax(0, var(--content));
-        gap: 0;
+      .hero-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .hero-stat:nth-child(2) {
+        border-right: 0;
+      }
+
+      .hero-stat:nth-child(-n + 2) {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+      }
+
+      .layout {
+        display: block;
+        max-width: 790px;
       }
 
       .toc {
         position: static;
-        margin-bottom: 3rem;
-        padding: 1rem;
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        background: rgba(255, 253, 248, 0.78);
+        margin-bottom: 68px;
       }
 
       .toc ol {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0 24px;
       }
 
-      .flow-row,
-      .curriculum .flow-row {
-        grid-template-columns: 1fr;
+      .figure--wide {
+        width: 100%;
+        margin-left: 0;
       }
 
-      .arrow {
-        transform: rotate(90deg);
+      .phase-strip {
+        grid-template-columns: repeat(2, 1fr);
       }
 
-      .curriculum .flow-node {
-        min-width: 0;
+      .phase::after {
+        display: none;
+      }
+
+      .phase:last-child {
+        grid-column: 1 / -1;
       }
     }
 
     @media (max-width: 700px) {
       body {
         font-size: 16px;
-        line-height: 1.72;
+        line-height: 1.75;
+      }
+
+      .site-header__inner,
+      .hero__inner,
+      .hero-stats,
+      .layout,
+      footer {
+        width: min(100% - 28px, 790px);
+      }
+
+      .header-meta {
+        display: none;
       }
 
       .hero {
-        min-height: 760px;
+        padding-top: 62px;
       }
 
-      .hero-media::after {
-        background:
-          linear-gradient(0deg, rgba(11, 25, 18, 0.97) 0%, rgba(11, 25, 18, 0.72) 68%, rgba(11, 25, 18, 0.3));
+      .hero::after {
+        opacity: 0.55;
       }
 
-      .hero-inner {
-        width: min(100% - 28px, var(--wide));
-        padding-bottom: 2.5rem;
+      h1 {
+        font-size: clamp(2.75rem, 15vw, 4.5rem);
       }
 
-      .hero h1 {
-        font-size: clamp(2.7rem, 14vw, 4.6rem);
-      }
-
-      .hero-meta span + span::before {
-        content: none;
-        margin: 0;
+      .hero-stats {
+        grid-template-columns: 1fr 1fr;
+        border-radius: 20px;
       }
 
       .hero-stat {
+        min-height: 145px;
+        padding: 22px;
+      }
+
+      .hero-stat__value {
+        font-size: 2.5rem;
+      }
+
+      .key-grid,
+      .result-cards,
+      .implication-grid,
+      .spec-grid {
         grid-template-columns: 1fr;
       }
 
-      .hero-stat div + div {
-        border-top: 1px solid rgba(255, 255, 255, 0.15);
-        border-left: 0;
-      }
-
-      .page {
-        width: min(var(--wide), calc(100% - 28px));
-      }
-
-      .article-grid {
-        padding-top: 2.5rem;
-      }
-
-      .toc ol,
-      .key-findings,
-      .metric-band,
-      .sensor-strip,
-      .behavior-grid {
+      .system-map {
         grid-template-columns: 1fr;
       }
 
-      .key-findings li {
-        min-height: 150px;
+      .flow-arrow {
+        transform: rotate(90deg);
       }
 
-      .pullquote {
-        padding: 2rem 1.4rem;
-      }
-
-      .system-flow,
-      .curriculum,
-      .behavior-flow {
-        padding: 1rem;
-      }
-
-      .bibliography {
+      .phase-strip {
         grid-template-columns: 1fr;
       }
 
-      .bibliography dt {
-        padding-bottom: 0;
+      .phase:last-child {
+        grid-column: auto;
+      }
+
+      .adaptation {
+        grid-template-columns: 1fr;
+      }
+
+      .adaptation__versus {
+        min-height: 32px;
+      }
+
+      .toc ol {
+        grid-template-columns: 1fr;
+      }
+
+      .bar-row {
+        grid-template-columns: 100px 1fr 44px;
+        gap: 9px;
+      }
+
+      .source-card dl {
+        grid-template-columns: 1fr;
+        gap: 3px;
+      }
+
+      .source-card dd {
+        margin-bottom: 10px;
+      }
+
+      footer {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .hero-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-stat,
+      .hero-stat:nth-child(2) {
+        border-right: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+      }
+
+      .hero-stat:last-child {
         border-bottom: 0;
       }
 
-      .bibliography dd {
-        padding-top: 0.15rem;
+      .feature-list li,
+      .limit-list li {
+        padding-left: 55px;
       }
 
-      .takeaway {
-        padding: 1.7rem;
+      .feature-list li::before,
+      .limit-list li::before {
+        left: 17px;
+      }
+
+      .equation {
+        text-align: left;
       }
     }
 
     @media print {
+      :root {
+        --paper: white;
+        --surface: white;
+      }
+
       body {
-        color: black;
         background: white;
+        color: black;
         font-size: 11pt;
       }
 
-      .hero {
-        min-height: auto;
-        color: black;
-        background: white;
-      }
-
-      .hero-media {
-        position: static;
-      }
-
-      .hero-media::after {
-        content: none;
-      }
-
-      .hero-media img {
-        max-height: 420px;
-      }
-
-      .hero-inner {
-        padding: 2rem 0;
-      }
-
-      .hero h1,
-      .hero-stat strong {
-        color: black;
-      }
-
-      .hero-deck,
-      .hero-meta,
-      .hero-stat span {
-        color: #444;
-      }
-
-      .hero-stat {
-        background: white;
-        border-color: #bbb;
-      }
-
-      .hero-stat div + div {
-        border-color: #bbb;
-      }
-
+      .site-header,
       .toc,
-      .share-card {
+      .tag-row,
+      footer {
         display: none;
       }
 
-      .article-grid {
-        display: block;
-        padding: 1rem 0;
+      .hero {
+        padding: 36px 0;
       }
 
-      .figure,
-      .table-wrap,
-      .pullquote,
-      .system-flow,
-      .curriculum,
-      .behavior-flow {
-        width: 100%;
-        left: auto;
-        transform: none;
+      .hero::after {
+        display: none;
+      }
+
+      .hero-stats {
         box-shadow: none;
         break-inside: avoid;
       }
 
-      .pullquote,
-      .takeaway {
-        color: black;
-        background: #eee;
-        box-shadow: none;
+      .layout {
+        display: block;
+        width: 100%;
       }
 
-      .pullquote p,
-      .takeaway h2,
-      .takeaway p,
-      .takeaway li {
-        color: black;
+      article {
+        max-width: none;
+      }
+
+      .section {
+        margin-bottom: 56px;
+      }
+
+      .figure--wide {
+        width: 100%;
+        margin-left: 0;
+      }
+
+      .figure,
+      .callout,
+      .diagram,
+      .table-wrap,
+      .result-cards,
+      .ending {
+        break-inside: avoid;
       }
     }
   </style>
@@ -1214,712 +1607,848 @@
 <meta name="twitter:title" content="Towards Learning Boulder Excavation with Hydraulic Excavators — 한국어 요약">
 <meta name="twitter:description" content="Towards Learning Boulder Excavation with Hydraulic Excavators [!abstract] 한 문장 요약 12톤 유압 굴착기가 표준 버킷 , 암 상태 피드백, 암석당 20개 LiDAR 점 만으로 불규칙 암석을 정렬·퍼담기·인양하도록 강화학습한 결과, 현장 40회 시험에서 70% 성공률 을 달성했다(숙련도 약 300시간인 인간 운전자: 83% ). 1. 연구의 핵심 질문 답변 무엇을 자동">
 <meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/ypked0/assets/fig1-excavation-scene.png">
-<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/s/ypked0/">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/2026-towards-learning-boulder-excavation-with-hydraulic-excavators-%EC%9A%94%EC%95%BD/">
 </head>
 <body>
-  <a class="skip-link" href="#article">본문으로 바로가기</a>
+  <a class="skip-link" href="#article">본문으로 건너뛰기</a>
 
-  <header class="hero">
-    <div class="hero-media" aria-hidden="true">
-      <img src="assets/fig1-excavation-scene.png" alt="">
-    </div>
-    <div class="hero-inner">
-      <p class="eyebrow">Research Report · ICRA 2026 · Construction Robotics</p>
-      <h1>20개의 점으로<br>12톤 굴착기를<br>가르치다</h1>
-      <p class="hero-deck">
-        표준 버킷, 희소 LiDAR, 강화학습만으로 불규칙 암석을 퍼담아 들어 올린 연구.
-        실제 현장 성공률 70%가 보여준 가능성과, 인간 운전자까지 남은 13%포인트를 읽는다.
-      </p>
-      <div class="hero-meta" aria-label="문서 정보">
-        <span>논문 한국어 해설</span>
-        <span>2026년 8월 7일</span>
-        <span>예상 읽기 16분</span>
-      </div>
-      <div class="hero-stat" aria-label="핵심 수치">
-        <div>
-          <strong>20</strong>
-          <span>정책에 입력한<br>암석 표면 3D 점</span>
-        </div>
-        <div>
-          <strong>94%</strong>
-          <span>시뮬레이션<br>평균 성공률</span>
-        </div>
-        <div>
-          <strong>70%</strong>
-          <span>실제 장비<br>40회 시험 성공률</span>
-        </div>
-      </div>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="publication" href="#top" aria-label="Field Notes 맨 위로">
+        <span class="publication__mark" aria-hidden="true">F</span>
+        <span>Field Notes · Robotics</span>
+      </a>
+      <div class="header-meta">Research Report · ICRA 2026</div>
     </div>
   </header>
 
-  <div class="page article-grid">
-    <nav class="toc" aria-label="목차">
-      <p class="toc-title">Contents</p>
-      <ol>
-        <li><a href="#abstract">초록</a></li>
-        <li><a href="#findings">핵심 발견</a></li>
-        <li><a href="#problem">문제와 기여</a></li>
-        <li><a href="#system">전체 시스템</a></li>
-        <li><a href="#training">시뮬레이션과 학습</a></li>
-        <li><a href="#results">실험 결과</a></li>
-        <li><a href="#adaptation">토양 적응 행동</a></li>
-        <li><a href="#limitations">실패와 한계</a></li>
-        <li><a href="#implications">해석과 시사점</a></li>
-        <li><a href="#sources">출처와 서지정보</a></li>
-      </ol>
-    </nav>
-
-    <main id="article">
-      <p class="lead">
-        건설 현장에서 암석 하나를 버킷으로 들어 올리는 일은 단순해 보인다. 그러나 로봇에게는
-        불규칙한 형상, 변화하는 토양 저항, 가림, 유압 지연을 한꺼번에 풀어야 하는 복합 조작 문제다.
-        ETH Zurich와 Gravis Robotics 연구진은 이 문제를 정밀한 3D 복원이나 전용 그리퍼 없이 풀어냈다.
-      </p>
-
-      <aside class="abstract" id="abstract" aria-labelledby="abstract-title">
-        <h2 id="abstract-title">Abstract · 한 문장 요약</h2>
-        <p>
-          12톤 유압 굴착기가 <strong>표준 버킷</strong>, 암 상태 피드백, 암석당
-          <strong>20개의 LiDAR 점</strong>만으로 불규칙 암석을 정렬·퍼담기·인양하도록 강화학습한 결과,
-          현장 40회 시험에서 <strong>70% 성공률</strong>을 달성했다. 약 300시간의 숙련도를 지닌
-          인간 운전자의 성공률은 83%였다.
+  <main id="top">
+    <header class="hero">
+      <div class="hero__inner">
+        <p class="eyebrow">Construction Robotics · Research Review</p>
+        <h1>20개의 점으로<br>바위를 들어 올리다</h1>
+        <p class="hero__subtitle">
+          <strong>12톤 유압 굴착기</strong>가 전용 그리퍼도, 조밀한 3D 복원도 없이
+          불규칙 암석을 정렬하고 퍼담아 들어 올렸다. 강화학습이 만든 토양 적응 행동과
+          실제 현장에서 드러난 병목을 함께 살펴본다.
         </p>
-      </aside>
+        <p class="paper-title">Towards Learning Boulder Excavation with Hydraulic Excavators</p>
 
-      <section id="findings">
-        <p class="section-kicker">01 · Key findings</p>
-        <h2>이 연구에서 먼저 기억할 네 가지</h2>
-
-        <ul class="key-findings">
-          <li>
-            <strong>전용 도구 없이 암석을 조작했다</strong>
-            <span>작업 중 그리퍼로 교체하지 않고, 토사 굴착에 쓰는 표준 버킷으로 0.4–0.7m 암석을 제거했다.</span>
-          </li>
-          <li>
-            <strong>지각 입력은 놀랄 만큼 작다</strong>
-            <span>SAM2로 목표 암석을 추적한 뒤, 마스킹한 LiDAR 점 중 20개만 정책에 전달한다.</span>
-          </li>
-          <li>
-            <strong>토양 대응 전략이 창발했다</strong>
-            <span>경질 토양에서는 표면을 길게 끌고, 연질 토양에서는 직접 관입하는 행동을 별도 분류기 없이 학습했다.</span>
-          </li>
-          <li>
-            <strong>남은 병목은 정책보다 관측이다</strong>
-            <span>작은 암석이 버킷 뒤로 가려질 때 추적이 끊기며, 실제 토양 동역학과의 차이도 성능을 제한했다.</span>
-          </li>
-        </ul>
-
-        <div class="table-wrap wide">
-          <table>
-            <caption>연구 질문을 한눈에 보는 요약</caption>
-            <thead>
-              <tr>
-                <th scope="col">질문</th>
-                <th scope="col">답변</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>무엇을 자동화했나?</strong></td>
-                <td>툴 교체 없이 표준 굴착 버킷으로 0.4–0.7m 크기의 암석을 제거하는 작업</td>
-              </tr>
-              <tr>
-                <td><strong>왜 어려운가?</strong></td>
-                <td>불규칙 형상, 암석–토양 결합, 저항 변화, 야외 조명, 진흙, 가림, 유압 지연이 동시에 존재하기 때문</td>
-              </tr>
-              <tr>
-                <td><strong>핵심 방법은?</strong></td>
-                <td>Isaac Lab 강체 시뮬레이션, 준정적 2D 토양 저항 모델, 희소 점군·고유감각 기반 PPO 정책</td>
-              </tr>
-              <tr>
-                <td><strong>가장 중요한 결과는?</strong></td>
-                <td>시뮬레이션 평균 94%, 실제 장비 70%. 연속 토사 굴착용 Digging RL 기준선은 시뮬레이션에서 33%</td>
-              </tr>
-              <tr>
-                <td><strong>가장 큰 병목은?</strong></td>
-                <td>작은 암석의 완전 가림으로 인한 추적 손실과 시뮬레이션에 없는 실제 토양 상호작용</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="byline">
+          <span><strong>논문 저자</strong> Jonas Gruetter · Lorenzo Terenzi · Pascal Egli · Marco Hutter</span>
+          <span class="byline__dot" aria-hidden="true"></span>
+          <span>ETH Zurich · Gravis Robotics AG</span>
+          <span class="byline__dot" aria-hidden="true"></span>
+          <time datetime="2026-08-07">2026년 8월 7일</time>
         </div>
 
-        <figure class="figure wide">
-          <div class="figure-frame">
-            <img src="assets/fig1-excavation-scene.png" alt="12톤 유압 굴착기 앞의 실제 토양 환경과 파란색으로 표시된 제거 대상 암석">
-          </div>
-          <figcaption><strong>그림 1.</strong> 제거 대상 암석을 파란색으로 표시한 실제 굴착 환경. 논문 Fig. 1에서 추출.</figcaption>
-        </figure>
-      </section>
-
-      <section id="problem">
-        <p class="section-kicker">02 · Problem &amp; contribution</p>
-        <h2>토사를 퍼는 것과 암석 하나를 집는 것은 다른 문제다</h2>
-
-        <p>
-          기존 자동 굴착 연구는 주로 토사나 자갈처럼 연속 매질로 근사할 수 있는 재료를 다뤘다.
-          개별 암석을 대상으로 한 연구는 정밀한 3D 모델과 전용 그리퍼에 의존하는 경우가 많았다.
-          하지만 실제 현장에서 도구 교체는 작업 흐름을 멈추며, 암석을 치운 다음에는 다시 버킷이 필요하다.
-        </p>
-        <p>
-          이 연구의 핵심은 암석 제거를 단순한 “굴착량 최대화”가 아니라
-          <strong>정렬 → 퍼담기 → 컬링 → 인양</strong>으로 이어지는 물체 조작 문제로 다룬 데 있다.
-          정책은 목표 암석의 자세와 토양 저항에 반응하며 버킷의 접근 깊이와 방향을 계속 수정한다.
-        </p>
-
-        <div class="pullquote">
-          <p>많이 퍼는 궤적만으로는 암석을 안정적으로 포획할 수 없다. 필요한 것은 암석의 상태에 반응하는 조작 정책이다.</p>
-          <cite>시뮬레이션 기준선 비교에서 도출되는 핵심 메시지</cite>
+        <div class="tag-row" aria-label="주제 태그">
+          <span class="tag">#굴착로봇</span>
+          <span class="tag">#강화학습</span>
+          <span class="tag">#건설로봇</span>
+          <span class="tag">#FieldRobotics</span>
         </div>
+      </div>
+    </header>
 
-        <h3>연구가 결합한 세 가지 요소</h3>
+    <section class="hero-stats" aria-label="연구 핵심 수치">
+      <div class="hero-stat">
+        <span class="hero-stat__value">70%</span>
+        <span class="hero-stat__label">실제 장비 40회 시험<br>제안 정책 성공률</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat__value">94%</span>
+        <span class="hero-stat__label">시뮬레이션 평균<br>성공률</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat__value">20</span>
+        <span class="hero-stat__label">정책에 입력한<br>암석 표면 3D 점 개수</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat__value">12t</span>
+        <span class="hero-stat__label">현장 검증에 사용한<br>유압 워킹 굴착기 규모</span>
+      </div>
+    </section>
+
+    <div class="layout">
+      <nav class="toc" aria-label="기사 목차">
+        <p class="toc__title">Contents</p>
         <ol>
-          <li>
-            <strong>표준 버킷 기반 개별 물체 조작:</strong>
-            암석을 버킷 정면에 맞추고, 아래로 진입해 퍼담은 뒤, 버킷을 말아 올리며 고정한다.
-          </li>
-          <li>
-            <strong>희소 지각:</strong>
-            RGB 영상에서 SAM2로 목표 암석을 분할하고 LiDAR 점군을 마스킹한 뒤, 표면점 20개만 정책에 입력한다.
-          </li>
-          <li>
-            <strong>토양 적응형 제어:</strong>
-            토양 종류를 명시적으로 판별하지 않고도 관절 토크와 운동 상태를 이용해 관입 전략을 바꾼다.
-          </li>
+          <li><a href="#abstract">초록과 핵심 발견</a></li>
+          <li><a href="#problem">문제와 기여</a></li>
+          <li><a href="#system">전체 시스템</a></li>
+          <li><a href="#method">시뮬레이션과 학습</a></li>
+          <li><a href="#results">실험 결과</a></li>
+          <li><a href="#adaptation">토양 적응 행동</a></li>
+          <li><a href="#limits">실패 모드와 한계</a></li>
+          <li><a href="#implications">해석과 시사점</a></li>
+          <li><a href="#conclusion">결론</a></li>
+          <li><a href="#sources">출처와 증거 메모</a></li>
         </ol>
+      </nav>
 
-        <aside class="callout">
-          <span class="callout-label">저자들의 기여 주장</span>
-          <p>
-            저자들은 이 연구를 표준 굴착 버킷과 희소 3D 지각을 사용해 산업 규모 건설 장비에서
-            암석 조작을 현장 검증한 첫 사례로 제시한다.
-          </p>
-        </aside>
-      </section>
+      <article id="article">
+        <section class="section" id="abstract">
+          <div class="section-number">01 · Abstract</div>
+          <h2>작은 입력으로<br>큰 장비를 움직이다</h2>
 
-      <section id="system">
-        <p class="section-kicker">03 · System</p>
-        <h2>카메라에서 유압 밸브까지, 하나의 폐루프로 연결하다</h2>
-
-        <p>
-          사용자가 RGB 화면에서 목표 암석에 약 5개의 픽셀을 지정하면 SAM2가 추적을 시작한다.
-          분할 마스크는 LiDAR 점군에서 목표 암석만 걸러내는 데 사용된다. 여기서 선택한 20개의 3D 점과
-          굴착기의 관절 상태가 PPO 정책에 들어가며, 정책은 다섯 관절의 속도 명령을 출력한다.
-        </p>
-
-        <figure class="figure wide">
-          <div class="figure-frame">
-            <img src="assets/fig2-system-overview.png" alt="시뮬레이션 학습과 실제 굴착기 배치 파이프라인을 나타낸 전체 시스템 개요">
+          <div class="abstract">
+            <p class="abstract__label">한 문장 초록</p>
+            <p>
+              12톤 유압 굴착기가 <strong>표준 버킷</strong>, 암 상태 피드백,
+              암석당 <strong>20개의 LiDAR 점</strong>만으로 불규칙 암석을 정렬·퍼담기·인양하도록
+              강화학습한 결과, 현장 40회 시험에서 <strong>70% 성공률</strong>을 기록했다.
+              약 300시간의 숙련도를 가진 인간 운전자는 같은 조건에서 83%를 달성했다.
+            </p>
           </div>
-          <figcaption><strong>그림 2.</strong> 학습과 실제 배치를 연결하는 전체 구조. 논문 Fig. 2에서 추출.</figcaption>
-        </figure>
 
-        <div class="system-flow" role="img" aria-label="RGB 영상과 LiDAR 및 굴착기 상태가 PPO 정책을 거쳐 관절 속도 명령과 유압 제어로 이어지는 시스템 흐름">
-          <p class="diagram-title">Perception-to-control pipeline</p>
-          <div class="sensor-strip">
-            <div class="flow-node blue">RGB 영상<br>사용자 5점 초기화<br>→ SAM2 추적</div>
-            <div class="flow-node violet">Ouster LiDAR<br>분할 마스크 적용<br>→ 암석 표면 20점</div>
+          <aside class="share-card" aria-label="공유용 문장">
+            <span class="share-card__label">Share framing · 그대로 인용하기</span>
+            <blockquote>
+              “암석을 완벽하게 복원하지 않아도 된다. 20개의 표면점과 장비가 느끼는 저항만으로,
+              12톤 굴착기는 바위를 다루는 반응 행동을 학습했다.”
+            </blockquote>
+          </aside>
+
+          <h3>핵심 발견</h3>
+          <div class="key-grid">
+            <article class="key-card">
+              <span class="key-card__index">01</span>
+              <h3>표준 버킷으로 개별 암석 조작</h3>
+              <p>툴 교체 없이 0.4–0.7m 크기의 암석을 정렬하고 버킷 안에 포획해 들어 올렸다.</p>
+            </article>
+            <article class="key-card">
+              <span class="key-card__index">02</span>
+              <h3>희소 지각으로 현장 배치</h3>
+              <p>SAM2 마스크로 LiDAR 점군을 걸러낸 뒤 목표 암석의 3D 점 20개만 정책에 제공했다.</p>
+            </article>
+            <article class="key-card">
+              <span class="key-card__index">03</span>
+              <h3>토양 저항에 따른 행동 변화</h3>
+              <p>경질 토양에서는 표면을 길게 끌고, 연질 토양에서는 더 직접적으로 관입했다.</p>
+            </article>
+            <article class="key-card">
+              <span class="key-card__index">04</span>
+              <h3>정책보다 관측이 더 큰 병목</h3>
+              <p>작은 암석이 버킷에 완전히 가려질 때 추적이 끊기는 문제가 실제 성공률을 제한했다.</p>
+            </article>
           </div>
-          <div class="down-arrow">↓</div>
-          <div class="flow-row">
-            <div class="flow-node blue">관절 위치·속도·토크<br>버킷 자세·이전 행동</div>
-            <div class="arrow">→</div>
-            <div class="flow-node amber">PPO 정책<br>유압 지연 이력 포함</div>
-            <div class="arrow">→</div>
-            <div class="flow-node green">5개 관절<br>속도 명령</div>
-            <div class="arrow">→</div>
-            <div class="flow-node violet">PID·밸브 유량 제어<br>12톤 M545</div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">연구 질문</th>
+                  <th scope="col">논문의 답</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>무엇을 자동화했나?</td>
+                  <td>툴 교체 없이 표준 굴착 버킷으로 0.4–0.7m 암석을 제거하는 작업</td>
+                </tr>
+                <tr>
+                  <td>왜 어려운가?</td>
+                  <td>불규칙 형상, 암석–토양 결합, 저항 변화, 조명·진흙·가림, 유압 지연이 동시에 존재한다.</td>
+                </tr>
+                <tr>
+                  <td>핵심 방법은?</td>
+                  <td>Isaac Lab 강체 시뮬레이션, 준정적 2D 토양 저항 모델, 희소 점군·고유감각 기반 PPO 정책</td>
+                </tr>
+                <tr>
+                  <td>가장 중요한 결과는?</td>
+                  <td>시뮬레이션 94%, 실제 장비 70%. 연속 토사 굴착용 기준선은 시뮬레이션에서 33%였다.</td>
+                </tr>
+                <tr>
+                  <td>가장 큰 병목은?</td>
+                  <td>버킷과 암에 의한 목표 가림, 그리고 시뮬레이션에 없는 실제 토양 상호작용</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-        </div>
 
-        <h3>하드웨어와 실행 주기</h3>
-        <div class="table-wrap">
-          <table>
-            <caption>실제 시스템 구성</caption>
-            <tbody>
-              <tr>
-                <th scope="row">플랫폼</th>
-                <td>Menzi Muck M545, 12톤 유압 워킹 굴착기</td>
-              </tr>
-              <tr>
-                <th scope="row">센서</th>
-                <td>Ouster OS1 Rev 6 LiDAR, ZED 2i 스테레오 카메라, 관절 IMU·변위 센서, 유압 압력 기반 토크 추정</td>
-              </tr>
-              <tr>
-                <th scope="row">목표 초기화</th>
-                <td>사용자가 목표 암석에 약 5개 픽셀을 지정해 SAM2 추적 시작</td>
-              </tr>
-              <tr>
-                <th scope="row">추론 하드웨어</th>
-                <td>NVIDIA RTX 4080</td>
-              </tr>
-              <tr>
-                <th scope="row">추론 시간</th>
-                <td>약 95ms</td>
-              </tr>
-              <tr>
-                <th scope="row">정책 제어 주기</th>
-                <td>6Hz</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <figure class="figure wide">
-          <div class="figure-frame">
-            <img src="assets/fig4-sam2-segmentation.png" alt="저조도와 가림 및 복잡한 지면 조건에서 SAM2가 목표 암석을 분할한 여러 사례">
-          </div>
-          <figcaption><strong>그림 3.</strong> 저조도·가림·복잡한 지면에서도 동작하는 SAM2 분할 예. 논문 Fig. 4에서 추출.</figcaption>
-        </figure>
-      </section>
-
-      <section id="training">
-        <p class="section-kicker">04 · Simulation &amp; learning</p>
-        <h2>단순한 토양 모델로 8년의 경험을 압축하다</h2>
-
-        <p>
-          실제 굴착기로 시행착오를 반복하는 것은 느리고 위험하며 장비 비용도 크다.
-          연구진은 Isaac Lab에서 수천 개 환경을 병렬 실행하고, 실제 유압 지연과 토양 물성을 무작위화해
-          정책이 특정 조건에 과적합하지 않도록 했다.
-        </p>
-
-        <h3>굴착기·암석·토양 모델</h3>
-        <ul>
-          <li><strong>굴착기:</strong> 베이스 회전, 붐, 스틱, 텔레스코픽 연장, 버킷 피치의 5개 관절을 작동시킨다.</li>
-          <li><strong>암석:</strong> 실제 암석을 3D 스캔한 50개 형상을 사용한다. 밀도는 2,500kg/m³이며 질량은 에피소드마다 ±10%로 무작위화한다.</li>
-          <li><strong>암석 크기:</strong> 주축별 범위는 각각 0.3–1.0m, 0.1–0.5m, 0.2–0.7m다.</li>
-          <li><strong>접촉:</strong> 암석–토양 마찰계수는 0.35–0.6, 굴착기 지지면 마찰계수는 0.8이다.</li>
-          <li><strong>토양:</strong> Reece의 Fundamental Equation of Earth-Moving에 기반한 준정적 2D 저항 모델을 사용한다.</li>
-        </ul>
-
-        <figure class="figure wide">
-          <div class="figure-frame">
-            <img src="assets/fig3-simulation-setup.png" alt="Isaac Lab 굴착기 환경과 LiDAR 레이캐스트 및 암석 방향에 정렬된 2차원 토양면">
-          </div>
-          <figcaption><strong>그림 4.</strong> Isaac Lab 환경, LiDAR 레이캐스트와 암 방향에 정렬된 2D 토양면. 논문 Fig. 3에서 추출.</figcaption>
-        </figure>
-
-        <figure class="figure">
-          <div class="figure-frame">
-            <img src="assets/table1-soil-parameters.png" alt="연질 토양과 경질 토양의 지반공학 파라미터를 비교한 표">
-          </div>
-          <figcaption><strong>표 1.</strong> 연질·경질 토양 조건의 지반공학 파라미터. 논문 Table I에서 추출.</figcaption>
-        </figure>
-
-        <aside class="callout">
-          <span class="callout-label">모델링 선택의 의미</span>
-          <p>
-            입자 기반 토양 시뮬레이션보다 물리적 충실도는 낮지만 계산량이 훨씬 작다.
-            이 선택 덕분에 대규모 병렬 환경에서 강화학습을 수행할 수 있었다.
-          </p>
-        </aside>
-
-        <h3>정책은 무엇을 보고 무엇을 명령하는가</h3>
-        <p>
-          상태에는 관절 위치·속도·토크, 회전 관절 이력, 버킷 자세와 속도, 목표 암석의 20개 3D 점,
-          이전 행동이 포함된다. 모든 입력은 −1에서 1 사이로 정규화되며, 출력은 다섯 관절의 속도 명령이다.
-        </p>
-
-        <div class="formula" aria-label="정책 행동 벡터">
-          <span class="tag">(1)</span>
-          <strong>a</strong><sub>t</sub> =
-          [q̇<sub>turn</sub>, q̇<sub>boom</sub>, q̇<sub>stick</sub>, q̇<sub>tele</sub>, q̇<sub>pitch</sub>]<sup>T</sup>
-        </div>
-
-        <p>
-          정렬을 마친 뒤에는 회전축을 멈춰 작업을 수직 평면에 가깝게 제한한다.
-          이를 위해 회전 명령의 절댓값이 임계값보다 작으면 0으로 만드는 데드밴드를 사용한다.
-        </p>
-
-        <div class="formula" aria-label="회전 관절 속도 데드밴드">
-          <span class="tag">(2)</span>
-          q̇<sub>turn</sub> =
-          { 0, if |q̇<sub>turn</sub>| &lt; ε<sub>turn</sub>;
-          &nbsp;q̇<sub>turn</sub>, otherwise }
-        </div>
-
-        <p>
-          실제 유압계의 지연은 에피소드마다 0–1.2초 범위에서 샘플링한다.
-          정책의 이력 길이는 가장 긴 지연 구간을 덮도록 설정해, 현재 관측만으로 파악하기 어려운
-          유압 응답을 시간 문맥으로 보완한다.
-        </p>
-
-        <h3>보상과 종료 조건</h3>
-        <p>
-          보상은 횡방향 정렬, 버킷 접근, 암석 아래 진입, 버킷 내부 포획, 컬링, 목표 높이 인양,
-          최종 성공을 순차적으로 유도한다. 급격한 행동, 과도한 버킷 속도, 불필요한 회전,
-          토양 내부 회전, 얕고 정렬되지 않은 퍼담기와 최종 실패에는 벌점을 준다.
-        </p>
-
-        <figure class="figure">
-          <div class="figure-frame">
-            <img src="assets/table2-reward-terms.png" alt="강화학습의 보상 항목 R1부터 R7과 벌점 P1부터 P6을 정리한 표">
-          </div>
-          <figcaption><strong>표 2.</strong> R1–R7 보상과 P1–P6 벌점. 논문 Table II에서 추출.</figcaption>
-        </figure>
-
-        <p>
-          암석이 버킷 안에 있고 컬 각도가 0.5rad보다 크며 기준면에서 0.5m 이상 들리면 성공이다.
-          제한시간은 29초다. 베이스 또는 버킷의 과속, 관절 속도 제한 위반, 암석 낙하,
-          잘못된 받음각도도 에피소드를 종료한다.
-        </p>
-
-        <figure class="figure">
-          <div class="figure-frame">
-            <img src="assets/table3-termination-conditions.png" alt="강화학습 에피소드의 종료 조건 T1부터 T7을 정리한 표">
-          </div>
-          <figcaption><strong>표 3.</strong> T1–T7 종료 조건. 논문 Table III에서 추출.</figcaption>
-        </figure>
-
-        <div class="metric-band" aria-label="강화학습 설정의 핵심 수치">
-          <div class="metric">
-            <strong>9,000</strong>
-            <span>PPO 학습 반복 횟수</span>
-          </div>
-          <div class="metric">
-            <strong>24</strong>
-            <span>환경별 업데이트당 스텝</span>
-          </div>
-          <div class="metric">
-            <strong>≈ 8년</strong>
-            <span>누적 시뮬레이션 경험</span>
-          </div>
-        </div>
-
-        <p>
-          PPO/GAE 정책은 각각 256유닛인 은닉층 두 개와 leaky ReLU를 사용한다.
-          학습률은 10<sup>−4</sup>, PPO clip은 0.2, value loss 계수는 0.5,
-          entropy 계수는 0.005다.
-        </p>
-
-        <h3>쉬운 인양에서 완전한 암석 제거까지</h3>
-        <p>
-          학습은 5단계 커리큘럼으로 진행된다. 현재 단계의 최근 1,000개 에피소드 성공률이
-          80%를 넘으면 다음 단계로 이동한다.
-        </p>
-
-        <div class="curriculum" role="img" aria-label="연질 토양에서 인양을 배우는 0단계부터 오정렬 벌점과 깊이 인지를 포함한 4단계까지의 커리큘럼">
-          <p class="diagram-title">Five-stage curriculum</p>
-          <div class="flow-row">
-            <div class="flow-node blue"><strong>Level 0</strong><br>연질 토양<br>암석이 버킷 앞<br>인양부터 학습</div>
-            <div class="arrow">→</div>
-            <div class="flow-node blue"><strong>Level 1</strong><br>받음각 종료 활성화<br>올바른 퍼담기</div>
-            <div class="arrow">→</div>
-            <div class="flow-node violet"><strong>Level 2</strong><br>토양 물성 무작위화<br>저항 적응</div>
-            <div class="arrow">→</div>
-            <div class="flow-node amber"><strong>Level 3</strong><br>넓은 초기영역<br>횡방향 정렬</div>
-            <div class="arrow">→</div>
-            <div class="flow-node green"><strong>Level 4</strong><br>오정렬 벌점<br>깊이 인지 퍼담기</div>
-          </div>
-        </div>
-      </section>
-
-      <section id="results">
-        <p class="section-kicker">05 · Evidence</p>
-        <h2>시뮬레이션 94%, 실제 현장 70%</h2>
-
-        <h3>시뮬레이션: 토사 굴착 정책과의 격차</h3>
-
-        <figure class="figure">
-          <div class="figure-frame">
-            <img src="assets/table4-simulation-results.png" alt="토양 경도와 암석 크기에 따른 제안 방법 및 Digging RL 기준선의 시뮬레이션 성공률">
-          </div>
-          <figcaption><strong>표 4.</strong> 시뮬레이션 조건별 성공률. 논문 Table IV에서 추출.</figcaption>
-        </figure>
-
-        <ul class="evidence-list">
-          <li>
-            <strong>94%</strong>
-            <span>제안 방법의 전체 시뮬레이션 평균 성공률. 연속 토사 굴착용 Digging RL 기준선은 33%였다.</span>
-          </li>
-          <li>
-            <strong>88%</strong>
-            <span>가장 어려운 대형 암석·경질 토양 조건의 성공률. 같은 조건에서 기준선은 0%였다.</span>
-          </li>
-          <li>
-            <strong>87%</strong>
-            <span>학습에 사용하지 않은 대형 암석 25개를 경질 토양에서 시험한 성공률. 학습 형상의 88%와 거의 같다.</span>
-          </li>
-        </ul>
-
-        <p>
-          결과는 토사를 많이 담는 궤적이 개별 암석 조작으로 자연스럽게 전이되지 않음을 보여준다.
-          암석의 위치와 자세에 맞춰 정렬하고, 버킷 진입 깊이를 조절하며, 포획 여부에 따라 컬링하는
-          목적 특화 정책이 필요했다.
-        </p>
-
-        <h3>현장: 인간 운전자와 13%포인트 차이</h3>
-
-        <figure class="figure">
-          <div class="figure-frame">
-            <img src="assets/table5-hardware-results.png" alt="소형 및 대형 암석과 연질 및 경질 토양 조건에서 제안 방법과 인간 운전자의 실제 장비 성공률">
-          </div>
-          <figcaption><strong>표 5.</strong> 실제 장비 40회 시험 결과. 논문 Table V에서 추출.</figcaption>
-        </figure>
-
-        <div class="table-wrap wide">
-          <table>
-            <caption>조건별 실제 장비 성공률 — 각 조건 10회, 총 40회</caption>
-            <thead>
-              <tr>
-                <th scope="col">조건</th>
-                <th scope="col" class="num">제안 방법</th>
-                <th scope="col" class="num">인간 운전자</th>
-                <th scope="col" class="num">차이</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>소형 / 연질</td>
-                <td class="num">90%</td>
-                <td class="num">90%</td>
-                <td class="num">0%p</td>
-              </tr>
-              <tr>
-                <td>대형 / 연질</td>
-                <td class="num">80%</td>
-                <td class="num">90%</td>
-                <td class="num negative">−10%p</td>
-              </tr>
-              <tr>
-                <td>소형 / 경질</td>
-                <td class="num">50%</td>
-                <td class="num">80%</td>
-                <td class="num negative">−30%p</td>
-              </tr>
-              <tr>
-                <td>대형 / 경질</td>
-                <td class="num">60%</td>
-                <td class="num">70%</td>
-                <td class="num negative">−10%p</td>
-              </tr>
-              <tr class="highlight-row">
-                <td>전체</td>
-                <td class="num">70%</td>
-                <td class="num">83%</td>
-                <td class="num">−13%p</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <p>
-          가장 큰 차이는 <strong>소형 암석·경질 토양</strong>에서 나타났다. 작은 암석은 버킷 뒤로
-          완전히 가려지기 쉽다. 인간은 암석의 마지막 위치를 기억하고 지면 변화를 읽으며 조작을 이어가지만,
-          현재 시스템은 시각 추적이 끊긴 뒤 상태를 안정적으로 복원하기 어렵다.
-        </p>
-
-        <aside class="callout warning">
-          <span class="callout-label">숫자를 읽을 때의 주의점</span>
-          <p>
-            실제 시험은 총 40회이며 네 조건에 각 10회가 배정됐다. 70%는 중요한 현장 증거지만,
-            다양한 지질과 경사, 날씨, 복수 암석 환경까지 일반화된 상용 성능으로 해석하기에는 표본이 작다.
-          </p>
-        </aside>
-      </section>
-
-      <section id="adaptation">
-        <p class="section-kicker">06 · Emergent behavior</p>
-        <h2>단단한 토양을 만나자, 버킷은 우회하는 법을 배웠다</h2>
-
-        <p>
-          경질 토양에서 버킷의 수평 이동 거리는 연질 토양보다 약 40% 길었다.
-          정책은 단단한 지면을 곧바로 파고들기보다 표면을 따라 암석을 끌어 정렬한 뒤 퍼담았다.
-          반대로 연질 토양에서는 짧은 경로로 직접 관입했다.
-        </p>
-
-        <figure class="figure wide">
-          <div class="figure-frame">
-            <img src="assets/fig5-soil-adaptive-trajectories.png" alt="경질 토양에서는 표면을 길게 이동하고 연질 토양에서는 직접 관입하는 버킷 궤적 비교">
-          </div>
-          <figcaption><strong>그림 5.</strong> 경질 토양에서는 표면을 길게 끌고, 연질 토양에서는 직접 관입하는 궤적. 논문 Fig. 5에서 추출.</figcaption>
-        </figure>
-
-        <div class="behavior-flow" role="img" aria-label="초기 관입 저항에 따라 경질 토양에서는 표면 드래깅으로, 연질 토양에서는 직접 관입으로 분기한 뒤 퍼담기와 인양으로 이어지는 행동">
-          <p class="diagram-title">Soil-adaptive strategy</p>
-          <div class="behavior-grid">
-            <div class="flow-node red">초기 관입 저항<br>관절 토크와 운동 상태로 감지</div>
-            <div class="branch">
-              <span class="branch-label">저항이 클 때 · 경질 토양</span>
-              <div class="flow-node amber">표면 드래깅<br>수평 경로 약 40% 증가</div>
-              <span class="branch-label">저항이 작을 때 · 연질 토양</span>
-              <div class="flow-node blue">직접 관입<br>짧은 퍼담기 경로</div>
+          <figure class="figure figure--wide">
+            <div class="figure__frame">
+              <img src="assets/fig1-excavation-scene.png" alt="파란색으로 표시된 제거 대상 암석과 실제 유압 굴착기가 있는 야외 시험 환경">
             </div>
-            <div class="flow-node green">정렬 → 퍼담기 → 컬링<br>암석 고정 후 인양</div>
+            <figcaption><span class="source-tag">그림 1</span> 제거 대상 암석을 파란색으로 표시한 실제 굴착 환경. 논문 Fig. 1에서 추출.</figcaption>
+          </figure>
+        </section>
+
+        <section class="section" id="problem">
+          <div class="section-number">02 · Research question</div>
+          <h2>흙을 뜨는 것과<br>바위를 다루는 것은 다르다</h2>
+
+          <p class="lead dropcap">
+            기존 자동 굴착 연구는 주로 토사나 자갈 같은 연속 매질을 다뤘다.
+            개별 암석을 대상으로 할 때는 정밀한 3D 모델과 전용 그리퍼를 전제하는 경우가 많았다.
+            그러나 실제 작업장에서 툴 교체는 흐름을 끊고, 암석 제거 뒤 다시 굴착하려면 버킷을 되돌려 달아야 한다.
+          </p>
+
+          <p>
+            이 연구는 문제를 단순한 “퍼올리기”가 아니라 <strong>표준 버킷을 이용한 개별 물체 조작</strong>으로
+            다시 정의한다. 목표 암석의 자세에 맞춰 굴착기를 정렬하고, 버킷 날을 암석 아래로 진입시킨 뒤,
+            암석이 빠져나가지 않도록 컬링하며 들어 올려야 한다.
+          </p>
+
+          <ol class="feature-list">
+            <li>
+              <strong>표준 버킷 기반 개별 물체 조작</strong>
+              암석을 먼저 정렬하고 버킷 안으로 퍼담은 다음, 말아 올리며 들어 올린다.
+            </li>
+            <li>
+              <strong>희소한 3D 지각</strong>
+              SAM2로 RGB 영상의 목표 암석을 분할하고 LiDAR 점을 마스킹한 뒤 20개 점만 정책에 입력한다.
+            </li>
+            <li>
+              <strong>토양 분류기 없는 적응 제어</strong>
+              관절 토크와 운동 상태를 통해 단단한 토양에서는 표면 드래깅, 부드러운 토양에서는 직접 관입을 선택한다.
+            </li>
+          </ol>
+
+          <aside class="callout callout--important">
+            <p class="callout__title">저자들의 기여 주장</p>
+            <p>
+              저자들은 이 연구를 표준 굴착 버킷과 희소 3D 지각을 사용해
+              산업 규모 건설 장비에서 암석 조작을 현장 검증한 첫 사례로 제시한다.
+            </p>
+          </aside>
+
+          <blockquote class="pullquote">
+            핵심은 더 많은 흙을 담는 궤적이 아니라, 암석의 자세와 저항에 반응하며
+            정렬과 진입 깊이를 계속 수정하는 데 있다.
+          </blockquote>
+        </section>
+
+        <section class="section" id="system">
+          <div class="section-number">03 · System</div>
+          <h2>카메라에서 밸브까지,<br>6Hz로 닫힌 제어 고리</h2>
+
+          <figure class="figure figure--wide">
+            <div class="figure__frame">
+              <img src="assets/fig2-system-overview.png" alt="시뮬레이션 학습과 실제 굴착기 배치를 연결하는 시스템 전체 구조">
+            </div>
+            <figcaption><span class="source-tag">그림 2</span> 학습과 실제 배치를 연결하는 전체 구조. 논문 Fig. 2에서 추출.</figcaption>
+          </figure>
+
+          <div class="diagram" aria-label="지각과 제어 시스템 흐름">
+            <p class="diagram__title">Perception-to-control pipeline</p>
+            <div class="system-map">
+              <div class="system-map__sources">
+                <div class="flow-node">
+                  RGB 영상
+                  <small>사용자 5점으로 목표 초기화</small>
+                </div>
+                <div class="flow-node">
+                  Ouster LiDAR
+                  <small>장면의 3D 점군</small>
+                </div>
+              </div>
+              <div class="flow-arrow" aria-hidden="true">→</div>
+              <div class="system-map__sources">
+                <div class="flow-node flow-node--violet">
+                  SAM2 추적
+                  <small>목표 암석 분할 마스크</small>
+                </div>
+                <div class="flow-node flow-node--violet">
+                  점군 필터링
+                  <small>암석 표면점 20개 선택</small>
+                </div>
+              </div>
+              <div class="flow-arrow" aria-hidden="true">→</div>
+              <div class="system-map__sources">
+                <div class="flow-node flow-node--amber">
+                  PPO 정책
+                  <small>지연 이력과 고유감각 결합</small>
+                </div>
+                <div class="flow-node flow-node--green">
+                  PID·밸브 제어
+                  <small>5개 관절 속도 명령 실행</small>
+                </div>
+              </div>
+            </div>
+            <div class="feedback-loop">
+              관절 위치·속도·토크, 버킷 자세와 이전 행동이 다시 정책으로 돌아가는 폐루프 구조
+            </div>
           </div>
-        </div>
 
-        <p>
-          연구진은 이를 명시적인 토양 분류기의 결과가 아니라, 초기 관입 시 토크가 커질 때 저항을 피해
-          표면 드래깅으로 전환한 <strong>창발적 행동</strong>으로 해석한다. 정책은 “경질 토양”이라는
-          라벨을 입력받지 않았지만 작업 성공에 유리한 대응 방식을 학습했다.
-        </p>
+          <h3>하드웨어와 실행 주기</h3>
+          <dl class="spec-grid">
+            <div class="spec">
+              <dt>Platform</dt>
+              <dd>Menzi Muck M545<br>12톤 유압 워킹 굴착기</dd>
+            </div>
+            <div class="spec">
+              <dt>Perception</dt>
+              <dd>Ouster OS1 Rev 6 LiDAR<br>ZED 2i 스테레오 카메라</dd>
+            </div>
+            <div class="spec">
+              <dt>Machine state</dt>
+              <dd>관절 IMU·변위 센서<br>유압 압력 기반 토크 추정</dd>
+            </div>
+            <div class="spec">
+              <dt>Segmentation</dt>
+              <dd>목표 암석에 약 5개 픽셀을 지정해 SAM2 추적 초기화</dd>
+            </div>
+            <div class="spec">
+              <dt>Inference</dt>
+              <dd>NVIDIA RTX 4080에서 약 95ms</dd>
+            </div>
+            <div class="spec">
+              <dt>Control rate</dt>
+              <dd>정책 제어 주기 6Hz</dd>
+            </div>
+          </dl>
 
-        <figure class="figure wide">
-          <div class="figure-frame">
-            <img src="assets/fig6-control-signals.png" alt="성공적인 암석 제거 작업에서 정렬 퍼담기 인양 단계별 다섯 관절 속도 명령과 토크 신호">
+          <figure class="figure">
+            <div class="figure__frame">
+              <img src="assets/fig4-sam2-segmentation.png" alt="저조도와 부분 가림이 있는 야외 장면에서 SAM2가 목표 암석을 분할한 사례">
+            </div>
+            <figcaption><span class="source-tag">그림 3</span> 저조도·가림·복잡한 지면에서도 동작하는 SAM2 분할 예. 논문 Fig. 4에서 추출.</figcaption>
+          </figure>
+
+          <p>
+            분할은 완전 자동이 아니다. 사용자가 처음에 목표 암석 위 약 5개 픽셀을 지정해야 한다.
+            이후에는 SAM2가 영상에서 목표를 추적하고, 그 마스크가 LiDAR 점군을 걸러낸다.
+            이 설계는 조밀한 메시 복원 비용을 피하지만, 목표가 완전히 가려졌을 때 공간적 기억을 제공하지 못한다.
+          </p>
+        </section>
+
+        <section class="section" id="method">
+          <div class="section-number">04 · Method</div>
+          <h2>단순화한 흙에서<br>8년을 연습하다</h2>
+
+          <h3>굴착기·암석·토양 모델</h3>
+          <p>
+            학습 환경은 Isaac Lab의 강체 시뮬레이션을 기반으로 한다. 굴착기에서는
+            베이스 회전, 붐, 스틱, 텔레스코픽 연장, 버킷 피치의 다섯 관절만 작동시킨다.
+            암석에는 실제 3D 스캔에서 얻은 50개 형상을 사용했다.
+          </p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">모델 요소</th>
+                  <th scope="col">설정</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>암석 형상</td>
+                  <td>실제 스캔 기반 50개 형상</td>
+                </tr>
+                <tr>
+                  <td>밀도와 질량</td>
+                  <td>2,500kg/m³, 에피소드마다 질량 ±10%</td>
+                </tr>
+                <tr>
+                  <td>주축 크기</td>
+                  <td>각각 0.3–1.0m, 0.1–0.5m, 0.2–0.7m 범위에서 무작위화</td>
+                </tr>
+                <tr>
+                  <td>암석–토양 마찰</td>
+                  <td>마찰계수 0.35–0.60</td>
+                </tr>
+                <tr>
+                  <td>굴착기 지지면 마찰</td>
+                  <td>마찰계수 0.80</td>
+                </tr>
+                <tr>
+                  <td>토양 저항</td>
+                  <td>Reece의 Fundamental Equation of Earth-Moving 기반 준정적 2D 모델</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <figcaption><strong>그림 6.</strong> 성공 작업의 관절 속도 명령과 토크. 점선은 정렬→퍼담기→인양 전환을 나타낸다. 논문 Fig. 6에서 추출.</figcaption>
-        </figure>
 
-        <div class="pullquote">
-          <p>정책은 토양의 이름을 맞히지 않았다. 대신 저항을 느끼고, 성공에 유리한 움직임으로 바꿨다.</p>
-          <cite>토양 적응 행동에 대한 연구진의 해석을 요약</cite>
-        </div>
-      </section>
+          <figure class="figure figure--wide">
+            <div class="figure__frame">
+              <img src="assets/fig3-simulation-setup.png" alt="Isaac Lab 굴착기 환경과 LiDAR 레이캐스트, 암석 방향에 정렬된 2차원 토양면">
+            </div>
+            <figcaption><span class="source-tag">그림 4</span> Isaac Lab 환경, LiDAR 레이캐스트와 암 방향에 정렬된 2D 토양면. 논문 Fig. 3에서 추출.</figcaption>
+          </figure>
 
-      <section id="limitations">
-        <p class="section-kicker">07 · Failure modes</p>
-        <h2>성능을 막은 것은 더 큰 네트워크가 아니었다</h2>
+          <figure class="figure">
+            <div class="figure__frame">
+              <img src="assets/table1-soil-parameters.png" alt="연질 토양과 경질 토양에 적용한 지반공학 파라미터 표">
+            </div>
+            <figcaption><span class="source-tag">표 1</span> 연질·경질 토양 조건의 지반공학 파라미터. 논문 Table I에서 추출.</figcaption>
+          </figure>
 
-        <p>
-          시뮬레이션과 실제 사이에는 24%포인트의 성공률 격차가 있다. 논문이 보고한 실패 사례를 보면,
-          주된 원인은 정책의 표현력 부족보다는 가림으로 인한 상태 손실과 단순화된 토양 모델에 있다.
-        </p>
+          <p>
+            준정적 모델은 입자 기반 토양 모델보다 실제 지면의 변형과 토사 흐름을 덜 충실하게 표현한다.
+            대신 수천 개 환경을 병렬로 실행할 수 있어 강화학습에 필요한 방대한 경험을 생성한다.
+            이 선택은 논문 전체의 중요한 교환관계다. <strong>학습 규모를 얻는 대신 실제 토양의 세부 동역학을 포기했다.</strong>
+          </p>
 
-        <ol class="limitations">
-          <li>
-            <div>
+          <h3>관측과 행동</h3>
+          <p>
+            정책 상태에는 관절 위치·속도·토크, 회전 관절 이력, 버킷 자세와 속도,
+            목표 암석의 20개 3D 점, 이전 행동이 포함된다. 모든 입력은 −1에서 1 사이로 정규화된다.
+            출력은 다섯 관절의 속도 명령이다.
+          </p>
+
+          <div class="equation" aria-label="정책 행동 벡터 식">
+            <span>
+              a<sub>t</sub> =
+              [q̇<sub>turn</sub>, q̇<sub>boom</sub>, q̇<sub>stick</sub>,
+              q̇<sub>tele</sub>, q̇<sub>pitch</sub>]<sup>T</sup>
+            </span>
+            <span class="equation__number">(1)</span>
+          </div>
+
+          <p>
+            정렬을 마친 뒤 회전축을 멈춰 작업을 수직 평면에 가깝게 제한하도록 데드밴드를 적용한다.
+          </p>
+
+          <div class="equation" aria-label="회전축 속도 데드밴드 식">
+            <span>q̇<sub>turn</sub> = </span>
+            <span class="piecewise">
+              <span>0,</span><span>|q̇<sub>turn</sub>| &lt; ε<sub>turn</sub></span>
+              <span>q̇<sub>turn</sub>,</span><span>그 외</span>
+            </span>
+            <span class="equation__number">(2)</span>
+          </div>
+
+          <p>
+            실제 유압계의 지연을 모사하기 위해 에피소드마다 제어 지연
+            <strong>τ<sub>delay</sub> ∈ [0, 1.2]초</strong>를 샘플링한다.
+            정책이 지연된 반응을 구분할 수 있도록 관측 이력의 길이는 최대 지연을 포괄하도록 정한다.
+          </p>
+
+          <h3>보상·종료 조건·학습 설정</h3>
+          <p>
+            보상은 횡방향 정렬, 버킷 접근, 암석 아래 진입, 버킷 내부 포획, 컬링,
+            목표 높이 인양, 최종 성공을 순차적으로 유도한다. 급격한 행동, 과도한 버킷 속도,
+            불필요한 회전, 토양 내부 회전, 얕고 정렬되지 않은 퍼담기와 최종 실패에는 벌점을 준다.
+          </p>
+
+          <figure class="figure">
+            <div class="figure__frame">
+              <img src="assets/table2-reward-terms.png" alt="강화학습에 적용한 R1부터 R7까지의 보상과 P1부터 P6까지의 벌점 항목">
+            </div>
+            <figcaption><span class="source-tag">표 2</span> R1–R7 보상과 P1–P6 벌점. 논문 Table II에서 추출.</figcaption>
+          </figure>
+
+          <p>
+            성공은 암석이 버킷 안에 있고, 컬 각도가 0.5rad보다 크며,
+            기준 높이 0.5m보다 높게 들렸을 때로 정의한다. 제한시간은 29초다.
+            베이스 속도 0.1m/s 초과, 버킷 속도 1.2m/s 초과, 관절 속도 제한 위반,
+            암석 낙하 또는 잘못된 받음각은 조기 종료를 유발한다.
+          </p>
+
+          <figure class="figure">
+            <div class="figure__frame">
+              <img src="assets/table3-termination-conditions.png" alt="강화학습 에피소드의 T1부터 T7까지 종료 조건">
+            </div>
+            <figcaption><span class="source-tag">표 3</span> T1–T7 종료 조건. 논문 Table III에서 추출.</figcaption>
+          </figure>
+
+          <div class="parameter-note">
+            <strong>학습 설정.</strong>
+            PPO/GAE 정책은 256유닛 은닉층 두 개와 leaky ReLU를 사용한다.
+            학습률은 10<sup>−4</sup>, PPO clip 0.2, value loss 계수 0.5,
+            entropy 계수 0.005다. 9,000회 반복하고 환경마다 업데이트당 24step을 수행해
+            약 <strong>8년 분량의 시뮬레이션 경험</strong>을 축적했다.
+          </div>
+
+          <h3>쉬운 인양에서 완전한 굴착으로</h3>
+          <p>
+            커리큘럼은 다섯 단계로 구성된다. 현재 단계의 최근 1,000개 에피소드 성공률이
+            80%를 넘으면 다음 단계로 이동한다.
+          </p>
+
+          <div class="phase-strip" aria-label="5단계 강화학습 커리큘럼">
+            <article class="phase">
+              <span class="phase__level">LEVEL 0</span>
+              <strong>인양부터 시작</strong>
+              <p>연질 토양, 암석을 버킷 앞에 배치한다.</p>
+            </article>
+            <article class="phase">
+              <span class="phase__level">LEVEL 1</span>
+              <strong>올바른 퍼담기</strong>
+              <p>받음각 종료 조건을 활성화한다.</p>
+            </article>
+            <article class="phase">
+              <span class="phase__level">LEVEL 2</span>
+              <strong>저항 적응</strong>
+              <p>토양 물성을 무작위화한다.</p>
+            </article>
+            <article class="phase">
+              <span class="phase__level">LEVEL 3</span>
+              <strong>정렬 학습</strong>
+              <p>4.5×3×0.4m 초기 영역을 사용한다.</p>
+            </article>
+            <article class="phase">
+              <span class="phase__level">LEVEL 4</span>
+              <strong>깊이 인지</strong>
+              <p>오정렬 벌점으로 퍼담기를 정교화한다.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="results">
+          <div class="section-number">05 · Evidence</div>
+          <h2>시뮬레이션 94%,<br>현장에서는 70%</h2>
+
+          <h3>시뮬레이션: 물체 조작 정책의 우위</h3>
+
+          <figure class="figure">
+            <div class="figure__frame">
+              <img src="assets/table4-simulation-results.png" alt="암석 크기와 토양 조건에 따른 제안 방법과 기준선의 시뮬레이션 성공률">
+            </div>
+            <figcaption><span class="source-tag">표 4</span> 시뮬레이션 조건별 성공률. 논문 Table IV에서 추출.</figcaption>
+          </figure>
+
+          <div class="bar-chart" aria-label="시뮬레이션 평균 성공률 비교">
+            <p class="bar-chart__title">Simulation success rate</p>
+            <div class="bar-row">
+              <span>제안 방법</span>
+              <span class="bar-track"><span class="bar-fill"></span></span>
+              <span class="bar-value">94%</span>
+            </div>
+            <div class="bar-row">
+              <span>Digging RL</span>
+              <span class="bar-track"><span class="bar-fill bar-fill--muted"></span></span>
+              <span class="bar-value">33%</span>
+            </div>
+          </div>
+
+          <div class="result-cards">
+            <article class="result-card">
+              <span class="result-card__value">88%</span>
+              <span class="result-card__label">대형 암석·경질 토양에서 제안 방법 성공률</span>
+            </article>
+            <article class="result-card">
+              <span class="result-card__value">0%</span>
+              <span class="result-card__label">같은 조건에서 Digging RL 기준선 성공률</span>
+            </article>
+            <article class="result-card">
+              <span class="result-card__value">87%</span>
+              <span class="result-card__label">미학습 대형 암석 25개 형상의 경질 토양 성공률</span>
+            </article>
+          </div>
+
+          <p>
+            경질 토양의 미학습 대형 암석 형상에서는 87%, 학습 형상에서는 88%였다.
+            형상 일반화 성능이 거의 유지된 셈이다. 반면 연속 토사 굴착용 Digging RL 기준선은
+            가장 어려운 대형 암석·경질 토양 조건에서 한 번도 성공하지 못했다.
+          </p>
+
+          <p>
+            이 비교가 보여주는 것은 분명하다. “흙을 많이 담는 궤적”만으로는 개별 암석을
+            안정적으로 포획할 수 없다. 암석의 자세에 반응해 정렬과 버킷 깊이를 수정하는
+            물체 조작 정책이 별도로 필요하다.
+          </p>
+
+          <h3>실제 굴착기: 인간과 13%p 차이</h3>
+
+          <figure class="figure">
+            <div class="figure__frame">
+              <img src="assets/table5-hardware-results.png" alt="연질과 경질 토양, 소형과 대형 암석 조건에서 제안 정책과 인간 운전자의 실제 장비 성공률">
+            </div>
+            <figcaption><span class="source-tag">표 5</span> 실제 장비 40회 시험 결과. 논문 Table V에서 추출.</figcaption>
+          </figure>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">시험 조건</th>
+                  <th scope="col" class="number">제안 방법</th>
+                  <th scope="col" class="number">인간 운전자</th>
+                  <th scope="col" class="number">차이</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>소형 / 연질</td>
+                  <td class="number">90%</td>
+                  <td class="number">90%</td>
+                  <td class="number">0%p</td>
+                </tr>
+                <tr>
+                  <td>대형 / 연질</td>
+                  <td class="number">80%</td>
+                  <td class="number">90%</td>
+                  <td class="number">−10%p</td>
+                </tr>
+                <tr>
+                  <td>소형 / 경질</td>
+                  <td class="number">50%</td>
+                  <td class="number">80%</td>
+                  <td class="number">−30%p</td>
+                </tr>
+                <tr>
+                  <td>대형 / 경질</td>
+                  <td class="number">60%</td>
+                  <td class="number">70%</td>
+                  <td class="number">−10%p</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td>전체</td>
+                  <td class="number">70%</td>
+                  <td class="number">83%</td>
+                  <td class="number">−13%p</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="bar-chart" aria-label="실제 장비 전체 성공률 비교">
+            <p class="bar-chart__title">Hardware success rate · 40 trials</p>
+            <div class="bar-row">
+              <span>제안 방법</span>
+              <span class="bar-track"><span class="bar-fill"></span></span>
+              <span class="bar-value">70%</span>
+            </div>
+            <div class="bar-row">
+              <span>인간 운전자</span>
+              <span class="bar-track"><span class="bar-fill bar-fill--human"></span></span>
+              <span class="bar-value">83%</span>
+            </div>
+          </div>
+
+          <p>
+            가장 큰 격차는 <strong>소형 암석·경질 토양 조건의 −30%p</strong>에서 나타났다.
+            작은 암석은 버킷 뒤로 완전히 가려지기 쉽다. 인간은 마지막으로 본 위치에 대한 공간 기억과
+            지면 변형을 이용해 조작을 계속하지만, 현재 시스템은 추적이 끊기면 복구하기 어렵다.
+          </p>
+        </section>
+
+        <section class="section" id="adaptation">
+          <div class="section-number">06 · Emergent behavior</div>
+          <h2>단단한 흙에서는<br>먼저 옆으로 끌었다</h2>
+
+          <figure class="figure figure--wide">
+            <div class="figure__frame">
+              <img src="assets/fig5-soil-adaptive-trajectories.png" alt="경질 토양에서는 표면을 길게 끌고 연질 토양에서는 직접 관입하는 버킷 궤적 비교">
+            </div>
+            <figcaption><span class="source-tag">그림 5</span> 경질 토양에서는 표면을 길게 끌고, 연질 토양에서는 직접 관입하는 궤적. 논문 Fig. 5에서 추출.</figcaption>
+          </figure>
+
+          <p class="lead">
+            경질 토양에서 버킷의 수평 이동 거리는 연질 토양보다 약 <strong>40% 길었다.</strong>
+            정책에 토양 종류를 직접 알려주지 않았다는 점이 중요하다.
+          </p>
+
+          <div class="diagram" aria-label="초기 관입 저항에 따른 토양 적응 행동">
+            <p class="diagram__title">Learned soil adaptation</p>
+            <div class="adaptation">
+              <div class="decision">초기 관입에서 관절 토크로 감지한 저항</div>
+              <div class="adaptation__branch adaptation__branch--hard">
+                <strong>저항이 큼 · 경질 토양</strong>
+                <p>깊은 관입을 피하고 표면 드래깅으로 전환<br>수평 경로 약 40% 증가</p>
+              </div>
+              <div class="adaptation__versus">versus</div>
+              <div class="adaptation__branch adaptation__branch--soft">
+                <strong>저항이 작음 · 연질 토양</strong>
+                <p>버킷을 더 직접적으로 관입<br>짧은 퍼담기 경로 사용</p>
+              </div>
+            </div>
+          </div>
+
+          <p>
+            연구진은 이를 명시적인 토양 분류기의 결과가 아니라, 초기 관입 시 토크가 커질 때
+            저항을 피해 표면 드래깅으로 전환한 <strong>창발적 행동</strong>으로 해석한다.
+            즉 정책은 “이 흙은 경질이다”라는 라벨을 추정하기보다, 장비가 지금 느끼는 힘에 반응해
+            궤적을 바꾼다.
+          </p>
+
+          <figure class="figure figure--wide">
+            <div class="figure__frame">
+              <img src="assets/fig6-control-signals.png" alt="성공 작업 중 정렬, 퍼담기, 인양 단계의 관절 속도 명령과 토크 신호">
+            </div>
+            <figcaption><span class="source-tag">그림 6</span> 성공 작업의 관절 속도 명령과 토크. 점선은 정렬→퍼담기→인양 전환을 나타낸다. 논문 Fig. 6에서 추출.</figcaption>
+          </figure>
+
+          <blockquote class="pullquote">
+            토양을 정확히 분류하지 않아도, 힘을 느끼고 실패를 피하는 행동은 배울 수 있었다.
+          </blockquote>
+        </section>
+
+        <section class="section" id="limits">
+          <div class="section-number">07 · Limitations</div>
+          <h2>실패는 대부분<br>보이지 않는 곳에서 시작됐다</h2>
+
+          <ol class="limit-list">
+            <li>
               <strong>지각과 가림</strong>
-              <span>고정된 캐빈 센서는 근접 조작 시 암과 버킷에 가려진다. 작은 암석의 완전 추적 손실이 주요 실패 원인이다.</span>
-            </div>
-          </li>
-          <li>
-            <div>
+              고정된 캐빈 센서는 근접 조작 시 암과 버킷에 의해 가려진다.
+              작은 암석의 완전 추적 손실이 주요 실패 원인이었다.
+            </li>
+            <li>
               <strong>부분 매립 암석</strong>
-              <span>LiDAR는 노출된 표면만 관측하므로 실제 크기와 매립 깊이를 충분히 표현하지 못한다.</span>
-            </div>
-          </li>
-          <li>
-            <div>
-              <strong>미모델링 토양 동역학</strong>
-              <span>암석–토양 결합, 지면 높이 변화, 버킷 내부 토사 축적과 넘침은 준정적 2D 모델에 충분히 반영되지 않는다.</span>
-            </div>
-          </li>
-          <li>
-            <div>
+              LiDAR는 노출된 표면만 관측하므로 실제 크기와 매립 깊이를 충분히 표현하지 못한다.
+            </li>
+            <li>
+              <strong>모델링되지 않은 토양 동역학</strong>
+              암석–토양 결합, 지면 높이 변화, 버킷 내부 토사 축적과 넘침이 준정적 2D 모델에 충분히 반영되지 않는다.
+            </li>
+            <li>
               <strong>회전 제어 오차</strong>
-              <span>거친 회전 동역학 모델로 정렬이 어긋나 큰 암석이 버킷 측면에 끼는 사례가 발생했다.</span>
-            </div>
-          </li>
-          <li>
-            <div>
-              <strong>제한된 실험 범위</strong>
-              <span>실제 시험은 40회, 두 가지 암석 크기와 두 가지 토양 조건에 한정됐다. 다양한 경사와 지질에서의 재현성은 아직 검증되지 않았다.</span>
-            </div>
-          </li>
-          <li>
-            <div>
-              <strong>사람의 초기 개입</strong>
-              <span>목표 암석 분할은 사용자가 약 5개 픽셀을 지정해야 시작되므로 완전 무인 작업은 아니다.</span>
-            </div>
-          </li>
-        </ol>
+              거친 회전 동역학 모델 때문에 대형 암석과의 정렬이 어긋나 버킷 측면에 끼는 경우가 있다.
+            </li>
+            <li>
+              <strong>제한적인 실험 범위</strong>
+              실제 시험은 총 40회이며 0.4m와 0.7m 두 크기, 연질·경질 두 조건에 한정됐다.
+              다양한 지질·경사·다중 암석 환경에서의 재현성은 아직 확인되지 않았다.
+            </li>
+            <li>
+              <strong>초기 사람 개입</strong>
+              목표 분할은 사용자가 약 5개 픽셀을 지정한 뒤 시작한다. 따라서 완전 무인 작업은 아니다.
+            </li>
+          </ol>
 
-        <p>
-          고충실도 입자 기반 토양 시뮬레이션은 일부 현실 격차를 줄일 수 있지만, 연구진은 대규모 병렬
-          강화학습에 필요한 계산비용이 현재 지나치게 크다고 본다. 후속 과제로는 가림을 견디는 시간 모델과
-          현장 정리에 필요한 다중 암석 시나리오가 제시됐다.
-        </p>
-      </section>
-
-      <section id="implications">
-        <p class="section-kicker">08 · Interpretation</p>
-        <h2>다음 돌파구는 더 큰 정책보다 더 오래 기억하는 지각이다</h2>
-
-        <aside class="callout">
-          <span class="callout-label">논문에서 직접 뒷받침되는 해석</span>
           <p>
-            이 연구의 성과는 70%라는 숫자만이 아니다. 단순화된 토양 모델과 암석당 20개 점이라는 작은
-            입력으로도 작업에 필요한 반응 행동을 학습할 수 있음을 실제 산업 규모 장비에서 보였다.
-            시뮬레이션과 실제 사이의 24%포인트 격차는 주로 가림과 미모델링 환경 상호작용에서 나타났다.
+            고충실도 입자 기반 토양 시뮬레이션은 일부 격차를 줄일 수 있다. 하지만 저자들은
+            대규모 병렬 강화학습에 필요한 계산비용이 현재로서는 지나치게 크다고 지적한다.
+            향후 과제로는 가림을 견디는 시간 모델과 실제 현장 정리에 필요한 다중 암석 시나리오가 제시된다.
           </p>
-        </aside>
+        </section>
 
-        <h3>연구와 제품 개발에 주는 세 가지 함의</h3>
-        <ol>
-          <li>
-            <strong>희소 관측도 작업 중심으로 구성하면 충분할 수 있다.</strong>
-            범용적으로 완전한 3D 장면을 복원하는 대신, 목표 암석과 장비 상태처럼 행동 결정에 필요한 정보에
-            집중함으로써 계산량과 시스템 복잡도를 낮출 수 있다.
-          </li>
-          <li>
-            <strong>시뮬레이터는 완벽한 복제본이 아니라 유용한 행동을 만드는 훈련장일 수 있다.</strong>
-            준정적 2D 토양 모델은 현실을 모두 재현하지 못했지만, 토양 저항에 반응하는 전략을 학습시키는 데는 유효했다.
-          </li>
-          <li>
-            <strong>현장 성능을 높이려면 가림 중 상태 추정과 복구가 필요하다.</strong>
-            마지막 관측을 기억하고, 불확실성을 추적하며, 필요할 때 시야를 확보하는 재탐색 동작이 작은 암석의 실패를 직접 겨냥한다.
-          </li>
-        </ol>
+        <section class="section" id="implications">
+          <div class="section-number">08 · Implications</div>
+          <h2>다음 개선점은<br>더 큰 정책이 아닐 수 있다</h2>
 
-        <aside class="callout opinion">
-          <span class="callout-label">분석자의 제안 · 논문에서 검증된 결론은 아님</span>
-          <p>
-            후속 시스템은 암석 상태 추정기에 가림 중 예측, 불확실도, 재탐색 행동을 포함하고
-            버킷 내부 토사 축적과 변화한 지면까지 상태로 반영할 필요가 있다. 성공률뿐 아니라 작업시간,
-            에너지, 버킷·암석 충격과 재시도 횟수를 함께 최적화해야 인간 운전자와 공정 수준에서 비교할 수 있다.
-          </p>
-        </aside>
+          <aside class="callout callout--note">
+            <p class="callout__title">논문에서 직접 뒷받침되는 해석</p>
+            <p>
+              이 연구의 의미는 70%라는 숫자만이 아니다. 매우 단순화된 토양 모델과 암석당
+              20개 점이라는 작은 입력으로도 작업에 필요한 반응 행동을 학습할 수 있음을
+              실제 대형 장비에서 보였다. 시뮬레이션과 실제의 24%p 격차는 정책 자체뿐 아니라
+              가림과 모델링되지 않은 환경 상호작용에서 발생했다.
+            </p>
+          </aside>
 
-        <div class="takeaway">
-          <p class="section-kicker">Reader takeaway</p>
-          <h2>이 논문을 한 문장으로 다시 읽는다면</h2>
-          <p>
-            자율 굴착의 가능성을 결정하는 것은 언제나 더 많은 센서나 더 복잡한 물리가 아니라,
-            제한된 관측으로도 현장 저항에 반응하고 실패에서 복구할 수 있는 폐루프 시스템이다.
-          </p>
-          <ul>
-            <li>표준 버킷만으로 실제 암석 제거가 가능하다는 현장 증거를 제시했다.</li>
-            <li>20개의 3D 점과 고유감각으로도 토양 적응 행동을 학습했다.</li>
-            <li>상용화까지의 핵심 과제는 가림 대응, 지형 변화 모델링, 더 넓은 현장 검증이다.</li>
-          </ul>
-        </div>
+          <div class="implication-grid">
+            <article class="implication-card">
+              <span class="implication-card__index">01 / MEMORY</span>
+              <h3>관측의 시간적 지속성</h3>
+              <p>암석이 가려져도 마지막 상태와 움직임을 바탕으로 위치를 예측하는 시간 모델이 필요하다.</p>
+            </article>
+            <article class="implication-card">
+              <span class="implication-card__index">02 / RECOVERY</span>
+              <h3>불확실성 기반 복구</h3>
+              <p>확신이 낮아졌을 때 무리하게 조작하지 않고 재관측·재정렬하는 행동을 정책에 포함해야 한다.</p>
+            </article>
+            <article class="implication-card">
+              <span class="implication-card__index">03 / PROCESS</span>
+              <h3>공정 수준의 평가</h3>
+              <p>성공률과 함께 작업시간, 에너지, 충격, 재시도 횟수를 측정해야 인간과 실제 생산성을 비교할 수 있다.</p>
+            </article>
+          </div>
 
-        <div class="share-card" aria-label="공유용 문구">
-          <h2>Share framing · 복사해 공유하기</h2>
-          <p class="share-copy">
-            20개의 LiDAR 점만 보고 12톤 굴착기가 불규칙 암석을 들어 올렸다.
-            ICRA 2026 연구의 실제 현장 성공률은 70%. 인간과의 격차를 만든 핵심은 정책 크기가 아니라
-            작은 암석의 가림과 현실의 토양 동역학이었다. #건설로봇 #강화학습 #자율굴착
-          </p>
-        </div>
-      </section>
+          <aside class="callout callout--opinion">
+            <p class="callout__title">분석자의 제안 · 논문에서 검증되지 않음</p>
+            <p>
+              자율 굴착 시스템의 다음 우선순위는 정책 네트워크를 키우는 것보다
+              <strong>관측의 시간적 지속성</strong>을 확보하는 데 두는 편이 타당해 보인다.
+              암석 상태 추정기에 가림 중 예측, 불확실도, 재탐색 동작을 포함하고 버킷의 토사 축적과
+              지면 변화까지 상태에 반영하면 소형·경질 조건의 30%p 격차를 직접 겨냥할 수 있다.
+            </p>
+          </aside>
 
-      <section id="sources" class="source-notes">
-        <p class="section-kicker">09 · Source notes</p>
-        <h2>출처와 서지정보</h2>
+          <h3>연구 결과가 제시하는 설계 원칙</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">관찰된 문제</th>
+                  <th scope="col">권장 연구 방향</th>
+                  <th scope="col">기대 효과</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>가림 중 목표 추적 손실</td>
+                  <td>시간적 상태 추정과 가림 중 궤적 예측</td>
+                  <td>소형 암석 조작의 연속성 향상</td>
+                </tr>
+                <tr>
+                  <td>부분 매립 깊이의 불확실성</td>
+                  <td>가시 표면과 힘 피드백을 결합한 잠재 형상 추정</td>
+                  <td>버킷 진입 깊이와 받음각 개선</td>
+                </tr>
+                <tr>
+                  <td>시뮬레이션에 없는 지면 변화</td>
+                  <td>온라인 지형 상태 갱신과 선택적 고충실도 학습</td>
+                  <td>시뮬레이션–현실 격차 축소</td>
+                </tr>
+                <tr>
+                  <td>단일 암석 중심 평가</td>
+                  <td>다중 암석 순서 계획과 재시도 정책</td>
+                  <td>실제 토공 공정으로 적용 범위 확대</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
 
-        <dl class="bibliography">
-          <dt>논문명</dt>
-          <dd><cite>Towards Learning Boulder Excavation with Hydraulic Excavators</cite></dd>
+        <section class="section" id="conclusion">
+          <div class="ending">
+            <div class="section-number">09 · Conclusion</div>
+            <h2>완벽한 세계 모델보다<br>유용한 반응 행동</h2>
+            <p>
+              이 논문은 전용 그리퍼나 조밀한 3D 복원 없이도, 표준 버킷과 희소 LiDAR·고유감각을
+              사용하는 강화학습 정책이 실제 12톤 굴착기에서 불규칙 암석을 제거할 수 있음을 보였다.
+              미학습 형상에 대한 일반화는 강했지만, 실제 성공률을 제한한 핵심은 작은 암석의 가림과
+              실제 토양 상호작용이었다.
+            </p>
+            <ul class="takeaway-list">
+              <li>표준 굴착 버킷만으로 정렬·퍼담기·인양을 하나의 정책에 통합했다.</li>
+              <li>암석 표면점 20개와 장비의 힘 피드백만으로 토양 적응 행동이 나타났다.</li>
+              <li>후속 연구의 중심은 시간적 지각, 불확실성 기반 복구, 변화하는 지형과 다중 암석 모델링이다.</li>
+            </ul>
+          </div>
+        </section>
 
-          <dt>저자</dt>
-          <dd>Jonas Gruetter, Lorenzo Terenzi, Pascal Egli, Marco Hutter</dd>
+        <section class="section" id="sources">
+          <div class="section-number">10 · Source notes</div>
+          <h2>서지정보와<br>증거의 경계</h2>
 
-          <dt>소속</dt>
-          <dd>Robotic Systems Lab, ETH Zurich · Gravis Robotics AG</dd>
+          <div class="source-card">
+            <dl>
+              <dt>논문명</dt>
+              <dd>Towards Learning Boulder Excavation with Hydraulic Excavators</dd>
 
-          <dt>학회</dt>
-          <dd>2026 IEEE International Conference on Robotics and Automation (ICRA 2026), Vienna, Austria</dd>
+              <dt>저자</dt>
+              <dd>Jonas Gruetter, Lorenzo Terenzi, Pascal Egli, Marco Hutter</dd>
 
-          <dt>키워드</dt>
-          <dd>Construction Robotics · Field Robotics · Reinforcement Learning</dd>
+              <dt>소속</dt>
+              <dd>Robotic Systems Lab, ETH Zurich · Gravis Robotics AG</dd>
 
-          <dt>원문 파일</dt>
-          <dd>2026 Towards Learning Boulder Excavation with Hydraulic Excavators.pdf</dd>
-        </dl>
+              <dt>학회</dt>
+              <dd>2026 IEEE International Conference on Robotics and Automation (ICRA 2026), Vienna, Austria</dd>
 
-        <p class="note">
-          이 글은 제공된 논문 요약을 바탕으로 구성한 한국어 연구 해설이다. 그림과 표는 원 논문의
-          Fig. 1–6 및 Table I–V에서 추출된 로컬 자산을 사용했다. “분석자의 제안”으로 표시된 내용은
-          논문의 실험 결과에서 확장한 해석이며 저자들이 직접 검증한 결론과 구분된다.
-        </p>
-      </section>
-    </main>
-  </div>
+              <dt>키워드</dt>
+              <dd>Construction Robotics · Field Robotics · Reinforcement Learning</dd>
+
+              <dt>원문 기록</dt>
+              <dd>2026 Towards Learning Boulder Excavation with Hydraulic Excavators.pdf</dd>
+            </dl>
+          </div>
+
+          <ol class="source-notes">
+            <li>성공률, 장비 사양, 센서 구성, 정책 입력, 학습 설정과 실패 모드는 제공된 논문 요약 및 추출 표·그림을 바탕으로 정리했다.</li>
+            <li>그림과 표의 번호는 이 기사에서의 표시 순서를 따르며, 캡션에 원 논문의 Fig./Table 번호를 별도로 적었다.</li>
+            <li>“다음 개선점은 더 큰 정책이 아닐 수 있다”는 절의 연구 제안은 보고된 결과에 근거한 해석이며 논문에서 실험적으로 검증된 결론이 아니다.</li>
+            <li>현장 결과는 총 40회 시험에 기반하므로, 다른 지질·경사·장비·다중 암석 환경으로 일반화할 때는 추가 검증이 필요하다.</li>
+          </ol>
+
+          <div class="evidence-legend" aria-label="증거 구분">
+            <span class="evidence-pill evidence-pill--paper">논문 보고 · 직접 근거</span>
+            <span class="evidence-pill evidence-pill--analysis">편집 해석 · 후속 연구 제안</span>
+          </div>
+        </section>
+      </article>
+    </div>
+  </main>
 
   <footer>
-    <p>Towards Learning Boulder Excavation with Hydraulic Excavators — 한국어 연구 해설 · 2026</p>
+    <span>Research report · Korean editorial summary · Published 2026-08-07</span>
+    <a href="#top">맨 위로 ↑</a>
   </footer>
 </body>
 </html>
