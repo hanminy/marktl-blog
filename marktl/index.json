@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-07T01:52:30.926Z",
+  "updatedAt": "2026-08-07T02:26:35.3502323Z",
   "items": [
     {
       "slug": "2025-towards-fully-integrated-autonomous-excavation-서울대-요약",
@@ -38,59 +38,9 @@
         "ì°êµ¬ìë£",
         "ë¡ë´",
         "ê°ííìµ",
-        "íì´ë°ì´ìëª¨ë¸"
+        "íì´ë°ì´ì\u0085ëª¨ë¸"
       ],
       "updatedAt": "2026-08-06T08:36:05.517Z"
-    },
-    {
-      "slug": "yt-sergey-levine-rl-for-robot-foundation-models-Ã¬ÂÂÃ¬ÂÂ½",
-      "shortId": "5iazpp",
-      "url": "https://hanminy.github.io/marktl-blog/marktl/s/5iazpp/",
-      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-sergey-levine-rl-for-robot-foundation-models-%EC%9A%94%EC%95%BD/",
-      "sourcePath": "clippings/yt_Sergey_Levine_RL_for_Robot_Foundation_Models_Ã¬ÂÂÃ¬ÂÂ½.md",
-      "artifactType": "slide-deck",
-      "title": "Sergey Levine (UC Berkeley & PI): RL for Robot Foundation Models",
-      "excerpt": "Ã¬ÂÂÃ¬ÂÂ Ã¬Â ÂÃ«Â³Â´ Ã¬Â±ÂÃ«ÂÂ: Zhanpeng He Ã«ÂÂ Ã¬Â§Â: 20260608 ÃªÂ¸Â¸Ã¬ÂÂ´: 32Ã«Â¶Â 14Ã¬Â´Â Ã­ÂÂÃ¬ÂÂ¬: ICRA 2026 Workshop on RL in the Era of IL ($1) Ã«Â§ÂÃ­ÂÂ¬: https://www.youtube.com/watch?v=u0WJXi8PC6Y <div style=\"position: relative; wi",
-      "tags": [
-        "- youtube",
-        "youtube",
-        "Ã¬ÂÂ°ÃªÂµÂ¬Ã¬ÂÂÃ«Â£Â",
-        "Ã«Â¡ÂÃ«Â´Â",
-        "ÃªÂ°ÂÃ­ÂÂÃ­ÂÂÃ¬ÂÂµ",
-        "Ã­ÂÂÃ¬ÂÂ´Ã«ÂÂ°Ã¬ÂÂ´Ã¬ÂÂÃ«ÂªÂ¨Ã«ÂÂ¸"
-      ],
-      "updatedAt": "2026-08-06T08:16:57.426Z"
-    },
-    {
-      "slug": "yt-sergey-levine-rl-for-robot-foundation-models-ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½",
-      "shortId": "5iazpp",
-      "url": "https://hanminy.github.io/marktl-blog/marktl/s/5iazpp/",
-      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-sergey-levine-rl-for-robot-foundation-models-%EC%9A%94%EC%95%BD/",
-      "sourcePath": "clippings/yt_Sergey_Levine_RL_for_Robot_Foundation_Models_ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½.md",
-      "artifactType": "faithful-note",
-      "title": "Sergey Levine (UC Berkeley & PI): RL for Robot Foundation Models",
-      "excerpt": "ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ ÃÂ¬ÃÂ ÃÂÃÂ«ÃÂ³ÃÂ´ ÃÂ¬ÃÂ±ÃÂÃÂ«ÃÂÃÂ: Zhanpeng He ÃÂ«ÃÂÃÂ ÃÂ¬ÃÂ§ÃÂ: 20260608 ÃÂªÃÂ¸ÃÂ¸ÃÂ¬ÃÂÃÂ´: 32ÃÂ«ÃÂ¶ÃÂ 14ÃÂ¬ÃÂ´ÃÂ ÃÂ­ÃÂÃÂÃÂ¬ÃÂÃÂ¬: ICRA 2026 Workshop on RL in the Era of IL ($1) ÃÂ«ÃÂ§ÃÂÃÂ­ÃÂÃÂ¬: https://www.youtube.com/watch?v=u0WJXi8PC6Y <div style=\"position: relative; wi",
-      "tags": [
-        "- youtube",
-        "youtube",
-        "ÃÂ¬ÃÂÃÂ°ÃÂªÃÂµÃÂ¬ÃÂ¬ÃÂÃÂÃÂ«ÃÂ£ÃÂ",
-        "ÃÂ«ÃÂ¡ÃÂÃÂ«ÃÂ´ÃÂ",
-        "ÃÂªÃÂ°ÃÂÃÂ­ÃÂÃÂÃÂ­ÃÂÃÂÃÂ¬ÃÂÃÂµ",
-        "ÃÂ­ÃÂÃÂÃÂ¬ÃÂÃÂ´ÃÂ«ÃÂÃÂ°ÃÂ¬ÃÂÃÂ´ÃÂ¬ÃÂÃÂÃÂ«ÃÂªÃÂ¨ÃÂ«ÃÂÃÂ¸"
-      ],
-      "updatedAt": "2026-08-06T06:42:55.278Z"
-    },
-    {
-      "slug": "2025-towards-fully-integrated-autonomous-excavation-ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¸ÃÂÃÂ«ÃÂÃÂÃÂÃÂ-ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ½",
-      "shortId": "l992hf",
-      "url": "https://hanminy.github.io/marktl-blog/marktl/s/l992hf/",
-      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/2025-towards-fully-integrated-autonomous-excavation-%EC%84%9C%EC%9A%B8%EB%8C%80-%EC%9A%94%EC%95%BD/",
-      "sourcePath": "02_research/ÃÂÃÂ­ÃÂÃÂÃÂÃÂÃÂÃÂ«ÃÂÃÂÃÂÃÂÃÂÃÂ«ÃÂÃÂ¡ÃÂÃÂÃÂÃÂ«ÃÂÃÂ´ÃÂÃÂ/2025 Towards Fully Integrated Autonomous Excavation-ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¸ÃÂÃÂ«ÃÂÃÂÃÂÃÂ_ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ½.md",
-      "artifactType": "faithful-note",
-      "title": "Towards Fully Integrated Autonomous Excavation - ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ½",
-      "excerpt": "papertitle: \"Towards Fully Integrated Autonomous Excavation: Autonomous Excavator for Precise Earth Cutting and Onboard Landscape Inspection\" authors: Inkyu Jang Junha Kim Dongjae ",
-      "tags": [],
-      "updatedAt": "2026-07-16T02:49:19.516Z"
     }
   ]
 }
