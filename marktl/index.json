@@ -1,7 +1,24 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-07T02:54:09.368Z",
+  "updatedAt": "2026-08-07T06:36:53.163Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/2026-towards-learning-boulder-excavation-with-hydraulic-excavators-%EC%9A%94%EC%95%BD/",
+      "excerpt": "Towards Learning Boulder Excavation with Hydraulic Excavators [!abstract] 한 문장 요약 12톤 유압 굴착기가 표준 버킷 , 암 상태 피드백, 암석당 20개 LiDAR 점 만으로 불규칙 암석을 정렬·퍼담기·인양하도록 강화학습한 결과, 현장 40회 시험에서 70% 성공률 을 달성했다(숙련도 약 300시간인 인간 운전자: 83% ). 1. 연구의 핵심 질문 답변 무엇을 자동",
+      "shortId": "ypked0",
+      "slug": "2026-towards-learning-boulder-excavation-with-hydraulic-excavators-요약",
+      "sourcePath": "02_research/필드로봇/2026 Towards Learning Boulder Excavation with Hydraulic Excavators_요약.md",
+      "tags": [
+        "논문요약",
+        "굴착로봇",
+        "강화학습",
+        "건설로봇"
+      ],
+      "title": "Towards Learning Boulder Excavation with Hydraulic Excavators — 한국어 요약",
+      "updatedAt": "2026-08-07T06:36:53.163Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/ypked0/"
+    },
     {
       "slug": "yt-yann-lecun-world-models-요약",
       "shortId": "ksm4c5",
