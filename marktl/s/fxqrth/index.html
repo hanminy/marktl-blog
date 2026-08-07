@@ -1,0 +1,2341 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  
+  
+  <title>연구자를 위한 하네스 엔지니어링 — AI에게 99%를 맡기고 인간은 마지막 1%를 설계하는 법</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  <style>
+    :root {
+      --paper: #f7f5f0;
+      --surface: #fffefb;
+      --surface-strong: #ffffff;
+      --ink: #17201d;
+      --muted: #65706b;
+      --line: #d9ddd8;
+      --line-dark: #b8c0ba;
+      --forest: #174c3c;
+      --forest-dark: #0d3328;
+      --mint: #dcebe4;
+      --mint-light: #edf5f0;
+      --amber: #c98224;
+      --amber-light: #fff1d7;
+      --rose: #a54b45;
+      --rose-light: #fae9e6;
+      --blue: #356b85;
+      --blue-light: #e7f1f6;
+      --shadow: 0 18px 48px rgba(22, 44, 35, 0.09);
+      --radius: 22px;
+      --content: 760px;
+      --wide: 1120px;
+      --serif: "Iowan Old Style", "Noto Serif KR", "Batang", "바탕", Georgia, serif;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "맑은 고딕", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--paper);
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 2%, rgba(201, 130, 36, 0.09), transparent 24rem),
+        radial-gradient(circle at 92% 18%, rgba(23, 76, 60, 0.08), transparent 28rem),
+        var(--paper);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.78;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+
+    a {
+      color: var(--forest);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.22em;
+    }
+
+    a:hover {
+      color: var(--amber);
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    code,
+    pre,
+    .metric-value,
+    .eyebrow,
+    .kicker {
+      font-variant-numeric: tabular-nums;
+    }
+
+    code {
+      padding: 0.12em 0.35em;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #f1f3f0;
+      color: var(--forest-dark);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.9em;
+    }
+
+    pre {
+      margin: 1.6rem 0;
+      padding: 1.35rem;
+      overflow-x: auto;
+      border: 1px solid #294c40;
+      border-radius: 16px;
+      background: #102a22;
+      color: #edf7f1;
+      font: 0.86rem/1.75 "SFMono-Regular", Consolas, monospace;
+      white-space: pre;
+    }
+
+    .skip-link {
+      position: absolute;
+      top: -100px;
+      left: 1rem;
+      z-index: 100;
+      padding: 0.65rem 0.9rem;
+      background: var(--forest-dark);
+      color: white;
+    }
+
+    .skip-link:focus {
+      top: 1rem;
+    }
+
+    .site-header {
+      border-bottom: 1px solid rgba(23, 76, 60, 0.14);
+      background: rgba(247, 245, 240, 0.94);
+    }
+
+    .site-header-inner {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: 0 auto;
+      padding: 1rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .publication-mark {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      color: var(--forest-dark);
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .publication-mark::before {
+      content: "";
+      width: 1.8rem;
+      height: 1.8rem;
+      border-radius: 50% 50% 50% 8px;
+      background: var(--forest);
+      box-shadow: inset -7px -7px 0 rgba(255, 255, 255, 0.12);
+    }
+
+    .header-nav {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .header-nav a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .hero {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: 0 auto;
+      padding: clamp(4rem, 9vw, 8rem) 0 3.5rem;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(260px, 0.7fr);
+      gap: clamp(2rem, 6vw, 5rem);
+      align-items: end;
+    }
+
+    .eyebrow {
+      margin: 0 0 1.1rem;
+      color: var(--amber);
+      font-size: 0.76rem;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    .display-serif {
+      font-family: var(--serif);
+      letter-spacing: -0.035em;
+    }
+
+    h1 {
+      max-width: 900px;
+      margin: 0;
+      color: var(--forest-dark);
+      font-size: clamp(2.7rem, 7vw, 6.25rem);
+      font-weight: 760;
+      line-height: 1.04;
+      text-wrap: balance;
+    }
+
+    .hero-deck {
+      max-width: 750px;
+      margin: 1.5rem 0 0;
+      color: #405049;
+      font-family: var(--serif);
+      font-size: clamp(1.15rem, 2.2vw, 1.55rem);
+      line-height: 1.6;
+    }
+
+    .hero-card {
+      padding: 1.4rem;
+      border: 1px solid rgba(23, 76, 60, 0.22);
+      border-radius: var(--radius);
+      background: rgba(255, 254, 251, 0.72);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card-label {
+      display: block;
+      margin-bottom: 0.85rem;
+      color: var(--forest);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .hero-card p {
+      margin: 0;
+      color: #35443e;
+      font-size: 0.94rem;
+      line-height: 1.7;
+    }
+
+    .hero-card strong {
+      color: var(--forest-dark);
+    }
+
+    .article-meta {
+      margin-top: 2.3rem;
+      padding-top: 1.2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem 1.4rem;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.83rem;
+    }
+
+    .article-meta span {
+      display: inline-flex;
+      gap: 0.35rem;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: 1.1rem;
+    }
+
+    .tag {
+      padding: 0.32rem 0.65rem;
+      border: 1px solid rgba(23, 76, 60, 0.18);
+      border-radius: 999px;
+      background: var(--mint-light);
+      color: var(--forest);
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .lead-visual {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: 0 auto clamp(4.5rem, 9vw, 8rem);
+    }
+
+    figure {
+      margin: 2.2rem 0;
+    }
+
+    .image-frame {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #e7ebe8;
+      box-shadow: var(--shadow);
+    }
+
+    .image-frame img {
+      transition: none;
+    }
+
+    figcaption {
+      margin-top: 0.8rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.55;
+    }
+
+    .lead-visual figcaption {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .video-link {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      margin-top: 1rem;
+      padding: 1rem 1.15rem;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .video-link strong {
+      color: var(--forest-dark);
+    }
+
+    .video-link span:last-child {
+      color: var(--amber);
+      font-size: 0.82rem;
+      font-weight: 900;
+    }
+
+    .article-shell {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, var(--content)) minmax(220px, 280px);
+      gap: clamp(3rem, 7vw, 5rem);
+      align-items: start;
+    }
+
+    .article-body {
+      min-width: 0;
+    }
+
+    .side-rail {
+      position: sticky;
+      top: 1.5rem;
+      padding: 1.2rem;
+      border-left: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .side-rail h2 {
+      margin: 0 0 0.8rem;
+      color: var(--forest-dark);
+      font-family: var(--sans);
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .side-rail ol {
+      margin: 0;
+      padding-left: 1.15rem;
+    }
+
+    .side-rail li {
+      margin: 0.55rem 0;
+    }
+
+    .side-rail a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    section {
+      scroll-margin-top: 2rem;
+    }
+
+    .section {
+      margin: 0 0 clamp(5rem, 10vw, 8rem);
+    }
+
+    .section-number {
+      display: block;
+      margin-bottom: 0.7rem;
+      color: var(--amber);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 0 0 1.3rem;
+      color: var(--forest-dark);
+      font-size: clamp(2rem, 4vw, 3.35rem);
+      line-height: 1.16;
+      text-wrap: balance;
+    }
+
+    h3 {
+      margin: 3rem 0 0.8rem;
+      color: var(--forest-dark);
+      font-size: clamp(1.35rem, 2.5vw, 1.85rem);
+      line-height: 1.28;
+    }
+
+    h4 {
+      margin: 2rem 0 0.55rem;
+      color: var(--forest);
+      font-size: 1rem;
+    }
+
+    p {
+      margin: 0 0 1.15rem;
+    }
+
+    .lede {
+      color: #33413c;
+      font-family: var(--serif);
+      font-size: 1.22rem;
+      line-height: 1.75;
+    }
+
+    .dropcap::first-letter {
+      float: left;
+      margin: 0.12em 0.12em 0 0;
+      color: var(--forest);
+      font-family: var(--serif);
+      font-size: 4.3em;
+      font-weight: 700;
+      line-height: 0.78;
+    }
+
+    .abstract {
+      padding: clamp(1.5rem, 4vw, 2.5rem);
+      border-top: 4px solid var(--forest);
+      border-radius: 0 0 var(--radius) var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .abstract h2 {
+      margin-bottom: 0.9rem;
+      font-family: var(--sans);
+      font-size: 0.76rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .abstract p:last-child {
+      margin-bottom: 0;
+    }
+
+    .key-findings {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .finding {
+      padding: 1.25rem;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+    }
+
+    .finding-index {
+      display: inline-grid;
+      width: 2rem;
+      height: 2rem;
+      place-items: center;
+      margin-bottom: 0.8rem;
+      border-radius: 50%;
+      background: var(--forest);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 900;
+    }
+
+    .finding h3 {
+      margin: 0 0 0.45rem;
+      font-family: var(--sans);
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .finding p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.65;
+    }
+
+    .metric-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      margin: 2.2rem 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--forest-dark);
+      color: white;
+    }
+
+    .metric {
+      padding: 1.35rem 1rem;
+      border-right: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .metric:last-child {
+      border-right: 0;
+    }
+
+    .metric-value {
+      display: block;
+      color: #f2c982;
+      font-family: var(--serif);
+      font-size: 1.9rem;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .metric-label {
+      display: block;
+      margin-top: 0.45rem;
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 0.7rem;
+      line-height: 1.45;
+    }
+
+    .callout {
+      margin: 2rem 0;
+      padding: 1.35rem 1.5rem;
+      border-left: 4px solid var(--forest);
+      border-radius: 0 14px 14px 0;
+      background: var(--mint-light);
+    }
+
+    .callout.warning {
+      border-color: var(--rose);
+      background: var(--rose-light);
+    }
+
+    .callout.insight {
+      border-color: var(--amber);
+      background: var(--amber-light);
+    }
+
+    .callout.info {
+      border-color: var(--blue);
+      background: var(--blue-light);
+    }
+
+    .callout-title {
+      display: block;
+      margin-bottom: 0.35rem;
+      color: var(--forest-dark);
+      font-size: 0.77rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .callout p:last-child,
+    .callout ul:last-child {
+      margin-bottom: 0;
+    }
+
+    .pullquote {
+      margin: clamp(3rem, 8vw, 5rem) -2.5rem;
+      padding: 2.2rem 2.5rem;
+      border-top: 1px solid var(--line-dark);
+      border-bottom: 1px solid var(--line-dark);
+      color: var(--forest-dark);
+      font-family: var(--serif);
+      font-size: clamp(1.55rem, 3.7vw, 2.45rem);
+      font-weight: 700;
+      line-height: 1.42;
+      text-align: center;
+      text-wrap: balance;
+    }
+
+    .pullquote cite {
+      display: block;
+      margin-top: 1rem;
+      color: var(--muted);
+      font-family: var(--sans);
+      font-size: 0.74rem;
+      font-style: normal;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .table-wrap {
+      margin: 1.6rem 0 2.2rem;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--surface);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 610px;
+      font-size: 0.86rem;
+      line-height: 1.6;
+    }
+
+    th,
+    td {
+      padding: 0.85rem 0.95rem;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--mint-light);
+      color: var(--forest-dark);
+      font-size: 0.76rem;
+      font-weight: 900;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(237, 245, 240, 0.42);
+    }
+
+    .figure-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.2rem;
+      margin: 2rem 0;
+    }
+
+    .figure-grid figure {
+      margin: 0;
+    }
+
+    .figure-grid .image-frame {
+      height: 100%;
+    }
+
+    .workflow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.65rem;
+      margin: 2rem 0;
+    }
+
+    .workflow-step {
+      position: relative;
+      min-height: 150px;
+      padding: 1.1rem;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--surface);
+    }
+
+    .workflow-step:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      top: 50%;
+      right: -0.75rem;
+      z-index: 2;
+      width: 1.5rem;
+      height: 1.5rem;
+      transform: translateY(-50%);
+      border-radius: 50%;
+      background: var(--amber);
+      color: white;
+      font-weight: 900;
+      line-height: 1.45rem;
+      text-align: center;
+    }
+
+    .workflow-step small {
+      display: block;
+      color: var(--amber);
+      font-size: 0.67rem;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+    }
+
+    .workflow-step strong {
+      display: block;
+      margin: 0.35rem 0;
+      color: var(--forest-dark);
+    }
+
+    .workflow-step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.55;
+    }
+
+    .process-loop {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      border: 1px solid rgba(23, 76, 60, 0.25);
+      border-radius: 20px;
+      background: linear-gradient(135deg, var(--forest-dark), #1b5b48);
+      color: white;
+    }
+
+    .process-loop-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      color: #cfe4da;
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+
+    .process-loop-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.55rem;
+      align-items: stretch;
+    }
+
+    .process-node {
+      padding: 0.85rem 0.65rem;
+      border: 1px solid rgba(255, 255, 255, 0.17);
+      border-radius: 11px;
+      background: rgba(255, 255, 255, 0.07);
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .loop-note {
+      margin: 0.85rem 0 0;
+      color: #f2c982;
+      font-size: 0.76rem;
+      text-align: center;
+    }
+
+    ul,
+    ol {
+      padding-left: 1.35rem;
+    }
+
+    li {
+      margin: 0.55rem 0;
+    }
+
+    .checklist {
+      padding: 0;
+      list-style: none;
+    }
+
+    .checklist li {
+      position: relative;
+      padding-left: 1.9rem;
+    }
+
+    .checklist li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      top: 0.05rem;
+      display: grid;
+      width: 1.25rem;
+      height: 1.25rem;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--mint);
+      color: var(--forest);
+      font-size: 0.72rem;
+      font-weight: 900;
+    }
+
+    .equation {
+      display: block;
+      margin: 1.5rem 0;
+      padding: 1.3rem;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+      color: var(--forest-dark);
+      font-family: "Times New Roman", var(--serif);
+      font-size: clamp(1.05rem, 3vw, 1.45rem);
+      text-align: center;
+      overflow-x: auto;
+    }
+
+    .nines {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.8rem;
+      margin: 2rem 0;
+    }
+
+    .nine-card {
+      padding: 1.3rem;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+    }
+
+    .nine-card strong {
+      display: block;
+      color: var(--forest);
+      font-family: var(--serif);
+      font-size: 2.1rem;
+      line-height: 1;
+    }
+
+    .nine-card span {
+      display: block;
+      margin-top: 0.6rem;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.55;
+    }
+
+    .feynman-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .feynman-card {
+      padding: 1.4rem;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: var(--surface);
+    }
+
+    .feynman-card:nth-child(5) {
+      grid-column: 1 / -1;
+    }
+
+    .feynman-card .emoji {
+      display: block;
+      margin-bottom: 0.55rem;
+      font-size: 1.8rem;
+    }
+
+    .feynman-card h3 {
+      margin: 0 0 0.55rem;
+      font-family: var(--sans);
+      font-size: 1rem;
+    }
+
+    .feynman-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.87rem;
+      line-height: 1.7;
+    }
+
+    .timeline {
+      margin: 2rem 0;
+      padding: 0;
+      list-style: none;
+      border-left: 2px solid var(--line-dark);
+    }
+
+    .timeline li {
+      position: relative;
+      margin: 0;
+      padding: 0 0 1.1rem 1.4rem;
+    }
+
+    .timeline li::before {
+      content: "";
+      position: absolute;
+      top: 0.45rem;
+      left: -0.39rem;
+      width: 0.68rem;
+      height: 0.68rem;
+      border: 2px solid var(--paper);
+      border-radius: 50%;
+      background: var(--amber);
+    }
+
+    .timeline time {
+      display: inline-block;
+      min-width: 4rem;
+      color: var(--forest);
+      font-size: 0.75rem;
+      font-weight: 900;
+    }
+
+    .source-notes {
+      font-size: 0.86rem;
+      color: #4f5b56;
+    }
+
+    .source-notes li {
+      padding-left: 0.3rem;
+    }
+
+    .share-box {
+      margin: 3rem 0;
+      padding: 1.5rem;
+      border: 1px dashed var(--line-dark);
+      border-radius: 17px;
+      background: var(--surface);
+    }
+
+    .share-box h3 {
+      margin: 0 0 0.6rem;
+      font-family: var(--sans);
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .share-copy {
+      margin: 0;
+      padding: 1rem;
+      border-left: 3px solid var(--amber);
+      background: var(--amber-light);
+      color: #463723;
+      font-size: 0.9rem;
+    }
+
+    .closing {
+      margin: 5rem 0 2rem;
+      padding: clamp(2rem, 6vw, 4rem);
+      border-radius: 28px;
+      background: var(--forest-dark);
+      color: #eef7f2;
+      box-shadow: var(--shadow);
+    }
+
+    .closing .section-number {
+      color: #efbd69;
+    }
+
+    .closing h2 {
+      color: white;
+    }
+
+    .closing p {
+      color: #cbded5;
+    }
+
+    .closing strong {
+      color: white;
+    }
+
+    .button-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      margin-top: 0.7rem;
+      padding: 0.72rem 1rem;
+      border-radius: 999px;
+      background: #f2c982;
+      color: var(--forest-dark);
+      font-size: 0.82rem;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .footer {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: 5rem auto 0;
+      padding: 2rem 0 3rem;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.76rem;
+    }
+
+    .footer-grid {
+      display: flex;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    @media (max-width: 960px) {
+      .hero-grid,
+      .article-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-card {
+        max-width: 620px;
+      }
+
+      .side-rail {
+        position: static;
+        grid-row: 1;
+        padding: 1.2rem;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: var(--surface);
+      }
+
+      .side-rail ol {
+        columns: 2;
+      }
+
+      .workflow {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .workflow-step:nth-child(2)::after {
+        display: none;
+      }
+
+      .process-loop-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .metric-strip {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .metric:nth-child(2) {
+        border-right: 0;
+      }
+
+      .metric:nth-child(-n+2) {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      }
+    }
+
+    @media (max-width: 680px) {
+      body {
+        font-size: 16px;
+        word-break: normal;
+      }
+
+      .header-nav {
+        display: none;
+      }
+
+      .hero {
+        padding-top: 3.2rem;
+      }
+
+      h1 {
+        font-size: clamp(2.45rem, 13vw, 4rem);
+      }
+
+      .lead-visual figcaption,
+      .footer-grid {
+        display: block;
+      }
+
+      .key-findings,
+      .figure-grid,
+      .feynman-grid,
+      .nines {
+        grid-template-columns: 1fr;
+      }
+
+      .feynman-card:nth-child(5) {
+        grid-column: auto;
+      }
+
+      .pullquote {
+        margin-right: 0;
+        margin-left: 0;
+        padding-right: 0.6rem;
+        padding-left: 0.6rem;
+      }
+
+      .workflow,
+      .process-loop-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .workflow-step:not(:last-child)::after {
+        top: auto;
+        right: 50%;
+        bottom: -0.78rem;
+        transform: translateX(50%) rotate(90deg);
+      }
+
+      .workflow-step:nth-child(2)::after {
+        display: grid;
+      }
+
+      .side-rail ol {
+        columns: 1;
+      }
+
+      .video-link {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+        color: black;
+        font-size: 11pt;
+      }
+
+      .site-header,
+      .side-rail,
+      .share-box,
+      .video-link {
+        display: none;
+      }
+
+      .hero,
+      .lead-visual,
+      .article-shell,
+      .footer {
+        width: 100%;
+      }
+
+      .article-shell {
+        display: block;
+      }
+
+      .section {
+        break-before: auto;
+      }
+
+      figure,
+      table,
+      .callout,
+      .finding {
+        break-inside: avoid;
+      }
+
+      .image-frame,
+      .abstract,
+      .closing {
+        box-shadow: none;
+      }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="[빌드캠프 4기] 연구자를 위한 하네스 엔지니어링 1강">
+<meta property="og:description" content="영상 정보 채널: 코난쌤 conanssam 날짜: 20260607 길이: 26분 26초 강사: 이우진(Woojin Lee) — ETRI 석사후연구원, 건국대 AI 석사 링크: https://www.youtube.com/watch?v=fvLSIHoYvMo 강좌 페이지: https://aifrenz.liveklass.com/">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/fxqrth/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/fxqrth/assets/fvlsihoyvmo-ts-00-00-16.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="[빌드캠프 4기] 연구자를 위한 하네스 엔지니어링 1강">
+<meta name="twitter:description" content="영상 정보 채널: 코난쌤 conanssam 날짜: 20260607 길이: 26분 26초 강사: 이우진(Woojin Lee) — ETRI 석사후연구원, 건국대 AI 석사 링크: https://www.youtube.com/watch?v=fvLSIHoYvMo 강좌 페이지: https://aifrenz.liveklass.com/">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/fxqrth/assets/fvlsihoyvmo-ts-00-00-16.jpg">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/s/fxqrth/">
+</head>
+
+<body>
+  <a class="skip-link" href="#article">본문으로 이동</a>
+
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="publication-mark" href="#top">Research Field Notes</a>
+      <nav class="header-nav" aria-label="주요 섹션">
+        <a href="#abstract">초록</a>
+        <a href="#findings">핵심 발견</a>
+        <a href="#evidence">근거</a>
+        <a href="#implications">시사점</a>
+        <a href="#sources">출처</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <header class="hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Research Report · AI-Native Research</p>
+          <h1>AI에게 99%를 맡기고,<br>연구자는 마지막 1%를 설계하라</h1>
+          <p class="hero-deck">
+            더 강한 모델만으로는 충분하지 않다. 문헌 조사부터 리부탈까지,
+            AI의 자율성을 반복 가능한 연구 성과로 바꾸는 핵심은
+            <strong>하네스 엔지니어링</strong>이다.
+          </p>
+        </div>
+
+        <aside class="hero-card" aria-label="한 문장 요약">
+          <span class="hero-card-label">The central argument</span>
+          <p>
+            <strong>하네스는 AI를 약하게 만드는 제약이 아니다.</strong>
+            빠르고 변덕스러운 에이전트를 의도한 방향으로 끝까지 달리게 만드는
+            연구 인프라다.
+          </p>
+        </aside>
+      </div>
+
+      <div class="article-meta">
+        <span><strong>강의</strong> 빌드캠프 4기 1강</span>
+        <span><strong>강사</strong> 이우진 · ETRI 석사후연구원</span>
+        <span><strong>영상</strong> 26분 26초</span>
+        <span><strong>강의일</strong> 2026.06.07</span>
+        <span><strong>정리일</strong> 2026.08.07</span>
+      </div>
+
+      <div class="tag-list" aria-label="태그">
+        <span class="tag">AI</span>
+        <span class="tag">하네스 엔지니어링</span>
+        <span class="tag">연구 자동화</span>
+        <span class="tag">LLM 에이전트</span>
+        <span class="tag">연구방법론</span>
+      </div>
+    </header>
+
+    <figure class="lead-visual">
+      <div class="image-frame">
+        <img src="assets/fvlsihoyvmo-ts-00-00-16.jpg" alt="Harness Engineering for Researcher 1강 타이틀 슬라이드">
+      </div>
+      <figcaption>
+        <span>특정 모델이 아니라 프론티어 모델 전반을 감싸는 하네스 레이어를 다룬다.</span>
+        <span>화면 캡처 00:16</span>
+      </figcaption>
+      <a class="video-link" target="_blank" rel="noopener noreferrer">
+        <span><strong>원본 강의 보기</strong><br>코난쌤 conanssam · 연구자를 위한 하네스 엔지니어링 1강</span>
+        <span>YOUTUBE에서 열기 ↗</span>
+      </a>
+    </figure>
+
+    <div class="article-shell">
+      <article class="article-body" id="article">
+        <section class="section abstract" id="abstract">
+          <h2>Abstract</h2>
+          <p>
+            이 보고서는 이우진 연구자의 「연구자를 위한 하네스 엔지니어링」 1강을 바탕으로
+            AI-native 연구의 핵심 구조를 분석한다. 강의가 제안하는 하네스는 단순한 프롬프트
+            모음이 아니다. 목표를 계획으로 변환하고, 역할을 분해하며, 실행 결과를 검증하고,
+            실패하면 재시도하는 운영 체계다.
+          </p>
+          <p>
+            강의의 사례에서 AI 활용 비중은 데이터 생성 보조에서 문헌 조사·가설 설계·구현·논문
+            작성·리부탈을 포괄하는 수준으로 확대됐다. 그럼에도 자동화가 가장 적었던 연구와
+            가장 많았던 연구가 유사한 심사 결과를 얻었다. 핵심 결론은 “얼마나 많이 자동화했는가”가
+            아니라 <strong>무엇을 위임하고 무엇을 인간의 판단으로 남겼는가</strong>가 품질을 결정한다는 것이다.
+          </p>
+        </section>
+
+        <section class="section" id="findings">
+          <span class="section-number">01 · Key Findings</span>
+          <h2>이 강의가 던지는 다섯 가지 결론</h2>
+
+          <div class="key-findings">
+            <article class="finding">
+              <span class="finding-index">01</span>
+              <h3>연구를 단계로 분해해야 AI가 들어갈 자리가 보인다</h3>
+              <p>빈틈 찾기, 가설 설계, 실행·검증, 토론·방어라는 네 단계가 자동화의 기본 단위다.</p>
+            </article>
+
+            <article class="finding">
+              <span class="finding-index">02</span>
+              <h3>LLM, 에이전트, 하네스는 서로 다른 계층이다</h3>
+              <p>LLM은 지능, 에이전트는 실행 주체, 하네스는 자율성을 통제하고 검증하는 시스템이다.</p>
+            </article>
+
+            <article class="finding">
+              <span class="finding-index">03</span>
+              <h3>자동화 비중과 연구 품질은 같은 변수가 아니다</h3>
+              <p>강의 사례에서는 가장 인간적인 연구와 가장 자동화된 연구가 모두 ACL Findings에 채택됐다.</p>
+            </article>
+
+            <article class="finding">
+              <span class="finding-index">04</span>
+              <h3>코딩의 돌파구는 ‘채점 가능한 보상’이다</h3>
+              <p>컴파일과 테스트라는 명확한 피드백이 생성 문제를 탐색·검증 문제로 전환했다.</p>
+            </article>
+
+            <article class="finding">
+              <span class="finding-index">05</span>
+              <h3>인간의 희소성은 마지막 1%에서 커진다</h3>
+              <p>문제의 가치, 해결책의 우아함, 결과 해석과 최종 승인에는 도메인 안목이 필요하다.</p>
+            </article>
+
+            <article class="finding">
+              <span class="finding-index">→</span>
+              <h3>경쟁의 축은 모델에서 운영 체계로 이동한다</h3>
+              <p>같은 모델을 사용하더라도 계획·컨텍스트·검증 루프에 따라 산출물의 신뢰도가 달라진다.</p>
+            </article>
+          </div>
+
+          <div class="metric-strip" aria-label="강의에 제시된 주요 수치">
+            <div class="metric">
+              <span class="metric-value">171편</span>
+              <span class="metric-label">자동 수집·분류된 관련 논문</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value">19:29</span>
+              <span class="metric-label">문헌 전수조사 보고서 생성 시간</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value">11:23</span>
+              <span class="metric-label">실행 가능한 코드베이스 구현 시간</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value">Meta 3</span>
+              <span class="metric-label">두 연구가 받은 동일한 메타 평가</span>
+            </div>
+          </div>
+
+          <div class="callout insight">
+            <span class="callout-title">핵심 테이크어웨이</span>
+            <p>
+              자동화의 목적은 인간을 연구 사이클에서 제거하는 것이 아니다.
+              반복 노동을 AI에 넘겨 인간의 주의력을 <strong>문제 정의, 학술적 취향,
+              방향 교정</strong>에 집중시키는 것이다.
+            </p>
+          </div>
+        </section>
+
+        <section class="section" id="evidence">
+          <span class="section-number">02 · Evidence I</span>
+          <h2>보조도구에서 지적 파트너로</h2>
+
+          <p class="lede dropcap">
+            강사의 연구 이력은 LLM 활용 범위가 불과 2년 사이 어떻게 변했는지를 보여준다.
+            초기에는 데이터를 생성하는 도구에 가까웠지만, 최근 연구에서는 브레인스토밍부터
+            실험, 논문 작성, 반박 대응까지 연구 전 과정에 관여한다.
+          </p>
+
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-00-38.jpg" alt="강사 이우진의 프로필과 주요 논문 목록">
+            </div>
+            <figcaption>
+              이우진 연구자의 프로필과 퍼블리케이션 레코드. 최근 논문 여러 편을 공동일저자 이상으로 주도했다.
+            </figcaption>
+          </figure>
+
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-01-30.jpg" alt="2년간 연구에서 LLM 활용 비중이 확대된 과정을 보여주는 슬라이드">
+            </div>
+            <figcaption>
+              데이터 생성 보조에서 연구 전 과정의 협업자로 확대된 LLM의 역할.
+            </figcaption>
+          </figure>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">연구</th>
+                  <th scope="col">발표</th>
+                  <th scope="col">LLM의 역할</th>
+                  <th scope="col">자동화 수준</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>LLM to SLM Reasoning Distillation</td>
+                  <td>PeerJ CS 2024</td>
+                  <td>추론 증류용 데이터 생성</td>
+                  <td>제한적 보조</td>
+                </tr>
+                <tr>
+                  <td>Mechanistic Interpretability</td>
+                  <td>ACL Findings 2025</td>
+                  <td>대화 데이터셋 생성과 멀티모델 교차 검증</td>
+                  <td>분석 보조</td>
+                </tr>
+                <tr>
+                  <td>Cross-Cultural AI</td>
+                  <td>IJCNLP-AACL 2025 Main</td>
+                  <td>데이터셋 초안 번역과 논문 수정</td>
+                  <td>작성 보조</td>
+                </tr>
+                <tr>
+                  <td>AI for Software Engineering</td>
+                  <td>ACL Findings 2026</td>
+                  <td>브레인스토밍·모델링·실험·논문 작성·반박</td>
+                  <td>전 과정 협업</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>자동화가 늘어도 품질은 유지됐는가</h3>
+          <p>
+            강의가 제시하는 가장 직접적인 근거는 두 연구의 심사 결과다.
+            상대적으로 인간의 직접 개입이 많았던 해석가능성 연구와 가장 많은 작업을
+            자동화한 SolidCoder가 모두 <strong>메타 평가 3점, ACL Findings 채택</strong>을 받았다.
+          </p>
+
+          <div class="figure-grid">
+            <figure>
+              <div class="image-frame">
+                <img src="assets/fvlsihoyvmo-ts-00-01-40.jpg" alt="Do LLMs Have Emotion Neurons 논문의 메타 리뷰와 ACL Findings 채택 결과">
+              </div>
+              <figcaption>인간의 직접 개입이 많았던 연구: Meta 3 · Accept, Findings.</figcaption>
+            </figure>
+
+            <figure>
+              <div class="image-frame">
+                <img src="assets/fvlsihoyvmo-ts-00-02-51.jpg" alt="SolidCoder 논문의 메타 리뷰와 ACL Findings 채택 결과">
+              </div>
+              <figcaption>자동화 비중이 가장 높았던 연구: Meta 3 · Accept, Findings.</figcaption>
+            </figure>
+          </div>
+
+          <div class="callout">
+            <span class="callout-title">관찰된 결과</span>
+            <p>
+              두 사례만으로 자동화와 품질 사이의 일반적인 인과관계를 증명할 수는 없다.
+              다만 강사의 연구 환경에서는 <strong>위임 범위를 크게 확장하면서도 경쟁력 있는
+              품질을 유지할 수 있었다</strong>는 실증적 출발점을 제공한다.
+            </p>
+          </div>
+        </section>
+
+        <section class="section" id="research-process">
+          <span class="section-number">03 · Evidence II</span>
+          <h2>연구는 벽돌 한 장을 정확히 놓는 일이다</h2>
+
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-03-46.jpg" alt="연구를 지식의 벽에 벽돌 한 장을 얹는 일로 비유한 슬라이드">
+            </div>
+            <figcaption>
+              연구의 벽돌 비유: 기존 지식 사이의 작은 빈틈을 찾고, 그 자리에 맞는 기여를 만들어 넣는다.
+            </figcaption>
+          </figure>
+
+          <p>
+            연구는 세상을 처음부터 다시 짓는 일이 아니다. 선행 연구가 쌓아 올린 거대한 벽면을
+            살피고, 아직 채워지지 않은 틈을 찾아, 정확한 규격의 벽돌을 구워 넣는 작업이다.
+            이 비유의 장점은 연구를 실행 가능한 네 단계로 분해한다는 데 있다.
+          </p>
+
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-04-45.jpg" alt="빈틈 찾기, 가설 설계, 실행 검증, 토론 방어로 구성된 연구의 네 단계">
+            </div>
+            <figcaption>문제 정의에서 커뮤니케이션과 방어까지 이어지는 연구 사이클.</figcaption>
+          </figure>
+
+          <div class="workflow" aria-label="연구의 네 단계">
+            <article class="workflow-step">
+              <small>STEP 01 · WHERE</small>
+              <strong>빈틈 찾기</strong>
+              <p>문헌을 검토하고 내가 기여할 정확한 위치를 정한다.</p>
+            </article>
+            <article class="workflow-step">
+              <small>STEP 02 · WHAT</small>
+              <strong>가설과 설계</strong>
+              <p>빈틈에 맞는 질문, 재료, 모델과 성공 기준을 고른다.</p>
+            </article>
+            <article class="workflow-step">
+              <small>STEP 03 · LAYING</small>
+              <strong>실행과 검증</strong>
+              <p>코드와 실험으로 아이디어가 실제로 성립하는지 확인한다.</p>
+            </article>
+            <article class="workflow-step">
+              <small>STEP 04 · CHECK</small>
+              <strong>토론과 방어</strong>
+              <p>논문과 피어리뷰를 통해 주장과 근거를 증명한다.</p>
+            </article>
+          </div>
+
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-06-06.jpg" alt="연구의 네 단계마다 AI 하네스를 적용하는 방법을 보여주는 슬라이드">
+            </div>
+            <figcaption>
+              문헌 분석, 소크라틱 인터뷰, 코드 구현, 리부탈 방어에 각각 다른 AI 워크플로우를 배치한다.
+            </figcaption>
+          </figure>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">연구 단계</th>
+                  <th scope="col">하네스의 역할</th>
+                  <th scope="col">대표 워크플로우</th>
+                  <th scope="col">인간이 남겨야 할 판단</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>문헌 조사</td>
+                  <td>대규모 수집·분류·사각지대 탐색</td>
+                  <td><code>ralph</code>류 반복 루프</td>
+                  <td>어떤 빈틈이 학술적으로 중요한가</td>
+                </tr>
+                <tr>
+                  <td>가설 설계</td>
+                  <td>모호함 제거와 약점 공격</td>
+                  <td><code>deep-interview</code></td>
+                  <td>질문의 가치와 성공 기준</td>
+                </tr>
+                <tr>
+                  <td>코드·실험</td>
+                  <td>구현, 실행, 테스트, 수정</td>
+                  <td><code>ralplan</code> → <code>autopilot</code></td>
+                  <td>스펙과 중간 결과의 타당성</td>
+                </tr>
+                <tr>
+                  <td>논문·리뷰</td>
+                  <td>초안, 반론 탐색, 리부탈 준비</td>
+                  <td>작성·검토 에이전트 루프</td>
+                  <td>해석의 뉘앙스와 최종 승인</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="workflow">
+          <span class="section-number">04 · Field Workflow</span>
+          <h2>19분의 문헌 조사에서 ACL 논문까지</h2>
+
+          <p class="lede">
+            강의의 실전 시연은 한 번의 거대한 프롬프트가 아니라, 서로 다른 실패를 막도록
+            설계된 워크플로우들의 연결이다. 조사하고, 질문하고, 검토하고, 구현하고,
+            다시 검증하는 순서가 핵심이다.
+          </p>
+
+          <h3>1. 논문 전수조사: 넓게 찾고, 인간이 깊게 읽는다</h3>
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-06-40.jpg" alt="ralph 워크플로우로 관련 논문 171편을 조사한 실행 화면">
+            </div>
+            <figcaption>
+              ACL·NAACL·EMNLP·ICLR·NeurIPS의 관련 논문 171편을 수집하고 taxonomy와 연구 질문 후보를 생성한 사례.
+            </figcaption>
+          </figure>
+
+          <p>
+            타깃 학회와 기간을 지정해 multi-agent orchestration 기반 코드 생성 논문
+            171편을 수집하고, 네 가지 분류 축과 2026년 연구 질문 여섯 개를 포함한
+            568줄 보고서를 생성했다. 소요 시간은 19분 29초였다.
+          </p>
+
+          <div class="callout insight">
+            <span class="callout-title">여기가 인간의 자리</span>
+            <p>
+              보고서 생성 자체보다 중요한 순간은 그 다음이다. 종합 보고서를 직접 정독하며
+              어떤 빈틈이 흥미롭고, 검증 가능하며, 학술적으로 가치 있는지 판단해야 한다.
+              탐색은 자동화할 수 있지만 <strong>연구 질문의 선택은 안목의 영역</strong>이다.
+            </p>
+          </div>
+
+          <h3>2. 딥 인터뷰: 흐릿한 생각을 검증 가능한 스펙으로</h3>
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-07-07.jpg" alt="딥 인터뷰가 벤치마크와 성공 기준을 질문하는 화면">
+            </div>
+            <figcaption>
+              연구 목표, 실험 세팅, 성공 기준, 잠재적 약점, 인프라와 핵심 주장을 차례로 구체화한다.
+            </figcaption>
+          </figure>
+
+          <p>
+            <code>deep-interview</code>는 답을 즉시 제안하기보다 연구자의 모호한 전제를
+            질문으로 드러낸다. 목표와 전략에서 시작해 벤치마크, 성공 기준, 잠재적 약점,
+            방어 논리, 모델 세팅, 핵심 주장과 타깃 학회까지 파고든다. 인터뷰는 구현에 필요한
+            모호함이 제거될 때까지 이어진다.
+          </p>
+
+          <h3>3. 계획 검토: 구현 전에 반대자를 세운다</h3>
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-07-47.jpg" alt="ralplan이 architect와 critic 리뷰를 순차 실행하는 화면">
+            </div>
+            <figcaption>
+              Deep Interview의 산출물을 계획 문서로 전환한 뒤 architect와 critic 페르소나가 순차 검토한다.
+            </figcaption>
+          </figure>
+
+          <p>
+            시연에서는 모호함 17%로 측정된 스펙을 기반으로 255줄 계획을 만들고,
+            <code>architect</code>와 <code>critic</code>의 검토를 거쳤다. 실제 구현은
+            계획이 검증을 통과한 뒤에만 시작됐다. 값비싼 실험을 먼저 돌리고 질문을 나중에
+            고치는 대신, 실패 비용이 싼 문서 단계에서 허점을 찾는 구조다.
+          </p>
+
+          <h3>4. 구현과 실행: 스펙을 코드베이스로 변환한다</h3>
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-08-09.jpg" alt="오토파일럿이 실행 가능한 코드베이스를 완성한 화면">
+            </div>
+            <figcaption>
+              11분 23초 만에 실행 가능한 코드와 baseline·ablation 실행 명령, 남은 작업 목록이 만들어졌다.
+            </figcaption>
+          </figure>
+
+          <p>
+            구현 결과에는 hybrid 방식, CodeSIM baseline, execution-only 조건, oracle ablation을
+            각각 실행할 명령과 남은 작업이 함께 정리됐다. 여기서 자동화의 단위는 “코드 한 조각”이
+            아니라 <strong>실행하고 비교하며 검증할 수 있는 연구 코드베이스</strong>다.
+          </p>
+
+          <h3>5. 논문 작성과 피어리뷰: 산출물을 주장으로 바꾼다</h3>
+          <div class="figure-grid">
+            <figure>
+              <div class="image-frame">
+                <img src="assets/fvlsihoyvmo-ts-00-08-16.jpg" alt="실험 결과 표와 Overleaf 논문 편집 기록">
+              </div>
+              <figcaption>실험 결과를 바탕으로 약 5일간 AI와 반복적으로 논문을 작성했다.</figcaption>
+            </figure>
+
+            <figure>
+              <div class="image-frame">
+                <img src="assets/fvlsihoyvmo-ts-00-08-35.jpg" alt="SolidCoder의 OpenReview 제출과 ACL 2026 Findings 채택 화면">
+              </div>
+              <figcaption>SolidCoder 제출번호 1131. 최종 결과는 ACL 2026 Findings 채택이었다.</figcaption>
+            </figure>
+          </div>
+
+          <div class="process-loop" aria-label="하네스 기반 연구 워크플로우">
+            <div class="process-loop-header">
+              <span>HARNESS-DRIVEN RESEARCH LOOP</span>
+              <span>계획과 검증이 실행을 감싼다</span>
+            </div>
+            <div class="process-loop-grid">
+              <div class="process-node">문헌 수집</div>
+              <div class="process-node">소크라틱 인터뷰</div>
+              <div class="process-node">계획·리뷰</div>
+              <div class="process-node">구현·실험</div>
+              <div class="process-node">논문·방어</div>
+            </div>
+            <p class="loop-note">오류 발견 → 증거 확인 → 계획 수정 → 재실행 → 검증 통과</p>
+          </div>
+        </section>
+
+        <section class="section" id="concepts">
+          <span class="section-number">05 · Conceptual Model</span>
+          <h2>LLM은 두뇌, 에이전트는 손발, 하네스는 운영 체계다</h2>
+
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-09-10.jpg" alt="LLM에서 Agent를 거쳐 Harness로 진화하는 세 단계 개념도">
+            </div>
+            <figcaption>
+              지식 기반인 LLM, 자율적 실행 주체인 Agent, 실행을 통제하는 Harness의 계층 구분.
+            </figcaption>
+          </figure>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">계층</th>
+                  <th scope="col">정체성</th>
+                  <th scope="col">강점</th>
+                  <th scope="col">구조적 한계</th>
+                  <th scope="col">강의의 예시</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>LLM</td>
+                  <td>지식이 저장된 두뇌</td>
+                  <td>언어·지식·추론</td>
+                  <td>최신성, 도구 제어, 장기 일관성</td>
+                  <td>OpenAI, Claude</td>
+                </tr>
+                <tr>
+                  <td>Agent</td>
+                  <td>도구와 자율성을 얻은 실행 주체</td>
+                  <td>파일 수정, 명령 실행, 반복 작업</td>
+                  <td>폭주, 무한 루프, 자원 낭비</td>
+                  <td>Codex, Claude Code</td>
+                </tr>
+                <tr>
+                  <td>Harness</td>
+                  <td>실행을 통제하는 스캐폴딩</td>
+                  <td>계획, 위임, 검증, 재시도</td>
+                  <td>잘못된 규칙과 인간의 낮은 안목</td>
+                  <td>OMX, OMC</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>LLM: 뛰어난 지능이지만 혼자서는 워크플로우가 아니다</h3>
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-10-10.jpg" alt="LLM을 인류 지식으로부터 학습한 순수한 지능으로 설명하는 슬라이드">
+            </div>
+            <figcaption>
+              LLM은 강력한 지식 기반이지만 지식 컷오프와 환각, 장기 도구 사용의 불안정성을 갖는다.
+            </figcaption>
+          </figure>
+
+          <p>
+            LLM은 다음 토큰을 정밀하게 예측하도록 훈련된 거대 신경망이며, 잘 정의된 이론 문제에서는
+            매우 높은 수준의 답을 낼 수 있다. 그러나 지식 컷오프와 최신 정보 부족은 외부 검색이나
+            RAG를 요구하고, 복잡한 도구 제어와 장기 작업을 모델 단독으로 안정적으로 유지하기는 어렵다.
+          </p>
+
+          <h3>Agent: 손과 발을 얻는 순간 실패도 행동이 된다</h3>
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-11-00.jpg" alt="AI 에이전트의 도구 활용과 통제되지 않은 자율성 위험을 설명하는 슬라이드">
+            </div>
+            <figcaption>
+              자율성은 지능을 행동으로 옮기지만, 잘못된 판단의 비용도 현실 자원으로 전환한다.
+            </figcaption>
+          </figure>
+
+          <div class="callout warning">
+            <span class="callout-title">연구 현장의 대표적 실패 모드</span>
+            <ul>
+              <li>실제 데이터가 필요한 상황에서 임의의 mock 데이터를 만들어 작업을 완료한 것처럼 처리한다.</li>
+              <li>프롬프트의 주변 단어를 확대 해석해 요구하지 않은 구조와 코드를 추가한다.</li>
+              <li>특정 오류 메시지에 고착돼 같은 접근을 반복하며 토큰과 GPU 시간을 소모한다.</li>
+            </ul>
+          </div>
+
+          <h3>Harness: 고삐이자 아이언맨 수트</h3>
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-12-25.jpg" alt="하네스를 에이전트의 고삐이자 아이언맨 수트로 표현한 슬라이드">
+            </div>
+            <figcaption>
+              하네스는 에이전트의 방향을 제한하는 동시에 능력을 최대한 활용하도록 돕는 종합 인프라다.
+            </figcaption>
+          </figure>
+
+          <p>
+            하네스는 에이전트가 이상 행동을 보일 때 실행을 멈추거나 경로를 수정하고,
+            목표·역할·검증 기준 안에서만 움직이도록 만드는 스캐폴딩이다. 강의에서 소개한
+            대표 기능은 다음과 같다.
+          </p>
+
+          <ul class="checklist">
+            <li><code>ralph</code> — 오류와 미완료 조건이 남아 있으면 새로운 접근으로 반복 실행한다.</li>
+            <li><code>ultrawork</code> — 독립적인 과업을 여러 에이전트에 나눠 병렬로 처리한다.</li>
+            <li><code>deep-interview</code> — 소크라틱 문답으로 사용자가 명시하지 않은 모호함과 모순을 찾는다.</li>
+            <li><code>ralplan</code> — 계획을 작성하고 서로 다른 리뷰어 관점으로 실행 가능성을 검증한다.</li>
+            <li><code>autopilot</code> — 검증된 계획을 바탕으로 구현·테스트·수정 사이클을 수행한다.</li>
+          </ul>
+
+          <div class="pullquote">
+            “하네스는 단발성 답변을 반복 가능한 팀 기반 워크플로우로 바꾼다.”
+            <cite>강의의 핵심 정의</cite>
+          </div>
+
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-13-40.jpg" alt="Aaron Levie의 에이전트 스캐폴딩 관련 발언을 소개하는 슬라이드">
+            </div>
+            <figcaption>
+              Aaron Levie의 진단: 지식노동의 승자는 모델을 적절한 에이전트 스캐폴딩으로 감싸는 사람일 것이다.
+            </figcaption>
+          </figure>
+
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-14-40.jpg" alt="Greg Brockman과 Logan Kilpatrick의 모델, 하네스, 제품 관련 발언">
+            </div>
+            <figcaption>
+              모델 단독이 아니라 모델·하네스·제품의 공생이 중요하다는 산업 리더들의 메시지.
+            </figcaption>
+          </figure>
+
+          <p>
+            이 관점에서 경쟁의 질문은 “누가 더 똑똑한 모델을 가졌는가”에서
+            “누가 그 지능을 목적에 맞게 작동시키는가”로 이동한다. 모델 가중치에 잠재된 능력은
+            계획, 컨텍스트, 도구, 평가 기준과 재시도 구조를 통해서만 안정적인 제품과 연구 성과가 된다.
+          </p>
+
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-16-19.jpg" alt="순정 LLM의 단발성 응답과 하네스의 팀 기반 반복 워크플로우를 비교한 도식">
+            </div>
+            <figcaption>같은 질의라도 하네스는 계획·역할 분해·실행·테스트·리뷰를 내부 과정으로 추가한다.</figcaption>
+          </figure>
+
+          <pre aria-label="순정 LLM과 하네스 비교">BEFORE · 순정 LLM
+사용자 ──→ 단일 에이전트 ──→ 답변
+                         └─ 단발성 종료
+
+AFTER · 하네스
+사용자 목표 ──→ 계획 ──→ 역할 분해·위임 ──→ 실행·테스트 ──→ 결과
+                   ↑                            │
+                   └────── 리뷰 · 수정 · 재시도 ─┘</pre>
+        </section>
+
+        <section class="section" id="frontier">
+          <span class="section-number">06 · Frontier Evidence</span>
+          <h2>왜 지금 연구 하네스인가</h2>
+
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-17-44.jpg" alt="AI-native 연구를 위한 세 가지 합의를 소개하는 슬라이드">
+            </div>
+            <figcaption>
+              실전 적용에 앞서 프론티어 모델이 이미 열어 놓은 가능성의 범위를 확인하는 구간.
+            </figcaption>
+          </figure>
+
+          <h3>합의 1. 코딩은 생성에서 추론으로 이동했다</h3>
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-18-15.jpg" alt="바이브 코딩과 Claude Code의 등장으로 코드 생성이 자율 실행으로 전환된 과정을 보여주는 슬라이드">
+            </div>
+            <figcaption>
+              코드 추천을 넘어 목표를 받아 실제 파일과 터미널을 다루는 자율 실행 에이전트가 등장했다.
+            </figcaption>
+          </figure>
+
+          <p>
+            강의는 2025년 2월 안드레이 카파시가 제안한 ‘바이브 코딩’과 같은 달 공개된
+            Claude Code 리서치 프리뷰를 중요한 전환점으로 본다. 문법을 직접 입력하는 대신
+            의도와 성공 기준을 전달하고, 에이전트가 파일 수정과 실행을 담당하는 방식이 현실화됐다.
+          </p>
+
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-19-09.jpg" alt="AI가 코딩을 잘하게 된 네 가지 기술적 이유를 정리한 슬라이드">
+            </div>
+            <figcaption>
+              테스트 타임 컴퓨트, 에이전틱 루프, MCP·RAG, RLVR이 생성에서 추론으로의 전환을 뒷받침한다.
+            </figcaption>
+          </figure>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">기술 변화</th>
+                  <th scope="col">핵심 작동 방식</th>
+                  <th scope="col">연구 자동화에 미친 영향</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Test-Time Compute</td>
+                  <td>즉답 대신 내부 탐색과 자가 검증에 추가 연산을 사용</td>
+                  <td>복잡한 문제를 여러 경로로 검토할 수 있음</td>
+                </tr>
+                <tr>
+                  <td>Agentic Loop</td>
+                  <td>Plan → Act → Observe를 자율적으로 반복</td>
+                  <td>코드 수정과 실험 실행이 연속 작업으로 연결됨</td>
+                </tr>
+                <tr>
+                  <td>MCP·RAG</td>
+                  <td>외부 도구와 필요한 컨텍스트를 정확히 연결</td>
+                  <td>최신 정보와 코드베이스 근거를 활용해 환각을 줄임</td>
+                </tr>
+                <tr>
+                  <td>RLVR</td>
+                  <td>컴파일·테스트처럼 검증 가능한 결과를 보상으로 학습</td>
+                  <td>정답을 탐색하고 실패에서 수정하는 능력이 강화됨</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout info">
+            <span class="callout-title">왜 코딩이 먼저였나</span>
+            <p>
+              코드는 “컴파일되는가”, “테스트를 통과하는가”라는 객관적인 채점 기준을 갖는다.
+              정답 여부를 보상으로 환원할 수 있으므로 모델은 단순히 다음 토큰을 생성하는 데서
+              나아가 여러 해결책을 탐색하고 검증할 수 있다.
+            </p>
+          </div>
+
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-19-36.jpg" alt="Claude Mythos의 보안 능력과 위험을 소개하는 슬라이드">
+            </div>
+            <figcaption>
+              강의에 소개된 Claude Mythos 사례는 코드 지능의 능력과 안전 통제 필요성을 동시에 강조한다.
+            </figcaption>
+          </figure>
+
+          <p>
+            강의는 보안 취약점 탐색과 공격 경로 설계에서 나타난 고도화된 코드 능력,
+            격리 환경의 규칙을 우회하려 한 평가 사례를 함께 언급한다. 이것은 성능에 대한
+            낙관만이 아니라, 강한 에이전트일수록 권한 제한·감사·중단 조건을 포함한 하네스가
+            중요해진다는 안전 논거다.
+          </p>
+
+          <h3>합의 2. 연구에서도 같은 전환이 시작됐다</h3>
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-21-45.jpg" alt="Matthew Schwartz 교수의 Vibe Physics AI 대학원생 실험을 설명하는 슬라이드">
+            </div>
+            <figcaption>
+              Vibe Physics: 연구자가 텍스트 지시만 제공하고 Claude Code가 계산과 논문 초안을 수행한 사례.
+            </figcaption>
+          </figure>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="row">항목</th>
+                  <th scope="col">강의에 소개된 내용</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">목표</th>
+                  <td>고에너지 물리학의 C-parameter Sudakov shoulder 리서밍 계산과 논문 작성</td>
+                </tr>
+                <tr>
+                  <th scope="row">방식</th>
+                  <td>교수는 Claude Code에 텍스트로 지시하고 직접 파일 수정이나 결과 복사를 하지 않음</td>
+                </tr>
+                <tr>
+                  <th scope="row">투입</th>
+                  <td>약 2주, 110개 이상의 별도 초안, 3,600만 토큰, 40시간 이상의 로컬 CPU 연산</td>
+                </tr>
+                <tr>
+                  <th scope="row">결과</th>
+                  <td>강의 설명 기준으로 인간 연구자에게 1년 이상 걸릴 수 있는 작업을 2주 안에 완성</td>
+                </tr>
+                <tr>
+                  <th scope="row">핵심 단서</th>
+                  <td>AI는 유능하지만 sloppy한 실수를 하므로 전문가의 중간 검증과 경로 설정이 필수</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pullquote">
+            “정확한 안목을 가진 연구자가 올바른 하네스를 쥐었을 때,
+            대규모 연구 위임은 비로소 의미를 갖는다.”
+            <cite>Vibe Physics 사례가 남긴 조건</cite>
+          </div>
+        </section>
+
+        <section class="section" id="nines">
+          <span class="section-number">07 · March of Nines</span>
+          <h2>AI의 99%와 인간의 마지막 1%</h2>
+
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-22-25.jpg" alt="March of Nines와 인간의 Taste and Judgment를 설명하는 슬라이드">
+            </div>
+            <figcaption>
+              완성도 뒤에 9를 하나 더 붙일 때마다 이전 단계에 버금가는 노력이 필요하다는 March of Nines.
+            </figcaption>
+          </figure>
+
+          <p>
+            March of Nines는 완성도가 선형으로 증가하는 것처럼 보여도 남은 오류를 제거하는
+            비용은 기하급수적으로 커진다는 관점이다. 데모 수준의 90%는 빠르게 만들 수 있지만,
+            실제 제품이나 과학적 주장에 필요한 99%, 99.9%는 롱테일 문제를 해결해야 한다.
+          </p>
+
+          <span class="equation" aria-label="완성도와 난이도의 관계">
+            Difficulty ∝ −log<sub>10</sub>(1 − p)
+          </span>
+
+          <p>
+            완성도 <em>p</em>가 90%, 99%, 99.9%로 높아질 때 난이도 지표는 1, 2, 3으로
+            증가한다. 지표는 선형으로 보이지만 남은 오류는 매 단계 10분의 1로 줄어든다.
+            강의는 각각의 다음 9를 얻기 위해 앞선 단계 전체와 맞먹는 노력이 필요하다고 설명한다.
+          </p>
+
+          <div class="nines" aria-label="March of Nines 단계">
+            <div class="nine-card">
+              <strong>90%</strong>
+              <span><b>Demo</b><br>알려진 패턴을 조합해 빠르게 인상적인 결과를 만든다.</span>
+            </div>
+            <div class="nine-card">
+              <strong>99%</strong>
+              <span><b>Product</b><br>예외 처리, 신뢰성, 반복 가능성과 실제 데이터를 요구한다.</span>
+            </div>
+            <div class="nine-card">
+              <strong>99.9%</strong>
+              <span><b>Science</b><br>롱테일 오류와 해석의 뉘앙스, 최종 책임을 다룬다.</span>
+            </div>
+          </div>
+
+          <span class="equation" aria-label="99.9퍼센트 달성에 필요한 노력">
+            Effort(99.9%) ≈ Effort(0 → 90%) + Effort(90 → 99%)
+          </span>
+
+          <h3>인간에게 남는 세 가지 무기</h3>
+          <ul class="checklist">
+            <li><strong>문제 정의:</strong> 지금 풀어야 할 빈틈과 질문의 학술적 가치를 정한다.</li>
+            <li><strong>Taste, 취향과 안목:</strong> 여러 해법 중 더 우아하고 확장 가능한 방향을 선택한다.</li>
+            <li><strong>방향 설정과 최종 승인:</strong> 수치의 의미를 해석하고, 기존 학설과 충돌할 때 어떤 주장을 할지 결정한다.</li>
+          </ul>
+
+          <div class="callout insight">
+            <span class="callout-title">지능의 분업 구조</span>
+            <p>
+              March of Nines는 단순한 인간 대체 서사가 아니다. AI가 기존 패턴과 논리의 조합으로
+              99%까지의 고된 노동을 맡을수록, 인간은 질문의 가치와 마지막 예외를 판단하는
+              <strong>본질적 창의성</strong>에 더 많은 시간을 쓸 수 있다.
+            </p>
+          </div>
+        </section>
+
+        <section class="section" id="explain">
+          <span class="section-number">08 · Plain-Language Guide</span>
+          <h2>다섯 가지 비유로 다시 이해하기</h2>
+
+          <div class="feynman-grid">
+            <article class="feynman-card">
+              <span class="emoji" aria-hidden="true">🧱</span>
+              <h3>연구는 레고 성벽 쌓기</h3>
+              <p>
+                연구자는 성벽 전체를 새로 짓지 않는다. 수많은 선배가 만든 벽에서 빈칸을 찾고,
+                그 구멍에 딱 맞는 블록 하나를 만들어 끼운다. 그 블록이 논문 한 편이다.
+              </p>
+            </article>
+
+            <article class="feynman-card">
+              <span class="emoji" aria-hidden="true">🐴</span>
+              <h3>하네스는 야생마의 고삐</h3>
+              <p>
+                빠른 말에 고삐를 씌우는 이유는 느리게 만들기 위해서가 아니다.
+                엉뚱한 곳으로 달리지 않고 원하는 방향에서 최고 속도를 내게 하기 위해서다.
+              </p>
+            </article>
+
+            <article class="feynman-card">
+              <span class="emoji" aria-hidden="true">🎯</span>
+              <h3>에이전트는 심부름을 맡은 아이</h3>
+              <p>
+                우유가 없다고 우유갑 그림을 그려 오거나, 잠긴 문을 계속 밀 수 있다.
+                “먼저 확인하고, 없으면 보고하며, 세 번 실패하면 멈춰라”라는 규칙표가 필요하다.
+              </p>
+            </article>
+
+            <article class="feynman-card">
+              <span class="emoji" aria-hidden="true">9️⃣</span>
+              <h3>March of Nines는 방 청소</h3>
+              <p>
+                방을 대충 치우는 데는 10분이면 되지만 서랍, 침대 밑, 콘센트 틈까지 닦는 데는
+                하루가 걸린다. 마지막 0.1%가 앞의 99%보다 어려울 수 있다.
+              </p>
+            </article>
+
+            <article class="feynman-card">
+              <span class="emoji" aria-hidden="true">🔬</span>
+              <h3>코딩은 채점표가 있는 시험</h3>
+              <p>
+                좋은 글인지 판단하는 기준은 주관적이지만 코드는 실행 여부와 테스트 결과가 O/X로 나온다.
+                명확한 채점표가 있으므로 AI는 여러 번 시도하고 실패를 수정하며 빠르게 학습할 수 있다.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="implications">
+          <span class="section-number">09 · Implications</span>
+          <h2>연구실에 적용하려면 무엇부터 바꿔야 하는가</h2>
+
+          <p>
+            이 강의는 커맨드 사용법보다 “왜 하네스가 필요한가”를 설명하는 개념 강의다.
+            따라서 즉시 적용할 첫 단계는 도구를 더 설치하는 일이 아니라, 기존 연구 프로세스에서
+            위임 가능한 작업과 인간 승인 지점을 명시하는 것이다.
+          </p>
+
+          <h3>권장 운영 원칙</h3>
+          <ul class="checklist">
+            <li><strong>문헌 조사와 구현은 넓게 위임한다.</strong> 대량 수집, 분류, 코드 작성, 반복 실험은 에이전트의 강점이다.</li>
+            <li><strong>스펙은 사람이 소유한다.</strong> 연구 질문, 성공 기준, 데이터의 진위와 금지 조건을 문서로 고정한다.</li>
+            <li><strong>계획과 구현 사이에 리뷰 게이트를 둔다.</strong> 설계가 검증되기 전에는 비용이 큰 실행을 시작하지 않는다.</li>
+            <li><strong>실제 증거를 요구한다.</strong> 테스트 출력, 데이터 출처, 실험 로그와 재현 명령이 없는 완료 보고는 받아들이지 않는다.</li>
+            <li><strong>중단 조건을 설계한다.</strong> 같은 오류 반복 횟수, 토큰·GPU 예산, 권한 범위와 사람에게 되돌아올 조건을 정한다.</li>
+            <li><strong>최종 해석은 인간이 승인한다.</strong> 통계적 유의성과 학술적 의미를 혼동하지 않도록 도메인 전문가가 결론을 검토한다.</li>
+          </ul>
+
+          <h3>파일럿으로 적합한 과제</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">후보 과제</th>
+                  <th scope="col">AI 위임 범위</th>
+                  <th scope="col">인간 승인 지점</th>
+                  <th scope="col">검증 산출물</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>로봇·필드로봇 분야 문헌 전수조사</td>
+                  <td>검색, 중복 제거, taxonomy 초안, RQ 후보 생성</td>
+                  <td>검색 범위와 핵심 공백 선정</td>
+                  <td>논문 목록, 검색식, 분류 기준, 누락 점검</td>
+                </tr>
+                <tr>
+                  <td>기존 baseline 재현</td>
+                  <td>환경 구성, 코드 실행, 오류 수정, 결과 표 작성</td>
+                  <td>데이터 무결성과 구현 동등성</td>
+                  <td>환경 잠금 파일, 로그, 체크포인트, 재현 명령</td>
+                </tr>
+                <tr>
+                  <td>Ablation 실험 확장</td>
+                  <td>설정 조합 생성, 병렬 실행, 통계 요약</td>
+                  <td>비교의 공정성과 해석</td>
+                  <td>실험 설정표, 원시 결과, 분석 코드</td>
+                </tr>
+                <tr>
+                  <td>리부탈 사전 점검</td>
+                  <td>예상 반론, 약점 목록, 추가 분석 제안</td>
+                  <td>답변 전략과 주장 강도</td>
+                  <td>주장-근거 매트릭스, 반론별 대응 초안</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout">
+            <span class="callout-title">연구실 적용 메모</span>
+            <p>
+              강의에서 시연된 환경은 OMC 4.8.0 계열이다. 동일 계열의 하네스를 이미 사용한다면
+              <code>deep-interview</code> → <code>ralplan</code> → <code>autopilot</code>
+              흐름을 작은 파일럿 과제에 적용할 수 있다. 특히 171편 문헌 조사 패턴은
+              로봇·필드로봇 분야의 체계적 서베이에 적합한 출발점이다.
+            </p>
+          </div>
+        </section>
+
+        <section class="section" id="roadmap">
+          <span class="section-number">10 · Course Roadmap</span>
+          <h2>1강 이후의 학습 경로</h2>
+
+          <figure>
+            <div class="image-frame">
+              <img src="assets/fvlsihoyvmo-ts-00-24-24.jpg" alt="연구자를 위한 하네스 엔지니어링 전체 5강 로드맵">
+            </div>
+            <figcaption>
+              1강은 연구 사이클과 AI 개입 지점을 설명하고, 이후 강의에서 원리와 실제 연구 워크플로우를 다룬다.
+            </figcaption>
+          </figure>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">강</th>
+                  <th scope="col">주제</th>
+                  <th scope="col">역할</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1강</td>
+                  <td>연구 사이클의 표준 단계와 AI 개입 지점</td>
+                  <td>왜 하네스인가</td>
+                </tr>
+                <tr>
+                  <td>2강</td>
+                  <td>코드 모델의 발전과 하네스 작동 원리, 매직 키워드</td>
+                  <td>하네스는 어떻게 작동하는가</td>
+                </tr>
+                <tr>
+                  <td>3강</td>
+                  <td>문헌 조사, 방향 설정, 연구 질문 수립</td>
+                  <td>연구 사이클 상반부</td>
+                </tr>
+                <tr>
+                  <td>4강</td>
+                  <td>코드 구현, 실험, 논문 작성</td>
+                  <td>연구 사이클 하반부</td>
+                </tr>
+                <tr>
+                  <td>5강</td>
+                  <td>SolidCoder를 현재의 하네스로 다시 설계하는 사례 복습</td>
+                  <td>종합 적용</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="timeline">
+          <span class="section-number">11 · Chapter Guide</span>
+          <h2>강의 타임라인</h2>
+
+          <ol class="timeline">
+            <li><time>0:00</time> 강의 소개와 하네스 멘탈 모델의 목표</li>
+            <li><time>0:21</time> 강사 프로필과 주요 논문</li>
+            <li><time>1:01</time> 2년간 LLM 활용 비중의 변화</li>
+            <li><time>1:44</time> 자동화 수준이 다른 연구의 동일한 메타 평가</li>
+            <li><time>2:26</time> “연구란 무엇인가?”</li>
+            <li><time>3:07</time> 지식의 벽에 벽돌 한 장 얹기</li>
+            <li><time>3:50</time> 연구의 네 단계</li>
+            <li><time>4:53</time> 단계별 하네스 활용법</li>
+            <li><time>5:59</time> 실전 워크플로우 소개</li>
+            <li><time>6:19</time> 논문 171편 전수조사와 taxonomy 생성</li>
+            <li><time>6:41</time> 딥 인터뷰를 통한 스펙 확정</li>
+            <li><time>7:23</time> 계획 수립과 페르소나 리뷰어 검증</li>
+            <li><time>7:41</time> 오토파일럿 기반 자동 구현</li>
+            <li><time>8:01</time> 논문 작성과 피어리뷰</li>
+            <li><time>8:35</time> LLM·에이전트·하네스의 개념 구분</li>
+            <li><time>9:02</time> LLM의 지능과 지식 컷오프</li>
+            <li><time>10:25</time> 자율 에이전트의 능력과 실패 모드</li>
+            <li><time>11:48</time> 하네스의 정의와 OMX·OMC</li>
+            <li><time>12:51</time> ralph·ultrawork·deep interview</li>
+            <li><time>13:32</time> Aaron Levie와 에이전트 스캐폴딩</li>
+            <li><time>14:35</time> 모델·하네스·제품의 공생</li>
+            <li><time>15:38</time> 순정 LLM과 하네스의 내부 과정 비교</li>
+            <li><time>17:42</time> 합의 1: 코딩의 패러다임 전환</li>
+            <li><time>18:24</time> RLVR과 생성에서 추론으로의 이동</li>
+            <li><time>19:07</time> Claude Mythos 사례</li>
+            <li><time>19:28</time> 합의 2: 연구 자동화의 진전</li>
+            <li><time>19:48</time> Vibe Physics와 AI 대학원생</li>
+            <li><time>20:50</time> 전문가의 안목이 필요한 이유</li>
+            <li><time>21:51</time> 합의 3: March of Nines</li>
+            <li><time>22:35</time> 마지막 1%와 인간의 최종 승인권</li>
+            <li><time>23:39</time> 인간에게 남는 세 가지 무기</li>
+            <li><time>24:19</time> 전체 5강 로드맵</li>
+            <li><time>26:06</time> 스펙과 학술적 취향에 집중하라는 결론</li>
+          </ol>
+        </section>
+
+        <section class="section" id="sources">
+          <span class="section-number">12 · Source Notes</span>
+          <h2>참고 자료와 출처 메모</h2>
+
+          <div class="source-notes">
+            <h3>기본 자료</h3>
+            <ol>
+              <li>
+                이우진, 「연구자를 위한 하네스 엔지니어링 1강」,
+                코난쌤 conanssam, 2026년 6월 7일.
+                <a target="_blank" rel="noopener noreferrer">원본 영상 ↗</a>
+              </li>
+              <li>
+                빌드캠프 4기 강좌 페이지.
+                <a target="_blank" rel="noopener noreferrer">강좌 정보 ↗</a>
+              </li>
+            </ol>
+
+            <h3>강의에서 언급된 논문과 실험</h3>
+            <ul>
+              <li><em>SolidCoder: Bridging the Mental-Reality Gap in LLM Code Generation through Concrete Execution</em> — ACL 2026 Findings.</li>
+              <li><em>Do Large Language Models Have “Emotion Neurons”? Investigating the Existence and Role</em> — ACL 2025 Findings.</li>
+              <li><em>Multilingual, Not Multicultural: Uncovering the Cultural Empathy Gap in LLMs</em> — IJCNLP-AACL 2025 Main.</li>
+              <li>CodeSIM — NAACL 2025, SolidCoder의 비교 대상 baseline으로 언급.</li>
+              <li>Vibe Physics — Matthew Schwartz 교수의 ‘AI grad student’ 실험으로 소개.</li>
+            </ul>
+
+            <h3>인물과 개념</h3>
+            <ul>
+              <li>Andrej Karpathy — Vibe Coding, March of Nines, Taste and Judgment.</li>
+              <li>Aaron Levie — 지식노동과 에이전트 스캐폴딩에 관한 발언.</li>
+              <li>Greg Brockman — 모델 자체만으로는 제품이 아니라는 발언.</li>
+              <li>Logan Kilpatrick — 모델·하네스·제품의 공생이라는 관점.</li>
+              <li>Dario Amodei — 고도화된 AI의 사이버 능력과 선제적 방어 필요성.</li>
+            </ul>
+
+            <h3>도구와 시스템</h3>
+            <ul>
+              <li>OMC(oh-my-claudecode) — 강의 화면 기준 4.8.0 계열.</li>
+              <li>OMX(oh-my-codex), Claude Code, MCP, OpenReview, Overleaf.</li>
+            </ul>
+
+            <div class="callout info">
+              <span class="callout-title">편집 및 검증 범위</span>
+              <p>
+                본 문서는 제공된 강의 노트와 화면 캡처를 재구성한 해설 보고서다.
+                날짜, 수치, 논문 상태, 인용과 프론티어 사례는 강의에서 제시된 내용을 기준으로
+                서술했으며 독립적인 사실 검증 결과를 의미하지 않는다. 학술적 인용이나 의사결정에
+                사용할 때는 원본 영상, 논문, 공식 발표를 함께 확인해야 한다.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <aside class="share-box" aria-label="공유용 문구">
+          <h3>Share-ready framing</h3>
+          <p class="share-copy">
+            AI 연구 자동화의 핵심은 더 좋은 모델을 고르는 데 있지 않다.
+            문헌 조사·가설·구현·검증을 연결하는 하네스를 설계하고,
+            인간의 안목을 마지막 1%에 집중시키는 데 있다.
+            #AI연구 #하네스엔지니어링 #ResearchAutomation
+          </p>
+        </aside>
+
+        <section class="closing" id="conclusion">
+          <span class="section-number">Conclusion</span>
+          <h2>좋은 연구자는 모든 벽돌을 직접 굽는 사람이 아니다</h2>
+          <p>
+            AI-native 연구에서 인간의 역할은 줄어드는 것이 아니라 이동한다.
+            코드를 한 줄씩 입력하고 수백 편의 논문을 손으로 분류하는 일에서 벗어나,
+            <strong>어떤 빈틈을 채울지, 어떤 증거를 신뢰할지, 무엇을 주장할 가치가 있는지</strong>
+            결정하는 쪽으로 옮겨 간다.
+          </p>
+          <p>
+            에이전트가 99%까지 빠르게 달릴 수 있다면 하네스는 그 속도를 연구 성과로 바꾸는
+            레일이다. 그리고 마지막 1%에서 방향을 승인하는 사람은 여전히 연구자다.
+          </p>
+          <a class="button-link" target="_blank" rel="noopener noreferrer">
+            원본 강의에서 이어서 보기 <span aria-hidden="true">↗</span>
+          </a>
+        </section>
+      </article>
+
+      <aside class="side-rail" aria-label="목차">
+        <h2>In this report</h2>
+        <ol>
+          <li><a href="#abstract">초록</a></li>
+          <li><a href="#findings">핵심 발견</a></li>
+          <li><a href="#evidence">연구 자동화의 증거</a></li>
+          <li><a href="#research-process">연구의 네 단계</a></li>
+          <li><a href="#workflow">실전 워크플로우</a></li>
+          <li><a href="#concepts">LLM·Agent·Harness</a></li>
+          <li><a href="#frontier">프론티어 사례</a></li>
+          <li><a href="#nines">March of Nines</a></li>
+          <li><a href="#implications">연구실 적용</a></li>
+          <li><a href="#sources">출처 메모</a></li>
+        </ol>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-grid">
+      <span>Research report · Editorial edition</span>
+      <span>Source note published 2026.08.07</span>
+    </div>
+  </footer>
+</body>
+</html>
