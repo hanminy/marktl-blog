@@ -1,0 +1,2411 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  <title>LLM 다음의 AI는 세계를 예측한다 — Yann LeCun의 World Models와 JEPA</title>
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+  
+  
+
+  
+
+  <style>
+    :root {
+      --ink: #17211e;
+      --muted: #62706b;
+      --faint: #89948f;
+      --paper: #f7f5ef;
+      --surface: #fffdf8;
+      --surface-2: #edf2ed;
+      --line: #d8ddd7;
+      --forest: #173b32;
+      --green: #266b56;
+      --mint: #cce5d8;
+      --lime: #dce89b;
+      --amber: #d99442;
+      --amber-soft: #f5e3c8;
+      --blue: #406c85;
+      --shadow: 0 18px 56px rgba(23, 48, 40, .10);
+      --radius: 22px;
+      --content: 760px;
+      --wide: 1160px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--paper);
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 6%, rgba(220, 232, 155, .30), transparent 26rem),
+        radial-gradient(circle at 95% 20%, rgba(204, 229, 216, .38), transparent 32rem),
+        var(--paper);
+      font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 17px;
+      line-height: 1.82;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      color: var(--green);
+      text-decoration-color: rgba(38, 107, 86, .35);
+      text-underline-offset: .18em;
+      transition: color .18s ease, text-decoration-color .18s ease;
+    }
+
+    a:hover,
+    a:focus-visible {
+      color: #124f3c;
+      text-decoration-color: currentColor;
+    }
+
+    a:focus-visible {
+      outline: 3px solid rgba(217, 148, 66, .42);
+      outline-offset: 4px;
+      border-radius: 4px;
+    }
+
+    p,
+    ul,
+    ol,
+    blockquote {
+      margin-top: 0;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      margin: 0;
+      color: var(--forest);
+      font-family: Georgia, "Noto Serif KR", "Nanum Myeongjo", serif;
+      font-weight: 700;
+      letter-spacing: -.035em;
+      line-height: 1.28;
+      text-wrap: balance;
+    }
+
+    h2 {
+      margin: 4.8rem 0 1.5rem;
+      font-size: clamp(2rem, 4vw, 3.25rem);
+    }
+
+    h3 {
+      margin: 3.25rem 0 1rem;
+      font-size: clamp(1.42rem, 2.5vw, 2rem);
+    }
+
+    h4 {
+      margin: 1.6rem 0 .7rem;
+      font-size: 1.15rem;
+    }
+
+    section[id],
+    figure[id] {
+      scroll-margin-top: 2rem;
+    }
+
+    .skip-link {
+      position: fixed;
+      top: .75rem;
+      left: .75rem;
+      z-index: 100;
+      transform: translateY(-180%);
+      padding: .75rem 1rem;
+      color: #fff;
+      background: var(--forest);
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .skip-link:focus {
+      transform: none;
+    }
+
+    .hero {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      min-height: 700px;
+      color: #f7faf7;
+      background:
+        linear-gradient(118deg, rgba(12, 35, 29, .98) 0%, rgba(23, 59, 50, .95) 48%, rgba(29, 83, 66, .88) 100%);
+    }
+
+    .hero::before,
+    .hero::after {
+      position: absolute;
+      z-index: -1;
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 50%;
+      content: "";
+    }
+
+    .hero::before {
+      width: 540px;
+      height: 540px;
+      top: -230px;
+      right: -110px;
+      box-shadow:
+        0 0 0 80px rgba(255, 255, 255, .022),
+        0 0 0 160px rgba(255, 255, 255, .018);
+    }
+
+    .hero::after {
+      width: 260px;
+      height: 260px;
+      bottom: -140px;
+      left: 6%;
+      background: rgba(220, 232, 155, .08);
+    }
+
+    .hero-inner {
+      width: min(var(--wide), calc(100% - 40px));
+      margin: 0 auto;
+      padding: 3rem 0 4.5rem;
+    }
+
+    .masthead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      padding-bottom: 5rem;
+      color: rgba(255, 255, 255, .7);
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .masthead .edition {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+    }
+
+    .masthead .edition::before {
+      width: 2.2rem;
+      height: 2px;
+      background: var(--lime);
+      content: "";
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: .55rem;
+      margin-bottom: 1.4rem;
+      padding: .45rem .8rem;
+      color: #eef7f1;
+      background: rgba(255, 255, 255, .08);
+      border: 1px solid rgba(255, 255, 255, .13);
+      border-radius: 999px;
+      font-size: .75rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      width: .5rem;
+      height: .5rem;
+      background: var(--lime);
+      border-radius: 50%;
+      box-shadow: 0 0 0 5px rgba(220, 232, 155, .11);
+      content: "";
+    }
+
+    .hero h1 {
+      max-width: 980px;
+      color: #fff;
+      font-size: clamp(3rem, 8vw, 6.8rem);
+      line-height: 1.02;
+      letter-spacing: -.06em;
+    }
+
+    .hero h1 em {
+      color: var(--lime);
+      font-style: normal;
+    }
+
+    .dek {
+      max-width: 780px;
+      margin: 2rem 0 2.2rem;
+      color: rgba(247, 250, 247, .82);
+      font-size: clamp(1.08rem, 2vw, 1.35rem);
+      line-height: 1.72;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .8rem 1.5rem;
+      align-items: center;
+      color: rgba(255, 255, 255, .67);
+      font-size: .86rem;
+    }
+
+    .hero-meta strong {
+      color: #fff;
+    }
+
+    .hero-meta span + span {
+      position: relative;
+    }
+
+    .hero-meta span + span::before {
+      position: absolute;
+      top: 50%;
+      left: -.82rem;
+      width: 3px;
+      height: 3px;
+      background: rgba(255, 255, 255, .4);
+      border-radius: 50%;
+      content: "";
+    }
+
+    .topic-strip {
+      background: #102a23;
+      border-top: 1px solid rgba(255, 255, 255, .08);
+    }
+
+    .topic-strip-inner {
+      display: flex;
+      width: min(var(--wide), calc(100% - 40px));
+      margin: 0 auto;
+      padding: 1rem 0;
+      gap: .55rem;
+      overflow-x: auto;
+      scrollbar-width: thin;
+    }
+
+    .topic-strip a {
+      flex: 0 0 auto;
+      padding: .35rem .72rem;
+      color: rgba(255, 255, 255, .72);
+      border: 1px solid rgba(255, 255, 255, .13);
+      border-radius: 999px;
+      font-size: .75rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 220px;
+      gap: 5rem;
+      width: min(var(--wide), calc(100% - 40px));
+      margin: 0 auto;
+      padding: 5rem 0 7rem;
+    }
+
+    .article {
+      min-width: 0;
+    }
+
+    .article > p,
+    .article > ul,
+    .article > ol,
+    .article > blockquote,
+    .article > h2,
+    .article > h3,
+    .article > h4,
+    .article > .narrow,
+    .article > section:not(.full-bleed),
+    .article > header {
+      max-width: var(--content);
+      margin-right: auto;
+      margin-left: auto;
+    }
+
+    .toc {
+      align-self: start;
+      position: sticky;
+      top: 1.5rem;
+      padding-top: .4rem;
+    }
+
+    .toc-title {
+      display: block;
+      margin-bottom: .8rem;
+      color: var(--forest);
+      font-size: .75rem;
+      font-weight: 900;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    .toc ol {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      border-left: 1px solid var(--line);
+    }
+
+    .toc li {
+      margin: 0;
+    }
+
+    .toc a {
+      display: block;
+      padding: .46rem 0 .46rem 1rem;
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.45;
+      text-decoration: none;
+    }
+
+    .toc a:hover,
+    .toc a:focus-visible {
+      color: var(--green);
+      border-left: 2px solid var(--green);
+      margin-left: -1px;
+    }
+
+    .lead {
+      color: #25332e;
+      font-family: Georgia, "Noto Serif KR", "Nanum Myeongjo", serif;
+      font-size: clamp(1.25rem, 2.5vw, 1.7rem);
+      line-height: 1.75;
+      letter-spacing: -.02em;
+    }
+
+    .lead::first-letter {
+      float: left;
+      margin: .15rem .55rem 0 0;
+      color: var(--green);
+      font-family: Georgia, serif;
+      font-size: 4.8rem;
+      font-weight: 700;
+      line-height: .82;
+    }
+
+    .abstract {
+      position: relative;
+      margin-top: 3rem;
+      padding: 2rem 2.1rem 1.9rem;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 12px 36px rgba(23, 48, 40, .06);
+    }
+
+    .abstract::before {
+      position: absolute;
+      top: 0;
+      left: 2rem;
+      width: 5.5rem;
+      height: 4px;
+      background: var(--amber);
+      border-radius: 0 0 4px 4px;
+      content: "";
+    }
+
+    .abstract-label,
+    .section-kicker {
+      display: block;
+      margin-bottom: .7rem;
+      color: var(--green);
+      font-size: .72rem;
+      font-weight: 900;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .abstract p:last-child {
+      margin-bottom: 0;
+    }
+
+    .report-meta {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      margin-top: 2rem;
+      overflow: hidden;
+      background: var(--line);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+
+    .report-meta div {
+      padding: 1rem;
+      background: var(--surface);
+    }
+
+    .report-meta dt {
+      margin-bottom: .2rem;
+      color: var(--faint);
+      font-size: .67rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .report-meta dd {
+      margin: 0;
+      color: var(--forest);
+      font-size: .86rem;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+
+    .key-findings {
+      margin-top: 3.5rem;
+    }
+
+    .finding-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .finding {
+      min-height: 220px;
+      padding: 1.55rem;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+
+    .finding-number {
+      display: inline-grid;
+      width: 2rem;
+      height: 2rem;
+      margin-bottom: 1.2rem;
+      place-items: center;
+      color: #fff;
+      background: var(--forest);
+      border-radius: 50%;
+      font-family: Georgia, serif;
+      font-size: .85rem;
+      font-weight: 700;
+    }
+
+    .finding h3 {
+      margin: 0 0 .65rem;
+      font-family: inherit;
+      font-size: 1.05rem;
+      letter-spacing: -.02em;
+    }
+
+    .finding p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .89rem;
+      line-height: 1.7;
+    }
+
+    .cover-figure {
+      margin: 3.5rem auto 0;
+    }
+
+    .figure,
+    .cover-figure {
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .figure img,
+    .cover-figure img {
+      width: 100%;
+      height: auto;
+      background: #e6e8e4;
+    }
+
+    figcaption {
+      padding: 1rem 1.2rem 1.1rem;
+      color: var(--muted);
+      font-size: .78rem;
+      line-height: 1.55;
+    }
+
+    figcaption strong {
+      color: var(--forest);
+    }
+
+    .figure-wide {
+      width: min(100%, 980px);
+      margin: 2.2rem auto;
+    }
+
+    .figure-pair {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      width: min(100%, 980px);
+      margin: 2.2rem auto;
+    }
+
+    .figure-pair .figure {
+      margin: 0;
+    }
+
+    .figure-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      width: min(100%, 980px);
+      margin: 2.2rem auto;
+    }
+
+    .figure-grid .figure {
+      margin: 0;
+      box-shadow: 0 12px 34px rgba(23, 48, 40, .07);
+    }
+
+    .pullquote {
+      position: relative;
+      width: min(100%, 920px);
+      margin: 4.5rem auto;
+      padding: 3rem clamp(1.5rem, 6vw, 4.5rem);
+      color: #fff;
+      background: var(--forest);
+      border-radius: 28px;
+      overflow: hidden;
+    }
+
+    .pullquote::before {
+      position: absolute;
+      top: -2.2rem;
+      left: 1.1rem;
+      color: rgba(220, 232, 155, .16);
+      font-family: Georgia, serif;
+      font-size: 10rem;
+      line-height: 1;
+      content: "“";
+    }
+
+    .pullquote p {
+      position: relative;
+      margin: 0;
+      font-family: Georgia, "Noto Serif KR", serif;
+      font-size: clamp(1.55rem, 4vw, 2.7rem);
+      font-weight: 700;
+      line-height: 1.45;
+      letter-spacing: -.035em;
+      text-wrap: balance;
+    }
+
+    .pullquote footer {
+      position: relative;
+      margin-top: 1.25rem;
+      color: rgba(255, 255, 255, .6);
+      font-size: .76rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .section-intro {
+      color: var(--muted);
+      font-size: 1.06rem;
+    }
+
+    .callout {
+      margin: 2rem auto;
+      padding: 1.4rem 1.5rem;
+      background: var(--amber-soft);
+      border-left: 4px solid var(--amber);
+      border-radius: 0 16px 16px 0;
+    }
+
+    .callout strong {
+      display: block;
+      margin-bottom: .35rem;
+      color: #704515;
+      font-size: .78rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .callout p:last-child {
+      margin-bottom: 0;
+    }
+
+    .plain-language {
+      display: grid;
+      grid-template-columns: 110px minmax(0, 1fr);
+      gap: 1.2rem;
+      align-items: start;
+      margin: 2.3rem auto;
+      padding: 1.5rem;
+      background: var(--surface-2);
+      border-radius: 18px;
+    }
+
+    .plain-language .label {
+      color: var(--green);
+      font-size: .72rem;
+      font-weight: 900;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .plain-language p {
+      margin: 0;
+      font-size: .94rem;
+    }
+
+    .metric {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 1rem;
+      align-items: stretch;
+      margin: 2.3rem auto;
+    }
+
+    .metric-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 190px;
+      padding: 1.4rem;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+
+    .metric-card small {
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .metric-card strong {
+      display: block;
+      margin: 1.2rem 0 .4rem;
+      color: var(--forest);
+      font-family: Georgia, serif;
+      font-size: clamp(1.8rem, 5vw, 3.1rem);
+      letter-spacing: -.05em;
+      line-height: 1;
+    }
+
+    .metric-card span {
+      color: var(--faint);
+      font-size: .76rem;
+      line-height: 1.5;
+    }
+
+    .metric-vs {
+      align-self: center;
+      color: var(--amber);
+      font-family: Georgia, serif;
+      font-size: 1rem;
+      font-weight: 800;
+      font-style: italic;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(88px, 1fr));
+      gap: .55rem;
+      width: min(100%, 1040px);
+      margin: 2.5rem auto;
+      padding: 1.3rem;
+      overflow-x: auto;
+      background: var(--forest);
+      border-radius: var(--radius);
+    }
+
+    .flow-node {
+      position: relative;
+      min-width: 88px;
+      padding: 1rem .65rem;
+      color: #eef7f1;
+      background: rgba(255, 255, 255, .07);
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 12px;
+      text-align: center;
+      font-size: .72rem;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .flow-node:not(:last-child)::after {
+      position: absolute;
+      top: 50%;
+      right: -.48rem;
+      z-index: 2;
+      color: var(--lime);
+      content: "›";
+      transform: translateY(-52%);
+      font-size: 1.2rem;
+    }
+
+    .flow-node.accent {
+      color: var(--forest);
+      background: var(--lime);
+      border-color: var(--lime);
+    }
+
+    .flow-caption {
+      width: min(100%, 1040px);
+      margin: -.9rem auto 2.5rem;
+      color: var(--faint);
+      font-size: .75rem;
+      text-align: center;
+    }
+
+    .equation {
+      margin: 2rem auto;
+      padding: 1.6rem;
+      overflow-x: auto;
+      color: #f5faf7;
+      background: #142c25;
+      border-radius: 16px;
+      font-family: "Cambria Math", "Times New Roman", serif;
+      font-size: clamp(1rem, 2.4vw, 1.35rem);
+      line-height: 1.8;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .equation small {
+      display: block;
+      margin-top: .55rem;
+      color: rgba(255, 255, 255, .55);
+      font-family: inherit;
+      font-size: .7rem;
+      white-space: normal;
+    }
+
+    .comparison {
+      width: 100%;
+      margin: 2.2rem auto;
+      border-collapse: separate;
+      border-spacing: 0;
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      font-size: .85rem;
+      line-height: 1.55;
+    }
+
+    .table-scroll {
+      margin: 2rem auto;
+      overflow-x: auto;
+      border-radius: 16px;
+    }
+
+    .table-scroll .comparison {
+      min-width: 680px;
+      margin: 0;
+    }
+
+    .comparison th,
+    .comparison td {
+      padding: 1rem;
+      vertical-align: top;
+      border-bottom: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      text-align: left;
+    }
+
+    .comparison tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .comparison th:last-child,
+    .comparison td:last-child {
+      border-right: 0;
+    }
+
+    .comparison thead th {
+      color: #fff;
+      background: var(--forest);
+      font-size: .74rem;
+      letter-spacing: .05em;
+    }
+
+    .comparison tbody th {
+      width: 22%;
+      color: var(--forest);
+      background: var(--surface-2);
+    }
+
+    .comparison td {
+      color: #43504b;
+    }
+
+    .evidence-tag {
+      display: inline-block;
+      margin-bottom: .7rem;
+      padding: .25rem .55rem;
+      color: var(--green);
+      background: var(--mint);
+      border-radius: 999px;
+      font-size: .67rem;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .evidence-list {
+      counter-reset: evidence;
+      margin: 2.2rem auto;
+      padding: 0;
+      list-style: none;
+    }
+
+    .evidence-list li {
+      position: relative;
+      margin-bottom: .75rem;
+      padding: 1.15rem 1.15rem 1.15rem 3.6rem;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      counter-increment: evidence;
+    }
+
+    .evidence-list li::before {
+      position: absolute;
+      top: 1.05rem;
+      left: 1rem;
+      display: grid;
+      width: 1.9rem;
+      height: 1.9rem;
+      place-items: center;
+      color: #fff;
+      background: var(--green);
+      border-radius: 50%;
+      content: counter(evidence);
+      font-family: Georgia, serif;
+      font-size: .78rem;
+      font-weight: 800;
+    }
+
+    .evidence-list strong {
+      color: var(--forest);
+    }
+
+    .timeline {
+      position: relative;
+      margin: 2.2rem auto;
+      padding-left: 1.6rem;
+      border-left: 2px solid var(--mint);
+    }
+
+    .timeline-item {
+      position: relative;
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 1rem;
+      padding: 0 0 1.15rem 1.1rem;
+    }
+
+    .timeline-item::before {
+      position: absolute;
+      top: .48rem;
+      left: -1.99rem;
+      width: .62rem;
+      height: .62rem;
+      background: var(--green);
+      border: 4px solid var(--paper);
+      border-radius: 50%;
+      content: "";
+    }
+
+    .timeline time {
+      color: var(--green);
+      font-family: Georgia, serif;
+      font-size: .88rem;
+      font-weight: 800;
+    }
+
+    .timeline p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .86rem;
+      line-height: 1.55;
+    }
+
+    .timeline strong {
+      color: var(--ink);
+    }
+
+    .implications {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      width: min(100%, 980px);
+      margin: 2.3rem auto;
+    }
+
+    .implication {
+      padding: 1.5rem;
+      background: var(--forest);
+      border-radius: 18px;
+    }
+
+    .implication:nth-child(2) {
+      background: #245344;
+    }
+
+    .implication:nth-child(3) {
+      background: #345f50;
+    }
+
+    .implication span {
+      color: var(--lime);
+      font-family: Georgia, serif;
+      font-size: 2rem;
+      font-weight: 800;
+    }
+
+    .implication h3 {
+      margin: .5rem 0 .75rem;
+      color: #fff;
+      font-family: inherit;
+      font-size: 1rem;
+      letter-spacing: -.02em;
+    }
+
+    .implication p {
+      margin: 0;
+      color: rgba(255, 255, 255, .7);
+      font-size: .82rem;
+      line-height: 1.65;
+    }
+
+    .takeaways {
+      margin-top: 4rem;
+      padding: clamp(1.5rem, 5vw, 3rem);
+      background: linear-gradient(145deg, #e9f2eb, #f6f4e8);
+      border: 1px solid #d4ded4;
+      border-radius: 26px;
+    }
+
+    .takeaways h2 {
+      margin-top: 0;
+      font-size: clamp(1.8rem, 4vw, 2.75rem);
+    }
+
+    .takeaways ol {
+      margin-bottom: 0;
+      padding-left: 1.25rem;
+    }
+
+    .takeaways li {
+      margin-bottom: .85rem;
+      padding-left: .35rem;
+    }
+
+    .takeaways li::marker {
+      color: var(--green);
+      font-family: Georgia, serif;
+      font-weight: 800;
+    }
+
+    .share-copy {
+      margin-top: 3rem;
+      padding: 1.5rem;
+      background: var(--surface);
+      border: 1px dashed #9aaa9f;
+      border-radius: 16px;
+    }
+
+    .share-copy strong {
+      display: block;
+      margin-bottom: .6rem;
+      color: var(--green);
+      font-size: .72rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .share-copy p {
+      margin: 0;
+      color: #37443f;
+      font-family: Georgia, "Noto Serif KR", serif;
+      font-size: 1.02rem;
+      line-height: 1.7;
+    }
+
+    .sources {
+      margin-top: 5rem;
+      padding-top: 2.5rem;
+      border-top: 2px solid var(--forest);
+    }
+
+    .sources h2 {
+      margin-top: 0;
+    }
+
+    .source-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: sources;
+    }
+
+    .source-list li {
+      position: relative;
+      margin-bottom: .8rem;
+      padding: 0 0 .8rem 2.4rem;
+      color: var(--muted);
+      border-bottom: 1px solid var(--line);
+      counter-increment: sources;
+      font-size: .82rem;
+      line-height: 1.6;
+    }
+
+    .source-list li::before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      color: var(--green);
+      content: "[" counter(sources) "]";
+      font-family: Georgia, serif;
+      font-weight: 800;
+    }
+
+    .source-list cite {
+      color: var(--ink);
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    .source-note {
+      margin-top: 1.5rem;
+      padding: 1rem 1.1rem;
+      color: var(--muted);
+      background: var(--surface-2);
+      border-radius: 12px;
+      font-size: .76rem;
+      line-height: 1.65;
+    }
+
+    .closing {
+      margin-top: 5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .closing p {
+      color: var(--muted);
+    }
+
+    .closing .last-line {
+      color: var(--forest);
+      font-family: Georgia, "Noto Serif KR", serif;
+      font-size: clamp(1.3rem, 3vw, 1.8rem);
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
+    .article-footer {
+      padding: 3.5rem 20px;
+      color: rgba(255, 255, 255, .68);
+      background: #102a23;
+    }
+
+    .article-footer-inner {
+      display: flex;
+      width: min(var(--wide), 100%);
+      margin: 0 auto;
+      gap: 2rem;
+      justify-content: space-between;
+      align-items: end;
+    }
+
+    .article-footer strong {
+      display: block;
+      margin-bottom: .5rem;
+      color: #fff;
+      font-family: Georgia, "Noto Serif KR", serif;
+      font-size: 1.2rem;
+    }
+
+    .article-footer p {
+      max-width: 680px;
+      margin: 0;
+      font-size: .78rem;
+      line-height: 1.6;
+    }
+
+    .back-to-top {
+      flex: 0 0 auto;
+      color: var(--lime);
+      font-size: .8rem;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .print-only {
+      display: none;
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        display: block;
+      }
+
+      .toc {
+        position: static;
+        max-width: var(--content);
+        margin: 0 auto 3rem;
+        padding: 1.2rem;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+      }
+
+      .toc ol {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        border-left: 0;
+      }
+
+      .toc a {
+        padding: .4rem;
+      }
+
+      .toc a:hover,
+      .toc a:focus-visible {
+        margin-left: 0;
+        border-left: 0;
+      }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        font-size: 16px;
+        line-height: 1.75;
+      }
+
+      .hero {
+        min-height: 0;
+      }
+
+      .hero-inner,
+      .topic-strip-inner,
+      .layout {
+        width: min(100% - 28px, var(--wide));
+      }
+
+      .hero-inner {
+        padding: 1.5rem 0 3.5rem;
+      }
+
+      .masthead {
+        padding-bottom: 3.5rem;
+      }
+
+      .masthead > span:last-child {
+        display: none;
+      }
+
+      .hero h1 {
+        font-size: clamp(2.8rem, 16vw, 4.7rem);
+      }
+
+      .hero-meta span + span::before {
+        display: none;
+      }
+
+      .layout {
+        padding-top: 3.2rem;
+      }
+
+      .report-meta,
+      .finding-grid,
+      .figure-pair,
+      .figure-grid,
+      .implications {
+        grid-template-columns: 1fr;
+      }
+
+      .report-meta {
+        gap: 1px;
+      }
+
+      .finding {
+        min-height: 0;
+      }
+
+      .metric {
+        grid-template-columns: 1fr;
+      }
+
+      .metric-vs {
+        justify-self: center;
+      }
+
+      .plain-language {
+        grid-template-columns: 1fr;
+        gap: .5rem;
+      }
+
+      .flow {
+        grid-template-columns: repeat(7, 108px);
+      }
+
+      .toc ol {
+        grid-template-columns: 1fr;
+      }
+
+      .pullquote {
+        margin-top: 3.5rem;
+        margin-bottom: 3.5rem;
+        border-radius: 20px;
+      }
+
+      .timeline-item {
+        grid-template-columns: 58px minmax(0, 1fr);
+        gap: .65rem;
+      }
+
+      .article-footer-inner {
+        display: block;
+      }
+
+      .back-to-top {
+        display: inline-block;
+        margin-top: 1.5rem;
+      }
+    }
+
+    @media print {
+      :root {
+        --paper: #fff;
+        --surface: #fff;
+      }
+
+      body {
+        color: #111;
+        background: #fff;
+        font-size: 11pt;
+      }
+
+      .skip-link,
+      .topic-strip,
+      .toc,
+      .back-to-top {
+        display: none;
+      }
+
+      .hero {
+        min-height: 0;
+        color: #111;
+        background: #fff;
+        border-bottom: 2px solid #111;
+      }
+
+      .hero h1,
+      .hero-meta strong,
+      .masthead {
+        color: #111;
+      }
+
+      .hero h1 em {
+        color: #111;
+      }
+
+      .dek,
+      .hero-meta {
+        color: #333;
+      }
+
+      .hero-inner,
+      .layout {
+        width: 100%;
+      }
+
+      .layout {
+        display: block;
+        padding-top: 2rem;
+      }
+
+      .figure,
+      .cover-figure,
+      .finding,
+      .abstract {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .pullquote,
+      .implication,
+      .equation,
+      .flow {
+        color: #111;
+        background: #eee;
+      }
+
+      .pullquote p,
+      .implication h3,
+      .flow-node,
+      .equation {
+        color: #111;
+      }
+
+      .print-only {
+        display: block;
+      }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Yann LeCun: World Models: Enabling the next AI revolution">
+<meta property="og:description" content="영상 정보 채널: Computer Vision and Geometry Group, ETH Zurich 날짜: 20260609 길이: 58분 54초 링크: https://www.youtube.com/watch?v=72Xj8k5WQX4 &lt;div style=&quot;position: relative; width: 100%; paddi">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/ksm4c5/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/ksm4c5/assets/72xj8k5wqx4-ts-00-00-05.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Yann LeCun: World Models: Enabling the next AI revolution">
+<meta name="twitter:description" content="영상 정보 채널: Computer Vision and Geometry Group, ETH Zurich 날짜: 20260609 길이: 58분 54초 링크: https://www.youtube.com/watch?v=72Xj8k5WQX4 &lt;div style=&quot;position: relative; width: 100%; paddi">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/ksm4c5/assets/72xj8k5wqx4-ts-00-00-05.jpg">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/s/ksm4c5/">
+</head>
+
+<body>
+  <a class="skip-link" href="#article">본문으로 바로가기</a>
+
+  <header class="hero" id="top">
+    <div class="hero-inner">
+      <div class="masthead">
+        <span class="edition">AI Research Review</span>
+        <span>Editorial Report · 23 June 2026</span>
+      </div>
+
+      <span class="eyebrow">World Models · JEPA · Autonomous Intelligence</span>
+      <h1>LLM 다음의 AI는<br><em>세계를 예측한다</em></h1>
+
+      <p class="dek">
+        언어를 그럴듯하게 이어 쓰는 능력만으로는 현실에서 계획하고 행동하는 지능에 도달하기 어렵다.
+        Yann LeCun의 ETH Zurich 강연을 따라가며 세계 모델, JEPA, 표현 학습과 로봇 플래닝이
+        어떻게 다음 AI 아키텍처로 연결되는지 분석한다.
+      </p>
+
+      <div class="hero-meta" aria-label="기사 정보">
+        <span><strong>연구 보고서</strong></span>
+        <span>읽기 약 24분</span>
+        <span>강연 58분 54초</span>
+        <span>이미지·비디오 자기지도학습</span>
+      </div>
+    </div>
+
+    <nav class="topic-strip" aria-label="주요 주제">
+      <div class="topic-strip-inner">
+        <a href="#abstract">초록</a>
+        <a href="#findings">핵심 발견</a>
+        <a href="#limits">현재 AI의 한계</a>
+        <a href="#architecture">인지 아키텍처</a>
+        <a href="#jepa">JEPA</a>
+        <a href="#evidence">실증적 성과</a>
+        <a href="#implications">함의</a>
+        <a href="#sources">출처</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="layout">
+    <article class="article" id="article">
+      <p class="lead">
+        “Machine learning sucks.” Yann LeCun은 도발적인 한 문장으로 강연을 시작한다.
+        지금의 AI가 눈부신 결과를 내고 있다는 사실을 부정하려는 말이 아니다. 오히려 그 성공이
+        가리고 있는 더 근본적인 문제—기계가 인간이나 동물만큼 효율적으로 세계를 학습하지 못한다는
+        사실—를 정면으로 지적하는 선언이다.
+      </p>
+
+      <section class="abstract" id="abstract" aria-labelledby="abstract-title">
+        <span class="abstract-label">Abstract</span>
+        <h2 id="abstract-title">초록</h2>
+        <p>
+          이 보고서는 Yann LeCun의 강연 <cite>World Models: Enabling the next AI revolution</cite>을
+          바탕으로, 세계 모델과 JEPA(Joint Embedding Predictive Architecture)가 차세대 자율지능의
+          핵심으로 제안되는 논리를 정리한다. 강연의 중심 주장은 세 가지다. 첫째, 텍스트 기반
+          피드포워드 모델은 현실의 풍부한 구조와 불확실성을 충분히 학습하지 못한다. 둘째, 지능적인
+          행동에는 행동 결과를 예측하는 세계 모델과 목표를 만족시키는 행동을 탐색하는 최적화 과정이
+          필요하다. 셋째, 미래를 픽셀 단위로 생성하기보다 불필요한 세부사항을 제거한 표현 공간에서
+          예측해야 한다.
+        </p>
+        <p>
+          I-JEPA, DINOv3, V-JEPA 2 및 행동 조건부 세계 모델은 이 구상이 단순한 이론을 넘어 이미지
+          이해, 비디오 상식, 깊이 추정, 시맨틱 분할, 로봇의 zero-shot 목표 도달로 이어지고 있음을
+          보여준다. 다만 “최고 성능의 표현 학습”과 “일반적인 자율지능” 사이에는 장기 기억, 계층적
+          계획, 안전 제약, 인과적 일반화라는 큰 연구 간극이 남아 있다.
+        </p>
+      </section>
+
+      <dl class="report-meta" aria-label="보고서 메타데이터">
+        <div>
+          <dt>강연자</dt>
+          <dd>Yann LeCun</dd>
+        </div>
+        <div>
+          <dt>주최</dt>
+          <dd>ETH Zurich CVG</dd>
+        </div>
+        <div>
+          <dt>강연일</dt>
+          <dd>2026. 06. 09.</dd>
+        </div>
+        <div>
+          <dt>분석일</dt>
+          <dd>2026. 06. 23.</dd>
+        </div>
+      </dl>
+
+      <figure class="cover-figure">
+        <img src="assets/72xj8k5wqx4-ts-00-00-05.jpg" alt="Yann LeCun의 World Models 강연 타이틀 화면" width="1280" height="720">
+        <figcaption>
+          <strong>강연의 출발점.</strong> 세계 모델은 현재 머신러닝의 한계를 넘어 다음 AI 혁명을
+          가능하게 할 아키텍처로 제시된다.
+        </figcaption>
+      </figure>
+
+      <section class="key-findings" id="findings" aria-labelledby="findings-title">
+        <span class="section-kicker">Executive summary</span>
+        <h2 id="findings-title">핵심 발견 6가지</h2>
+
+        <div class="finding-grid">
+          <article class="finding">
+            <span class="finding-number">1</span>
+            <h3>데이터의 양보다 경험의 구조가 중요하다</h3>
+            <p>
+              4세 아이가 처리한 감각 정보량은 초대형 언어모델의 텍스트 훈련량과 맞먹거나 이를
+              넘어선다. 차이는 현실과 상호작용하며 물리적 규칙을 배운다는 데 있다.
+            </p>
+          </article>
+
+          <article class="finding">
+            <span class="finding-number">2</span>
+            <h3>계획은 단순한 다음 토큰 예측이 아니다</h3>
+            <p>
+              반응형 정책은 익숙한 상황에 빠르지만, 새로운 목표와 제약을 다루려면 가능한 미래를
+              예측하고 행동 시퀀스를 탐색하는 최적화가 필요하다.
+            </p>
+          </article>
+
+          <article class="finding">
+            <span class="finding-number">3</span>
+            <h3>좋은 예측은 모든 픽셀을 맞히지 않는다</h3>
+            <p>
+              미래의 불확실한 세부사항까지 생성하려 하면 평균화와 흐림이 발생한다. JEPA는 의미 있는
+              추상 표현만 예측해 이 문제를 우회한다.
+            </p>
+          </article>
+
+          <article class="finding">
+            <span class="finding-number">4</span>
+            <h3>표현 붕괴가 자기지도학습의 중심 난제다</h3>
+            <p>
+              모든 입력을 같은 벡터로 보내면 예측 손실은 쉽게 줄지만 표현은 무의미해진다.
+              증류와 정보 최대화는 이 ‘게으른 해’를 막는 두 핵심 전략이다.
+            </p>
+          </article>
+
+          <article class="finding">
+            <span class="finding-number">5</span>
+            <h3>이미지·비디오 모델에서 실증이 축적되고 있다</h3>
+            <p>
+              DINOv3와 V-JEPA 계열은 분류를 넘어 깊이, 추적, 분할, 직관적 물리 이해에서 강한
+              전이 성능을 보이며 범용 표현의 가능성을 뒷받침한다.
+            </p>
+          </article>
+
+          <article class="finding">
+            <span class="finding-number">6</span>
+            <h3>최종 목표는 계층적 인과 모델이다</h3>
+            <p>
+              물체와 장면에서 세포·신체·사회·생태계까지 서로 다른 시간·공간 규모를 연결하는 계층적
+              JEPA가 장기 비전으로 제안된다.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <figure class="figure-wide figure">
+        <img src="assets/yt-yann-lecun-world-models-%EC%9D%B8%ED%8F%AC%EA%B7%B8%EB%9E%98%ED%94%BD.png" alt="Yann LeCun의 세계 모델과 JEPA 강연 내용을 정리한 인포그래픽" loading="lazy">
+        <figcaption>
+          <strong>한눈에 보는 세계 모델 논지.</strong> 감각 경험에서 표현을 학습하고, 행동 조건부
+          예측과 목표 최적화를 결합해 계획 가능한 에이전트로 나아가는 흐름.
+        </figcaption>
+      </figure>
+
+      <blockquote class="pullquote">
+        <p>진정한 지능의 질문은 “무엇을 말할 것인가”보다 “이 행동을 하면 세계가 어떻게 달라질 것인가”에 가깝다.</p>
+        <footer>강연의 핵심 논지를 재구성한 요약</footer>
+      </blockquote>
+
+      <section id="limits" aria-labelledby="limits-title">
+        <span class="section-kicker">Evidence I · Learning</span>
+        <h2 id="limits-title">왜 지금의 AI는 충분히 배우지 못하는가</h2>
+
+        <p class="section-intro">
+          LeCun의 비판은 LLM이 무용하다는 주장이 아니다. 언어모델이 보여준 압축과 생성 능력에도
+          불구하고, 그것만으로는 인간이 매우 적은 시행착오를 통해 획득하는 상식·물리 직관·행동 계획을
+          설명하기 어렵다는 것이다.
+        </p>
+
+        <figure class="figure-wide figure">
+          <img src="assets/72xj8k5wqx4-ts-00-06-28.jpg" alt="인간과 동물이 정신적 세계 모델을 학습하고 목표에 따라 행동한다는 강연 슬라이드" loading="lazy" width="1280" height="720">
+          <figcaption>
+            <strong>장면 2.</strong> 인간과 동물은 세계의 정신 모델을 형성하고, 행동의 결과를
+            예측하면서 복잡한 행동 시퀀스를 계획한다. 아동은 생후 초기부터 물체 영속성, 중력,
+            관성 같은 규칙을 단계적으로 획득한다.
+          </figcaption>
+        </figure>
+
+        <div class="metric" aria-label="언어모델과 4세 아이의 데이터량 비교">
+          <div class="metric-card">
+            <small>대규모 언어모델</small>
+            <strong>약 9×10¹³ B</strong>
+            <span>3×10¹³ 토큰 규모의 텍스트. 사람이 읽는다면 약 40만 년에 해당한다는 추산.</span>
+          </div>
+          <div class="metric-vs">versus</div>
+          <div class="metric-card">
+            <small>4세 아이의 감각 경험</small>
+            <strong>약 1.1×10¹⁴ B</strong>
+            <span>시각 신경 200만 개, 초당 1 byte, 깨어 있는 약 16,000시간을 사용한 개념적 추산.</span>
+          </div>
+        </div>
+
+        <figure class="figure-wide figure">
+          <img src="assets/72xj8k5wqx4-ts-00-12-25.jpg" alt="대규모 언어모델과 4세 아이가 처리한 데이터량을 비교하는 슬라이드" loading="lazy" width="1280" height="720">
+          <figcaption>
+            <strong>장면 3.</strong> “4세 아이는 LLM보다 더 많은 데이터를 보았다.” 수치는 정밀한
+            정보량 측정이라기보다 텍스트 외 감각 경험의 압도적 규모를 드러내는 사고실험에 가깝다.
+          </figcaption>
+        </figure>
+
+        <div class="callout">
+          <strong>해석할 때 주의할 점</strong>
+          <p>
+            byte 수는 학습 가치나 정보량과 동일하지 않다. 감각 신호에는 강한 시간적 중복이 있고,
+            토큰 역시 고정된 정보 단위가 아니다. 이 비교의 의미는 “아이가 정확히 몇 배 더 많은
+            정보를 얻는다”가 아니라, 지능 연구가 언어 데이터만으로는 놓치는 거대한 실세계 신호를
+            다시 보아야 한다는 데 있다.
+          </p>
+        </div>
+
+        <div class="plain-language">
+          <span class="label">쉽게 말하면</span>
+          <p>
+            LLM은 도서관의 모든 책을 읽은 학생에 가깝다. 아이는 공을 떨어뜨리고, 컵을 넘어뜨리고,
+            물체가 가려져도 사라지지 않는다는 사실을 몸으로 확인한다. 둘 다 데이터를 보지만,
+            두 번째 경험에는 시간·공간·원인과 결과가 함께 들어 있다.
+          </p>
+        </div>
+      </section>
+
+      <section id="planning" aria-labelledby="planning-title">
+        <span class="section-kicker">Evidence II · Reasoning</span>
+        <h2 id="planning-title">반응하는 시스템에서 계획하는 시스템으로</h2>
+
+        <p>
+          강연은 에이전틱 AI를 두 경로로 구분한다. 첫 번째는 현재 상태에서 곧바로 행동을 출력하는
+          <strong>System 1</strong> 방식이다. 빠르고 학습하기 쉽지만, 새로운 목표나 복잡한 제약을
+          만났을 때 내부에서 대안을 비교하지 않는다. 두 번째는 세계 모델을 이용해 행동 결과를
+          예측하고, 목표를 가장 잘 만족하는 행동 시퀀스를 찾는 <strong>System 2</strong> 방식이다.
+        </p>
+
+        <div class="figure-pair">
+          <figure class="figure">
+            <img src="assets/72xj8k5wqx4-ts-00-12-38.jpg" alt="피드포워드 예측과 계획 최적화 탐색을 비교하는 슬라이드" loading="lazy" width="1280" height="720">
+            <figcaption>
+              <strong>장면 4.</strong> 피드포워드 계산과 서치·최적화를 포함하는 계획 구조의 차이.
+            </figcaption>
+          </figure>
+
+          <figure class="figure">
+            <img src="assets/72xj8k5wqx4-ts-00-14-29.jpg" alt="System 1 반응형 에이전트와 System 2 계획형 에이전트를 비교하는 슬라이드" loading="lazy" width="1280" height="720">
+            <figcaption>
+              <strong>장면 5.</strong> 상태→행동 직접 매핑과 세계 모델 기반 행동 탐색을 비교한다.
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="table-scroll">
+          <table class="comparison">
+            <thead>
+              <tr>
+                <th scope="col">구분</th>
+                <th scope="col">System 1 · 반응형</th>
+                <th scope="col">System 2 · 계획형</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">핵심 연산</th>
+                <td>현재 관측에서 행동으로 직접 매핑</td>
+                <td>행동 결과 예측 후 목표 함수 최적화</td>
+              </tr>
+              <tr>
+                <th scope="row">장점</th>
+                <td>빠른 실행, 단순한 추론 경로, 익숙한 패턴에 강함</td>
+                <td>새로운 목표, 긴 행동 시퀀스, 제약 조건을 명시적으로 다룸</td>
+              </tr>
+              <tr>
+                <th scope="row">약점</th>
+                <td>분포 밖 상황과 장기 계획에 취약</td>
+                <td>정확한 세계 모델과 효율적인 탐색이 필요</td>
+              </tr>
+              <tr>
+                <th scope="row">대표적 접근</th>
+                <td>LLM 기반 정책, VLA의 직접 행동 생성</td>
+                <td>World Model + MPC·서치·에너지 최소화</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          여기서 “추론에는 최적화가 필요하다”는 주장은 생성 모델 내부의 모든 계산이 무의미하다는 뜻이
+          아니다. 핵심은 행동하기 전 여러 가능한 미래를 명시적으로 평가할 수 있어야 한다는 것이다.
+          체스 선수가 후보 수를 상상하고 비교하듯, 에이전트도 세계 모델 안에서 가상의 시행착오를
+          수행해야 한다.
+        </p>
+      </section>
+
+      <section id="architecture" aria-labelledby="architecture-title">
+        <span class="section-kicker">Architecture</span>
+        <h2 id="architecture-title">LeCun이 그리는 완전한 인지 아키텍처</h2>
+
+        <p class="section-intro">
+          장기 비전은 단일 거대 신경망보다 여러 기능이 목표를 중심으로 협력하는 모듈형 구조에 가깝다.
+          지각은 현재 상태를 추정하고, 세계 모델은 가능한 미래를 예측하며, 행위자는 목표와 안전
+          제약을 만족하는 행동을 선택한다. 기억과 구성자는 과제에 맞는 정보와 모듈을 활성화한다.
+        </p>
+
+        <div class="flow" role="img" aria-label="지각, 기억, 세계 모델, 목표, 안전 제약, 행위자, 행동으로 이어지는 인지 아키텍처 개념도">
+          <div class="flow-node">Perception<br>지각</div>
+          <div class="flow-node">Memory<br>기억</div>
+          <div class="flow-node accent">World Model<br>세계 모델</div>
+          <div class="flow-node">Task Objective<br>과제 목표</div>
+          <div class="flow-node">Guardrails<br>안전 제약</div>
+          <div class="flow-node">Actor<br>행위자</div>
+          <div class="flow-node">Action<br>행동</div>
+        </div>
+        <p class="flow-caption">Configurator는 과제와 상황에 따라 각 모듈의 동작을 조정한다.</p>
+
+        <figure class="figure-wide figure">
+          <img src="assets/72xj8k5wqx4-ts-00-16-10.jpg" alt="Perception, World Model, Actor, Memory, Configurator, Objective와 Guardrails로 구성된 인지 아키텍처 슬라이드" loading="lazy" width="1280" height="720">
+          <figcaption>
+            <strong>장면 6.</strong> 지각, 세계 모델, 행위자, 기억, 구성자, 과제 목표와 안전
+            가드레일을 연결한 목표 구동형 인지 아키텍처.
+          </figcaption>
+        </figure>
+
+        <figure class="figure-wide figure">
+          <img src="assets/72xj8k5wqx4-ts-00-16-21.jpg" alt="A path towards autonomous machine intelligence 논문과 Yann LeCun 강연 자료 링크가 표시된 슬라이드" loading="lazy" width="1280" height="720">
+          <figcaption>
+            <strong>장면 7.</strong> 이 아키텍처의 상세한 출발점은 LeCun의 2022년 논문
+            <cite>A Path Towards Autonomous Machine Intelligence</cite>다.
+          </figcaption>
+        </figure>
+
+        <div class="callout">
+          <strong>안전에 대한 구조적 주장</strong>
+          <p>
+            이 설계에서 안전은 출력 뒤에 붙이는 필터가 아니라, 행위자가 최소화해야 할 목표 함수의
+            일부다. LeCun은 이를 통해 가드레일을 우회하기 어렵게 만들 수 있다고 주장한다. 다만 실제
+            시스템에서는 목표 명세 오류, 세계 모델의 오판, 센서 실패가 여전히 존재하므로 구조 자체가
+            절대적인 안전을 보장한다고 보기는 어렵다.
+          </p>
+        </div>
+      </section>
+
+      <blockquote class="pullquote">
+        <p>세계 모델은 현실을 복제하는 카메라가 아니라, 행동에 필요한 것을 남기는 압축된 시뮬레이터다.</p>
+        <footer>JEPA의 표현 공간 예측을 설명하는 핵심 관점</footer>
+      </blockquote>
+
+      <section id="jepa" aria-labelledby="jepa-title">
+        <span class="section-kicker">Evidence III · Representation</span>
+        <h2 id="jepa-title">JEPA: 픽셀이 아니라 의미를 예측한다</h2>
+
+        <p>
+          미래 프레임을 픽셀 단위로 예측하는 모델은 수많은 가능한 미래를 모두 다뤄야 한다. 사람이
+          걸어갈 방향, 나뭇잎의 움직임, 그림자의 미세한 변화처럼 과제와 무관한 세부사항까지 정확히
+          생성하려 하면, 평균 제곱 오차 기반 모델은 서로 다른 가능성을 평균내어 흐릿한 이미지를
+          만든다.
+        </p>
+
+        <figure class="figure-wide figure">
+          <img src="assets/72xj8k5wqx4-ts-00-24-53.jpg" alt="여러 가능한 미래를 픽셀 공간에서 평균화할 때 흐릿한 예측이 발생하는 문제를 설명하는 슬라이드" loading="lazy" width="1280" height="720">
+          <figcaption>
+            <strong>장면 8.</strong> 픽셀 공간의 생성적 미래 예측은 다중 가능성을 평균화하며
+            흐릿해질 수 있다. JEPA는 추상 표현 공간의 예측으로 과제와 무관한 불확실성을 제거한다.
+          </figcaption>
+        </figure>
+
+        <div class="plain-language">
+          <span class="label">파인만식 설명</span>
+          <p>
+            사진 전체를 외우는 대신 “고양이가 창가에 앉아 있다”는 핵심을 기억한다고 생각하면 된다.
+            다음 순간 털 한 올이 어디로 움직일지는 몰라도, 고양이가 여전히 창가 근처에 있을 것이라는
+            의미 수준의 예측은 할 수 있다.
+          </p>
+        </div>
+
+        <h3>공동 임베딩 예측의 기본 구조</h3>
+
+        <p>
+          JEPA는 입력 <em>x</em>와 목표 <em>y</em>를 각각 표현으로 인코딩한다. 예측기는
+          <em>x</em>의 표현과 필요한 경우 잠재변수 또는 행동을 받아 <em>y</em>의 표현을 예측한다.
+          학습은 실제 목표 표현과 예측 표현의 거리를 줄이는 방향으로 진행된다.
+        </p>
+
+        <div class="equation" aria-label="JEPA의 기본 수식">
+          s<sub>x</sub> = Enc(x),
+          &nbsp; s<sub>y</sub> = Enc(y),
+          &nbsp; s̃<sub>y</sub> = Pred(s<sub>x</sub>, z),
+          &nbsp; min D(s<sub>y</sub>, s̃<sub>y</sub>)
+          <small>x는 관측, y는 예측 대상, z는 예측할 수 없는 변화를 나타내는 선택적 잠재변수다.</small>
+        </div>
+
+        <figure class="figure-wide figure">
+          <img src="assets/72xj8k5wqx4-ts-00-42-26.jpg" alt="관측과 행동으로부터 결과 표현을 예측하는 Action-Conditioned World Model 구조" loading="lazy" width="1280" height="720">
+          <figcaption>
+            <strong>장면 13.</strong> 행동 조건부 세계 모델은 관측 <em>x</em>와 개입
+            <em>a</em>가 주어졌을 때 결과 <em>y</em>의 추상 표현을 예측하는 인과 모델이다.
+          </figcaption>
+        </figure>
+
+        <h3>가장 쉬운 답이 가장 쓸모없는 답일 때</h3>
+
+        <p>
+          공동 임베딩 학습에는 치명적인 지름길이 있다. 인코더가 모든 입력을 똑같은 표현으로 보내면
+          예측기는 언제나 정답을 맞힐 수 있다. 손실은 낮지만 아무 정보도 남지 않는다. 이를
+          <strong>표현 붕괴</strong>라고 부른다.
+        </p>
+
+        <div class="plain-language">
+          <span class="label">쉽게 말하면</span>
+          <p>
+            세상의 모든 질문에 “42”라고 답하는 학생과 같다. 답은 항상 일관되므로 자기 답안끼리
+            비교하면 틀리지 않지만, 현실을 구분하거나 설명하는 능력은 전혀 없다.
+          </p>
+        </div>
+
+        <figure class="figure-wide figure">
+          <img src="assets/72xj8k5wqx4-ts-00-29-37.jpg" alt="JEPA의 예측 구조와 표현 붕괴를 막는 증류 및 정보 최대화 방법을 정리한 슬라이드" loading="lazy" width="1280" height="720">
+          <figcaption>
+            <strong>장면 9.</strong> JEPA의 붕괴 방지는 크게 증류(DINO, I-JEPA, V-JEPA)와
+            정보 최대화(SIGReg, VCReg, Barlow Twins 등)로 나뉜다.
+          </figcaption>
+        </figure>
+
+        <div class="table-scroll">
+          <table class="comparison">
+            <thead>
+              <tr>
+                <th scope="col">전략</th>
+                <th scope="col">핵심 아이디어</th>
+                <th scope="col">대표 방법</th>
+                <th scope="col">주요 부담</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">증류</th>
+                <td>변형된 입력을 보는 학생이 안정적인 교사 표현을 예측</td>
+                <td>DINO, I-JEPA, V-JEPA</td>
+                <td>교사 업데이트 규칙과 데이터 증강 설계</td>
+              </tr>
+              <tr>
+                <th scope="row">정보 최대화</th>
+                <td>샘플 다양성과 변수 독립성을 직접 정규화</td>
+                <td>SIGReg, VCReg, Barlow Twins, MMCR</td>
+                <td>유한 표본에서 정보량을 안정적으로 측정하는 문제</td>
+              </tr>
+              <tr>
+                <th scope="row">대조 학습</th>
+                <td>실제 샘플의 에너지는 낮추고 대조 샘플의 에너지는 높임</td>
+                <td>다양한 contrastive EBM</td>
+                <td>고차원에서 필요한 대조 샘플 수와 계산량</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>에너지 지형으로 보는 붕괴</h3>
+
+        <div class="figure-pair">
+          <figure class="figure">
+            <img src="assets/72xj8k5wqx4-ts-00-34-07.jpg" alt="붕괴, 대조 학습, 정규화 방법의 에너지 지형을 비교한 시각화" loading="lazy" width="1280" height="720">
+            <figcaption>
+              <strong>장면 10.</strong> 붕괴된 평탄면, 대조 방법, 정규화 방법이 만드는 에너지
+              표면의 차이.
+            </figcaption>
+          </figure>
+
+          <figure class="figure">
+            <img src="assets/72xj8k5wqx4-ts-00-35-17.jpg" alt="에너지 기반 모델의 대조 학습과 정규화 학습을 비교하는 슬라이드" loading="lazy" width="1280" height="720">
+            <figcaption>
+              <strong>장면 11.</strong> 대조 방법은 음성 샘플의 에너지를 올리고, 정규화 방법은
+              낮은 에너지를 허용하는 공간 자체를 제한한다.
+            </figcaption>
+          </figure>
+        </div>
+
+        <p>
+          에너지 기반 모델의 언어로 보면 학습 데이터와 잘 맞는 구성에는 낮은 에너지를, 그렇지 않은
+          구성에는 높은 에너지를 부여해야 한다. 모든 곳의 에너지가 같아지면 모델은 아무것도 구분하지
+          않는다. 대조 학습은 잘못된 사례를 직접 밀어내지만, 고차원 공간을 충분히 덮는 음성 샘플을
+          만들기 어렵다. 정규화 접근은 낮은 에너지 영역의 부피를 제한해 이 문제를 우회한다.
+        </p>
+
+        <h3>LeJEPA와 SIGReg: 표현에 정보를 남기는 법</h3>
+
+        <figure class="figure-wide figure">
+          <img src="assets/72xj8k5wqx4-ts-00-35-32.jpg" alt="LeJEPA의 인코더와 예측기, 샘플 다양성과 변수 독립성을 표현한 학습 다이어그램" loading="lazy" width="1280" height="720">
+          <figcaption>
+            <strong>장면 12.</strong> 좋은 표현은 행 방향으로 샘플이 다양하고, 열 방향으로 표현
+            변수가 중복되지 않아야 한다.
+          </figcaption>
+        </figure>
+
+        <div class="equation" aria-label="정보 최대화 항을 포함한 JEPA 손실">
+          ℒ = D(s<sub>y</sub>, s̃<sub>y</sub>)
+          − λ<sub>x</sub>I(s<sub>x</sub>)
+          − λ<sub>y</sub>I(s<sub>y</sub>)
+          <small>예측 오차는 줄이고, 입력과 목표 표현에 남아 있는 정보는 늘리는 개념적 목적함수.</small>
+        </div>
+
+        <p>
+          실제 난점은 인코더가 만든 유한한 표본만으로 고차원 표현의 정보량을 측정해야 한다는 것이다.
+          LeJEPA의 SIGReg(Sketched Isotropic Gaussian Regularization)는 여러 임의 방향으로 표현을
+          투영하고, 각 1차원 분포를 가우시안에 가깝게 만든다. 충분히 많은 방향에서 정규화를 적용하면
+          결합 분포가 등방성 가우시안으로 수렴한다는 아이디어다.
+        </p>
+
+        <div class="figure-pair">
+          <figure class="figure">
+            <img src="assets/72xj8k5wqx4-ts-00-42-41.jpg" alt="입력과 임베딩을 여러 방향으로 투영해 가우시안화하는 SIGReg 방법 슬라이드" loading="lazy" width="1280" height="720">
+            <figcaption>
+              <strong>장면 14.</strong> 무작위 투영으로 얻은 단변량 마진을 가우시안화해 표현의
+              다양성과 등방성을 유도한다.
+            </figcaption>
+          </figure>
+
+          <figure class="figure">
+            <img src="assets/72xj8k5wqx4-ts-00-46-09.jpg" alt="퇴화된 고차원 분포를 SIGReg 통계가 감지하고 등방성 가우시안으로 조정한 실험 결과" loading="lazy" width="1280" height="720">
+            <figcaption>
+              <strong>장면 15.</strong> SIGReg가 고차원 공간의 퇴화된 부분공간을 포착하는 합성
+              데이터 실험.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section id="evidence" aria-labelledby="evidence-title">
+        <span class="section-kicker">Evidence IV · Systems</span>
+        <h2 id="evidence-title">아이디어에서 시스템으로: DINO와 V-JEPA</h2>
+
+        <p class="section-intro">
+          세계 모델의 비전은 아직 완성되지 않았지만, 그 기반이 되는 자기지도 표현 학습은 이미 여러
+          벤치마크와 로봇 실험에서 구체적인 성과를 내고 있다. 중요한 변화는 단순 이미지 분류 정확도를
+          넘어, 깊이·추적·분할·물리적 상식·행동 계획까지 하나의 표현을 재사용한다는 점이다.
+        </p>
+
+        <h3>1. 이미지에서 의미를 학습하는 JEPA</h3>
+
+        <figure class="figure-wide figure">
+          <img src="assets/72xj8k5wqx4-ts-00-47-46.jpg" alt="JEPA 자기지도 사전학습과 분류 헤드 지도학습 단계를 보여주는 슬라이드" loading="lazy" width="1280" height="720">
+          <figcaption>
+            <strong>장면 16.</strong> 레이블 없이 다중 뷰의 일관성을 학습한 뒤 작은 분류 헤드를
+            추가해 표현 품질을 평가한다.
+          </figcaption>
+        </figure>
+
+        <figure class="figure-wide figure">
+          <img src="assets/72xj8k5wqx4-ts-00-49-51.jpg" alt="I-JEPA의 학생과 EMA 교사 구조 및 ImageNet 학습 효율 비교 그래프" loading="lazy" width="1280" height="720">
+          <figcaption>
+            <strong>장면 17.</strong> I-JEPA는 마스킹·변형된 입력을 처리하는 학생이 원본을 보는
+            EMA 교사의 표현을 예측하도록 학습한다.
+          </figcaption>
+        </figure>
+
+        <p>
+          I-JEPA에서 학생 브랜치는 일부가 가려지거나 변형된 이미지를 보고, 교사 브랜치는 더 완전한
+          문맥에서 목표 표현을 제공한다. 교사 가중치는 학생의 지수이동평균(EMA)으로 업데이트되어
+          학습 목표를 천천히 움직이게 한다. 픽셀을 복원할 필요가 없기 때문에 모델은 형태, 배치,
+          물체 관계처럼 안정적인 의미에 집중할 수 있다.
+        </p>
+
+        <h3>2. DINOv3: 범용 이미지 표현의 확장</h3>
+
+        <figure class="figure-wide figure">
+          <img src="assets/72xj8k5wqx4-ts-00-50-29.jpg" alt="DINOv3의 이미지 표현 성능과 깊이, 추적, 분할 향상을 보여주는 슬라이드" loading="lazy" width="1280" height="720">
+          <figcaption>
+            <strong>장면 18.</strong> 강연은 DINOv3를 범용 이미지 표현 시스템의 선두 사례로
+            소개한다. 이미지 분류뿐 아니라 깊이, 추적, 분할 등 밀집 예측 작업에서 강한 전이 성능을
+            강조한다.
+          </figcaption>
+        </figure>
+
+        <h3>3. 표현을 행동 계획에 연결하기</h3>
+
+        <figure class="figure-wide figure">
+          <img src="assets/72xj8k5wqx4-ts-00-50-40.jpg" alt="DINO-WM과 DINO-World가 모델 예측 제어로 로봇의 목표 도달 행동을 계획하는 슬라이드" loading="lazy" width="1280" height="720">
+          <figcaption>
+            <strong>장면 19.</strong> DINO-WM과 DINO-World는 시각 표현 공간에서 행동 결과를
+            예측하고 MPC로 행동 시퀀스를 최적화해 테스트 시 zero-shot 목표 도달을 수행한다.
+          </figcaption>
+        </figure>
+
+        <p>
+          DINO 기반 세계 모델은 초기 장면과 목표 장면을 표현 공간에 놓고, 여러 행동 시퀀스가 목표에
+          얼마나 가까운 미래 표현을 만드는지 비교한다. MPC(Model Predictive Control)는 짧은 미래를
+          반복적으로 최적화해 첫 행동을 실행하고, 새 관측이 들어오면 다시 계획한다. 이 방식은
+          완벽한 장기 예측보다 지속적인 관측과 재계획을 활용한다.
+        </p>
+
+        <h3>4. V-JEPA 2: 비디오에서 상식과 역학을 학습하다</h3>
+
+        <div class="figure-pair">
+          <figure class="figure">
+            <img src="assets/72xj8k5wqx4-ts-00-51-26.jpg" alt="V-JEPA 2의 학습 데이터와 비디오 이해 벤치마크 성능을 소개하는 슬라이드" loading="lazy" width="1280" height="720">
+            <figcaption>
+              <strong>장면 20.</strong> V-JEPA 2는 대규모 비레이블 비디오·이미지로 학습된 범용
+              비디오 표현 모델이다.
+            </figcaption>
+          </figure>
+
+          <figure class="figure">
+            <img src="assets/72xj8k5wqx4-ts-00-52-11.jpg" alt="V-JEPA가 자연 동영상 자기지도학습으로 직관적 물리 상식을 획득했음을 보여주는 결과" loading="lazy" width="1280" height="720">
+            <figcaption>
+              <strong>장면 21.</strong> 자연 동영상 사전학습만으로 물리적으로 가능한 미래와
+              불가능한 미래를 구분하는 능력이 나타난다.
+            </figcaption>
+          </figure>
+        </div>
+
+        <p>
+          직관적 물리 평가에서는 과거 프레임을 보고 미래 표현을 예측한 뒤, 실제 관측이 모델의
+          기대에서 얼마나 벗어나는지 측정한다. 물체가 갑자기 사라지거나 불가능한 경로로 이동하면
+          예측 오차가 커진다. 이는 언어로 규칙을 설명하지 않아도 자연 비디오의 시간 구조에서 일부
+          물리적 규칙을 획득할 수 있음을 시사한다.
+        </p>
+
+        <figure class="figure-wide figure">
+          <img src="assets/72xj8k5wqx4-ts-00-53-16.jpg" alt="V-JEPA 2 마스킹 비디오 학습과 행동 및 로봇 자세를 입력하는 V-JEPA 2-AC 구조" loading="lazy" width="1280" height="720">
+          <figcaption>
+            <strong>장면 22.</strong> 기본 V-JEPA 2는 가려진 비디오 표현을 예측한다.
+            V-JEPA 2-AC는 고정된 비디오 인코더 위에 로봇 행동과 자세를 조건으로 추가해 행동 결과를
+            예측한다.
+          </figcaption>
+        </figure>
+
+        <h3>5. V-JEPA 2.1: 표현의 정밀도를 공간 이해로 검증하다</h3>
+
+        <div class="figure-pair">
+          <figure class="figure">
+            <img src="assets/72xj8k5wqx4-ts-00-54-13.jpg" alt="도로와 실내 장면에서 DINOv3와 V-JEPA 2.1의 깊이 추정 결과를 비교한 슬라이드" loading="lazy" width="1280" height="720">
+            <figcaption>
+              <strong>장면 23.</strong> 다양한 환경의 깊이 추정에서 V-JEPA 2.1이 더 세밀한 공간
+              구조를 복원하는 사례.
+            </figcaption>
+          </figure>
+
+          <figure class="figure">
+            <img src="assets/72xj8k5wqx4-ts-00-54-22.jpg" alt="동물, 자전거, 도시 장면에서 DINOv3와 V-JEPA 계열의 시맨틱 분할 결과를 비교한 슬라이드" loading="lazy" width="1280" height="720">
+            <figcaption>
+              <strong>장면 24.</strong> 시맨틱 분할에서 V-JEPA 2.1이 물체 경계를 더 깨끗하게
+              구분하는 사례.
+            </figcaption>
+          </figure>
+        </div>
+
+        <h3>증거를 어떻게 읽어야 하는가</h3>
+
+        <ol class="evidence-list">
+          <li>
+            <strong>표현 전이는 분명한 진전이다.</strong>
+            하나의 자기지도 표현이 분류, 깊이, 추적, 분할과 비디오 이해에 재사용된다는 점은
+            범용성에 대한 강한 근거다.
+          </li>
+          <li>
+            <strong>직관적 물리 평가는 세계 모델의 초기 증거다.</strong>
+            그러나 제한된 벤치마크에서 이상 장면을 감지하는 능력과 열린 현실에서 장기 계획하는
+            능력은 동일하지 않다.
+          </li>
+          <li>
+            <strong>로봇 MPC는 행동 조건부 예측의 실용성을 보여준다.</strong>
+            동시에 짧은 계획 지평, 제한된 행동 공간, 반복 재계획에 의존할 수 있다는 조건을 함께
+            보아야 한다.
+          </li>
+          <li>
+            <strong>“최고”라는 표현은 평가 범위에 종속된다.</strong>
+            모델 크기, 데이터, 계산량, 평가 프로토콜이 다르므로 특정 벤치마크 우위를 일반지능의
+            우위로 확대 해석해서는 안 된다.
+          </li>
+        </ol>
+
+        <div class="table-scroll">
+          <table class="comparison">
+            <thead>
+              <tr>
+                <th scope="col">시스템</th>
+                <th scope="col">학습 신호</th>
+                <th scope="col">주요 대상</th>
+                <th scope="col">세계 모델 비전과의 연결</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">I-JEPA</th>
+                <td>마스킹 문맥에서 목표 표현 예측</td>
+                <td>정적 이미지</td>
+                <td>픽셀 복원 없는 의미 표현 학습</td>
+              </tr>
+              <tr>
+                <th scope="row">DINOv3</th>
+                <td>자기증류 기반 자기지도학습</td>
+                <td>이미지·밀집 예측</td>
+                <td>재사용 가능한 시각 상태 표현</td>
+              </tr>
+              <tr>
+                <th scope="row">DINO-WM / DINO-World</th>
+                <td>행동에 따른 표현 변화</td>
+                <td>로봇 목표 도달</td>
+                <td>MPC가 탐색할 수 있는 잠재 동역학</td>
+              </tr>
+              <tr>
+                <th scope="row">V-JEPA 2</th>
+                <td>마스킹된 시공간 표현 예측</td>
+                <td>비디오 이해·물리 상식</td>
+                <td>시간적 변화와 기대 위반 학습</td>
+              </tr>
+              <tr>
+                <th scope="row">V-JEPA 2-AC</th>
+                <td>행동·자세 조건부 미래 표현</td>
+                <td>로봇 상호작용</td>
+                <td>개입 결과를 예측하는 인과 모델</td>
+              </tr>
+              <tr>
+                <th scope="row">V-JEPA 2.1</th>
+                <td>확장된 비디오 표현 학습</td>
+                <td>깊이·시맨틱 분할</td>
+                <td>정밀한 공간 구조 표현 검증</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="hierarchy" aria-labelledby="hierarchy-title">
+        <span class="section-kicker">Outlook</span>
+        <h2 id="hierarchy-title">다음 질문: 세계를 몇 단계로 이해해야 하는가</h2>
+
+        <p>
+          강연의 마지막은 하나의 모델이 모든 세부사항을 같은 해상도와 시간 척도에서 처리하는 방식에서
+          벗어난다. 원자는 분자 수준의 법칙으로, 분자는 물질의 성질로, 물질은 물체와 시스템의
+          거동으로 이어진다. 생명 영역에서도 단백질, 세포소기관, 세포, 장기, 개체, 사회, 생태계가
+          서로 다른 추상화 층을 이룬다.
+        </p>
+
+        <figure class="figure-wide figure">
+          <img src="assets/72xj8k5wqx4-ts-00-57-02.jpg" alt="물리와 생명 시스템의 복잡성 계층 및 계층적 JEPA 미래 비전을 보여주는 슬라이드" loading="lazy" width="1280" height="720">
+          <figcaption>
+            <strong>장면 25.</strong> 계층적 JEPA가 양자장부터 생태계까지 복잡한 시스템의 보편적
+            인과 모델을 구축할 수 있는가라는 질문으로 강연은 끝난다.
+          </figcaption>
+        </figure>
+
+        <p>
+          계층적 모델의 핵심은 아래 단계의 모든 정보를 상위 단계로 복사하지 않는 것이다. 상위
+          표현은 더 긴 시간 범위와 더 큰 공간 규모에서 안정적인 변수만 남긴다. 자동차를 운전할 때
+          타이어 고무의 분자 운동까지 예측할 필요는 없지만, 노면 마찰과 차량의 움직임은 알아야 하는
+          것과 같다.
+        </p>
+      </section>
+
+      <section id="implications" aria-labelledby="implications-title">
+        <span class="section-kicker">Implications</span>
+        <h2 id="implications-title">이 연구 방향이 바꾸는 것</h2>
+
+        <div class="implications">
+          <article class="implication">
+            <span>01</span>
+            <h3>AI 제품의 중심이 대화에서 행동으로 이동한다</h3>
+            <p>
+              실세계 에이전트는 답변 품질뿐 아니라 상태 추정, 결과 예측, 재계획, 안전 제약을 하나의
+              실행 루프로 묶어야 한다.
+            </p>
+          </article>
+
+          <article class="implication">
+            <span>02</span>
+            <h3>비레이블 비디오가 핵심 학습 자원이 된다</h3>
+            <p>
+              영상은 물체, 운동, 지속성, 상호작용에 관한 구조를 포함한다. 텍스트가 설명하지 않는
+              현실의 규칙을 학습할 수 있는 원천이다.
+            </p>
+          </article>
+
+          <article class="implication">
+            <span>03</span>
+            <h3>평가 기준이 생성 품질에서 계획 성공률로 확장된다</h3>
+            <p>
+              좋은 세계 모델은 보기 좋은 프레임보다 목표 달성에 필요한 구분을 보존해야 한다.
+              장기적 성공, 재계획 효율, 제약 준수가 중요해진다.
+            </p>
+          </article>
+        </div>
+
+        <h3>연구자와 개발자를 위한 실무적 질문</h3>
+
+        <ul>
+          <li>현재 모델은 과제와 무관한 세부사항까지 생성하느라 계산을 낭비하고 있지 않은가?</li>
+          <li>표현이 샘플을 충분히 구분하며, 변수 간 중복을 줄이고 있는가?</li>
+          <li>정적 데이터 성능 외에 시간적 일관성과 행동 결과 예측을 평가하고 있는가?</li>
+          <li>정책이 실패했을 때 세계 모델의 오류와 계획기의 오류를 분리해 진단할 수 있는가?</li>
+          <li>안전 제약이 사후 필터가 아니라 행동 선택의 목적함수와 검증 과정에 포함되어 있는가?</li>
+          <li>짧은 지평의 MPC 성과가 장기적·계층적 계획으로 확장될 근거가 있는가?</li>
+        </ul>
+
+        <div class="callout">
+          <strong>가장 큰 미해결 과제</strong>
+          <p>
+            표현 공간에서 무엇을 버리고 무엇을 보존할지 자동으로 결정하는 문제다. 너무 많은
+            세부사항을 남기면 예측이 어려워지고, 너무 많이 버리면 계획에 필요한 정보가 사라진다.
+            좋은 추상화의 기준은 결국 “어떤 목표를 위해 어떤 행동을 선택해야 하는가”와 연결된다.
+          </p>
+        </div>
+      </section>
+
+      <section id="timeline" aria-labelledby="timeline-title">
+        <span class="section-kicker">Viewing guide</span>
+        <h2 id="timeline-title">58분 강연 타임라인</h2>
+
+        <div class="timeline">
+          <div class="timeline-item"><time>0:00</time><p><strong>오프닝.</strong> “Machine learning sucks” — 현재 학습 방식의 한계 선언.</p></div>
+          <div class="timeline-item"><time>3:00</time><p><strong>학습.</strong> 인간과 동물의 정신 모델, 목표 구동 행동, 결과 예측.</p></div>
+          <div class="timeline-item"><time>6:00</time><p><strong>발달.</strong> 아동의 위반 기대 실험과 물리 개념 획득.</p></div>
+          <div class="timeline-item"><time>9:00</time><p><strong>상식.</strong> 물리적 직관과 공통 상식 평가.</p></div>
+          <div class="timeline-item"><time>12:00</time><p><strong>데이터.</strong> LLM과 아이의 경험량 비교, 비디오의 중요성.</p></div>
+          <div class="timeline-item"><time>15:00</time><p><strong>구조.</strong> 세계 모델 기반 모듈형 인지 아키텍처.</p></div>
+          <div class="timeline-item"><time>18:00</time><p><strong>안전.</strong> 목표 함수에 포함되는 Safety Guardrails.</p></div>
+          <div class="timeline-item"><time>21:00</time><p><strong>계층.</strong> 세계 모델을 어떻게 구성하고 훈련할 것인가.</p></div>
+          <div class="timeline-item"><time>24:00</time><p><strong>표현.</strong> 픽셀이 아닌 추상 공간에서 미래 예측.</p></div>
+          <div class="timeline-item"><time>27:00</time><p><strong>JEPA.</strong> Joint Embedding Architecture의 필요성.</p></div>
+          <div class="timeline-item"><time>30:00</time><p><strong>확산.</strong> JEPA 연구 커뮤니티와 관련 연구 증가.</p></div>
+          <div class="timeline-item"><time>33:00</time><p><strong>EBM.</strong> 에너지 지형과 표현 붕괴의 직관.</p></div>
+          <div class="timeline-item"><time>36:00</time><p><strong>다양성.</strong> 샘플 다양성과 표현 변수 독립성.</p></div>
+          <div class="timeline-item"><time>39:00</time><p><strong>추상화.</strong> 상위 개념이 새로운 정보를 만드는 방식.</p></div>
+          <div class="timeline-item"><time>42:00</time><p><strong>행동.</strong> Action-Conditioned World Model의 정의.</p></div>
+          <div class="timeline-item"><time>45:00</time><p><strong>SIGReg.</strong> 투영과 등방성 가우시안 정규화.</p></div>
+          <div class="timeline-item"><time>48:00</time><p><strong>I-JEPA.</strong> 이미지 표현의 자기증류 학습.</p></div>
+          <div class="timeline-item"><time>50:00</time><p><strong>DINO.</strong> DINOv3와 로봇 세계 모델·MPC.</p></div>
+          <div class="timeline-item"><time>51:00</time><p><strong>V-JEPA 2.</strong> 비디오 표현과 행동 조건부 버전.</p></div>
+          <div class="timeline-item"><time>52:00</time><p><strong>물리 상식.</strong> 자연 동영상 사전학습에서 나타난 직관.</p></div>
+          <div class="timeline-item"><time>54:00</time><p><strong>V-JEPA 2.1.</strong> 깊이 추정과 시맨틱 분할.</p></div>
+          <div class="timeline-item"><time>57:00</time><p><strong>전망.</strong> 모든 복잡계를 향한 계층적 인과 모델.</p></div>
+          <div class="timeline-item"><time>57:30</time><p><strong>Q&amp;A.</strong> MPC에서 표현 공간 제약을 처리하는 방법.</p></div>
+        </div>
+
+        <p>
+          원본 강연은
+          <a rel="noopener noreferrer">YouTube에서 시청</a>할 수 있다.
+          이 문서는 보안상 영상 플레이어를 삽입하지 않고 정적 링크만 제공한다.
+        </p>
+      </section>
+
+      <section class="takeaways" id="takeaways" aria-labelledby="takeaways-title">
+        <span class="section-kicker">Reader takeaways</span>
+        <h2 id="takeaways-title">독자가 기억해야 할 다섯 문장</h2>
+        <ol>
+          <li><strong>언어를 많이 읽는 것과 세계를 이해하는 것은 같은 문제가 아니다.</strong></li>
+          <li><strong>계획 가능한 AI에는 행동 결과를 상상하는 세계 모델이 필요하다.</strong></li>
+          <li><strong>JEPA는 불확실한 픽셀 대신 행동에 필요한 의미를 예측한다.</strong></li>
+          <li><strong>표현 붕괴를 막는 증류와 정보 최대화가 자기지도학습의 핵심 기술이다.</strong></li>
+          <li><strong>DINO와 V-JEPA의 성과는 중요한 기반이지만, 장기적 자율지능은 아직 열린 연구 문제다.</strong></li>
+        </ol>
+      </section>
+
+      <aside class="share-copy" aria-label="공유용 소개 문구">
+        <strong>Share-ready summary</strong>
+        <p>
+          LLM 다음의 AI는 더 많은 문장을 생성하는 모델이 아니라, 행동의 결과를 예측하고 목표를 향해
+          계획하는 모델일 수 있다. Yann LeCun의 World Models·JEPA 비전을 이미지 학습, 비디오 상식,
+          로봇 플래닝의 근거와 함께 정리했다.
+        </p>
+      </aside>
+
+      <section class="sources" id="sources" aria-labelledby="sources-title">
+        <span class="section-kicker">Source notes</span>
+        <h2 id="sources-title">출처 및 연구 노트</h2>
+
+        <ol class="source-list">
+          <li>
+            <cite>Yann LeCun, “World Models: Enabling the next AI revolution.”</cite>
+            Computer Vision and Geometry Group, ETH Zurich, 2026-06-09.
+            <a rel="noopener noreferrer">강연 영상</a>
+          </li>
+          <li>
+            <cite>Yann LeCun, “A Path Towards Autonomous Machine Intelligence.”</cite>
+            OpenReview, 2022.
+            <a rel="noopener noreferrer">자료 보기</a>
+          </li>
+          <li>
+            <cite>Emmanuel Dupoux, Yann LeCun, Jitendra Malik, “Why AI systems don't learn and what to do about it.”</cite>
+            arXiv:2603.15381.
+            <a rel="noopener noreferrer">arXiv</a>
+          </li>
+          <li>
+            <cite>Michaël Mathieu, Camille Couprie, Yann LeCun, “Deep Multi-Scale Video Prediction Beyond Mean Square Error.”</cite>
+            ICLR, 2016.
+          </li>
+          <li>
+            <cite>Adam Lerer, Sam Gross, Rob Fergus, “Learning Physical Intuition of Block Towers by Example.”</cite>
+            arXiv:1603.01312.
+            <a rel="noopener noreferrer">arXiv</a>
+          </li>
+          <li>
+            <cite>Mahmoud Assran et al., “Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture.”</cite>
+            CVPR 2023, arXiv:2301.08243.
+            <a rel="noopener noreferrer">arXiv</a>
+          </li>
+          <li>
+            <cite>DINOv3.</cite> arXiv:2508.10104.
+            <a rel="noopener noreferrer">프로젝트 페이지</a>
+          </li>
+          <li>
+            <cite>DINO-WM.</cite> arXiv:2411.04983.
+            <a rel="noopener noreferrer">프로젝트 페이지</a>
+          </li>
+          <li>
+            <cite>DINO-World.</cite> arXiv:2507.19468.
+            <a rel="noopener noreferrer">arXiv</a>
+          </li>
+          <li>
+            <cite>Mahmoud Assran et al., “V-JEPA 2.”</cite>
+            arXiv:2506.09985.
+            <a rel="noopener noreferrer">프로젝트 페이지</a>
+          </li>
+          <li>
+            <cite>Mur-Labadia et al., “V-JEPA 2.1.”</cite>
+            arXiv:2603.14482.
+            <a rel="noopener noreferrer">arXiv</a>
+          </li>
+          <li>
+            <cite>Randall Balestriero, Yann LeCun, “LeJEPA / SIGReg.”</cite>
+            arXiv:2511.08544.
+            <a rel="noopener noreferrer">arXiv</a>
+          </li>
+          <li>
+            <cite>Garrido et al., “Intuitive Physics Understanding Emerges from Self-Supervised Pretraining on Natural Videos.”</cite>
+            arXiv:2502.11831.
+            <a rel="noopener noreferrer">arXiv</a>
+          </li>
+          <li>
+            <cite>Yann LeCun Technical Talks.</cite>
+            <a rel="noopener noreferrer">강연 모음</a>
+          </li>
+        </ol>
+
+        <p class="source-note">
+          이 글은 제공된 강연 노트와 화면 캡처를 바탕으로 편집·재구성한 연구 해설이다. 성능 수치와
+          “최고” 등의 비교 표현은 강연 슬라이드가 제시한 평가 조건에 따른다. 논문의 세부 실험 설정,
+          통계적 유의성, 후속 수정 여부는 각 원문을 통해 별도로 확인해야 한다.
+        </p>
+      </section>
+
+      <section class="closing" aria-labelledby="closing-title">
+        <span class="section-kicker">Closing perspective</span>
+        <h2 id="closing-title">생성의 시대 다음에는 예측과 계획의 시대가 올까</h2>
+
+        <p>
+          세계 모델은 LLM을 폐기하는 선언이라기보다 지능의 빈칸을 채우려는 연구 프로그램이다.
+          언어모델은 지식과 의도를 표현하는 강력한 인터페이스가 될 수 있다. 그러나 현실에서 행동하려면
+          지각한 세계가 어떻게 변하는지, 선택한 행동이 어떤 결과를 낳는지, 실패했을 때 어떻게 다시
+          계획할지를 다루는 별도의 구조가 필요하다.
+        </p>
+
+        <p>
+          JEPA는 그 구조를 만들기 위한 한 가지 답이다. 모든 것을 생성하지 않고, 중요한 것을
+          표현하며, 표현 속에서 미래를 예측한다. DINO와 V-JEPA가 보여주는 성과는 이 방향이 유망하다는
+          증거다. 동시에 열린 환경에서 장기 목표를 달성하고, 계층적 인과관계를 학습하며, 안전 제약을
+          지속적으로 지키는 시스템까지는 아직 갈 길이 멀다.
+        </p>
+
+        <p class="last-line">
+          다음 AI 혁명의 기준은 얼마나 그럴듯하게 말하는가가 아니라, 얼마나 정확하게 세계를 상상하고
+          책임 있게 행동하는가가 될지도 모른다.
+        </p>
+      </section>
+    </article>
+
+    <aside class="toc" aria-label="기사 목차">
+      <span class="toc-title">Contents</span>
+      <ol>
+        <li><a href="#abstract">초록</a></li>
+        <li><a href="#findings">핵심 발견</a></li>
+        <li><a href="#limits">현재 AI의 한계</a></li>
+        <li><a href="#planning">반응과 계획</a></li>
+        <li><a href="#architecture">인지 아키텍처</a></li>
+        <li><a href="#jepa">JEPA와 표현 붕괴</a></li>
+        <li><a href="#evidence">DINO·V-JEPA의 증거</a></li>
+        <li><a href="#hierarchy">계층적 세계 모델</a></li>
+        <li><a href="#implications">연구의 함의</a></li>
+        <li><a href="#timeline">강연 타임라인</a></li>
+        <li><a href="#takeaways">핵심 정리</a></li>
+        <li><a href="#sources">출처</a></li>
+      </ol>
+    </aside>
+  </main>
+
+  <footer class="article-footer">
+    <div class="article-footer-inner">
+      <div>
+        <strong>World Models: Enabling the next AI revolution</strong>
+        <p>
+          Yann LeCun의 ETH Zurich 강연을 바탕으로 작성한 독립형 연구 해설.
+          주제: 세계 모델, JEPA, 자기지도학습, 행동 조건부 예측, 자율지능.
+        </p>
+      </div>
+      <a class="back-to-top" href="#top">맨 위로 ↑</a>
+    </div>
+  </footer>
+</body>
+</html>
