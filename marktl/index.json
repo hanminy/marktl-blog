@@ -1,7 +1,22 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-08T01:01:32.762Z",
+  "updatedAt": "2026-08-08T01:07:01.769Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-robert-platt-model-matters-leveraging-geometry-%EC%9A%94%EC%95%BD/",
+      "excerpt": "Robert Platt (Northeastern University): Model Matters — Leveraging Geometry in Robot Learning 영상 정보 채널 : Zhanpeng He (ICRA 2026 RL4IL 워크샵) 게시일 : 2026 06 08 길이 : 30분 03초 링크 : https://www.youtube.com/watch?v=4K9pg K9Ync <div style=\"position: ",
+      "shortId": "c1q5zk",
+      "slug": "yt-robert-platt-model-matters-leveraging-geometry-요약",
+      "sourcePath": "clippings/yt_Robert_Platt_Model_Matters_Leveraging_Geometry_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료"
+      ],
+      "title": "Robert Platt (Northeastern University): Model Matters — Leveraging Geometry in Robot Learning",
+      "updatedAt": "2026-08-08T01:07:01.769Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/c1q5zk/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-david-held-rl-case-study-robot-assisted-dressing-%EC%9A%94%EC%95%BD/",
@@ -76,21 +91,6 @@
       "title": "Georgia Chalvatzaki (TU Darmstadt): Reinforcement Learning From, For and With Demonstrations",
       "updatedAt": "2026-08-07T15:55:53.378Z",
       "url": "https://hanminy.github.io/marktl-blog/marktl/s/1y6niw0/"
-    },
-    {
-      "artifactType": "research-report",
-      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-robert-platt-model-matters-leveraging-geometry-%EC%9A%94%EC%95%BD/",
-      "excerpt": "Robert Platt (Northeastern University): Model Matters — Leveraging Geometry in Robot Learning 영상 정보 채널 : Zhanpeng He (ICRA 2026 RL4IL 워크샵) 게시일 : 2026 06 08 길이 : 30분 03초 링크 : https://www.youtube.com/watch?v=4K9pg K9Ync <div style=\"position: ",
-      "shortId": "c1q5zk",
-      "slug": "yt-robert-platt-model-matters-leveraging-geometry-요약",
-      "sourcePath": "clippings/yt_Robert_Platt_Model_Matters_Leveraging_Geometry_요약.md",
-      "tags": [
-        "youtube",
-        "연구자료"
-      ],
-      "title": "Robert Platt (Northeastern University): Model Matters — Leveraging Geometry in Robot Learning",
-      "updatedAt": "2026-08-07T15:48:39.411Z",
-      "url": "https://hanminy.github.io/marktl-blog/marktl/s/c1q5zk/"
     },
     {
       "artifactType": "research-report",

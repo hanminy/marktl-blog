@@ -1,25 +1,876 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Robert Platt (Northeastern University): Model Matters — Leveraging Geometry in Robot Learning</title>
-<style>
-      body { margin: 0; font-family: Georgia, "Times New Roman", serif; color: #202124; background: #faf7f2; }
-      main { max-width: 900px; margin: 0 auto; padding: 56px 36px 80px; box-sizing: border-box; }
-      article { background: #fffdf8; border: 1px solid #e6ddcf; padding: 44px; }
-      h1 { font-size: 44px; line-height: 1.05; margin-top: 0; }
-      h2 { margin-top: 42px; border-top: 1px solid #dfd5c8; padding-top: 24px; }
-      p, li { font-size: 18px; line-height: 1.75; }
-      a { color: #8b3a2b; }
-      pre { overflow: auto; padding: 18px; background: #25211d; color: #f7efe4; border-radius: 6px; }
-      table { width: 100%; border-collapse: collapse; margin: 22px 0; background: #fff; }
-      th, td { border-bottom: 1px solid #e6ddcf; padding: 10px 12px; }
-      img { max-width: 100%; height: auto; display: block; margin: 24px auto; }
-      .frontmatter { white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: #f1eadf; padding: 14px; color: #5f574f; }
-      .callout { border: 1px solid #d8b98c; background: #fff6e5; padding: 16px 18px; margin: 24px 0; }
-      .callout-title { font-family: ui-sans-serif, system-ui, sans-serif; font-weight: 800; text-transform: uppercase; font-size: 12px; letter-spacing: .08em; }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>데이터를 더 모으는 대신, 학습 곡선을 옮겨라 — 로봇 학습과 기하학</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  <style>
+    :root {
+      --paper: #f6f2e9;
+      --paper-deep: #ece5d8;
+      --ink: #19231f;
+      --muted: #64706a;
+      --line: #d5cfc2;
+      --accent: #ba4934;
+      --accent-dark: #7e2e20;
+      --forest: #1f5548;
+      --forest-soft: #dceae4;
+      --gold: #c88b2c;
+      --white: #fffdf8;
+      --shadow: 0 24px 70px rgba(39, 45, 38, 0.11);
+      --radius: 1.25rem;
+      --content: 760px;
+      --wide: 1120px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 3%, rgba(200, 139, 44, 0.12), transparent 24rem),
+        linear-gradient(180deg, #faf7f0 0, var(--paper) 36rem, #f8f5ee 100%);
+      font-family: Pretendard, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+      font-size: 17px;
+      line-height: 1.85;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+
+    a {
+      color: var(--accent-dark);
+      text-decoration-color: rgba(126, 46, 32, 0.35);
+      text-underline-offset: 0.18em;
+    }
+
+    a:hover,
+    a:focus-visible {
+      color: var(--accent);
+      text-decoration-color: currentColor;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    figure {
+      margin: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      top: -5rem;
+      left: 1rem;
+      z-index: 20;
+      padding: 0.7rem 1rem;
+      color: white;
+      background: var(--ink);
+      border-radius: 0.5rem;
+    }
+
+    .skip-link:focus {
+      top: 1rem;
+    }
+
+    .topbar {
+      border-bottom: 1px solid rgba(25, 35, 31, 0.12);
+      background: rgba(250, 247, 240, 0.88);
+    }
+
+    .topbar-inner {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: auto;
+      padding: 0.8rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .brand {
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .source-link {
+      white-space: nowrap;
+    }
+
+    .hero {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: 0 auto;
+      padding: clamp(4rem, 9vw, 8rem) 0 3rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+      gap: clamp(2rem, 6vw, 6rem);
+      align-items: end;
+    }
+
+    .eyebrow {
+      margin: 0 0 1.25rem;
+      color: var(--accent);
+      font-size: 0.77rem;
+      font-weight: 850;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    blockquote {
+      font-family: "Iowan Old Style", "Noto Serif KR", "Nanum Myeongjo", Batang, serif;
+    }
+
+    h1 {
+      max-width: 820px;
+      margin: 0;
+      font-size: clamp(2.7rem, 7vw, 6.25rem);
+      line-height: 1.06;
+      letter-spacing: -0.055em;
+      font-weight: 800;
+    }
+
+    h1 em {
+      color: var(--accent);
+      font-style: normal;
+    }
+
+    .dek {
+      max-width: 690px;
+      margin: 1.8rem 0 0;
+      color: #4d5953;
+      font-size: clamp(1.08rem, 1.8vw, 1.35rem);
+      line-height: 1.7;
+    }
+
+    .hero-card {
+      overflow: hidden;
+      background: var(--white);
+      border: 1px solid rgba(25, 35, 31, 0.12);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      transform: rotate(1.1deg);
+    }
+
+    .hero-card img {
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+    }
+
+    .hero-card figcaption {
+      padding: 1rem 1.15rem 1.15rem;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+
+    .meta-row {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: 0 auto 3.5rem;
+      padding: 1.1rem 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem 1.8rem;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .meta-row strong {
+      color: var(--ink);
+    }
+
+    .article-grid {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: auto;
+      display: grid;
+      grid-template-columns: 220px minmax(0, var(--content));
+      gap: clamp(2rem, 6vw, 6rem);
+      justify-content: center;
+    }
+
+    .toc {
+      align-self: start;
+      position: sticky;
+      top: 1.5rem;
+      padding-top: 0.35rem;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+
+    .toc-title {
+      margin: 0 0 0.9rem;
+      color: var(--ink);
+      font-size: 0.7rem;
+      font-weight: 850;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .toc ol {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      border-left: 1px solid var(--line);
+    }
+
+    .toc li {
+      margin: 0;
+    }
+
+    .toc a {
+      display: block;
+      padding: 0.45rem 0 0.45rem 1rem;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .toc a:hover,
+    .toc a:focus-visible {
+      color: var(--accent);
+    }
+
+    article {
+      min-width: 0;
+    }
+
+    .abstract {
+      margin-bottom: 5rem;
+      padding: clamp(1.5rem, 4vw, 2.4rem);
+      background: var(--ink);
+      color: #eef2ed;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .abstract .label {
+      margin: 0 0 0.8rem;
+      color: #e7b85b;
+      font-size: 0.7rem;
+      font-weight: 850;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .abstract p {
+      margin: 0;
+      font-size: 1.08rem;
+      line-height: 1.8;
+    }
+
+    .section {
+      margin: 0 0 6rem;
+      scroll-margin-top: 2rem;
+    }
+
+    .section-kicker {
+      margin: 0 0 0.55rem;
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 850;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 0 0 1.5rem;
+      font-size: clamp(2rem, 4.2vw, 3.35rem);
+      line-height: 1.18;
+      letter-spacing: -0.04em;
+    }
+
+    h3 {
+      margin: 3.5rem 0 1rem;
+      font-size: clamp(1.35rem, 2.5vw, 1.85rem);
+      line-height: 1.35;
+      letter-spacing: -0.025em;
+    }
+
+    p {
+      margin: 0 0 1.35rem;
+    }
+
+    .lead::first-letter {
+      float: left;
+      margin: 0.05em 0.12em 0 0;
+      color: var(--accent);
+      font-family: "Iowan Old Style", "Noto Serif KR", Batang, serif;
+      font-size: 4.2em;
+      font-weight: 800;
+      line-height: 0.78;
+    }
+
+    .key-findings {
+      margin: 2.5rem 0 0;
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    .finding {
+      display: grid;
+      grid-template-columns: 4rem 1fr;
+      gap: 1rem;
+      padding: 1.2rem 1.25rem;
+      background: rgba(255, 253, 248, 0.72);
+      border: 1px solid var(--line);
+      border-radius: 0.9rem;
+    }
+
+    .finding-number {
+      color: var(--accent);
+      font-family: "Iowan Old Style", Georgia, serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .finding strong {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-size: 1.01rem;
+    }
+
+    .finding p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.91rem;
+      line-height: 1.65;
+    }
+
+    .frame {
+      margin: 2.2rem 0;
+      overflow: hidden;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 1rem;
+      box-shadow: 0 16px 45px rgba(39, 45, 38, 0.09);
+    }
+
+    .frame img {
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      background: #ddd8cd;
+    }
+
+    .frame figcaption {
+      padding: 0.9rem 1.15rem 1rem;
+      color: var(--muted);
+      font-size: 0.79rem;
+      line-height: 1.6;
+    }
+
+    .timestamp {
+      color: var(--accent-dark);
+      font-weight: 800;
+    }
+
+    .filmstrip {
+      width: min(calc(100vw - 2rem), var(--wide));
+      margin-left: max(calc((var(--content) - min(100vw - 2rem, var(--wide))) / 2), -180px);
+      margin-top: 2.5rem;
+      margin-bottom: 2.5rem;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .filmstrip .frame {
+      margin: 0;
+    }
+
+    .filmstrip .frame:nth-child(3) {
+      grid-column: 1 / -1;
+      width: calc(50% - 0.5rem);
+      justify-self: center;
+    }
+
+    .pullquote {
+      width: min(calc(100vw - 2rem), 930px);
+      margin: 4.5rem 0 4.5rem max(-85px, calc((var(--content) - 930px) / 2));
+      padding: 2.4rem clamp(1.5rem, 5vw, 4rem);
+      color: var(--white);
+      background: var(--accent);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      font-size: clamp(1.55rem, 3.3vw, 2.5rem);
+      font-weight: 750;
+      line-height: 1.45;
+      letter-spacing: -0.035em;
+    }
+
+    .pullquote p {
+      margin: 0;
+    }
+
+    .pullquote cite {
+      display: block;
+      margin-top: 1.2rem;
+      color: rgba(255, 255, 255, 0.8);
+      font-family: Pretendard, "Apple SD Gothic Neo", sans-serif;
+      font-size: 0.72rem;
+      font-style: normal;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .diagram {
+      margin: 2.4rem 0;
+      padding: 1.4rem;
+      background: var(--forest-soft);
+      border: 1px solid #bfd3ca;
+      border-radius: var(--radius);
+    }
+
+    .diagram-title {
+      margin: 0 0 1rem;
+      color: var(--forest);
+      font-size: 0.74rem;
+      font-weight: 850;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.6rem;
+      align-items: stretch;
+    }
+
+    .flow-step {
+      position: relative;
+      padding: 1rem 0.75rem;
+      display: grid;
+      place-items: center;
+      min-height: 6rem;
+      color: var(--forest);
+      background: rgba(255, 255, 255, 0.66);
+      border: 1px solid rgba(31, 85, 72, 0.2);
+      border-radius: 0.75rem;
+      text-align: center;
+      font-size: 0.83rem;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+
+    .flow-step:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      right: -0.72rem;
+      z-index: 2;
+      color: var(--forest);
+      font-size: 1.2rem;
+    }
+
+    .equation {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      color: var(--forest);
+      background: var(--white);
+      border-left: 5px solid var(--forest);
+      border-radius: 0 0.8rem 0.8rem 0;
+      font-family: "Iowan Old Style", Georgia, serif;
+      font-size: clamp(1.35rem, 3vw, 2rem);
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+
+    .equation small {
+      display: block;
+      margin-top: 0.65rem;
+      color: var(--muted);
+      font-family: Pretendard, "Apple SD Gothic Neo", sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0;
+    }
+
+    .data-callout {
+      margin: 2.5rem 0;
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1.5rem;
+      align-items: center;
+      color: var(--white);
+      background: var(--forest);
+      border-radius: var(--radius);
+    }
+
+    .big-number {
+      color: #f4c66b;
+      font-family: "Iowan Old Style", Georgia, serif;
+      font-size: clamp(3.8rem, 11vw, 7rem);
+      font-weight: 800;
+      line-height: 0.9;
+      letter-spacing: -0.07em;
+    }
+
+    .data-callout strong {
+      display: block;
+      margin-bottom: 0.35rem;
+      font-size: 1.1rem;
+    }
+
+    .data-callout p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 0.88rem;
+      line-height: 1.65;
+    }
+
+    .comparison-wrap {
+      margin: 2rem 0;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 1rem;
+      background: var(--white);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 640px;
+      font-size: 0.86rem;
+      line-height: 1.6;
+    }
+
+    caption {
+      padding: 1rem 1.15rem;
+      color: var(--muted);
+      text-align: left;
+      font-size: 0.77rem;
+    }
+
+    th,
+    td {
+      padding: 0.95rem 1rem;
+      border-top: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    thead th {
+      color: var(--forest);
+      background: var(--forest-soft);
+      border-top: 0;
+      font-size: 0.76rem;
+      letter-spacing: 0.03em;
+    }
+
+    tbody th {
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .note {
+      margin: 2rem 0;
+      padding: 1.2rem 1.35rem;
+      background: #efe8d8;
+      border-radius: 0.8rem;
+      color: #5b584e;
+      font-size: 0.88rem;
+      line-height: 1.7;
+    }
+
+    .note strong {
+      color: var(--ink);
+    }
+
+    .limits,
+    .implications {
+      display: grid;
+      gap: 0.9rem;
+      margin-top: 2rem;
+    }
+
+    .card {
+      padding: 1.25rem 1.35rem;
+      background: rgba(255, 253, 248, 0.76);
+      border: 1px solid var(--line);
+      border-radius: 0.9rem;
+    }
+
+    .card h3 {
+      margin: 0 0 0.5rem;
+      font-family: inherit;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.91rem;
+      line-height: 1.7;
+    }
+
+    .checklist {
+      margin: 2rem 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .checklist li {
+      position: relative;
+      margin: 0 0 0.75rem;
+      padding: 0.95rem 1rem 0.95rem 3rem;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 0.75rem;
+    }
+
+    .checklist li::before {
+      content: "✓";
+      position: absolute;
+      left: 1rem;
+      top: 0.92rem;
+      display: grid;
+      place-items: center;
+      width: 1.25rem;
+      height: 1.25rem;
+      color: white;
+      background: var(--forest);
+      border-radius: 50%;
+      font-size: 0.7rem;
+      font-weight: 900;
+    }
+
+    .source-notes {
+      padding: 2rem;
+      background: var(--paper-deep);
+      border-radius: var(--radius);
+      color: #565d58;
+      font-size: 0.84rem;
+      line-height: 1.7;
+    }
+
+    .source-notes ol {
+      margin: 1rem 0 0;
+      padding-left: 1.25rem;
+    }
+
+    .source-notes li {
+      margin-bottom: 0.8rem;
+      padding-left: 0.3rem;
+    }
+
+    .share-card {
+      margin-top: 5rem;
+      padding: clamp(1.6rem, 5vw, 3rem);
+      color: var(--white);
+      background:
+        linear-gradient(135deg, rgba(186, 73, 52, 0.96), rgba(126, 46, 32, 0.98));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .share-card h2 {
+      max-width: 600px;
+      margin-bottom: 1rem;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+    }
+
+    .share-card p {
+      max-width: 650px;
+      color: rgba(255, 255, 255, 0.82);
+    }
+
+    .copy-ready {
+      margin-top: 1.4rem;
+      padding: 1rem 1.1rem;
+      color: #472016;
+      background: rgba(255, 253, 248, 0.9);
+      border-radius: 0.7rem;
+      font-size: 0.86rem;
+      line-height: 1.65;
+    }
+
+    .article-end {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: 6rem auto 0;
+      padding: 2.5rem 0 4rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 2rem;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .tag {
+      padding: 0.3rem 0.65rem;
+      color: var(--forest);
+      background: var(--forest-soft);
+      border-radius: 999px;
+      font-weight: 750;
+    }
+
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 4rem;
+      }
+
+      .hero-card {
+        max-width: 650px;
+        transform: none;
+      }
+
+      .article-grid {
+        grid-template-columns: minmax(0, var(--content));
+      }
+
+      .toc {
+        position: static;
+        padding: 1rem 0 2rem;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .toc ol {
+        columns: 2;
+        border-left: 0;
+      }
+
+      .toc a {
+        padding-left: 0;
+      }
+
+      .filmstrip {
+        margin-left: calc((100% - min(100vw - 2rem, var(--wide))) / 2);
+      }
+
+      .pullquote {
+        margin-left: calc((100% - min(100vw - 2rem, 930px)) / 2);
+      }
+    }
+
+    @media (max-width: 620px) {
+      body {
+        font-size: 16px;
+        line-height: 1.78;
+      }
+
+      .topbar-inner {
+        align-items: flex-start;
+      }
+
+      .topbar .source-link {
+        white-space: normal;
+        text-align: right;
+      }
+
+      h1 {
+        font-size: clamp(2.55rem, 14vw, 4rem);
+      }
+
+      .toc ol {
+        columns: 1;
+      }
+
+      .finding {
+        grid-template-columns: 2.7rem 1fr;
+      }
+
+      .filmstrip {
+        grid-template-columns: 1fr;
+      }
+
+      .filmstrip .frame:nth-child(3) {
+        grid-column: auto;
+        width: 100%;
+      }
+
+      .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .flow-step:not(:last-child)::after {
+        content: "↓";
+        right: auto;
+        bottom: -1.05rem;
+      }
+
+      .data-callout {
+        grid-template-columns: 1fr;
+      }
+
+      .article-end {
+        flex-direction: column;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+        color: black;
+      }
+
+      .topbar,
+      .toc,
+      .share-card {
+        display: none;
+      }
+
+      .hero,
+      .article-grid {
+        width: 100%;
+        display: block;
+      }
+
+      .hero-card,
+      .frame,
+      .abstract,
+      .pullquote,
+      .data-callout {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+
+      a {
+        color: inherit;
+      }
+    }
+  </style>
 <meta property="og:type" content="article">
 <meta property="og:title" content="Robert Platt (Northeastern University): Model Matters — Leveraging Geometry in Robot Learning">
 <meta property="og:description" content="Robert Platt (Northeastern University): Model Matters — Leveraging Geometry in Robot Learning 영상 정보 채널 : Zhanpeng He (ICRA 2026 RL4IL 워크샵) 게시일 : 2026 06 08 길이 : 30분 03초 링크 : https://www.youtube.com/watch?v=4K9pg K9Ync &lt;div style=&quot;position: ">
@@ -31,93 +882,752 @@
 <meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/c1q5zk/assets/4k9pg-k9ync-ts-00-00-20.jpg">
 <link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-robert-platt-model-matters-leveraging-geometry-%EC%9A%94%EC%95%BD/">
 </head>
-<body>
-<main data-template="editorial">
-<article>
-<pre class="frontmatter">title: &quot;Robert Platt (Northeastern University): Model Matters — Leveraging Geometry in Robot Learning&quot;
-tags:
-  - youtube
-  - 연구자료
-source: &quot;https://www.youtube.com/watch?v=4K9pg-K9Ync&quot;
-channel: &quot;Zhanpeng He&quot;
-video_id: &quot;4K9pg-K9Ync&quot;
-date: 2026-08-08</pre>
-<h1>Robert Platt (Northeastern University): Model Matters — Leveraging Geometry in Robot Learning</h1>
-<h2>영상 정보</h2>
-<ul><li><strong>채널</strong>: Zhanpeng He (ICRA 2026 RL4IL 워크샵)</li><li><strong>게시일</strong>: 2026-06-08</li><li><strong>길이</strong>: 30분 03초</li><li><strong>링크</strong>: https://www.youtube.com/watch?v=4K9pg-K9Ync</li></ul>
-<p>&lt;div relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;&quot;&gt; &lt;iframe absolute; top: 0; left: 0; width: 100%; height: 100%;&quot; src=&quot;https://www.youtube.com/embed/4K9pg-K9Ync&quot; frameborder=&quot;0&quot; allowfullscreen&gt;&lt;/iframe&gt; &lt;/div&gt;</p>
-<h2>한줄 요약</h2>
-<p>실기 RL의 최대 난관이 <strong>데이터 효율</strong>이라면 답은 귀납 편향이라는 주장이다. 오늘날 VLA가 인코더를 나오는 순간 <strong>기하 구조를 버린다</strong>는 점을 지적하고, Noether 정리를 근거로 <strong>대칭성(등변성)을 모델에 심어</strong> MimicGen에서 <strong>데이터 요구를 10배 줄인</strong> 결과를 제시한다. 결론은 &quot;스케일링 곡선을 옮기자&quot;이다.</p>
-<h2>핵심 장면 분석</h2>
-<h3>00:00:20 — 전제: 데모 → 모방 → 실기 RL</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-00-20.jpg" alt="4K9pg-K9Ync_ts_00-00-20.jpg"> 발표의 출발 구도다. 데모를 주고 정책을 모방학습한 뒤, <strong>실제 물리 시스템에서의 시행착오</strong>로 성능을 끌어올린다. Platt은 실기 RL이 sim-to-real 갭이든 &quot;BC/VLA 정책과 고성능 사이의 갭&quot;이든 <strong>그 간극을 메우는 최선의 수단</strong>이라고 본다. 모방학습과 VLA는 큰 성공을 거뒀지만, <strong>마지막 상자(RL로 개선)만은 여전히 훨씬 어렵다</strong>는 것이 문제의식이다.</p>
-<h3>00:01:40 — RL로 VLA를 개선할 때의 네 가지 난관</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-01-40.jpg" alt="4K9pg-K9Ync_ts_00-01-40.jpg"> 중요도 순으로 정리된다. ① <strong>실세계 데이터로 돌아갈 만큼 RL을 데이터 효율적으로 만들기</strong> ② actor가 diffusion policy일 때 RL 하기 ③ RL 시작 전 Q 함수와 정책 정렬하기 ④ 환경 리셋과 보상 함수 처리하기.</p>
-<h3>00:02:30 — 1번에 대한 답: 귀납 편향과 사전학습</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-02-30.jpg" alt="4K9pg-K9Ync_ts_00-02-30.jpg"> 데이터 효율을 얻는 두 갈래가 제시된다. <strong>actor/critic 모델에 귀납 편향을 주입</strong>하거나, <strong>다양한 행동을 담은 사전학습</strong>을 하는 것이다. 발표의 나머지 대부분은 첫 번째 갈래에 할애된다.</p>
-<h3>00:03:10 — 2번에 대한 솔직한 답: 매우 불확실하다</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-03-10.jpg" alt="4K9pg-K9Ync_ts_00-03-10.jpg"> diffusion 정책 헤드로 효율적인 RL을 하기는 <strong>극히 어렵다</strong>고 인정한다. FPO, DPPO 등이 시도되고 있지만, Platt이 덧붙이는 관찰이 흥미롭다. <strong>&quot;diffusion action head 없이도 그만큼 잘 되는 대안이 있을 수 있다는 증거가 늘고 있다.&quot;</strong></p>
-<h3>00:05:20 — 두 극단과 각각의 대가</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-05-20.jpg" alt="4K9pg-K9Ync_ts_00-05-20.jpg"> 로보틱스의 역사가 두 기둥으로 요약된다. 왼쪽은 <strong>고도로 구조화된 모델</strong>(물체 검출 → 수작업 물리 모델로 계획)로, 강력하지만 <strong>가정이 너무 많다.</strong> 오른쪽은 <strong>generalist 모델</strong>(이미지 → 학습된 제어 정책)로, <strong>학습에 엄청난 양의 데이터를 요구한다.</strong></p>
-<h3>00:06:10 — 그 사이에는 아무것도 없는가</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-06-10.jpg" alt="4K9pg-K9Ync_ts_00-06-10.jpg"> 발표 전체를 여는 질문이 가운데 물음표로 놓인다. <strong>&quot;그 중간에 무언가 있지 않은가?&quot;</strong> Platt의 답은 generalist 모델에 <strong>기하 구조를 주입</strong>하는 것이다.</p>
-<h3>00:06:50 — 오늘날의 모델들</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-06-50.jpg" alt="4K9pg-K9Ync_ts_00-06-50.jpg"> LBM, ManiFlow, DiT block policy, XVLA 등 대표적인 VLA들을 훑는다. 세부는 다르지만 뼈대는 같다. <strong>사전학습된 인코더/VLM + diffusion action head.</strong></p>
-<h3>00:07:40 — 기하 구조는 무시된다</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-07-40.jpg" alt="4K9pg-K9Ync_ts_00-07-40.jpg"> 발표에서 가장 날카로운 지적이다. 이 구조를 단순화하면 <strong>인코더를 빠져나오는 순간 기하 구조가 버려진다.</strong> 모델이 마지막으로 본 기하 정보는 <strong>ViT에 들어가는 토큰의 위치 인코딩</strong>뿐이고, 그 이후는 전부 잠재 공간이다.</p>
-<h3>00:08:20 — 대안: 3D 기하 표현을 유지하기</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-08-20.jpg" alt="4K9pg-K9Ync_ts_00-08-20.jpg"> 따라서 처방은 명확하다. <strong>관측을 어떤 형태로든 3D 기하 표현으로 인코딩하고, 그 구조를 정책 학습 개선에 활용한다.</strong></p>
-<h3>00:09:10 — 표현과 추론 방식의 조합</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-09-10.jpg" alt="4K9pg-K9Ync_ts_00-09-10.jpg"> 설계 공간이 두 축으로 정리된다. <strong>표현</strong>: 2D 이미지, 포인트 클라우드, 2-구면에 임베딩한 이미지, 3D 광선으로 표현한 이미지, 스테레오 이미지. <strong>모델의 추론 방식</strong>: SO(3)·SE(3)의 유한 부분군, 또는 R³·SO(2)·SO(3) 위 함수의 <strong>푸리에 계수</strong>. Platt은 표현보다 <strong>정책 내부에서 기하 표현을 어떻게 추론하느냐</strong>가 더 중요하다고 강조한다.</p>
-<h3>00:12:20 — 왜 대칭인가: Noether 정리</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-12-20.jpg" alt="4K9pg-K9Ync_ts_00-12-20.jpg"> 이론적 근거가 여기서 나온다. <strong>Noether 정리(1918)</strong>: 보존력을 가진 물리계의 작용에 대한 모든 연속 대칭은 대응하는 보존 법칙을 갖는다. 시간 대칭 → 에너지 보존, 공간 병진 대칭 → 운동량 보존, 공간 회전 대칭 → 각운동량 보존, 양자 게이지 대칭 → 전하 보존. <strong>따라서 물리의 보존 법칙을 신경망에 심고 싶다면, 대칭성을 모델에 인코딩하면 된다.</strong></p>
-<h3>00:13:40 — 등변 신경망 층으로 구현</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-13-40.jpg" alt="4K9pg-K9Ync_ts_00-13-40.jpg"> 목표가 구체화된다. <strong>병진·회전 대칭을 보존하는 모델</strong>을 만들고, 그것을 <strong>등변(equivariant) 신경망 층</strong>으로 달성한다.</p>
-<h3>00:14:30 — diffusion 정책에서 대칭이란</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-14-30.jpg" alt="4K9pg-K9Ync_ts_00-14-30.jpg"> 추상적 개념이 그림으로 확정된다. 오른쪽은 2차원 세계 위의 flow field로, diffusion 헤드가 원하는 궤적을 향해 흐르는 장이다. <strong>환경을 90° 회전시키면 출력 flow field도 정확히 같은 만큼 회전한다.</strong> 이것이 diffusion 정책에서의 대칭이다.</p>
-<h3>00:15:20 — 전이 동역학의 회전 불변성</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-15-20.jpg" alt="4K9pg-K9Ync_ts_00-15-20.jpg"> 형식화하면, 이미지 s ∈ R^{h×w}와 속도 a ∈ R²에 대해 g ∈ SO(2)를 적용해도 동역학이 유지된다. Platt은 이 가정이 <strong>보편적으로 참은 아니라고 분명히 한다.</strong> 중력이 있고, 테이블이 기울어져 있을 수도 있다. 그러나 요지는 이것이다. <strong>아무 가정도 하지 않는 것보다는 좋은 기본 가정이며, 필요하면 모델이 이 가정에서 벗어나는 법을 학습할 수 있다.</strong></p>
-<h3>00:17:30 — 등변 함수란 무엇인가</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-17-30.jpg" alt="4K9pg-K9Ync_ts_00-17-30.jpg"> 분할(segmentation) 함수 f로 개념을 설명한다. 좋은 분할 함수라면 <strong>이미지를 분할한 뒤 회전하나, 회전한 뒤 분할하나 같은 결과</strong>가 나와야 한다. 즉 <strong>f(gI) = g·f(I)</strong> 로, 함수가 군 연산자와 교환한다. 세계가 불변이면 최적 정책은 등변이라는 것이 앞선 논증의 귀결이다.</p>
-<h3>00:19:00 — 어떻게 학습시키는가</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-19-00.jpg" alt="4K9pg-K9Ync_ts_00-19-00.jpg"> 구현의 핵심은 <strong>커널에 제약을 거는 것</strong>이다. 입력을 회전시켰을 때 출력도 대응해 회전하도록 컨볼루션 커널의 자유 파라미터를 묶으면, 파라미터 수가 크게 줄면서 등변 대칭이 구조적으로 보장된다. SO(2)·SO(3)·SE(3)의 유한 부분군은 물론 연속군에 대해서도 다양한 메커니즘이 마련되어 있다.</p>
-<h3>00:20:30 — Equivariant Diffusion Policy</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-20-30.jpg" alt="4K9pg-K9Ync_ts_00-20-30.jpg"> 첫 번째 방법의 전체 구조다. 포인트 클라우드를 PC 트랜스포머로 인코딩하되 <strong>SO(3)의 유한 부분군에 대해 등변</strong>이며, 디코더도 등변이다. CoRL 2024 Best Paper Finalist.</p>
-<h3>00:21:20 — 실물 로봇에서</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-21-20.jpg" alt="4K9pg-K9Ync_ts_00-21-20.jpg"> 시뮬레이션에 그치지 않고 실제 로봇에서 수행한 결과 장면이다.</p>
-<h3>00:22:20 — 대칭성이 클수록 이득도 크다</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-22-20.jpg" alt="4K9pg-K9Ync_ts_00-22-20.jpg"> 환경별 성능 개선 폭을 보면 경향이 뚜렷하다. 과제를 <strong>고등변성·중간등변성·저등변성</strong>으로 나눴을 때, <strong>세계에 자세 변화가 많을수록(등변성이 클수록) 이 접근의 효과가 커진다.</strong></p>
-<p>여기서 발표의 핵심 수치가 나온다. MimicGen 벤치마크에서 <strong>등변 모델이 데모 100개로 학습한 성능이, 같은 모델의 비등변 버전이 데모 1,000개로 학습한 성능을 앞선다.</strong> 즉 <strong>데이터 효율 10배</strong>다.</p>
-<h3>00:23:40 — Image 2 Sphere: RGB 이미지를 어떻게 다룰까</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-23-40.jpg" alt="4K9pg-K9Ync_ts_00-23-40.jpg"> 기하 방법은 3D에 임베딩된 데이터에서 가장 잘 작동하는데 이미지는 2D다. 해법이 다소 과감하다. <strong>이미지를 2-구면에 투영</strong>하고, 모델이 <strong>구면 조화 함수의 계수</strong>로 추론하게 한다.</p>
-<h3>00:24:20 — 구면 위에서의 연산</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-24-20.jpg" alt="4K9pg-K9Ync_ts_00-24-20.jpg"> 파이프라인이 상세하게 나온다. 이미지를 구에 임베딩 → <strong>카메라(또는 손)의 좌표계에 맞춰 구를 회전</strong> → 구면 조화 함수로 <strong>푸리에 변환</strong> → <strong>주파수 영역에서 컨볼루션</strong>(컨볼루션 정리 덕에 효율적) → 역변환 후 SO(3)의 이산 부분군으로.</p>
-<h3>00:25:00 — 3D 구조를 덜 쓴 만큼 이득도 준다</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-25-00.jpg" alt="4K9pg-K9Ync_ts_00-25-00.jpg"> ISP의 MimicGen 결과다. <strong>데모 100개로 기준선의 200개에 해당하는 성능</strong>, 즉 약 2배의 데이터 효율이다. 등변 diffusion policy의 10배보다는 낮은데, Platt은 이유를 분명히 밝힌다. <strong>RGB 이미지를 수용하기 위해 활용 가능한 3차원 구조를 일부 포기했기 때문이다.</strong></p>
-<h3>00:25:50 — 스케일링 법칙이라는 배경</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-25-50.jpg" alt="4K9pg-K9Ync_ts_00-25-50.jpg"> 연산·데이터셋 크기·파라미터 수에 대한 멱법칙(OpenAI, 2020). 여기서 많은 사람이 얻은 결론은 <strong>&quot;데이터를 계속 넣으면 된다&quot;</strong> 였다.</p>
-<h3>00:27:20 — 로보틱스에서 그 결론이 성립하지 않는 이유</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-27-20.jpg" alt="4K9pg-K9Ync_ts_00-27-20.jpg"> 로보틱스에는 두 가지 불리함이 있다. <strong>인터넷 규모의 데이터가 없고</strong>, 요구되는 정확도가 훨씬 높다(환각의 대가가 크다). MimicGen 12개 과제에 대한 기준선 diffusion policy 성능에 멱법칙을 적합시키면 <strong>일정 신뢰도에 필요한 데이터 양을 계산할 수 있는데, 그 양이 현실적으로 확보 불가능</strong>하다.</p>
-<h3>00:28:00 — 피로스의 승리</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-28-00.jpg" alt="4K9pg-K9Ync_ts_00-28-00.jpg"> 비유가 통렬하다. <strong>&quot;로마와 한 번만 더 이렇게 이기면 우리는 완전히 파멸한다.&quot;</strong> — 기원전 275년 아스쿨룸 전투 후 에피로스의 피로스. 데이터를 더 넣어 성능을 올리는 길이 승리처럼 보여도 그 비용이 파멸적이라는 뜻이다.</p>
-<h3>00:29:20 — 곡선 자체를 옮기기</h3>
-<p><img src="assets/4k9pg-k9ync-ts-00-29-20.jpg" alt="4K9pg-K9Ync_ts_00-29-20.jpg"> 결론이다. 기하 구조와 등변성은 <strong>스케일링 곡선을 이동시키는 메커니즘</strong>이다. 같은 성능에 필요한 데이터·파라미터·연산을 줄인다. 그래프는 12개 MimicGen 과제 평균에서 기준선 diffusion policy 대비 ISP의 곡선이 왼쪽으로 이동했음을 보여준다. Platt의 마지막 메시지는 절충적이다. <strong>분야가 왼쪽으로, 완전히는 아니고 조금 이동해야 한다.</strong> 데이터 요구를 0으로 만들자는 것이 아니라 극적으로 줄이자는 것이다.</p>
-<h2>주요 내용 요약</h2>
-<h3>핵심 포인트</h3>
-<ul><li><strong>실기 RL의 병목은 데이터 효율이고, 그 해법은 귀납 편향이다.</strong> 이 발표는 그 편향을 &quot;기하 구조&quot;로 특정한다.</li><li><strong>오늘날 VLA는 인코더 출력 이후 기하 정보를 버린다.</strong> ViT 위치 인코딩이 마지막 기하 정보라는 지적은 구조적이고 검증 가능한 비판이다.</li><li><strong>Noether 정리가 설계 원리를 준다.</strong> 보존 법칙을 넣고 싶으면 대칭성을 넣어라. 전이 동역학이 회전 불변이면 최적 정책은 등변이다.</li><li><strong>불변 가정은 절대적 참이 아니라 좋은 기본값이다.</strong> 중력이나 기울어진 테이블처럼 대칭이 깨지는 상황이 있으므로, 모델이 필요할 때 그 가정에서 벗어날 수 있어야 한다.</li><li><strong>정량 결과가 명확하다. 데이터 효율 10배</strong>(등변 diffusion policy, MimicGen). 자세 변화가 큰 과제일수록 이득이 크다.</li><li><strong>표현에 따라 이득이 달라진다.</strong> 포인트 클라우드(3D 구조 최대 활용) 10배 → 구면 임베딩(RGB 수용) 2배. <strong>구조를 포기한 만큼 효율을 잃는다</strong>는 대응 관계가 뚜렷하다.</li><li><strong>&quot;데이터를 더 넣자&quot;는 로보틱스에서 피로스의 승리다.</strong> 필요한 데이터 양이 계산 가능하되 확보 불가능하므로, 곡선 위를 오르는 대신 곡선 자체를 옮겨야 한다.</li></ul>
-<h3>기술적 내용</h3>
-<ul><li><strong>등변성(equivariance)</strong>: f(g·I) = g·f(I). 함수가 군 연산자와 교환. 세계의 불변성 ↔ 정책의 등변성.</li><li><strong>구현</strong>: 유한군에 대해 컨볼루션 커널의 자유 파라미터를 묶는 제약. SO(2)/SO(3)/SE(3) 유한 부분군 및 연속군 모두 메커니즘 존재.</li><li><strong>Equivariant Diffusion Policy</strong>: 포인트 클라우드 + PC 트랜스포머 인코더(SO(3) 유한 부분군 등변) + 등변 디코더 + diffusion head. CoRL 2024 Best Paper Finalist.</li><li><strong>Image 2 Sphere Policy (ISP)</strong>: 이미지 → 2-구면 임베딩 → 손/카메라 좌표계로 구 회전 → 구면 조화 함수 푸리에 변환 → 주파수 영역 컨볼루션 → 역변환 → SO(3) 이산 부분군. NeurIPS 2025 Spotlight.</li><li><strong>추론 메커니즘 3종</strong>: ① SE(2)/SO(3)/SE(3)의 유한 부분군 ② R³·SO(2)·SO(3) 위 함수의 푸리에 계수 ③ 기하 트랜스포머 어텐션(self-attention에 기하 임베딩).</li><li><strong>다루지 않은 방법</strong>: 이미지를 3D 광선으로 표현해 기하 self-attention을 적용하는 방식, 스테레오 이미지 기반 추론(시간 관계상 생략).</li></ul>
-<h3>발표에서 언급된 미해결 문제</h3>
-<ul><li><strong>diffusion head 위에서의 RL</strong>: FPO, DPPO 등이 있지만 여전히 어렵다. diffusion action head를 대체할 수 있다는 증거가 축적되고 있다는 관찰이 덧붙는다.</li><li><strong>Q 함수와 정책의 정렬</strong>: RL 시작 시 성능 하락을 막는 문제. &quot;좋은 아이디어들이 나와 있다&quot;고만 언급.</li><li><strong>환경 리셋과 보상 함수 처리</strong>: 워크샵에서 많이 논의된 주제라며 짧게 넘어간다.</li></ul>
-<h2>시사점과 한계</h2>
-<h3>한계</h3>
-<ul><li>데이터 효율 10배는 <strong>MimicGen 벤치마크와 3~10개 물체의 다물체 강체 모델링</strong> 범위에서 입증된 것이다. Platt 본인이 나머지는 &quot;일화적 증거(anecdotal evidence)&quot;라고 표현한다.</li><li><strong>회전 불변 가정이 깨지는 상황</strong>(중력, 기울어진 지면, 마찰 이방성)에서 모델이 실제로 얼마나 잘 벗어나 학습하는지는 정량적으로 제시되지 않았다.</li><li>등변 구조는 <strong>강체 조작</strong>을 전제한다. 변형체나 유체가 개입하면 대칭군 자체를 정의하기 어려워진다.</li><li>발표 제목이 RL이지만 <strong>정량 결과는 대부분 모방학습(BC) 설정</strong>에서 나온다. 등변 구조가 RL의 데이터 효율에 미치는 영향은 논리적 연장으로 제시될 뿐이다.</li></ul>
-<h3>현장 적용 관점에서의 시사점</h3>
-<ul><li><strong>굴착기는 기하 구조가 명확한 도메인이라 이 접근과 궁합이 좋다.</strong> 붐·암·버킷의 기구학은 정확히 알려져 있고, 작업 대상(토사 더미, 트럭 적재함)의 배치는 자세 변화가 크다. Platt의 관찰대로라면 <strong>자세 변화가 클수록 등변 구조의 이득이 커지므로</strong>, 굴착 작업은 오히려 유리한 조건이다.</li><li><strong>회전 대칭이 부분적으로만 성립한다는 점도 그대로 적용된다.</strong> 중력과 지면 법선이 방향을 고정하므로 SO(3) 전체 대칭은 성립하지 않지만, <strong>수직축 회전(SO(2))에 대한 대칭은 자연스럽다.</strong> 선회체가 어느 방향을 향하든 굴착 동작의 구조는 같기 때문이다. 이는 발표에서 다룬 SO(2) 등변 모델과 정확히 맞는 설정이다.</li><li><strong>데이터 확보가 어려운 도메인일수록 곡선 이동 전략이 중요하다.</strong> 굴착 데이터는 인터넷에 없고 현장 수집 비용이 크므로, &quot;데이터를 10배 모으기&quot;보다 &quot;10배 효율적인 모델 구조&quot;가 현실적이다.</li><li>다만 <strong>표현 선택이 이득을 좌우한다는 교훈</strong>을 새겨야 한다. RGB만 쓰면 2배, 3D 포인트 클라우드를 쓰면 10배였다. 굴착기에 LiDAR·스테레오로 3D를 확보할 수 있다면 그만큼 구조적 이득이 커진다는 뜻이다.</li><li><strong>변형체 문제는 여전히 남는다.</strong> 토사는 강체가 아니므로 등변 가정이 버킷·암 등 기계 자체에는 잘 맞지만 토사 거동에는 직접 적용하기 어렵다. 기계 기구학은 등변 구조로, 토사 상호작용은 다른 방식으로 다루는 하이브리드가 현실적일 수 있다.</li></ul>
-<h2>관련 노트</h2>
-<ul><li>[[yt_Pulkit_Agrawal_On_RL_and_IL_요약]] — 같은 워크샵. &quot;물리적 상호작용 계층을 블랙박스로 두지 말라&quot;는 주장이 이 발표의 &quot;기하 구조를 버리지 말라&quot;와 같은 문제의식을 공유한다.</li><li>[[yt_David_Held_RL_Case_Study_Robot_Assisted_Dressing_요약]] — 같은 워크샵. 변형체를 다루기 때문에 기하 구조 활용이 어려운 반대 사례로 읽을 수 있다.</li><li>[[yt_Chelsea_Finn_Reliable_VLA_Post-Training_요약]] — 같은 워크샵. 구조 주입 대신 데이터와 RL 후속 학습으로 성능을 올리는 접근.</li></ul>
-</article>
-</main>
 
+<body>
+  <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#top">Geometry × Robot Learning</a>
+      <a class="source-link">원본 발표 보기 · 30분 03초</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div>
+        <p class="eyebrow">Research Report · ICRA 2026 RL4IL</p>
+        <h1>데이터를 더 모으는 대신, <em>학습 곡선을 옮겨라</em></h1>
+        <p class="dek">
+          Robert Platt은 로봇 학습의 병목을 데이터 부족만의 문제로 보지 않는다.
+          오늘날의 VLA가 잃어버린 기하 구조를 정책 안에 복원하면,
+          같은 성능에 필요한 데이터·파라미터·연산 자체를 줄일 수 있다는 주장이다.
+        </p>
+      </div>
+
+      <figure class="hero-card">
+        <img src="assets/4k9pg-k9ync-ts-00-29-20.jpg" alt="기하 구조를 사용한 모델의 스케일링 곡선이 기준선보다 왼쪽으로 이동한 발표 슬라이드">
+        <figcaption>
+          발표의 마지막 메시지: 곡선을 따라 더 멀리 가는 것보다 곡선 자체를 왼쪽으로 옮겨야 한다.
+        </figcaption>
+      </figure>
+    </section>
+
+    <div class="meta-row">
+      <span><strong>발표자</strong> Robert Platt · Northeastern University</span>
+      <span><strong>행사</strong> ICRA 2026 RL4IL Workshop</span>
+      <span><strong>게시</strong> 2026.06.08</span>
+      <span><strong>리포트</strong> 2026.08.08</span>
+      <span><strong>읽는 시간</strong> 약 15분</span>
+    </div>
+
+    <div class="article-grid">
+      <nav class="toc" aria-label="글 목차">
+        <p class="toc-title">Contents</p>
+        <ol>
+          <li><a href="#abstract">초록</a></li>
+          <li><a href="#findings">핵심 발견</a></li>
+          <li><a href="#problem">로봇 RL의 병목</a></li>
+          <li><a href="#geometry">사라진 기하 구조</a></li>
+          <li><a href="#symmetry">대칭성과 등변성</a></li>
+          <li><a href="#methods">두 가지 구현</a></li>
+          <li><a href="#evidence">정량적 증거</a></li>
+          <li><a href="#scaling">스케일링의 함정</a></li>
+          <li><a href="#implications">현장 적용 시사점</a></li>
+          <li><a href="#limits">한계와 미해결 문제</a></li>
+          <li><a href="#sources">출처 노트</a></li>
+        </ol>
+      </nav>
+
+      <article>
+        <section class="abstract" id="abstract">
+          <p class="label">Abstract</p>
+          <p>
+            실세계 로봇 강화학습의 가장 큰 장애물은 데이터 효율이다. Platt은 그 해법으로
+            물리 세계의 병진·회전 대칭을 신경망 구조에 직접 반영하는 등변 모델을 제안한다.
+            포인트 클라우드를 사용한 Equivariant Diffusion Policy는 MimicGen에서
+            비등변 기준선보다 최대 10배 높은 데이터 효율을 보였고, RGB 이미지를 구면에
+            투영한 Image 2 Sphere Policy도 약 2배의 효율 향상을 기록했다.
+            이 결과는 “데이터를 더 넣자”는 전략을 부정하기보다, 구조적 귀납 편향으로
+            스케일링 곡선의 출발점을 옮겨야 한다는 주장에 가깝다.
+          </p>
+        </section>
+
+        <section class="section" id="findings">
+          <p class="section-kicker">Executive Summary</p>
+          <h2>먼저 기억할 다섯 가지</h2>
+
+          <div class="key-findings">
+            <div class="finding">
+              <div class="finding-number">01</div>
+              <div>
+                <strong>실기 RL의 첫 번째 문제는 데이터 효율이다.</strong>
+                <p>로봇은 인터넷에서 행동 데이터를 내려받을 수 없다. 시행착오 한 번마다 시간, 장비, 안전 비용이 발생한다.</p>
+              </div>
+            </div>
+
+            <div class="finding">
+              <div class="finding-number">02</div>
+              <div>
+                <strong>현대 VLA는 인코더 뒤에서 기하 구조를 잃는다.</strong>
+                <p>이미지의 공간 관계는 잠재 표현으로 압축되고, 정책 헤드는 물리적 회전과 병진을 구조적으로 보장하지 않는다.</p>
+              </div>
+            </div>
+
+            <div class="finding">
+              <div class="finding-number">03</div>
+              <div>
+                <strong>대칭성을 넣으면 물리적으로 가능한 함수 공간만 탐색하게 된다.</strong>
+                <p>등변 층은 환경이 회전하면 정책 출력도 함께 회전하도록 파라미터를 묶어 학습 문제를 줄인다.</p>
+              </div>
+            </div>
+
+            <div class="finding">
+              <div class="finding-number">04</div>
+              <div>
+                <strong>3D 구조를 많이 보존할수록 효과가 컸다.</strong>
+                <p>포인트 클라우드 기반 모델은 최대 10배, RGB 구면 임베딩은 약 2배의 데이터 효율 향상을 보였다.</p>
+              </div>
+            </div>
+
+            <div class="finding">
+              <div class="finding-number">05</div>
+              <div>
+                <strong>목표는 데이터를 없애는 것이 아니라 스케일링 곡선을 옮기는 것이다.</strong>
+                <p>데이터·연산·파라미터를 계속 늘리기 전에, 같은 성능을 더 적은 자원으로 얻는 모델 구조가 필요하다.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="problem">
+          <p class="section-kicker">01 · The Bottleneck</p>
+          <h2>모방 다음의 마지막 간극</h2>
+
+          <p class="lead">
+            발표의 출발점은 익숙하다. 인간의 시연 데이터를 모아 행동 복제나 VLA 정책을
+            학습하고, 그다음 실제 물리 시스템에서 강화학습으로 성능을 끌어올린다.
+            Platt에게 실기 RL은 sim-to-real 간극뿐 아니라 “그럭저럭 작동하는 정책”과
+            “현장에서 믿고 쓸 수 있는 정책” 사이를 메우는 유력한 수단이다.
+          </p>
+
+          <figure class="frame">
+            <img src="assets/4k9pg-k9ync-ts-00-00-20.jpg" alt="데모에서 모방학습을 거쳐 실제 시스템 강화학습으로 이어지는 발표 도식">
+            <figcaption><span class="timestamp">00:00:20</span> · 데모 → 모방학습 → 실제 시스템에서의 RL 개선.</figcaption>
+          </figure>
+
+          <p>
+            문제는 마지막 단계가 앞선 단계들보다 훨씬 어렵다는 데 있다. 발표는 VLA를
+            RL로 개선하려 할 때 마주치는 난관을 네 가지로 정리한다.
+          </p>
+
+          <figure class="frame">
+            <img src="assets/4k9pg-k9ync-ts-00-01-40.jpg" alt="VLA 정책을 강화학습으로 개선할 때의 네 가지 난관을 정리한 슬라이드">
+            <figcaption><span class="timestamp">00:01:40</span> · 데이터 효율, diffusion 정책 최적화, Q 함수 정렬, 리셋과 보상이 핵심 난관으로 제시된다.</figcaption>
+          </figure>
+
+          <ol class="checklist">
+            <li><strong>데이터 효율:</strong> 실제 세계에서 반복할 수 있을 만큼 적은 시행착오로 학습해야 한다.</li>
+            <li><strong>Diffusion actor:</strong> diffusion policy를 안정적이고 효율적으로 RL에 연결해야 한다.</li>
+            <li><strong>정책–가치 정렬:</strong> RL 시작 전에 Q 함수와 정책을 맞춰 초기 성능 붕괴를 막아야 한다.</li>
+            <li><strong>운영 비용:</strong> 환경 리셋과 보상 함수 설계가 자동화되어야 한다.</li>
+          </ol>
+
+          <div class="filmstrip">
+            <figure class="frame">
+              <img src="assets/4k9pg-k9ync-ts-00-02-30.jpg" alt="데이터 효율을 위한 귀납 편향과 사전학습 두 경로를 보여주는 발표 슬라이드">
+              <figcaption><span class="timestamp">00:02:30</span> · 데이터 효율의 두 경로: 모델의 귀납 편향과 다양한 행동 사전학습.</figcaption>
+            </figure>
+
+            <figure class="frame">
+              <img src="assets/4k9pg-k9ync-ts-00-03-10.jpg" alt="Diffusion 정책 헤드 위에서 강화학습을 수행하는 난점을 설명하는 슬라이드">
+              <figcaption><span class="timestamp">00:03:10</span> · FPO와 DPPO가 시도되고 있지만 diffusion head 기반 RL은 여전히 불확실하다.</figcaption>
+            </figure>
+
+            <figure class="frame">
+              <img src="assets/4k9pg-k9ync-ts-00-05-20.jpg" alt="구조화된 로봇 모델과 데이터 중심 일반 모델의 두 극단을 비교한 슬라이드">
+              <figcaption><span class="timestamp">00:05:20</span> · 강한 가정을 가진 구조적 모델과 막대한 데이터를 요구하는 generalist 모델.</figcaption>
+            </figure>
+          </div>
+
+          <p>
+            데이터 효율을 높이는 방법은 크게 두 가지다. 다양한 행동으로 사전학습하거나,
+            actor와 critic에 유용한 귀납 편향을 심는 것이다. 이 발표는 후자를 택한다.
+            다만 과거의 수작업 물리 모델로 완전히 돌아가자는 뜻은 아니다.
+          </p>
+
+          <blockquote class="pullquote">
+            <p>“고도로 구조화된 모델과 완전한 generalist 모델 사이에는 정말 아무것도 없는가?”</p>
+            <cite>Robert Platt · 00:06:10</cite>
+          </blockquote>
+
+          <figure class="frame">
+            <img src="assets/4k9pg-k9ync-ts-00-06-10.jpg" alt="구조적 모델과 일반 모델 사이의 중간 지점을 묻는 발표 슬라이드">
+            <figcaption><span class="timestamp">00:06:10</span> · 발표 전체를 여는 질문. 답은 학습 모델 안에 기하 구조를 보존하는 것이다.</figcaption>
+          </figure>
+        </section>
+
+        <section class="section" id="geometry">
+          <p class="section-kicker">02 · What Models Forget</p>
+          <h2>VLA는 어디에서 기하학을 잃는가</h2>
+
+          <p>
+            LBM, ManiFlow, DiT block policy, XVLA 등 오늘날의 접근은 서로 다르지만 대체로
+            하나의 뼈대를 공유한다. 사전학습된 비전 인코더 또는 VLM이 관측을 잠재 표현으로
+            바꾸고, diffusion action head가 행동 궤적을 생성한다.
+          </p>
+
+          <div class="filmstrip">
+            <figure class="frame">
+              <img src="assets/4k9pg-k9ync-ts-00-06-50.jpg" alt="여러 최신 VLA 모델의 공통 구조를 비교하는 발표 슬라이드">
+              <figcaption><span class="timestamp">00:06:50</span> · 모델은 달라도 사전학습 인코더와 diffusion action head라는 구성이 반복된다.</figcaption>
+            </figure>
+
+            <figure class="frame">
+              <img src="assets/4k9pg-k9ync-ts-00-07-40.jpg" alt="인코더 출력 이후 기하 구조가 사라지는 지점을 지적한 발표 슬라이드">
+              <figcaption><span class="timestamp">00:07:40</span> · Platt의 핵심 비판: 인코더를 빠져나온 뒤에는 공간 기하가 잠재 공간 속에서 명시적으로 보존되지 않는다.</figcaption>
+            </figure>
+
+            <figure class="frame">
+              <img src="assets/4k9pg-k9ync-ts-00-08-20.jpg" alt="3차원 기하 표현을 정책 내부까지 유지하는 대안을 보여주는 발표 슬라이드">
+              <figcaption><span class="timestamp">00:08:20</span> · 대안은 관측을 3D 기하 표현으로 인코딩하고 그 구조를 정책 추론에 사용하는 것이다.</figcaption>
+            </figure>
+          </div>
+
+          <p>
+            ViT에 들어갈 때의 위치 인코딩이 모델이 명시적으로 보는 마지막 기하 정보라면,
+            이후의 정책은 같은 장면이 회전했을 때 출력도 동일하게 회전해야 한다는 사실을
+            데이터로 다시 배워야 한다. 한 자세에서 배운 행동이 다른 자세로 자동 일반화되지
+            않는 이유다.
+          </p>
+
+          <figure class="frame">
+            <img src="assets/4k9pg-k9ync-ts-00-09-10.jpg" alt="2D 이미지, 포인트 클라우드, 구면 이미지 등 표현과 기하 추론 방법을 분류한 슬라이드">
+            <figcaption><span class="timestamp">00:09:10</span> · 표현 방식보다 정책 내부에서 그 표현을 어떻게 기하학적으로 추론하는지가 더 중요하다는 분류.</figcaption>
+          </figure>
+
+          <div class="comparison-wrap">
+            <table>
+              <caption>발표가 제시한 기하 표현과 추론 메커니즘의 설계 공간</caption>
+              <thead>
+                <tr>
+                  <th scope="col">축</th>
+                  <th scope="col">선택지</th>
+                  <th scope="col">핵심 절충</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">입력 표현</th>
+                  <td>2D 이미지, 포인트 클라우드, 구면 임베딩 이미지, 3D 광선, 스테레오</td>
+                  <td>RGB 접근성과 3D 구조 보존량 사이의 균형</td>
+                </tr>
+                <tr>
+                  <th scope="row">군 기반 추론</th>
+                  <td>SE(2), SO(3), SE(3)의 유한 부분군</td>
+                  <td>구조적 보장과 계산 복잡도 사이의 균형</td>
+                </tr>
+                <tr>
+                  <th scope="row">주파수 추론</th>
+                  <td>R³, SO(2), SO(3) 위 함수의 푸리에 계수</td>
+                  <td>연속 대칭을 다루면서 효율적인 컨볼루션 수행</td>
+                </tr>
+                <tr>
+                  <th scope="row">기하 어텐션</th>
+                  <td>Self-attention에 기하 임베딩 결합</td>
+                  <td>유연성은 높지만 대칭 보장의 형태가 설계에 의존</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="symmetry">
+          <p class="section-kicker">03 · The Design Principle</p>
+          <h2>보존 법칙을 원한다면 대칭성을 넣어라</h2>
+
+          <p>
+            이 접근의 이론적 배경으로 Platt은 Noether 정리를 호출한다. 보존력을 가진
+            물리계에서 작용의 연속 대칭은 대응하는 보존 법칙과 연결된다. 시간 대칭은
+            에너지 보존, 공간 병진 대칭은 운동량 보존, 공간 회전 대칭은 각운동량 보존으로
+            이어진다.
+          </p>
+
+          <figure class="frame">
+            <img src="assets/4k9pg-k9ync-ts-00-12-20.jpg" alt="Noether 정리와 시간, 병진, 회전 대칭에 대응하는 보존 법칙을 설명한 슬라이드">
+            <figcaption><span class="timestamp">00:12:20</span> · 물리 법칙의 대칭성을 모델 설계 원리로 바꾸는 이론적 연결.</figcaption>
+          </figure>
+
+          <p>
+            신경망이 물리 세계의 보존 구조를 더 쉽게 학습하게 하려면, 가능한 모든 함수를
+            탐색하게 두는 대신 해당 대칭을 만족하는 함수 공간으로 학습을 제한할 수 있다.
+            병진과 회전 대칭을 보존하는 등변 신경망 층이 그 구현 수단이다.
+          </p>
+
+          <div class="filmstrip">
+            <figure class="frame">
+              <img src="assets/4k9pg-k9ync-ts-00-13-40.jpg" alt="병진과 회전 대칭을 등변 신경망으로 구현하는 목표를 설명하는 슬라이드">
+              <figcaption><span class="timestamp">00:13:40</span> · 병진·회전 대칭을 보존하는 모델을 등변 층으로 구성한다.</figcaption>
+            </figure>
+
+            <figure class="frame">
+              <img src="assets/4k9pg-k9ync-ts-00-14-30.jpg" alt="환경을 회전했을 때 diffusion flow field도 함께 회전하는 모습을 보여주는 슬라이드">
+              <figcaption><span class="timestamp">00:14:30</span> · 환경이 90° 회전하면 행동을 만드는 flow field도 같은 각도로 회전해야 한다.</figcaption>
+            </figure>
+
+            <figure class="frame">
+              <img src="assets/4k9pg-k9ync-ts-00-15-20.jpg" alt="상태와 행동에 회전 변환을 적용해도 전이 동역학이 유지되는 조건을 표현한 슬라이드">
+              <figcaption><span class="timestamp">00:15:20</span> · 회전 변환 뒤에도 전이 구조가 유지된다는 기본 가정. 단, 보편적인 법칙은 아니다.</figcaption>
+            </figure>
+          </div>
+
+          <div class="equation" aria-label="등변 함수의 정의">
+            f(g · I) = g · f(I)
+            <small>입력을 변환한 뒤 함수를 적용한 결과와, 함수 출력에 같은 변환을 적용한 결과가 같다.</small>
+          </div>
+
+          <figure class="frame">
+            <img src="assets/4k9pg-k9ync-ts-00-17-30.jpg" alt="이미지 회전과 분할 함수의 순서를 바꿔도 결과가 같은 등변성을 설명하는 슬라이드">
+            <figcaption><span class="timestamp">00:17:30</span> · 이미지를 분할한 뒤 회전하든, 회전한 뒤 분할하든 결과가 같아야 한다.</figcaption>
+          </figure>
+
+          <p>
+            이 정의는 “세계가 불변이면 최적 정책은 등변”이라는 주장으로 이어진다.
+            장면 전체가 회전해도 과제의 물리적 의미가 같다면, 정책 출력 역시 같은 방식으로
+            회전해야 한다. 모델은 서로 다른 자세를 완전히 별개의 사례로 외울 필요가 없다.
+          </p>
+
+          <div class="note">
+            <strong>중요한 단서:</strong> 회전 불변성은 보편적으로 참이 아니다. 중력,
+            기울어진 테이블, 방향별 마찰은 대칭을 깨뜨린다. Platt의 주장은 이를 절대 법칙으로
+            고정하자는 것이 아니라, 아무 가정도 없는 모델보다 좋은 기본값으로 사용하고
+            필요할 때 대칭에서 벗어나는 잔차를 학습하게 하자는 쪽에 가깝다.
+          </div>
+
+          <figure class="frame">
+            <img src="assets/4k9pg-k9ync-ts-00-19-00.jpg" alt="회전 시 출력도 대응하도록 컨볼루션 커널의 파라미터를 묶는 방법을 설명한 슬라이드">
+            <figcaption><span class="timestamp">00:19:00</span> · 컨볼루션 커널의 자유 파라미터를 묶어 등변성을 구조적으로 보장한다.</figcaption>
+          </figure>
+        </section>
+
+        <section class="section" id="methods">
+          <p class="section-kicker">04 · Two Implementations</p>
+          <h2>포인트 클라우드와 구면 이미지</h2>
+
+          <h3>방법 1 — Equivariant Diffusion Policy</h3>
+
+          <p>
+            첫 번째 방법은 포인트 클라우드의 3차원 구조를 직접 활용한다. PC Transformer
+            인코더와 디코더를 SO(3)의 유한 부분군에 대해 등변으로 구성하고, diffusion
+            정책의 행동 생성 과정에도 같은 구조를 유지한다. 이 연구는 CoRL 2024 Best
+            Paper Finalist로 소개됐다.
+          </p>
+
+          <div class="diagram" aria-label="Equivariant Diffusion Policy 처리 흐름">
+            <p class="diagram-title">Equivariant Diffusion Policy</p>
+            <div class="flow">
+              <div class="flow-step">3D 포인트<br>클라우드</div>
+              <div class="flow-step">SO(3) 등변<br>PC Transformer</div>
+              <div class="flow-step">등변<br>디코더</div>
+              <div class="flow-step">Diffusion<br>행동 궤적</div>
+            </div>
+          </div>
+
+          <div class="filmstrip">
+            <figure class="frame">
+              <img src="assets/4k9pg-k9ync-ts-00-20-30.jpg" alt="Equivariant Diffusion Policy의 인코더와 디코더 구조를 보여주는 슬라이드">
+              <figcaption><span class="timestamp">00:20:30</span> · 포인트 클라우드부터 행동 출력까지 SO(3) 부분군에 대한 등변성을 유지한다.</figcaption>
+            </figure>
+
+            <figure class="frame">
+              <img src="assets/4k9pg-k9ync-ts-00-21-20.jpg" alt="Equivariant Diffusion Policy를 실제 로봇에서 시험하는 장면">
+              <figcaption><span class="timestamp">00:21:20</span> · 시뮬레이션을 넘어 실제 로봇 조작에서도 평가된 접근이다.</figcaption>
+            </figure>
+
+            <figure class="frame">
+              <img src="assets/4k9pg-k9ync-ts-00-22-20.jpg" alt="과제의 등변성 수준에 따라 성능 향상이 달라지는 결과 그래프">
+              <figcaption><span class="timestamp">00:22:20</span> · 자세 변화가 크고 대칭성이 강한 과제일수록 구조적 이득이 커졌다.</figcaption>
+            </figure>
+          </div>
+
+          <h3>방법 2 — Image 2 Sphere Policy</h3>
+
+          <p>
+            포인트 클라우드는 기하학적으로 이상적이지만 모든 로봇 시스템이 고품질 3D
+            관측을 제공하는 것은 아니다. RGB 이미지를 받아들이기 위해 Image 2 Sphere
+            Policy는 2D 이미지를 2-구면에 투영하고, 구면 조화 함수의 계수로 추론한다.
+            이 연구는 NeurIPS 2025 Spotlight로 소개됐다.
+          </p>
+
+          <figure class="frame">
+            <img src="assets/4k9pg-k9ync-ts-00-23-40.jpg" alt="RGB 이미지를 2-구면에 투영하는 Image 2 Sphere 방법을 설명한 슬라이드">
+            <figcaption><span class="timestamp">00:23:40</span> · 평면 이미지를 구면에 임베딩해 3D 회전 구조를 다룰 수 있게 한다.</figcaption>
+          </figure>
+
+          <div class="diagram" aria-label="Image 2 Sphere Policy 처리 흐름">
+            <p class="diagram-title">Image 2 Sphere Policy</p>
+            <div class="flow">
+              <div class="flow-step">RGB 이미지를<br>구면에 임베딩</div>
+              <div class="flow-step">카메라·손 좌표로<br>구면 회전</div>
+              <div class="flow-step">구면 조화<br>푸리에 변환</div>
+              <div class="flow-step">주파수 컨볼루션<br>및 역변환</div>
+            </div>
+          </div>
+
+          <div class="filmstrip">
+            <figure class="frame">
+              <img src="assets/4k9pg-k9ync-ts-00-24-20.jpg" alt="구면 임베딩, 푸리에 변환, 주파수 컨볼루션으로 이어지는 파이프라인 슬라이드">
+              <figcaption><span class="timestamp">00:24:20</span> · 컨볼루션 정리를 이용해 구면의 주파수 영역에서 효율적으로 연산한다.</figcaption>
+            </figure>
+
+            <figure class="frame">
+              <img src="assets/4k9pg-k9ync-ts-00-25-00.jpg" alt="Image 2 Sphere Policy와 기준선의 MimicGen 데이터 효율을 비교하는 결과 슬라이드">
+              <figcaption><span class="timestamp">00:25:00</span> · ISP는 데모 100개로 기준선의 약 200개 수준 성능을 보였다.</figcaption>
+            </figure>
+
+            <figure class="frame">
+              <img src="assets/4k9pg-k9ync-ts-00-09-10.jpg" alt="기하 표현과 추론 방식의 여러 조합을 다시 보여주는 발표 슬라이드">
+              <figcaption>표현 선택은 단순한 입력 형식의 문제가 아니라 보존할 수 있는 대칭 정보의 양을 결정한다.</figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <section class="section" id="evidence">
+          <p class="section-kicker">05 · Evidence</p>
+          <h2>데이터 효율 10배라는 숫자</h2>
+
+          <div class="data-callout">
+            <div class="big-number">10×</div>
+            <div>
+              <strong>MimicGen에서 보고된 최대 데이터 효율 향상</strong>
+              <p>
+                등변 모델은 데모 100개로 학습했을 때 같은 모델의 비등변 버전이
+                데모 1,000개로 학습한 성능을 앞섰다.
+              </p>
+            </div>
+          </div>
+
+          <p>
+            결과에서 특히 중요한 패턴은 대칭성의 정도와 이득의 크기가 함께 움직였다는
+            점이다. 과제를 고등변성·중간등변성·저등변성으로 나누면, 물체와 로봇의 자세
+            변화가 풍부한 과제일수록 등변 모델의 개선 폭이 커졌다. 이는 단순히 모델 크기나
+            정규화 효과가 아니라, 과제가 실제로 가진 구조와 귀납 편향이 맞을 때 이득이
+            발생한다는 해석을 뒷받침한다.
+          </p>
+
+          <div class="comparison-wrap">
+            <table>
+              <caption>발표에서 제시된 두 접근의 정량 결과와 구조 보존 수준</caption>
+              <thead>
+                <tr>
+                  <th scope="col">접근</th>
+                  <th scope="col">입력</th>
+                  <th scope="col">기하 처리</th>
+                  <th scope="col">보고된 데이터 효율</th>
+                  <th scope="col">해석</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Equivariant Diffusion Policy</th>
+                  <td>포인트 클라우드</td>
+                  <td>SO(3) 유한 부분군 등변 인코더·디코더</td>
+                  <td><strong>최대 10배</strong></td>
+                  <td>3D 구조를 직접 보존해 가장 큰 이득</td>
+                </tr>
+                <tr>
+                  <th scope="row">Image 2 Sphere Policy</th>
+                  <td>RGB 이미지</td>
+                  <td>구면 임베딩과 구면 조화 추론</td>
+                  <td><strong>약 2배</strong></td>
+                  <td>RGB 접근성을 얻는 대신 일부 3D 구조를 포기</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            “구조를 덜 사용한 만큼 효율도 줄었다”는 대응 관계는 이 발표에서 가장 실용적인
+            메시지 중 하나다. 센서 선택과 표현 설계가 모델 앞단의 부수적인 결정이 아니라,
+            얻을 수 있는 데이터 효율의 상한을 바꿀 수 있다는 뜻이기 때문이다.
+          </p>
+
+          <div class="note">
+            <strong>증거의 범위:</strong> 10배 수치는 MimicGen의 강체 다물체 조작
+            설정에서 제시된 비교다. 모든 로봇 과제나 실제 강화학습 전반에 그대로 일반화된
+            결과로 읽어서는 안 된다.
+          </div>
+        </section>
+
+        <section class="section" id="scaling">
+          <p class="section-kicker">06 · Shift the Curve</p>
+          <h2>로보틱스에서 스케일링은 피로스의 승리가 될 수 있다</h2>
+
+          <p>
+            2020년 전후의 신경망 스케일링 법칙은 연산량, 데이터셋 크기, 파라미터 수를
+            늘리면 손실이 멱법칙에 따라 개선된다는 관점을 널리 퍼뜨렸다. 여기서 얻기 쉬운
+            결론은 단순하다. 성능이 부족하면 데이터를 더 넣으면 된다.
+          </p>
+
+          <figure class="frame">
+            <img src="assets/4k9pg-k9ync-ts-00-25-50.jpg" alt="연산, 데이터, 파라미터 증가에 따른 멱법칙 스케일링을 설명하는 슬라이드">
+            <figcaption><span class="timestamp">00:25:50</span> · 데이터와 연산을 늘리면 성능이 예측 가능하게 개선된다는 스케일링 법칙.</figcaption>
+          </figure>
+
+          <p>
+            그러나 로보틱스에는 두 가지 불리함이 있다. 첫째, 인터넷 규모의 행동 데이터가
+            존재하지 않는다. 둘째, 언어 모델의 가벼운 오류와 달리 로봇의 오류는 장비 파손,
+            안전사고, 생산 중단으로 이어질 수 있어 요구 신뢰도가 훨씬 높다.
+          </p>
+
+          <figure class="frame">
+            <img src="assets/4k9pg-k9ync-ts-00-27-20.jpg" alt="MimicGen 성능 곡선으로 현실적으로 필요한 데이터 양이 매우 큼을 보여주는 슬라이드">
+            <figcaption><span class="timestamp">00:27:20</span> · 기준선의 멱법칙을 외삽하면 원하는 신뢰도에 필요한 데이터가 현실적 수집 범위를 벗어난다.</figcaption>
+          </figure>
+
+          <blockquote class="pullquote">
+            <p>“로마와 한 번만 더 이렇게 이기면 우리는 완전히 파멸한다.”</p>
+            <cite>피로스 왕의 일화 · 발표 00:28:00</cite>
+          </blockquote>
+
+          <figure class="frame">
+            <img src="assets/4k9pg-k9ync-ts-00-28-00.jpg" alt="데이터를 계속 늘리는 전략을 피로스의 승리에 비유한 발표 슬라이드">
+            <figcaption><span class="timestamp">00:28:00</span> · 성능은 오르지만 비용이 감당 불가능하다면 그 개선은 지속 가능한 승리가 아니다.</figcaption>
+          </figure>
+
+          <p>
+            그래서 목표는 곡선 위에서 더 비싼 지점으로 이동하는 것이 아니라 곡선 전체를
+            왼쪽으로 옮기는 것이다. 기하 구조와 등변성은 같은 성능에 필요한 데이터,
+            파라미터, 연산량을 낮추는 메커니즘으로 제안된다.
+          </p>
+
+          <figure class="frame">
+            <img src="assets/4k9pg-k9ync-ts-00-29-20.jpg" alt="ISP의 성능 곡선이 기준선 diffusion policy보다 왼쪽으로 이동한 최종 그래프">
+            <figcaption><span class="timestamp">00:29:20</span> · MimicGen 12개 과제 평균에서 ISP 곡선이 기준선보다 왼쪽으로 이동한 모습.</figcaption>
+          </figure>
+
+          <p>
+            Platt의 결론은 과거의 정교한 물리 모델로 완전히 회귀하자는 급진론이 아니다.
+            데이터의 역할을 없애자는 것도 아니다. generalist 모델 쪽으로 지나치게 이동한
+            현재의 균형점을 기하 구조가 있는 방향으로 조금 되돌려, 필요한 데이터의 규모를
+            현실적인 수준으로 낮추자는 절충안이다.
+          </p>
+        </section>
+
+        <section class="section" id="implications">
+          <p class="section-kicker">07 · Field Implications</p>
+          <h2>굴착 로봇에 적용한다면</h2>
+
+          <p>
+            굴착은 이 아이디어의 가능성과 한계를 동시에 잘 보여주는 도메인이다. 붐·암·버킷의
+            기구학은 명확하고, 토사 더미와 트럭 적재함의 배치는 현장마다 크게 달라진다.
+            자세 변화가 클수록 등변 모델의 이득이 커졌다는 발표 결과를 따르면, 구조를
+            활용할 여지가 상당하다.
+          </p>
+
+          <div class="implications">
+            <div class="card">
+              <h3>SO(3) 전체보다 SO(2)가 자연스럽다</h3>
+              <p>
+                중력과 지면 법선이 수직 방향을 고정하므로 모든 3D 회전이 대칭인 것은 아니다.
+                반면 선회체가 수직축을 중심으로 어느 방향을 향하든 굴착 동작의 구조는 유사하다.
+                수직축 회전 대칭을 명시하는 SO(2) 등변 모델이 현실적인 출발점이다.
+              </p>
+            </div>
+
+            <div class="card">
+              <h3>LiDAR와 스테레오는 단순한 센서 추가가 아니다</h3>
+              <p>
+                RGB 구면 표현보다 포인트 클라우드에서 더 큰 효율 향상이 나타난 결과를 고려하면,
+                3D 센서는 정책이 활용할 수 있는 기하 구조를 늘리는 모델 설계의 일부가 된다.
+              </p>
+            </div>
+
+            <div class="card">
+              <h3>현장 데이터가 비쌀수록 귀납 편향의 가치가 커진다</h3>
+              <p>
+                굴착 데이터는 인터넷에 없고 수집에는 장비, 작업자, 토공 환경이 필요하다.
+                데이터를 10배 더 모으는 대신 모델의 효율을 높이는 쪽이 경제적으로 더 현실적일 수 있다.
+              </p>
+            </div>
+
+            <div class="card">
+              <h3>강체와 토사를 분리하는 하이브리드가 필요하다</h3>
+              <p>
+                기계 기구학에는 등변 구조를 강하게 적용할 수 있지만 토사는 변형체다.
+                로봇 본체와 도구는 기하 모델로, 토사 상호작용은 학습 기반 잔차나 별도의
+                물질 모델로 다루는 구성이 유력하다.
+              </p>
+            </div>
+          </div>
+
+          <h3>도입 전 점검표</h3>
+
+          <ul class="checklist">
+            <li>과제에서 실제로 반복되는 병진·회전 대칭이 무엇인지 먼저 정의한다.</li>
+            <li>중력, 지면 경사, 마찰 이방성처럼 대칭을 깨는 요인을 별도로 기록한다.</li>
+            <li>RGB, 스테레오, LiDAR 중 유지할 수 있는 3D 구조와 센서 비용을 함께 비교한다.</li>
+            <li>비등변 기준선과 동일한 데이터 예산으로 비교해 곡선 이동 여부를 측정한다.</li>
+            <li>모방학습의 향상과 실제 온라인 RL의 데이터 효율을 분리해 검증한다.</li>
+          </ul>
+        </section>
+
+        <section class="section" id="limits">
+          <p class="section-kicker">08 · Limits & Open Questions</p>
+          <h2>강한 결과, 그러나 아직 제한된 증거</h2>
+
+          <div class="limits">
+            <div class="card">
+              <h3>벤치마크 범위</h3>
+              <p>
+                최대 10배 향상은 MimicGen과 3~10개 물체의 다물체 강체 모델링 범위에서
+                입증됐다. 발표자는 나머지 일반화 가능성을 “일화적 증거”로 구분한다.
+              </p>
+            </div>
+
+            <div class="card">
+              <h3>대칭이 깨질 때의 적응</h3>
+              <p>
+                중력, 기울어진 지면, 방향별 마찰이 있는 환경에서 모델이 구조적 가정으로부터
+                얼마나 잘 벗어나는지는 정량적으로 제시되지 않았다.
+              </p>
+            </div>
+
+            <div class="card">
+              <h3>강체 중심의 세계관</h3>
+              <p>
+                변형체나 유체에서는 적절한 대칭군을 정의하고 유지하기가 더 어렵다.
+                의복, 케이블, 토사 같은 과제에는 추가 모델링이 필요하다.
+              </p>
+            </div>
+
+            <div class="card">
+              <h3>RL 발표와 BC 증거의 간극</h3>
+              <p>
+                발표의 문제 설정은 실기 RL이지만 핵심 정량 결과는 주로 모방학습 설정에서
+                나왔다. 등변 구조가 실제 온라인 RL의 샘플 효율을 같은 비율로 높이는지는
+                후속 검증이 필요하다.
+              </p>
+            </div>
+          </div>
+
+          <h3>발표에 남은 세 가지 미해결 문제</h3>
+
+          <div class="comparison-wrap">
+            <table>
+              <caption>기하 구조만으로 해결되지 않는 실기 RL의 과제</caption>
+              <thead>
+                <tr>
+                  <th scope="col">문제</th>
+                  <th scope="col">현재 상태</th>
+                  <th scope="col">필요한 검증</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Diffusion head 위의 RL</th>
+                  <td>FPO, DPPO 등이 시도 중이지만 여전히 어렵다. 비-diffusion 대안도 재검토되고 있다.</td>
+                  <td>동일한 계산·데이터 예산에서 안정성과 최종 성능 비교</td>
+                </tr>
+                <tr>
+                  <th scope="row">Q 함수와 정책 정렬</th>
+                  <td>RL 시작 시 정책 성능이 떨어지지 않도록 초기 가치 추정과 actor를 맞춰야 한다.</td>
+                  <td>오프라인 데이터에서의 사전 정렬과 온라인 전환 실험</td>
+                </tr>
+                <tr>
+                  <th scope="row">리셋과 보상</th>
+                  <td>현장 적용 비용을 결정하는 운영 문제로 남아 있다.</td>
+                  <td>자동 리셋, 인간 개입 빈도, 보상 오설계에 대한 강건성 측정</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="sources">
+          <p class="section-kicker">09 · Source Notes</p>
+          <h2>자료와 해석의 범위</h2>
+
+          <div class="source-notes">
+            <p>
+              이 글은 아래 발표의 주장, 슬라이드, 정량 결과를 중심으로 재구성한 분석
+              리포트다. 수치와 논문 선정 이력은 발표에서 제시된 내용을 따른다.
+            </p>
+            <ol>
+              <li>
+                <strong>주요 출처:</strong>
+                Robert Platt, “Model Matters — Leveraging Geometry in Robot Learning,”
+                ICRA 2026 RL4IL Workshop. Zhanpeng He 채널,
+                <a>YouTube 영상</a>,
+                2026년 6월 8일 게시.
+              </li>
+              <li>
+                <strong>정량 근거:</strong> MimicGen 과제에서 발표자가 제시한
+                Equivariant Diffusion Policy 및 Image 2 Sphere Policy 비교 결과.
+                최대 10배와 약 2배는 서로 다른 표현과 실험 설정의 결과다.
+              </li>
+              <li>
+                <strong>이론적 근거:</strong> Noether 정리와 군 등변 신경망에 대한 설명은
+                발표의 설계 논리를 요약한 것이다. Noether 정리가 특정 신경망 구조의 성능을
+                직접 보장한다는 의미는 아니다.
+              </li>
+              <li>
+                <strong>편집자 해석:</strong> 굴착기, SO(2) 대칭, 강체–토사 하이브리드에
+                관한 부분은 발표 내용을 산업 현장에 연결한 분석이며 발표자가 직접 보고한
+                실험 결과가 아니다.
+              </li>
+              <li>
+                <strong>이미지:</strong> 모든 도판은 제공된 발표 영상의 타임스탬프 프레임이다.
+                캡션의 시각 표기는 해당 논점이 등장하는 대략적인 위치를 나타낸다.
+              </li>
+            </ol>
+          </div>
+
+          <div class="share-card">
+            <p class="section-kicker">Share Framing</p>
+            <h2>로봇에게 더 많은 데이터를 주기 전에, 더 나은 세계관을 줄 수 있을까?</h2>
+            <p>
+              이 발표가 던지는 질문은 모델 크기보다 근본적이다. 물리 세계가 가진 대칭을
+              학습 구조에 반영하면, 로봇은 같은 교훈을 자세마다 다시 배울 필요가 없다.
+            </p>
+            <div class="copy-ready">
+              공유용 요약 — 로봇 학습의 데이터 병목을 해결하는 길은 무작정 더 많은 데이터를
+              모으는 데만 있지 않다. Robert Platt은 기하 구조와 등변성을 정책에 심어
+              MimicGen에서 최대 10배의 데이터 효율을 보고했다. 핵심은 스케일링 곡선을 따라
+              올라가는 것이 아니라 곡선 자체를 왼쪽으로 옮기는 것이다.
+            </div>
+          </div>
+
+          <h3>마지막으로</h3>
+          <p>
+            로봇 학습은 구조와 규모 중 하나만 선택해야 하는 문제가 아니다. 데이터는 여전히
+            필요하고, generalist 모델의 유연성도 중요하다. 다만 데이터가 비싸고 실패 비용이
+            큰 물리 세계에서는 모델이 이미 알 수 있는 것을 굳이 처음부터 다시 배우게 해서는
+            안 된다.
+          </p>
+          <p>
+            Platt의 제안은 간명하다. 세계가 회전하면 정책도 함께 회전하게 만들고, 공간이
+            이동하면 추론도 그 이동을 이해하게 만들자. 그렇게 얻은 효율로 데이터 요구량을
+            0으로 만들 수는 없어도, 불가능한 규모를 현실적인 규모로 바꿀 수는 있다.
+            로보틱스가 옮겨야 할 것은 다음 데이터 포인트가 아니라 곡선 자체다.
+          </p>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <footer class="article-end">
+    <div>
+      <strong>Robert Platt 발표 분석</strong><br>
+      Model Matters — Leveraging Geometry in Robot Learning
+    </div>
+    <div class="tag-list" aria-label="문서 태그">
+      <span class="tag">Robot Learning</span>
+      <span class="tag">Equivariance</span>
+      <span class="tag">Geometry</span>
+      <span class="tag">VLA</span>
+      <span class="tag">Research Report</span>
+    </div>
+  </footer>
 </body>
 </html>
