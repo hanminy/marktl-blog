@@ -1,25 +1,1028 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Chelsea Finn &amp; Perry Dong (Stanford &amp; PI): Reliable VLA Post-Training with Real-World RL</title>
-<style>
-      body { margin: 0; font-family: Georgia, "Times New Roman", serif; color: #202124; background: #faf7f2; }
-      main { max-width: 900px; margin: 0 auto; padding: 56px 36px 80px; box-sizing: border-box; }
-      article { background: #fffdf8; border: 1px solid #e6ddcf; padding: 44px; }
-      h1 { font-size: 44px; line-height: 1.05; margin-top: 0; }
-      h2 { margin-top: 42px; border-top: 1px solid #dfd5c8; padding-top: 24px; }
-      p, li { font-size: 18px; line-height: 1.75; }
-      a { color: #8b3a2b; }
-      pre { overflow: auto; padding: 18px; background: #25211d; color: #f7efe4; border-radius: 6px; }
-      table { width: 100%; border-collapse: collapse; margin: 22px 0; background: #fff; }
-      th, td { border-bottom: 1px solid #e6ddcf; padding: 10px 12px; }
-      img { max-width: 100%; height: auto; display: block; margin: 24px auto; }
-      .frontmatter { white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: #f1eadf; padding: 14px; color: #5f574f; }
-      .callout { border: 1px solid #d8b98c; background: #fff6e5; padding: 16px 18px; margin: 24px 0; }
-      .callout-title { font-family: ui-sans-serif, system-ui, sans-serif; font-weight: 800; text-transform: uppercase; font-size: 12px; letter-spacing: .08em; }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>로봇이 스스로 신뢰성을 학습하는 법 — π*0.6와 EXPO-FT의 실세계 강화학습</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #19201d;
+      --muted: #64706a;
+      --paper: #f7f4ed;
+      --surface: #fffdf8;
+      --surface-strong: #ffffff;
+      --line: #ddd8cd;
+      --green: #176b55;
+      --green-dark: #0c4939;
+      --green-soft: #e2f0e9;
+      --amber: #c66a24;
+      --amber-soft: #f8e9d8;
+      --blue: #315b8a;
+      --blue-soft: #e7eef7;
+      --red: #9a443d;
+      --shadow: 0 20px 50px rgba(29, 42, 35, 0.09);
+      --radius: 22px;
+      --reading: 760px;
+      --wide: 1120px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 3%, rgba(23, 107, 85, 0.10), transparent 27rem),
+        radial-gradient(circle at 92% 18%, rgba(198, 106, 36, 0.09), transparent 28rem),
+        var(--paper);
+      font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+      font-size: 17px;
+      line-height: 1.78;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+
+    a {
+      color: var(--green-dark);
+      text-decoration-color: rgba(12, 73, 57, 0.35);
+      text-underline-offset: 0.2em;
+    }
+
+    a:hover,
+    a:focus-visible {
+      color: var(--amber);
+      text-decoration-color: currentColor;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 1rem;
+      top: -5rem;
+      z-index: 100;
+      padding: 0.75rem 1rem;
+      color: white;
+      background: var(--green-dark);
+      border-radius: 0 0 10px 10px;
+    }
+
+    .skip-link:focus {
+      top: 0;
+    }
+
+    .site-bar {
+      border-bottom: 1px solid rgba(25, 32, 29, 0.09);
+      background: rgba(247, 244, 237, 0.92);
+    }
+
+    .site-bar__inner {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: 0 auto;
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .publication {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.7rem;
+      color: var(--ink);
+      font-size: 0.83rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .publication::before {
+      content: "";
+      width: 11px;
+      height: 11px;
+      background: var(--green);
+      border-radius: 50%;
+      box-shadow: 0 0 0 5px var(--green-soft);
+    }
+
+    .site-bar__meta {
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .hero {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: 0 auto;
+      padding: clamp(4.5rem, 10vw, 8rem) 0 4rem;
+    }
+
+    .hero__grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.38fr) minmax(280px, 0.62fr);
+      align-items: end;
+      gap: clamp(2rem, 5vw, 5.5rem);
+    }
+
+    .eyebrow {
+      margin: 0 0 1rem;
+      color: var(--green);
+      font-size: 0.77rem;
+      font-weight: 850;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    .display-number {
+      font-family: "Iowan Old Style", "Noto Serif KR", "Batang", Georgia, serif;
+      letter-spacing: -0.035em;
+    }
+
+    h1 {
+      max-width: 850px;
+      margin: 0;
+      font-size: clamp(2.85rem, 7vw, 6.25rem);
+      font-weight: 800;
+      line-height: 1.03;
+    }
+
+    .hero__dek {
+      max-width: 780px;
+      margin: 1.6rem 0 0;
+      color: #3e4944;
+      font-size: clamp(1.08rem, 2vw, 1.38rem);
+      line-height: 1.62;
+    }
+
+    .hero__aside {
+      padding: 1.35rem 0 0 1.5rem;
+      border-left: 2px solid var(--green);
+    }
+
+    .hero__aside p {
+      margin: 0.45rem 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .hero__aside strong {
+      color: var(--ink);
+    }
+
+    .hero__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: 1.2rem;
+    }
+
+    .tag {
+      padding: 0.32rem 0.66rem;
+      color: var(--green-dark);
+      background: var(--green-soft);
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 750;
+    }
+
+    .hero-visual {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: 0 auto 4rem;
+      position: relative;
+    }
+
+    .hero-visual figure {
+      margin: 0;
+    }
+
+    .hero-visual img {
+      width: 100%;
+      max-height: 650px;
+      object-fit: cover;
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-visual figcaption {
+      max-width: 720px;
+      margin: 0.85rem 0 0 auto;
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.55;
+      text-align: right;
+    }
+
+    .stat-ribbon {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: 0 auto 5rem;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      overflow: hidden;
+      color: white;
+      background: var(--green-dark);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .stat {
+      min-height: 150px;
+      padding: 1.55rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-right: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .stat:last-child {
+      border-right: 0;
+    }
+
+    .stat__value {
+      font-family: "Iowan Old Style", Georgia, serif;
+      font-size: clamp(2rem, 4vw, 3.35rem);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .stat__label {
+      margin-top: 1rem;
+      color: rgba(255, 255, 255, 0.73);
+      font-size: 0.76rem;
+      line-height: 1.5;
+    }
+
+    .article-layout {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 210px minmax(0, var(--reading));
+      justify-content: center;
+      gap: clamp(2rem, 6vw, 5rem);
+    }
+
+    .toc {
+      align-self: start;
+      position: sticky;
+      top: 1.5rem;
+      padding-top: 0.35rem;
+    }
+
+    .toc__title {
+      margin: 0 0 0.8rem;
+      color: var(--ink);
+      font-size: 0.72rem;
+      font-weight: 850;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
+    .toc ol {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: toc;
+    }
+
+    .toc li {
+      counter-increment: toc;
+      margin: 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .toc a {
+      display: grid;
+      grid-template-columns: 1.7rem 1fr;
+      gap: 0.25rem;
+      padding: 0.72rem 0;
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.45;
+      text-decoration: none;
+    }
+
+    .toc a::before {
+      content: "0" counter(toc);
+      color: var(--green);
+      font-weight: 800;
+    }
+
+    article {
+      min-width: 0;
+    }
+
+    .lead {
+      margin: 0 0 2.5rem;
+      font-family: "Noto Serif KR", "Batang", Georgia, serif;
+      font-size: clamp(1.12rem, 2.4vw, 1.36rem);
+      line-height: 1.85;
+    }
+
+    .lead::first-letter {
+      float: left;
+      margin: 0.13em 0.13em 0 0;
+      color: var(--green);
+      font-family: Georgia, serif;
+      font-size: 4.6rem;
+      font-weight: 800;
+      line-height: 0.76;
+    }
+
+    .abstract {
+      margin: 2.8rem 0 4rem;
+      padding: clamp(1.4rem, 4vw, 2.35rem);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-top: 5px solid var(--green);
+      border-radius: 0 0 var(--radius) var(--radius);
+      box-shadow: 0 12px 30px rgba(29, 42, 35, 0.05);
+    }
+
+    .abstract h2 {
+      margin: 0 0 0.8rem;
+      font-size: 1.35rem;
+    }
+
+    .abstract p {
+      margin: 0;
+      color: #3d4843;
+    }
+
+    .section {
+      margin: 0 0 6rem;
+      scroll-margin-top: 2rem;
+    }
+
+    .section-heading {
+      margin-bottom: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--ink);
+    }
+
+    .section-number {
+      display: block;
+      margin-bottom: 0.55rem;
+      color: var(--green);
+      font-size: 0.73rem;
+      font-weight: 850;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(2rem, 4.6vw, 3.35rem);
+      line-height: 1.18;
+    }
+
+    h3 {
+      margin: 3.3rem 0 0.75rem;
+      font-size: clamp(1.4rem, 3vw, 1.95rem);
+      line-height: 1.35;
+    }
+
+    p {
+      margin: 0 0 1.25rem;
+    }
+
+    .finding-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin: 2rem 0 0;
+    }
+
+    .finding {
+      padding: 1.35rem;
+      background: var(--surface-strong);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+
+    .finding__index {
+      display: block;
+      margin-bottom: 1rem;
+      color: var(--amber);
+      font-family: Georgia, serif;
+      font-size: 1.9rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .finding h3 {
+      margin: 0 0 0.55rem;
+      font-family: inherit;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .finding p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.65;
+    }
+
+    .pullquote {
+      margin: 4rem -3.5rem;
+      padding: 2.3rem 3.5rem;
+      position: relative;
+      color: var(--green-dark);
+      border-top: 1px solid var(--green);
+      border-bottom: 1px solid var(--green);
+      font-family: "Noto Serif KR", "Batang", Georgia, serif;
+      font-size: clamp(1.45rem, 3.5vw, 2.15rem);
+      font-weight: 700;
+      line-height: 1.55;
+      letter-spacing: -0.03em;
+      text-align: center;
+    }
+
+    .pullquote cite {
+      display: block;
+      margin-top: 1rem;
+      color: var(--muted);
+      font-family: Pretendard, sans-serif;
+      font-size: 0.72rem;
+      font-style: normal;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+    }
+
+    .evidence-figure {
+      margin: 2.3rem 0 3rem;
+    }
+
+    .evidence-figure img {
+      width: 100%;
+      background: #e9e9e5;
+      border-radius: 16px;
+      box-shadow: 0 12px 28px rgba(29, 42, 35, 0.09);
+    }
+
+    figcaption {
+      margin-top: 0.72rem;
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.55;
+    }
+
+    .timestamp {
+      display: inline-block;
+      margin-right: 0.45rem;
+      color: var(--green);
+      font-weight: 850;
+      letter-spacing: 0.03em;
+    }
+
+    .figure-pair {
+      margin: 2.3rem 0 3rem;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .figure-pair figure {
+      margin: 0;
+    }
+
+    .figure-pair img {
+      width: 100%;
+      height: 100%;
+      min-height: 190px;
+      object-fit: cover;
+      background: #e9e9e5;
+      border-radius: 14px;
+      box-shadow: 0 10px 25px rgba(29, 42, 35, 0.08);
+    }
+
+    .process {
+      margin: 2.5rem 0 3rem;
+      padding: 1.35rem;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+
+    .process__title {
+      margin: 0 0 1rem;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 850;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .process__flow {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      align-items: stretch;
+    }
+
+    .process__step {
+      min-height: 125px;
+      padding: 1rem;
+      position: relative;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+    }
+
+    .process__step:not(:last-child)::after {
+      content: "→";
+      width: 1.6rem;
+      height: 1.6rem;
+      position: absolute;
+      z-index: 2;
+      top: 50%;
+      right: -1.2rem;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: var(--green);
+      border: 4px solid var(--surface);
+      border-radius: 50%;
+      font-size: 0.8rem;
+      transform: translateY(-50%);
+    }
+
+    .process__step strong {
+      display: block;
+      margin-bottom: 0.45rem;
+      color: var(--green-dark);
+      font-size: 0.9rem;
+    }
+
+    .process__step span {
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.55;
+    }
+
+    .formula {
+      margin: 2rem 0;
+      padding: 1.2rem 1.4rem;
+      overflow-x: auto;
+      color: var(--green-dark);
+      background: var(--green-soft);
+      border-radius: 14px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.92rem;
+      line-height: 1.65;
+      white-space: nowrap;
+    }
+
+    .metric-callout {
+      margin: 3rem 0;
+      padding: clamp(1.5rem, 4vw, 2.25rem);
+      color: white;
+      background: linear-gradient(135deg, var(--green-dark), #1b755d);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .metric-callout__label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: rgba(255, 255, 255, 0.66);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
+    .metric-callout__value {
+      display: block;
+      font-family: Georgia, serif;
+      font-size: clamp(2.3rem, 7vw, 4.7rem);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -0.05em;
+    }
+
+    .metric-callout p {
+      margin: 1rem 0 0;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 0.88rem;
+    }
+
+    .comparison {
+      width: 100%;
+      margin: 2.3rem 0 3rem;
+      border-collapse: separate;
+      border-spacing: 0;
+      overflow: hidden;
+      background: var(--surface-strong);
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      font-size: 0.82rem;
+      line-height: 1.55;
+    }
+
+    .comparison th,
+    .comparison td {
+      padding: 0.9rem 1rem;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .comparison tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .comparison th {
+      color: var(--green-dark);
+      background: var(--green-soft);
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+    }
+
+    .comparison tbody tr:nth-child(even) {
+      background: #faf8f3;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.18rem 0.48rem;
+      color: var(--green-dark);
+      background: var(--green-soft);
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .badge--amber {
+      color: #85400e;
+      background: var(--amber-soft);
+    }
+
+    .note {
+      margin: 2rem 0;
+      padding: 1.2rem 1.4rem;
+      color: #3e4944;
+      background: var(--blue-soft);
+      border-left: 4px solid var(--blue);
+      border-radius: 0 13px 13px 0;
+      font-size: 0.86rem;
+    }
+
+    .note strong {
+      color: #24486e;
+    }
+
+    .limitations {
+      display: grid;
+      gap: 0.85rem;
+      margin: 2rem 0 3rem;
+    }
+
+    .limitation {
+      padding: 1.1rem 1.25rem;
+      display: grid;
+      grid-template-columns: 1.7rem 1fr;
+      gap: 0.8rem;
+      align-items: start;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 13px;
+    }
+
+    .limitation::before {
+      content: "!";
+      width: 1.7rem;
+      height: 1.7rem;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: var(--red);
+      border-radius: 50%;
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+
+    .limitation p {
+      margin: 0;
+      font-size: 0.88rem;
+      line-height: 1.65;
+    }
+
+    .implication-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .implication {
+      min-height: 210px;
+      padding: 1.4rem;
+      background: var(--surface-strong);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+
+    .implication h3 {
+      margin: 0 0 0.7rem;
+      font-family: inherit;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .implication p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.83rem;
+      line-height: 1.65;
+    }
+
+    .takeaway {
+      margin: 4rem 0 1rem;
+      padding: clamp(1.6rem, 5vw, 2.6rem);
+      background: var(--amber-soft);
+      border-radius: var(--radius);
+    }
+
+    .takeaway h2 {
+      margin-bottom: 1.1rem;
+      color: #773b10;
+      font-size: clamp(1.65rem, 4vw, 2.4rem);
+    }
+
+    .takeaway ol {
+      margin: 0;
+      padding-left: 1.35rem;
+    }
+
+    .takeaway li {
+      margin: 0.7rem 0;
+      padding-left: 0.4rem;
+    }
+
+    .source-list {
+      margin: 1.5rem 0 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: sources;
+    }
+
+    .source-list li {
+      counter-increment: sources;
+      padding: 1rem 0 1rem 2.4rem;
+      position: relative;
+      border-top: 1px solid var(--line);
+      font-size: 0.84rem;
+      line-height: 1.65;
+    }
+
+    .source-list li::before {
+      content: counter(sources);
+      width: 1.55rem;
+      height: 1.55rem;
+      position: absolute;
+      top: 1.15rem;
+      left: 0;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: var(--green);
+      border-radius: 50%;
+      font-size: 0.67rem;
+      font-weight: 850;
+    }
+
+    .source-note {
+      margin-top: 2rem;
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.65;
+    }
+
+    .share-box {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: 2rem auto 0;
+      padding: clamp(1.5rem, 5vw, 3rem);
+      display: grid;
+      grid-template-columns: 0.75fr 1.25fr;
+      gap: 2rem;
+      align-items: center;
+      color: white;
+      background: #172a24;
+      border-radius: 28px 28px 0 0;
+    }
+
+    .share-box h2 {
+      font-size: clamp(1.7rem, 4vw, 2.6rem);
+    }
+
+    .share-box p {
+      margin: 0.65rem 0 0;
+      color: rgba(255, 255, 255, 0.68);
+      font-size: 0.84rem;
+    }
+
+    .share-copy {
+      padding: 1.2rem 1.35rem;
+      color: #e7f2ed;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 14px;
+      font-size: 0.88rem;
+      line-height: 1.7;
+      user-select: all;
+    }
+
+    footer {
+      color: rgba(255, 255, 255, 0.62);
+      background: #172a24;
+    }
+
+    .footer__inner {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: 0 auto;
+      padding: 1.4rem 0 2.6rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.11);
+      font-size: 0.72rem;
+    }
+
+    @media (max-width: 960px) {
+      .hero__grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero__aside {
+        max-width: 620px;
+      }
+
+      .article-layout {
+        grid-template-columns: minmax(0, var(--reading));
+      }
+
+      .toc {
+        position: static;
+        margin-bottom: 3rem;
+        padding: 1.1rem 1.25rem;
+        background: rgba(255, 255, 255, 0.55);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+      }
+
+      .toc ol {
+        columns: 2;
+        column-gap: 2rem;
+      }
+
+      .toc li {
+        break-inside: avoid;
+      }
+
+      .pullquote {
+        margin-right: 0;
+        margin-left: 0;
+        padding-right: 1rem;
+        padding-left: 1rem;
+      }
+    }
+
+    @media (max-width: 700px) {
+      body {
+        font-size: 16px;
+        word-break: normal;
+      }
+
+      .site-bar__meta {
+        display: none;
+      }
+
+      .hero {
+        padding-top: 3.5rem;
+      }
+
+      .stat-ribbon {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .stat:nth-child(2) {
+        border-right: 0;
+      }
+
+      .stat:nth-child(-n+2) {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+      }
+
+      .finding-grid,
+      .figure-pair,
+      .implication-grid,
+      .share-box {
+        grid-template-columns: 1fr;
+      }
+
+      .process__flow {
+        grid-template-columns: 1fr;
+      }
+
+      .process__step:not(:last-child)::after {
+        content: "↓";
+        top: auto;
+        right: 50%;
+        bottom: -1.2rem;
+        transform: translateX(50%);
+      }
+
+      .comparison {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+
+      .toc ol {
+        columns: 1;
+      }
+
+      .share-box {
+        border-radius: 22px 22px 0 0;
+      }
+
+      .footer__inner {
+        flex-direction: column;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+        font-size: 11pt;
+      }
+
+      .site-bar,
+      .toc,
+      .share-box,
+      footer {
+        display: none;
+      }
+
+      .hero,
+      .hero-visual,
+      .stat-ribbon,
+      .article-layout {
+        width: 100%;
+      }
+
+      .article-layout {
+        display: block;
+      }
+
+      .section,
+      figure,
+      .finding,
+      .implication {
+        break-inside: avoid;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .stat-ribbon,
+      .metric-callout {
+        color: black;
+        background: #eee;
+        box-shadow: none;
+      }
+    }
+  </style>
 <meta property="og:type" content="article">
 <meta property="og:title" content="Chelsea Finn &amp; Perry Dong (Stanford &amp; PI): Reliable VLA Post-Training with Real-World RL">
 <meta property="og:description" content="Chelsea Finn &amp; Perry Dong (Stanford &amp; PI): Reliable VLA Post Training with Real World RL 영상 정보 채널 : Zhanpeng He (ICRA 2026 RL4IL 워크샵) 게시일 : 2026 06 08 길이 : 31분 59초 링크 : https://www.youtube.com/watch?v=fAqgJMyxBbo &lt;div style=&quot;position: relat">
@@ -32,84 +1035,697 @@
 <link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-chelsea-finn-reliable-vla-post-training-%EC%9A%94%EC%95%BD/">
 </head>
 <body>
-<main data-template="editorial">
-<article>
-<pre class="frontmatter">title: &quot;Chelsea Finn &amp; Perry Dong (Stanford &amp; PI): Reliable VLA Post-Training with Real-World RL&quot;
-tags:
-  - youtube
-  - 연구자료
-source: &quot;https://www.youtube.com/watch?v=fAqgJMyxBbo&quot;
-channel: &quot;Zhanpeng He&quot;
-video_id: &quot;fAqgJMyxBbo&quot;
-date: 2026-08-08</pre>
-<h1>Chelsea Finn &amp; Perry Dong (Stanford &amp; PI): Reliable VLA Post-Training with Real-World RL</h1>
-<h2>영상 정보</h2>
-<ul><li><strong>채널</strong>: Zhanpeng He (ICRA 2026 RL4IL 워크샵)</li><li><strong>게시일</strong>: 2026-06-08</li><li><strong>길이</strong>: 31분 59초</li><li><strong>링크</strong>: https://www.youtube.com/watch?v=fAqgJMyxBbo</li></ul>
-<p>&lt;div relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;&quot;&gt; &lt;iframe absolute; top: 0; left: 0; width: 100%; height: 100%;&quot; src=&quot;https://www.youtube.com/embed/fAqgJMyxBbo&quot; frameborder=&quot;0&quot; allowfullscreen&gt;&lt;/iframe&gt; &lt;/div&gt;</p>
-<h2>한줄 요약</h2>
-<p>모방학습으로 만든 VLA를 실세계 강화학습으로 후속 학습시켜 <strong>에스프레소 제조 성공률을 40%에서 90% 이상으로</strong> 끌어올린 레시피(π*0.6)와, diffusion 정책을 안정적으로 온라인 미세조정해 <strong>평균 19.1분의 로봇 데이터로 30/30 성공</strong>을 달성한 EXPO-FT를 두 파트로 나누어 발표한다.</p>
-<h2>핵심 장면 분석</h2>
-<h3>00:01:40 — 오늘 AI의 첫 번째 미해결 문제</h3>
-<p><img src="assets/faqgjmyxbbo-ts-00-01-40.jpg" alt="fAqgJMyxBbo_ts_00-01-40.jpg"> Finn은 발표를 &quot;현대 로봇 시스템에서 어떻게 높은 <strong>성능</strong>과 <strong>신뢰성</strong>을 동시에 달성할 것인가&quot;라는 한 문장으로 연다. 높은 신뢰성은 로봇이 장시간 자율적으로 동작하기 위한 전제이며, 오늘날의 로봇과 사람을 가르는 핵심 차이라고 규정한다.</p>
-<h3>00:02:40 — 사람이 반복하는 루프의 한계</h3>
-<p><img src="assets/faqgjmyxbbo-ts-00-02-40.jpg" alt="fAqgJMyxBbo_ts_00-02-40.jpg"> 통상적 접근은 &quot;목표 정의 → 데모 데이터셋 수집 → 최적화&quot;이지만 <strong>첫 시도에 제대로 되는 법이 없다</strong>. 조금 나은 방법은 대학원생이나 엔지니어가 데이터를 더 모으고, 라벨을 더 상세하게 만들고, 실패 사례를 추가하며 반복하는 것이다. 문제는 사람이 먼저 지친다는 점이다. Finn은 여기서 &quot;AI 시스템 자체가 반복하게 하자&quot;는 발표의 논지를 끌어낸다.</p>
-<h3>00:04:50 — 대상 과제: 에스프레소 제조</h3>
-<p><img src="assets/faqgjmyxbbo-ts-00-04-50.jpg" alt="fAqgJMyxBbo_ts_00-04-50.jpg"> 에스프레소가 어려운 이유를 네 가지로 정리한다. 포터필터를 그룹헤드에 끼우는 <strong>정밀성</strong>, 돌려 잠그는 데 필요한 <strong>힘</strong>, 액체가 담긴 잔을 흘리지 않는 <strong>부드러운 조작</strong>, 그리고 추출이 끝나기 전에 다음 단계로 넘어가면 안 되는 <strong>타이밍 감각</strong>이다.</p>
-<h3>00:06:15 — VLA에 대한 기존 RL 연구와 미해결 지점</h3>
-<p><img src="assets/faqgjmyxbbo-ts-00-06-15.jpg" alt="fAqgJMyxBbo_ts_00-06-15.jpg"> VLA 구조(사전학습 VLM + action expert)를 요약하고, 최근 2년간 VLA용 RL 레시피 연구가 다수 있었음을 짚는다. NVIDIA가 π₀를 RL로 미세조정해 GPU 삽입이라는 단기 과제를 높은 신뢰도로 해결한 사례를 든 뒤, <strong>에스프레소처럼 길고 복잡한 과제에 대해서는 아직 설득력 있는 레시피가 없다</strong>고 문제를 좁힌다.</p>
-<h3>00:07:50 — 세 가지 핵심 설계 선택과 전체 파이프라인</h3>
-<p><img src="assets/faqgjmyxbbo-ts-00-07-50.jpg" alt="fAqgJMyxBbo_ts_00-07-50.jpg"> 레시피의 골격이 한 장에 담겨 있다.</p>
-<ol><li>정책 롤아웃과 <strong>사람의 교정(human policy corrections)</strong> 을 함께 배치로 사용한다. 데모에 없던 상태를 만났을 때 회복 방법을 스스로 알아내게 두는 대신 직접 보여주는 편이 효율적이기 때문이다.</li><li><strong>진행도(progress to go)</strong> 를 예측하는 가치함수를 학습한다.</li><li><strong>advantage 조건부 지도학습</strong>으로 정책을 갱신한다.</li></ol>
-<h3>00:10:00 — 가치함수가 학습한 &quot;진행도&quot;</h3>
-<p><img src="assets/faqgjmyxbbo-ts-00-10-00.jpg" alt="fAqgJMyxBbo_ts_00-10-00.jpg"> 가치함수는 사전학습 VLM에 value head를 얹어, 현재 이미지·언어 프롬프트·에피소드 메타데이터를 조건으로 <strong>성공까지 남은 시간(time to go)</strong> 을 예측한다. 몬테카를로 방식의 단순 지도학습 목적함수라 대형 모델·대규모 데이터로 확장하기 쉽다. 오른쪽 그래프가 근거다. 세탁물 접기에서 이미 접힌 옷을 다시 펼치면 가치가 <strong>하락</strong>(음의 진행)하고, 회복하면 다시 <strong>상승</strong>한다. 아래 냉장고 사례에서도 손잡이를 놓치면 진행이 없고, 문을 열면 크게 오르며, 정수 필터를 넘어뜨리면 음의 진행으로 잡힌다. 진행도 개념이 목적함수에서 자연히 창발한다는 점이 핵심이다.</p>
-<h3>00:10:50 — advantage 추정과 이진화</h3>
-<p><img src="assets/faqgjmyxbbo-ts-00-10-50.jpg" alt="fAqgJMyxBbo_ts_00-10-50.jpg"> advantage는 행동 전후 가치의 차이로 계산한다. 이 델타가 임계값을 넘으면 양의 advantage, 아니면 음의 advantage로 <strong>이진화</strong>해 정책의 조건 입력으로 넣는다. 테스트 시에는 양의 advantage로 조건화해 전진하는 행동만 선택하게 만든다. 학습에는 원본 데모뿐 아니라 반복 과정에서 쌓인 롤아웃과 DAgger 데이터가 함께 쓰인다.</p>
-<h3>00:12:30 — 사람과 협업하는 라떼 제조</h3>
-<p><img src="assets/faqgjmyxbbo-ts-00-12-30.jpg" alt="fAqgJMyxBbo_ts_00-12-30.jpg"> 학습된 정책의 실제 동작(8배속). 포터필터를 그라인더 아래에 놓고, 탬핑하고, 삽입하고, 추출을 기다린 뒤, 사람이 스팀한 우유를 붓는다. Finn은 가장 어려운 구간으로 <strong>완성된 잔을 코스터로 옮기는 마지막 동작</strong>을 꼽는다. 작은 흔들림 하나로도 크게 쏟기 때문이다.</p>
-<h3>00:13:40 — 13시간 연속 운전</h3>
-<p><img src="assets/faqgjmyxbbo-ts-00-13-40.jpg" alt="fAqgJMyxBbo_ts_00-13-40.jpg"> 신뢰성의 증거로 제시된 장면이다. RL 후속 학습을 거친 정책으로 <strong>13시간 동안 커피를 계속 만들었고</strong>(100배속 타임랩스), 모방학습만으로 만든 초기 정책보다 훨씬 안정적이었다고 보고한다.</p>
-<h3>00:14:10 — Dandelion 초콜릿 공장의 실제 워크플로</h3>
-<p><img src="assets/faqgjmyxbbo-ts-00-14-10.jpg" alt="fAqgJMyxBbo_ts_00-14-10.jpg"> 연구용으로 지어낸 과제가 아니라는 점이 중요하다. Physical Intelligence 사무실 근처 Dandelion 초콜릿 공장에서 <strong>사람이 실제로 반복하는 작업</strong>(골판지 상자 조립·라벨링·적재)을 그대로 가져와 재현했다(80배속, 실제 10분 51초).</p>
-<h3>00:14:45 — 처음 보는 옷, 처음 보는 집</h3>
-<p><img src="assets/faqgjmyxbbo-ts-00-14-45.jpg" alt="fAqgJMyxBbo_ts_00-14-45.jpg"> 일반화가 필요한 워크플로 검증. 로봇이 <strong>한 번도 본 적 없는 옷을, 한 번도 가본 적 없는 집에서</strong> 접는다. 동일한 알고리즘이 이 설정에도 적용된다는 것을 보인다.</p>
-<h3>00:15:30 — 성공률이 아니라 throughput</h3>
-<p><img src="assets/faqgjmyxbbo-ts-00-15-30.jpg" alt="fAqgJMyxBbo_ts_00-15-30.jpg"> Finn은 로보틱스 실험에서 잘 논의되지 않는 지표를 강조한다. 성공률과 속도를 동시에 담기 위해 <strong>단위 시간당 성공 횟수(throughput)</strong> 를 측정한다. 실패하면서 시간까지 오래 끄는 정책은 이 지표에서 크게 불리해진다.</p>
-<h3>00:16:40 — advantage 조건화가 AWR·PPO를 앞선다</h3>
-<p><img src="assets/faqgjmyxbbo-ts-00-16-40.jpg" alt="fAqgJMyxBbo_ts_00-16-40.jpg"> 정량 결과의 핵심. 네 과제 평균 <strong>throughput 2배 향상</strong>이며, 에스프레소는 <strong>40% → 90% 이상</strong>의 성공률로 올라섰다. 다른 RL 기반 정책 추출 방식과 비교하면 이 설정에서 <strong>AWR과 PPO는 SFT 대비 개선이 없었고</strong>, advantage 조건화만이 더 높은 성공률과 훨씬 높은 throughput을 냈다.</p>
-<h3>00:18:20 — 2부: 온라인 미세조정 문제 정의</h3>
-<p><img src="assets/faqgjmyxbbo-ts-00-18-20.jpg" alt="fAqgJMyxBbo_ts_00-18-20.jpg"> Perry Dong이 이어받아 데이터 효율에 초점을 맞춘다. 목표는 π_VLA를 추가 온라인 데이터로 개선하는 것이고, 관측은 손목·측면 카메라의 다중 시점 RGB와 고유수용성 상태다. 갱신은 과제 요구에 따라 스텝 단위, 에피소드 단위, 배치 단위로 수행한다.</p>
-<h3>00:19:50 — diffusion 정책이 RL과 잘 안 맞는 이유</h3>
-<p><img src="assets/faqgjmyxbbo-ts-00-19-50.jpg" alt="fAqgJMyxBbo_ts_00-19-50.jpg"> 현대 VLA는 대부분 diffusion/flow matching 같은 표현력 높은 정책을 쓰는데, 전통적 심층 RL은 단순한 가우시안 정책을 전제로 설계되었다. 기존 시도는 세 갈래다. <strong>가치를 diffusion으로 직접 역전파</strong>(긴 denoising 체인 탓에 불안정), <strong>여러 액션을 뽑아 Q가 최대인 것 선택</strong>, <strong>denoising 과정 자체를 가치로 유도</strong>. 뒤 두 방식은 정책 자체가 가치를 최대화하도록 갱신되지 않아 성능을 남긴다.</p>
-<h3>00:20:40 — EXPO 아이디어 1: 작은 edit policy</h3>
-<p><img src="assets/faqgjmyxbbo-ts-00-20-40.jpg" alt="fAqgJMyxBbo_ts_00-20-40.jpg"> 표현력 높은 base diffusion 정책을 직접 가치 최대화로 학습시키는 대신, 그 <strong>위에 작은 edit policy를 얹는다</strong>. edit policy는 가우시안이라 검증된 off-policy 목적함수를 그대로 쓸 수 있고, base 정책은 오프라인·온라인 데이터에 대한 안정적인 지도학습으로 계속 유지한다.</p>
-<h3>00:22:00 — EXPO 아이디어 2: on-the-fly 샘플링</h3>
-<p><img src="assets/faqgjmyxbbo-ts-00-22-00.jpg" alt="fAqgJMyxBbo_ts_00-22-00.jpg"> edit policy가 Q 함수에 뒤처지거나 붕괴하는 문제를 샘플링으로 흡수한다. base에서 여러 액션을 뽑고, 각각에 대해 edit을 여러 개 뽑은 뒤, <strong>합친 집합에서 Q가 가장 높은 것을 고른다</strong>. 항상 최신 Q를 쓸 수 있고, base 액션이 후보에 남아 있어 edit 붕괴에도 강하다. 벨만 백업의 다음 액션 선택에도 같은 절차를 쓴다.</p>
-<h3>00:23:00 — 12개 벤치마크 실험 설정</h3>
-<p><img src="assets/faqgjmyxbbo-ts-00-23-00.jpg" alt="fAqgJMyxBbo_ts_00-23-00.jpg"> 조작·내비게이션·손재주를 아우르는 12개 벤치마크에서, 오프라인 데이터셋을 시드로 두고 sparse reward로 평가한다. EXPO는 안정적이고 효율적인 미세조정과 최고 수준 성능을 보였다. 다만 <strong>오프라인 데이터 범위를 크게 벗어나는 탐색이 필요하면 저조</strong>하다(relocate binary). 실세계에서는 데모 몇 개를 더 모으는 편이 대개 현실적이라고 부연한다.</p>
-<h3>00:25:00 — EXPO-FT: 액션 청킹과 사람 개입</h3>
-<p><img src="assets/faqgjmyxbbo-ts-00-25-00.jpg" alt="fAqgJMyxBbo_ts_00-25-00.jpg"> EXPO의 안정성·효율성 위에 <strong>action chunking</strong>과 <strong>human-in-the-loop 보정</strong>을 얹은 것이 EXPO-FT다. 온라인 정제 단계에서 사람이 지켜보다가 언제든 원격조작으로 개입할 수 있고, 정책의 자율 예측과 사람이 덮어쓴 행동이 <strong>모두</strong> 리플레이 버퍼에 들어간다. 보상은 규칙 기반 분류기의 sparse binary 신호를 써서 과제별 보상 설계 부담을 피한다.</p>
-<h3>00:26:00 — 19.1분으로 30/30</h3>
-<p><img src="assets/faqgjmyxbbo-ts-00-26-00.jpg" alt="fAqgJMyxBbo_ts_00-26-00.jpg"> π₀.₅를 미세조정해 여섯 과제 모두 <strong>30/30</strong>을 달성했고, 소요된 온라인 로봇 데이터는 <strong>평균 19.1분</strong>이다. 과제는 전구 배선·점등, 당구공 포켓에 넣기, 와인병에 꽃 꽂기, 사탕 퍼담기, 넓은 초기 상태에서 큐브 집기, 계란 뒤집기로 정밀성·동적 동작·초기 상태 다양성을 아우른다. Hindsight Experience Replay 같은 강력한 실세계 기법도 <strong>초기 상태 분포를 크게 넓히면</strong> 일관된 성능을 내지 못했다고 비교한다.</p>
-<h3>00:28:45 — 남은 문제: 계산 비용</h3>
-<p><img src="assets/faqgjmyxbbo-ts-00-28-45.jpg" alt="fAqgJMyxBbo_ts_00-28-45.jpg"> 여러 액션 후보를 샘플링해 최선을 고르는 절차는 일종의 <strong>RL판 test-time scaling</strong>이지만 계산 비용이 크다. 이미 허용 가능한 지연 한계 근처에서 동작하는 현대 VLA 같은 대형 모델에 특히 부담이다. 해법으로 denoising이 끝나기 전에 후보를 미리 걸러내는 접근(FASTER)을 제시하며, 이 필터링 자체를 MDP로 보고 적응적 정책을 학습한다.</p>
-<h3>00:30:20 — 향후 방향</h3>
-<p><img src="assets/faqgjmyxbbo-ts-00-30-20.jpg" alt="fAqgJMyxBbo_ts_00-30-20.jpg"> 세 갈래를 제시한다. <strong>사전학습으로 강건성을 더 끌어올릴 수 있는가</strong>(π₀.₇ 사례), <strong>과제마다 규칙 기반 보상 분류기를 만드는 대신 일반화 가능한 보상 모델을 학습할 수 있는가</strong>(Robot Reward Model 리더보드), <strong>메모리와 추론이 신뢰성에 기여하는가</strong>(Mem 논문 — 50분 길이의 장기 메모리가 필요한 과제 수행, in-context 적응에도 유리).</p>
-<h2>주요 내용 요약</h2>
-<h3>핵심 포인트</h3>
-<ul><li>모방학습만으로는 <strong>첫 시도에 신뢰성 있는 정책이 나오지 않으며</strong>, 사람이 데이터를 반복 개선하는 루프는 사람의 체력에서 먼저 한계에 부딪힌다. 반복 주체를 AI로 옮기는 것이 발표 전체의 논지다.</li><li>신뢰성의 정의를 <strong>throughput(단위 시간당 성공)</strong> 으로 잡은 것이 방법론상 중요하다. 성공률만 보면 느리게 성공하는 정책이 과대평가된다.</li><li>1부(π*0.6)의 결론: 진행도 예측 가치함수 + advantage 이진화 조건부 지도학습으로 <strong>throughput 2배, 에스프레소 성공률 40% → 90%+</strong>.</li><li>이 설정에서 <strong>AWR과 PPO는 SFT 대비 개선이 없었다.</strong> 표준 RL 목적함수를 그대로 가져오는 것이 능사가 아니라는 실증이다.</li><li>2부(EXPO/EXPO-FT)의 결론: base diffusion 정책은 지도학습으로 안정적으로 두고, 작은 edit policy와 on-the-fly 샘플링으로 가치를 최대화하면 <strong>19.1분의 온라인 데이터로 30/30</strong>이 가능하다.</li><li>검증 과제가 연구용 벤치마크가 아니라 <strong>실제 상업 워크플로</strong>(초콜릿 공장의 상자 작업, 13시간 카페 운전)라는 점이 이 발표의 차별점이다.</li></ul>
-<h3>기술적 내용</h3>
-<ul><li><strong>가치함수</strong>: 사전학습 VLM + value head. 입력은 현재 이미지, 언어 프롬프트, 에피소드 메타데이터. 출력은 성공까지 남은 시간. 몬테카를로 지도학습이라 확장성이 좋다.</li><li><strong>advantage 조건화</strong>: A(o,a) = V(이후) − V(이전). 임계값으로 이진화해 정책 입력에 넣고, 추론 시 양의 값으로 조건화한다. 연속값 조건화는 Q&amp;A에서 &quot;시도하지 않았고 흥미로운 방향&quot;이라고 답했다. 이진화의 실용적 이점은 테스트 시 조건값을 고르기 쉽다는 점이다.</li><li><strong>학습 데이터 구성</strong>: 원본 데모 + 정책 롤아웃 + 사람 교정(DAgger). 사람 교정이 회복 행동의 커버리지를 메운다.</li><li><strong>EXPO</strong>: base(diffusion/flow) + edit(가우시안)의 2단 구조. 표현력은 base가, 가치 최대화는 edit이 담당한다.</li><li><strong>on-the-fly 샘플링</strong>: {a₁…aₙ, ā₁…āₙ} 중 Q 최대 선택. 벨만 백업의 next action 선택에도 동일 적용.</li><li><strong>EXPO-FT</strong>: EXPO + action chunking + 원격조작 개입. sparse binary reward(규칙 기반 분류기).</li><li><strong>FASTER</strong>: denoising 완료 전 후보 필터링을 MDP로 정식화. implicit diffusion Q-learning 등 &quot;샘플 후 최선 선택&quot; 계열 전반에 적용 가능.</li></ul>
-<h3>참조 문헌</h3>
-<ul><li>Physical Intelligence. <em>π\</em>0.6: a VLA That Learns From Experience*. 2025.</li><li>Dong, Li, Sadigh, Finn. <em>EXPO: Stable Reinforcement Learning with Expressive Policies</em>. ICLR 2026.</li><li>Dong\<em>, Hung\</em>, Gao, Sadigh, Finn. <em>EXPO-FT: Sample-Efficient RL Finetuning for Vision-Language-Action Models</em>. arXiv 2026.</li><li>Dong\<em>, Swerdlow\</em>, Sadigh, Finn. <em>FASTER: Value Guided Sampling for Fast RL</em>. arXiv 2026.</li><li>Xiao et al. <em>Self-Improving Vision-Language-Action Models with Data Generation via Residual RL</em>. 2025.</li></ul>
-<h2>시사점과 한계</h2>
-<h3>한계 (발표에서 직접 밝힌 것)</h3>
-<ul><li><strong>완전 자율이 아니다.</strong> 개입 데이터 수집과 환경 리셋에 사람이 계속 필요하다. 특히 EXPO-FT는 과제마다 사람이 리셋을 수행한다.</li><li>반복 횟수가 <strong>몇 회에 그쳤다.</strong> 더 많이 돌리면 신뢰성이 더 오를 여지가 있다는 뜻이기도 하다.</li><li>로봇은 여전히 실수하며 <strong>사람보다 느리다.</strong></li><li>수십억 파라미터 모델의 온라인 미세조정은 <strong>계산 비용이 크다.</strong></li><li>EXPO는 오프라인 데이터 분포를 크게 벗어난 탐색이 필요한 과제에서 약하다.</li></ul>
-<h3>현장 적용 관점에서의 시사점</h3>
-<ul><li><strong>진행도 기반 가치함수는 도메인 이식성이 높아 보인다.</strong> &quot;성공까지 남은 시간&quot;은 과제별 보상 설계 없이 지도학습으로 얻어지며, 굴착·상하차처럼 공정 단계가 뚜렷한 작업에서는 오히려 정의하기 쉬운 신호다. 되돌아가는 동작에 음의 진행이 잡히는 성질도 반복 작업 평가에 유용하다.</li><li><strong>사람의 교정을 학습 신호로 흡수하는 구조</strong>가 숙련 오퍼레이터가 있는 현장과 잘 맞는다. 데모를 새로 모으는 대신, 자동 운전 중 개입한 순간이 그대로 학습 데이터가 된다.</li><li><strong>throughput 지표</strong>는 장비 운용 KPI와 직접 연결된다. 성공률 대신 시간당 처리량으로 목표를 세우면 연구 지표와 현장 지표의 간극이 줄어든다.</li><li>다만 이 결과는 모두 <strong>테이블탑 매니퓰레이션</strong>이다. 중장비는 액추에이터 지연, 지형 변화, 안전 정지 요건이 달라 개입 기반 온라인 RL을 그대로 옮기기 어렵다. 특히 &quot;사람이 언제든 원격조작으로 덮어쓴다&quot;는 전제가 중장비 안전 규정과 충돌할 수 있다.</li><li>계산 비용 문제는 현장에서 더 심각하다. 후보 샘플링 방식은 지연에 민감한 제어 루프와 상충하므로, FASTER 계열의 조기 필터링이 오히려 중장비 쪽에서 더 중요해질 수 있다.</li></ul>
-<h2>관련 노트</h2>
-<ul><li>[[yt_Sergey_Levine_RL_for_Robot_Foundation_Models_요약]] — 같은 워크샵의 선행 발표. 이 노트가 &quot;Chelsea Finn의 후속 발표에서 상세히 다룬다&quot;고 넘긴 내용이 바로 여기다.</li></ul>
-</article>
-</main>
+  <a class="skip-link" href="#article">본문으로 건너뛰기</a>
 
+  <header class="site-bar">
+    <div class="site-bar__inner">
+      <a class="publication" href="#article">Robotics Research Brief</a>
+      <span class="site-bar__meta">ICRA 2026 RL4IL 워크샵 분석 · 2026.08.08</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <div class="hero__grid">
+        <div>
+          <p class="eyebrow">Research Report · Real-World Robot Learning</p>
+          <h1 id="page-title">로봇이 스스로<br>신뢰성을 학습하는 법</h1>
+          <p class="hero__dek">
+            Chelsea Finn과 Perry Dong이 공개한 두 가지 후속 학습 레시피를 따라가며,
+            모방학습 VLA가 어떻게 에스프레소 제조 성공률을 40%에서 90% 이상으로
+            끌어올리고 평균 19.1분의 온라인 데이터로 30/30 성공에 도달했는지 살펴본다.
+          </p>
+        </div>
+
+        <aside class="hero__aside" aria-label="발표 정보">
+          <p><strong>발표자</strong> Chelsea Finn · Perry Dong</p>
+          <p><strong>소속</strong> Stanford University · Physical Intelligence</p>
+          <p><strong>행사</strong> ICRA 2026 RL4IL Workshop</p>
+          <p><strong>영상</strong> 31분 59초 · Zhanpeng He</p>
+          <p><strong>게시일</strong> 2026년 6월 8일</p>
+          <p><a>원본 발표 영상 보기</a></p>
+          <div class="hero__tags" aria-label="주제 태그">
+            <span class="tag">VLA</span>
+            <span class="tag">실세계 RL</span>
+            <span class="tag">π*0.6</span>
+            <span class="tag">EXPO-FT</span>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="hero-visual" aria-label="대표 이미지">
+      <figure>
+        <img src="assets/faqgjmyxbbo-ts-00-16-40.jpg" alt="네 가지 실세계 로봇 과제에서 후속 학습 전후의 처리량을 비교한 발표 슬라이드">
+        <figcaption>
+          발표의 핵심 정량 결과. 네 과제 평균 처리량은 약 두 배로 늘었고,
+          에스프레소 제조 성공률은 40%에서 90% 이상으로 상승했다.
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="stat-ribbon" aria-label="핵심 수치">
+      <div class="stat">
+        <span class="stat__value">40→90%+</span>
+        <span class="stat__label">에스프레소 제조 성공률</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value">2×</span>
+        <span class="stat__label">네 과제 평균 throughput</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value">19.1분</span>
+        <span class="stat__label">과제당 평균 온라인 로봇 데이터</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value">30/30</span>
+        <span class="stat__label">EXPO-FT의 여섯 과제 최종 성공</span>
+      </div>
+    </section>
+
+    <div class="article-layout">
+      <nav class="toc" aria-label="목차">
+        <p class="toc__title">Contents</p>
+        <ol>
+          <li><a href="#abstract">초록과 핵심 발견</a></li>
+          <li><a href="#problem">왜 신뢰성이 어려운가</a></li>
+          <li><a href="#pi06">π*0.6의 학습 레시피</a></li>
+          <li><a href="#evidence">실세계 검증과 지표</a></li>
+          <li><a href="#expo">EXPO와 EXPO-FT</a></li>
+          <li><a href="#limits">한계와 계산 비용</a></li>
+          <li><a href="#implications">현장 적용 시사점</a></li>
+          <li><a href="#sources">출처와 연구 노트</a></li>
+        </ol>
+      </nav>
+
+      <article id="article">
+        <p class="lead">
+          높은 성능을 시연하는 로봇과, 하루 종일 믿고 맡길 수 있는 로봇 사이에는 큰 간극이 있다.
+          이 발표는 그 간극을 더 많은 사람의 수작업이 아니라, 로봇이 경험을 수집하고 스스로 반복하는
+          후속 학습 루프로 메우려는 시도다.
+        </p>
+
+        <section class="abstract" id="abstract">
+          <h2>초록</h2>
+          <p>
+            발표는 두 개의 상보적인 연구를 다룬다. 첫 번째인 π*0.6는 정책 롤아웃과 사람의 교정,
+            성공까지의 진행도를 예측하는 가치함수, advantage 조건부 지도학습을 결합해 장시간
+            워크플로의 신뢰성과 처리량을 높인다. 두 번째인 EXPO와 EXPO-FT는 표현력이 높은
+            diffusion 기반 VLA를 직접 강화학습으로 불안정하게 갱신하는 대신 작은 가우시안
+            edit policy를 추가하고, 최신 Q 함수에 따른 후보 선택으로 안정적인 온라인 미세조정을
+            수행한다. 결과는 인상적이지만 사람의 개입, 환경 리셋, 계산 비용, 분포 밖 탐색이라는
+            실용적 제약이 남아 있다.
+          </p>
+        </section>
+
+        <section class="section" aria-labelledby="findings-title">
+          <div class="section-heading">
+            <span class="section-number">Executive Summary</span>
+            <h2 id="findings-title">먼저 읽는 핵심 발견</h2>
+          </div>
+
+          <div class="finding-grid">
+            <section class="finding">
+              <span class="finding__index">01</span>
+              <h3>신뢰성은 성공률만으로 설명되지 않는다</h3>
+              <p>느리게 성공하거나 실패 뒤 오래 머무는 정책을 구분하려면 단위 시간당 성공 횟수인 throughput이 필요하다.</p>
+            </section>
+            <section class="finding">
+              <span class="finding__index">02</span>
+              <h3>진행도가 범용 가치 신호가 된다</h3>
+              <p>성공까지 남은 시간을 예측하면 과제별 정교한 보상 없이도 전진, 정체, 후퇴를 학습할 수 있다.</p>
+            </section>
+            <section class="finding">
+              <span class="finding__index">03</span>
+              <h3>복잡한 정책은 안정적으로 유지한다</h3>
+              <p>diffusion VLA는 지도학습으로 보존하고, 작은 edit policy가 가치 최대화 역할을 맡는 분업이 효과적이었다.</p>
+            </section>
+            <section class="finding">
+              <span class="finding__index">04</span>
+              <h3>사람의 개입이 데이터 생산 장치가 된다</h3>
+              <p>실패를 피하기 위한 원격조작이 일회성 안전조치에 그치지 않고 회복 행동을 가르치는 온라인 데이터로 축적된다.</p>
+            </section>
+          </div>
+        </section>
+
+        <section class="section" id="problem" aria-labelledby="problem-title">
+          <div class="section-heading">
+            <span class="section-number">01 · The Reliability Gap</span>
+            <h2 id="problem-title">첫 시연과 13시간 운전 사이</h2>
+          </div>
+
+          <figure class="evidence-figure">
+            <img src="assets/faqgjmyxbbo-ts-00-01-40.jpg" alt="성능과 신뢰성을 동시에 달성하는 문제를 소개하는 Chelsea Finn의 발표 장면">
+            <figcaption><span class="timestamp">00:01:40</span>높은 성능과 높은 신뢰성을 동시에 달성하는 것이 발표의 출발점이다.</figcaption>
+          </figure>
+
+          <p>
+            Finn이 제시한 첫 번째 미해결 문제는 단순하다. 현대 로봇 시스템에서 높은
+            <strong>성능</strong>과 높은 <strong>신뢰성</strong>을 어떻게 동시에 달성할 것인가.
+            신뢰성은 로봇이 장시간 자율적으로 움직이기 위한 전제이며, 사람이 자연스럽게 수행하는
+            반복 작업과 오늘날 로봇 사이의 핵심 차이다.
+          </p>
+
+          <figure class="evidence-figure">
+            <img src="assets/faqgjmyxbbo-ts-00-02-40.jpg" alt="목표 정의, 데이터 수집, 최적화와 사람 중심의 반복 개선 루프를 비교한 슬라이드">
+            <figcaption><span class="timestamp">00:02:40</span>통상적인 데이터 수집과 최적화 루프는 결국 사람의 반복 노동에 의존한다.</figcaption>
+          </figure>
+
+          <p>
+            기존 접근은 목표를 정하고 데모 데이터셋을 수집한 뒤 정책을 최적화한다. 하지만 실제
+            시스템은 첫 시도에 충분히 안정적이지 않다. 엔지니어는 데이터를 추가하고, 라벨을
+            세분화하고, 실패 사례를 모으며 다시 학습시킨다. 이 루프에서 가장 먼저 한계에 도달하는
+            자원은 GPU가 아니라 사람의 시간과 집중력이다.
+          </p>
+
+          <blockquote class="pullquote">
+            “정책을 한 번 학습시키는 것보다, 실패에서 회복하며 계속 나아지게 만드는 것이 더 어렵다.”
+            <cite>발표의 문제의식을 요약한 편집자 해석</cite>
+          </blockquote>
+
+          <h3>왜 하필 에스프레소인가</h3>
+
+          <figure class="evidence-figure">
+            <img src="assets/faqgjmyxbbo-ts-00-04-50.jpg" alt="로봇이 에스프레소를 만드는 단계와 정밀성, 힘, 부드러운 조작, 타이밍 요건을 보여주는 슬라이드">
+            <figcaption><span class="timestamp">00:04:50</span>에스프레소 제조는 정밀성, 힘, 액체 조작, 긴 시간적 의존성을 동시에 요구한다.</figcaption>
+          </figure>
+
+          <p>
+            에스프레소 제조는 작은 실패가 전체 에피소드를 망치는 장기 과제다. 포터필터를
+            그룹헤드에 정밀하게 끼우고, 충분한 힘으로 돌려 잠그고, 액체가 든 잔을 부드럽게
+            옮기며, 추출이 끝날 때까지 기다려야 한다. 각각은 개별적으로도 까다롭지만 실제
+            어려움은 이 조건이 하나의 긴 워크플로에서 연속해 나타난다는 데 있다.
+          </p>
+
+          <figure class="evidence-figure">
+            <img src="assets/faqgjmyxbbo-ts-00-06-15.jpg" alt="사전학습 VLM과 action expert로 구성된 VLA 구조 및 기존 강화학습 연구를 정리한 슬라이드">
+            <figcaption><span class="timestamp">00:06:15</span>단기 정밀 과제의 RL 미세조정 사례는 있었지만, 긴 워크플로를 위한 설득력 있는 레시피는 부족했다.</figcaption>
+          </figure>
+
+          <p>
+            VLA는 대체로 사전학습된 비전-언어 모델과 행동 생성을 담당하는 action expert를
+            결합한다. GPU 삽입처럼 짧고 정밀한 과제에서는 RL 후속 학습이 성과를 냈지만,
+            에스프레소처럼 길고 복합적인 작업에서 높은 신뢰성을 얻는 방법은 여전히 불분명했다.
+          </p>
+        </section>
+
+        <section class="section" id="pi06" aria-labelledby="pi06-title">
+          <div class="section-heading">
+            <span class="section-number">02 · π*0.6</span>
+            <h2 id="pi06-title">진행도를 배우고, 전진하는 행동을 고른다</h2>
+          </div>
+
+          <figure class="evidence-figure">
+            <img src="assets/faqgjmyxbbo-ts-00-07-50.jpg" alt="사람 교정, 진행도 가치함수, advantage 조건부 지도학습으로 구성된 전체 파이프라인">
+            <figcaption><span class="timestamp">00:07:50</span>π*0.6의 세 축: 사람 교정, progress-to-go 가치학습, advantage 조건부 정책 갱신.</figcaption>
+          </figure>
+
+          <div class="process" aria-label="π*0.6 학습 흐름">
+            <p class="process__title">Learning loop</p>
+            <div class="process__flow">
+              <div class="process__step">
+                <strong>경험 수집</strong>
+                <span>원본 데모, 정책 롤아웃, 사람이 개입해 수정한 DAgger 데이터를 함께 축적한다.</span>
+              </div>
+              <div class="process__step">
+                <strong>진행도 추정</strong>
+                <span>현재 관측에서 성공까지 얼마나 남았는지 가치함수가 예측한다.</span>
+              </div>
+              <div class="process__step">
+                <strong>정책 조건화</strong>
+                <span>가치가 충분히 증가한 행동을 양의 advantage로 표시해 지도학습한다.</span>
+              </div>
+            </div>
+          </div>
+
+          <p>
+            첫 번째 선택은 정책이 처음 보는 실패 상태에서 회복 방법을 우연히 발견하기를
+            기다리지 않는 것이다. 사람이 적절한 순간에 개입해 올바른 회복 행동을 보여주고,
+            그 교정 데이터를 정책 롤아웃과 같은 배치에 포함한다. 원본 데모가 정상 경로를
+            담당한다면 교정 데이터는 정상 경로 바깥의 복구 가능 영역을 메운다.
+          </p>
+
+          <h3>보상이 아니라 ‘남은 시간’을 예측한다</h3>
+
+          <figure class="evidence-figure">
+            <img src="assets/faqgjmyxbbo-ts-00-10-00.jpg" alt="세탁물 접기와 냉장고 문 열기에서 가치함수가 진행과 후퇴를 추적하는 그래프">
+            <figcaption><span class="timestamp">00:10:00</span>옷을 다시 펼치거나 물체를 넘어뜨리면 가치가 하락하고, 과제를 회복하면 다시 상승한다.</figcaption>
+          </figure>
+
+          <p>
+            가치함수는 사전학습 VLM에 value head를 더한 구조다. 현재 이미지, 언어 프롬프트,
+            에피소드 메타데이터를 입력으로 받아 성공까지 남은 시간, 즉
+            <strong>progress to go</strong>를 예측한다. 몬테카를로 방식의 단순한 지도학습
+            목적함수를 사용하므로 대형 모델과 대규모 데이터에 비교적 쉽게 확장할 수 있다.
+          </p>
+
+          <p>
+            중요한 점은 이 값이 단순한 타이머가 아니라 행동의 의미를 반영한다는 것이다.
+            이미 접은 옷을 다시 펼치면 음의 진행으로 평가되고, 냉장고 문을 열다가 물체를
+            쓰러뜨려 작업 상태를 악화시키면 가치가 하락한다. 과제를 다시 회복하면 값도
+            상승한다. ‘전진’과 ‘후퇴’라는 개념이 시간 예측에서 자연스럽게 나타난 셈이다.
+          </p>
+
+          <h3>Advantage를 이진 조건으로 바꾸는 이유</h3>
+
+          <figure class="evidence-figure">
+            <img src="assets/faqgjmyxbbo-ts-00-10-50.jpg" alt="행동 전후 가치 차이로 advantage를 추정하고 양수와 음수로 이진화하는 방식">
+            <figcaption><span class="timestamp">00:10:50</span>행동 전후 가치의 차이를 이진화해 정책의 조건 입력으로 사용한다.</figcaption>
+          </figure>
+
+          <div class="formula" aria-label="Advantage 추정식">
+            A(o, a) ≈ V(o<sub>after</sub>) − V(o<sub>before</sub>) → {positive, negative}
+          </div>
+
+          <p>
+            행동 전후의 가치 차이가 임계값을 넘으면 양의 advantage, 그렇지 않으면 음의
+            advantage로 표시한다. 정책은 이 레이블을 조건으로 받아 지도학습되고, 추론 시에는
+            양의 advantage에 고정해 ‘앞으로 나아가는 행동’을 생성한다. 발표 Q&amp;A에 따르면
+            연속값 조건화는 아직 시도하지 않았다. 이진화는 표현력이 제한적인 대신 테스트 시
+            어떤 조건값을 넣을지 명확하다는 실용적 장점이 있다.
+          </p>
+
+          <div class="note">
+            <strong>해석 포인트.</strong> 이 방법은 정책을 전통적인 RL 목적함수로 직접 최적화하기보다,
+            가치함수가 평가한 좋은 행동과 나쁜 행동을 지도학습 데이터의 조건으로 바꾼다.
+            대형 VLA가 잘 학습되는 기존 지도학습 경로를 최대한 보존하려는 설계다.
+          </div>
+        </section>
+
+        <section class="section" id="evidence" aria-labelledby="evidence-title">
+          <div class="section-heading">
+            <span class="section-number">03 · Real-World Evidence</span>
+            <h2 id="evidence-title">성공률을 넘어 처리량으로</h2>
+          </div>
+
+          <figure class="evidence-figure">
+            <img src="assets/faqgjmyxbbo-ts-00-12-30.jpg" alt="로봇이 사람과 협업해 라떼를 제조하는 실제 동작 장면">
+            <figcaption><span class="timestamp">00:12:30</span>로봇은 분쇄, 탬핑, 포터필터 삽입, 추출 대기와 잔 이동을 수행하고 사람이 스팀 우유를 붓는다.</figcaption>
+          </figure>
+
+          <p>
+            완성된 정책은 포터필터를 그라인더 아래에 놓고, 탬핑하고, 머신에 삽입하고,
+            추출을 기다린 뒤 잔을 옮긴다. Finn이 가장 어려운 구간으로 꼽은 것은 의외로
+            마지막 잔 이동이다. 액체가 담긴 잔은 작은 흔들림만으로도 결과 전체를 망칠 수 있다.
+          </p>
+
+          <figure class="evidence-figure">
+            <img src="assets/faqgjmyxbbo-ts-00-13-40.jpg" alt="로봇이 13시간 동안 연속으로 커피를 만드는 타임랩스 장면">
+            <figcaption><span class="timestamp">00:13:40</span>RL 후속 학습 정책은 13시간 동안 커피 제조를 반복하며 장시간 신뢰성을 검증했다.</figcaption>
+          </figure>
+
+          <p>
+            연구팀은 RL 후속 학습을 마친 정책으로 13시간 연속 커피 제조를 수행했다.
+            짧은 성공 영상보다 의미 있는 증거다. 장시간 운전에서는 희귀한 실패 상태,
+            누적 오차, 반복적인 물체 배치 변화가 자연스럽게 드러나기 때문이다.
+          </p>
+
+          <h3>연구실을 벗어난 워크플로</h3>
+
+          <div class="figure-pair">
+            <figure>
+              <img src="assets/faqgjmyxbbo-ts-00-14-10.jpg" alt="Dandelion 초콜릿 공장의 상자 조립과 라벨링 워크플로를 수행하는 로봇">
+              <figcaption><span class="timestamp">00:14:10</span>Dandelion 초콜릿 공장의 실제 상자 조립·라벨링·적재 작업.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/faqgjmyxbbo-ts-00-14-45.jpg" alt="처음 보는 집에서 처음 보는 옷을 접는 로봇">
+              <figcaption><span class="timestamp">00:14:45</span>새로운 옷과 새로운 주거 환경에서의 일반화 평가.</figcaption>
+            </figure>
+          </div>
+
+          <p>
+            평가 대상에는 연구용으로 설계된 과제만 있지 않다. Physical Intelligence 사무실
+            근처 Dandelion 초콜릿 공장에서 사람이 실제로 반복하는 골판지 상자 조립,
+            라벨링, 적재 작업을 재현했다. 또한 로봇이 학습 중 보지 못한 옷을 처음 방문한
+            집에서 접게 해 환경과 물체 변화에 대한 일반화도 확인했다.
+          </p>
+
+          <h3>왜 throughput인가</h3>
+
+          <figure class="evidence-figure">
+            <img src="assets/faqgjmyxbbo-ts-00-15-30.jpg" alt="성공률과 작업 속도를 결합한 throughput 평가 지표를 설명하는 슬라이드">
+            <figcaption><span class="timestamp">00:15:30</span>Throughput은 성공 여부와 소요 시간을 하나의 운영 지표로 결합한다.</figcaption>
+          </figure>
+
+          <p>
+            성공률만으로는 ‘천천히 성공하는 정책’과 ‘빠르게 성공하는 정책’을 구분하기 어렵다.
+            더 나쁜 경우, 실패가 확정된 뒤에도 오랫동안 동작하는 정책이 성공률상으로는
+            빠르게 실패하는 정책과 동일하게 기록된다. 연구팀은 이를 보완하기 위해
+            <strong>단위 시간당 성공 횟수</strong>를 측정했다.
+          </p>
+
+          <div class="metric-callout">
+            <span class="metric-callout__label">Reported result</span>
+            <span class="metric-callout__value">평균 처리량 2배</span>
+            <p>에스프레소 제조 성공률은 약 40%에서 90% 이상으로 상승했다.</p>
+          </div>
+
+          <p>
+            같은 설정에서 AWR과 PPO는 지도 미세조정(SFT) 대비 뚜렷한 개선을 보이지 못했다.
+            반면 advantage 조건부 지도학습만이 높은 성공률과 훨씬 높은 throughput을 함께
+            달성했다. 표준 RL 알고리즘을 대형 VLA에 그대로 적용하는 것보다 모델의 기존
+            학습 특성에 맞춘 인터페이스가 중요하다는 실증이다.
+          </p>
+
+          <table class="comparison">
+            <thead>
+              <tr>
+                <th scope="col">평가 관점</th>
+                <th scope="col">성공률</th>
+                <th scope="col">Throughput</th>
+                <th scope="col">운영 의미</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>무엇을 세는가</td>
+                <td>성공한 에피소드 비율</td>
+                <td>단위 시간당 성공 횟수</td>
+                <td>품질과 속도의 결합 여부</td>
+              </tr>
+              <tr>
+                <td>느린 성공</td>
+                <td><span class="badge badge--amber">높게 평가 가능</span></td>
+                <td><span class="badge">속도 비용 반영</span></td>
+                <td>실제 생산성 차이를 드러냄</td>
+              </tr>
+              <tr>
+                <td>오래 끄는 실패</td>
+                <td>시간 손실을 반영하지 않음</td>
+                <td>큰 불이익</td>
+                <td>복구·중단 전략 평가에 유리</td>
+              </tr>
+              <tr>
+                <td>현장 KPI 연결</td>
+                <td>간접적</td>
+                <td>직접적</td>
+                <td>시간당 처리량과 대응</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section" id="expo" aria-labelledby="expo-title">
+          <div class="section-heading">
+            <span class="section-number">04 · EXPO / EXPO-FT</span>
+            <h2 id="expo-title">Diffusion 정책은 보존하고, 작은 정책이 수정한다</h2>
+          </div>
+
+          <figure class="evidence-figure">
+            <img src="assets/faqgjmyxbbo-ts-00-18-20.jpg" alt="온라인 VLA 미세조정의 관측, 행동, 갱신 주기를 정의하는 슬라이드">
+            <figcaption><span class="timestamp">00:18:20</span>2부는 다중 시점 RGB와 고유수용성 상태를 사용하는 온라인 VLA 미세조정 문제를 다룬다.</figcaption>
+          </figure>
+
+          <p>
+            Perry Dong이 맡은 2부는 데이터 효율적인 온라인 미세조정에 집중한다. 시작점은
+            이미 학습된 π<sub>VLA</sub>이며, 손목·측면 카메라의 다중 시점 RGB와 로봇의
+            고유수용성 상태를 관측한다. 과제에 따라 정책 갱신은 스텝, 에피소드 또는 배치
+            단위로 수행할 수 있다.
+          </p>
+
+          <h3>표현력이 높을수록 RL은 어려워진다</h3>
+
+          <figure class="evidence-figure">
+            <img src="assets/faqgjmyxbbo-ts-00-19-50.jpg" alt="Diffusion 정책에 강화학습을 적용하는 기존 세 가지 접근과 한계를 보여주는 슬라이드">
+            <figcaption><span class="timestamp">00:19:50</span>긴 denoising 체인과 복잡한 분포는 전통적인 가우시안 정책용 RL 목적함수와 잘 맞지 않는다.</figcaption>
+          </figure>
+
+          <p>
+            현대 VLA는 diffusion이나 flow matching처럼 다봉형 행동 분포를 표현할 수 있는
+            정책을 사용한다. 반면 전통적인 심층 RL은 단순한 가우시안 정책을 전제로 발전했다.
+            가치를 diffusion 네트워크에 직접 역전파하면 긴 denoising 체인 때문에 학습이
+            불안정해질 수 있다. 여러 행동을 뽑아 Q가 가장 높은 행동을 선택하거나 denoising
+            과정에 가치 지도를 넣는 방식은 추론을 개선하지만 정책 자체가 가치를 최대화하도록
+            충분히 갱신되지 않는다는 문제가 있다.
+          </p>
+
+          <h3>EXPO의 첫 번째 아이디어: edit policy</h3>
+
+          <figure class="evidence-figure">
+            <img src="assets/faqgjmyxbbo-ts-00-20-40.jpg" alt="Base diffusion policy 위에 작은 Gaussian edit policy를 추가한 EXPO 구조">
+            <figcaption><span class="timestamp">00:20:40</span>표현력은 base policy가, 가치 최대화는 작은 가우시안 edit policy가 담당한다.</figcaption>
+          </figure>
+
+          <div class="process" aria-label="EXPO 행동 생성 구조">
+            <p class="process__title">Two-policy architecture</p>
+            <div class="process__flow">
+              <div class="process__step">
+                <strong>Base policy</strong>
+                <span>Diffusion/flow 정책이 오프라인·온라인 데이터로 안정적인 행동 후보를 만든다.</span>
+              </div>
+              <div class="process__step">
+                <strong>Edit policy</strong>
+                <span>작은 가우시안 정책이 후보에 잔차 수정을 적용하며 off-policy RL로 학습된다.</span>
+              </div>
+              <div class="process__step">
+                <strong>Q selection</strong>
+                <span>원본과 수정 후보를 함께 평가해 최신 Q 값이 가장 높은 행동을 실행한다.</span>
+              </div>
+            </div>
+          </div>
+
+          <p>
+            EXPO는 base diffusion 정책을 직접 가치 최대화로 밀어붙이지 않는다. 대신 그 위에
+            작은 가우시안 edit policy를 두어 행동을 수정한다. base는 오프라인과 온라인
+            데이터에 대한 지도학습으로 안정적으로 유지되고, edit policy에는 검증된 off-policy
+            목적함수를 적용할 수 있다.
+          </p>
+
+          <h3>두 번째 아이디어: 최신 Q로 즉석 후보 선택</h3>
+
+          <figure class="evidence-figure">
+            <img src="assets/faqgjmyxbbo-ts-00-22-00.jpg" alt="Base action과 edit action 후보 집합에서 Q가 가장 높은 행동을 선택하는 on-the-fly sampling">
+            <figcaption><span class="timestamp">00:22:00</span>원본 base 행동도 후보에 남기 때문에 edit policy가 붕괴해도 안전한 선택지가 보존된다.</figcaption>
+          </figure>
+
+          <p>
+            실행 시 base 정책에서 여러 행동을 샘플링하고, 각 행동마다 edit 후보를 다시 만든다.
+            시스템은 원본과 수정본을 합친 집합에서 Q가 가장 높은 행동을 고른다. 이 절차는
+            Bellman backup에서 다음 행동을 선택할 때도 동일하게 사용된다.
+          </p>
+
+          <div class="formula" aria-label="EXPO 후보 선택식">
+            a* = argmax<sub>a ∈ {base actions ∪ edited actions}</sub> Q(s, a)
+          </div>
+
+          <p>
+            이 구조는 두 가지 실패를 완화한다. edit policy가 최신 Q 함수보다 늦게 따라가더라도
+            행동 선택은 항상 현재 Q에 근거한다. edit policy가 붕괴하더라도 원본 base 행동이
+            후보 집합에 남아 있으므로 시스템이 완전히 무너지지 않는다.
+          </p>
+
+          <figure class="evidence-figure">
+            <img src="assets/faqgjmyxbbo-ts-00-23-00.jpg" alt="조작, 내비게이션, 손재주를 포함한 12개 벤치마크에서 EXPO를 평가한 결과">
+            <figcaption><span class="timestamp">00:23:00</span>EXPO는 12개 벤치마크에서 안정적이고 효율적인 미세조정 성능을 보였다.</figcaption>
+          </figure>
+
+          <p>
+            조작, 내비게이션, 손재주를 포괄하는 12개 벤치마크에서 EXPO는 sparse reward와
+            오프라인 데이터셋을 시드로 사용해 높은 성능을 보였다. 단, relocate binary처럼
+            오프라인 데이터 분포를 크게 벗어나는 탐색이 필요한 과제에서는 저조했다.
+            실세계에서는 무작정 탐색시키기보다 필요한 데모를 몇 개 추가하는 편이 현실적이라는
+            것이 발표자의 설명이다.
+          </p>
+
+          <h3>EXPO-FT: 사람의 개입까지 학습 데이터로</h3>
+
+          <figure class="evidence-figure">
+            <img src="assets/faqgjmyxbbo-ts-00-25-00.jpg" alt="EXPO에 action chunking과 사람의 원격조작 개입을 추가한 EXPO-FT 학습 흐름">
+            <figcaption><span class="timestamp">00:25:00</span>정책 행동과 사람이 덮어쓴 행동이 모두 리플레이 버퍼에 들어간다.</figcaption>
+          </figure>
+
+          <p>
+            EXPO-FT는 EXPO에 action chunking과 human-in-the-loop 보정을 더한다. 사람이
+            온라인 정제 과정을 지켜보다가 위험하거나 실패 가능성이 높은 순간 원격조작으로
+            개입한다. 정책이 원래 예측했던 행동과 사람이 대체한 행동은 모두 리플레이 버퍼에
+            저장된다. 보상은 과제별로 설계한 연속 함수 대신 규칙 기반 분류기의 sparse binary
+            신호를 사용한다.
+          </p>
+
+          <figure class="evidence-figure">
+            <img src="assets/faqgjmyxbbo-ts-00-26-00.jpg" alt="여섯 실세계 과제에서 평균 19.1분의 데이터로 30회 모두 성공한 EXPO-FT 결과">
+            <figcaption><span class="timestamp">00:26:00</span>π₀.₅ 기반 EXPO-FT는 여섯 과제에서 각각 30/30 성공을 기록했다.</figcaption>
+          </figure>
+
+          <div class="metric-callout">
+            <span class="metric-callout__label">Sample efficiency</span>
+            <span class="metric-callout__value">평균 19.1분 → 30/30</span>
+            <p>전구 배선, 당구공 넣기, 꽃 꽂기, 사탕 퍼담기, 넓은 초기 상태에서 큐브 집기, 계란 뒤집기에서 보고된 결과다.</p>
+          </div>
+
+          <p>
+            과제군은 정밀 조작, 동적 움직임, 넓은 초기 상태 분포를 포함한다. Hindsight
+            Experience Replay 같은 강력한 실세계 기법도 초기 상태 분포를 크게 넓히면
+            일관된 성능을 보이지 못했다는 비교가 함께 제시됐다. EXPO-FT의 차별점은
+            강력한 사전학습 정책, 잔차 수정, Q 기반 후보 선택, 사람 개입을 하나의 안정적인
+            데이터 루프로 묶었다는 데 있다.
+          </p>
+        </section>
+
+        <section class="section" id="limits" aria-labelledby="limits-title">
+          <div class="section-heading">
+            <span class="section-number">05 · Boundaries</span>
+            <h2 id="limits-title">여전히 사람과 계산 자원이 필요하다</h2>
+          </div>
+
+          <div class="limitations">
+            <div class="limitation">
+              <p><strong>완전 자율 학습이 아니다.</strong> 사람의 원격조작 개입과 과제별 환경 리셋이 계속 필요하며, EXPO-FT 실험에서도 사람이 리셋을 수행했다.</p>
+            </div>
+            <div class="limitation">
+              <p><strong>반복 횟수가 제한적이다.</strong> 발표의 후속 학습 루프는 몇 차례 반복됐으며, 장기적인 반복에서 성능이 계속 개선되는지는 추가 검증이 필요하다.</p>
+            </div>
+            <div class="limitation">
+              <p><strong>로봇은 여전히 느리고 실수한다.</strong> 높은 성공률은 인간 수준의 속도나 숙련도를 의미하지 않는다.</p>
+            </div>
+            <div class="limitation">
+              <p><strong>분포 밖 탐색에 약하다.</strong> EXPO는 오프라인 데이터가 거의 다루지 않은 상태를 새로 탐색해야 할 때 성능이 낮아진다.</p>
+            </div>
+            <div class="limitation">
+              <p><strong>추론 비용이 크다.</strong> 여러 base 행동과 edit 행동을 생성하고 Q로 평가하는 과정은 제어 지연과 계산 비용을 늘린다.</p>
+            </div>
+          </div>
+
+          <h3>RL판 test-time scaling의 비용</h3>
+
+          <figure class="evidence-figure">
+            <img src="assets/faqgjmyxbbo-ts-00-28-45.jpg" alt="여러 후보 행동을 샘플링하는 계산 비용과 FASTER의 조기 필터링 아이디어">
+            <figcaption><span class="timestamp">00:28:45</span>FASTER는 denoising이 끝나기 전에 가치가 낮은 후보를 제거해 추론 비용을 줄인다.</figcaption>
+          </figure>
+
+          <p>
+            여러 행동 후보를 생성한 뒤 가장 가치가 높은 것을 고르는 절차는 일종의
+            <strong>RL판 test-time scaling</strong>이다. 성능은 좋아질 수 있지만 후보 수에
+            비례해 계산량이 늘어난다. 이미 허용 가능한 지연 한계 근처에서 작동하는 대형
+            VLA에는 특히 부담스럽다.
+          </p>
+
+          <p>
+            후속 연구인 FASTER는 denoising이 완료되기 전에 가치가 낮은 후보를 걸러낸다.
+            어느 시점에 어떤 후보를 제거할지를 별도의 MDP로 정의하고 적응적 필터링 정책을
+            학습한다. 이는 EXPO뿐 아니라 ‘여러 행동을 샘플링한 뒤 최선을 고르는’ 다른
+            diffusion Q-learning 계열에도 적용 가능한 방향이다.
+          </p>
+
+          <h3>다음 연구 질문</h3>
+
+          <figure class="evidence-figure">
+            <img src="assets/faqgjmyxbbo-ts-00-30-20.jpg" alt="사전학습, 범용 보상 모델, 메모리와 추론을 향후 연구 방향으로 제시한 슬라이드">
+            <figcaption><span class="timestamp">00:30:20</span>더 강한 사전학습, 일반화 가능한 보상 모델, 장기 메모리와 추론이 다음 축으로 제시됐다.</figcaption>
+          </figure>
+
+          <p>
+            발표는 세 가지 방향으로 끝난다. 첫째, π₀.₇ 같은 더 강한 사전학습이 후속 학습
+            이전의 강건성을 어디까지 높일 수 있는가. 둘째, 과제마다 규칙 기반 성공 분류기를
+            만드는 대신 다양한 작업에서 재사용할 수 있는 범용 로봇 보상 모델을 학습할 수
+            있는가. 셋째, 장기 메모리와 추론이 신뢰성 및 in-context 적응에 얼마나 기여할 수
+            있는가다.
+          </p>
+        </section>
+
+        <section class="section" id="implications" aria-labelledby="implications-title">
+          <div class="section-heading">
+            <span class="section-number">06 · Field Implications</span>
+            <h2 id="implications-title">현장 자동화가 가져갈 네 가지 아이디어</h2>
+          </div>
+
+          <div class="implication-grid">
+            <section class="implication">
+              <h3>① 진행도는 이식 가능한 가치 신호다</h3>
+              <p>
+                성공까지 남은 시간은 복잡한 과제별 보상보다 정의하기 쉽다. 공정 단계가 분명한
+                굴착, 상하차, 조립 작업에서는 전진과 후퇴를 나타내는 실용적 감독 신호가 될 수 있다.
+              </p>
+            </section>
+            <section class="implication">
+              <h3>② 개입은 비용이 아니라 데이터다</h3>
+              <p>
+                숙련 오퍼레이터가 자동 운전 중 수행한 수정 행동을 저장하면 별도의 데모 세션 없이
+                회복 행동 데이터가 쌓인다. 안전 개입과 학습 데이터 수집을 같은 인터페이스로 묶을 수 있다.
+              </p>
+            </section>
+            <section class="implication">
+              <h3>③ 지표를 생산 KPI에 맞춰야 한다</h3>
+              <p>
+                시간당 성공 횟수는 생산 라인의 처리량과 직접 연결된다. 성공률뿐 아니라 실패 후
+                중단 시간, 복구 시간, 정상 사이클 시간을 함께 최적화하게 만든다.
+              </p>
+            </section>
+            <section class="implication">
+              <h3>④ 엣지 추론 비용이 병목이 된다</h3>
+              <p>
+                후보 샘플링은 지연에 민감한 제어 루프와 충돌한다. 중장비나 이동 로봇에서는
+                FASTER 같은 조기 후보 제거와 안전한 fallback 정책이 핵심 시스템 요건이 될 수 있다.
+              </p>
+            </section>
+          </div>
+
+          <div class="note">
+            <strong>적용 범위에 대한 주의.</strong> 발표의 물리 실험은 주로 테이블탑
+            매니퓰레이션이다. 중장비는 액추에이터 지연, 지형 변화, 작업자 근접 안전,
+            비상정지 규정이 다르다. “사람이 언제든 원격조작으로 덮어쓴다”는 전제를 그대로
+            옮기기보다 안전 인증 경계 안에서 개입 권한과 학습 데이터 사용 범위를 다시 설계해야 한다.
+          </div>
+
+          <section class="takeaway" aria-labelledby="takeaway-title">
+            <h2 id="takeaway-title">독자를 위한 최종 정리</h2>
+            <ol>
+              <li>대형 VLA의 신뢰성을 높이는 데 반드시 정책 전체를 RL로 직접 갱신할 필요는 없다.</li>
+              <li>진행도 기반 가치함수는 실패 상태에서 무엇이 전진이고 후퇴인지 구분하는 간결한 방법이다.</li>
+              <li>사람의 교정은 자율성의 반대가 아니라, 더 나은 자율성을 만드는 고가치 데이터가 될 수 있다.</li>
+              <li>실험 성과를 판단할 때 성공률과 함께 throughput, 개입량, 리셋 비용, 추론 지연을 봐야 한다.</li>
+              <li>현재 결과는 ‘무인 학습의 완성’보다 ‘현실적인 사람-로봇 공동 개선 루프’에 가깝다.</li>
+            </ol>
+          </section>
+        </section>
+
+        <section class="section" id="sources" aria-labelledby="sources-title">
+          <div class="section-heading">
+            <span class="section-number">07 · Source Notes</span>
+            <h2 id="sources-title">출처와 참조 문헌</h2>
+          </div>
+
+          <ol class="source-list">
+            <li>
+              Chelsea Finn &amp; Perry Dong.
+              <a><em>Reliable VLA Post-Training with Real-World RL</em></a>.
+              ICRA 2026 RL4IL Workshop 발표 영상, Zhanpeng He 채널, 2026.
+            </li>
+            <li>Physical Intelligence. <em>π*0.6: a VLA That Learns From Experience</em>. 2025.</li>
+            <li>Dong, Li, Sadigh, Finn. <em>EXPO: Stable Reinforcement Learning with Expressive Policies</em>. ICLR 2026.</li>
+            <li>Dong*, Hung*, Gao, Sadigh, Finn. <em>EXPO-FT: Sample-Efficient RL Finetuning for Vision-Language-Action Models</em>. arXiv, 2026.</li>
+            <li>Dong*, Swerdlow*, Sadigh, Finn. <em>FASTER: Value Guided Sampling for Fast RL</em>. arXiv, 2026.</li>
+            <li>Xiao et al. <em>Self-Improving Vision-Language-Action Models with Data Generation via Residual RL</em>. 2025.</li>
+          </ol>
+
+          <p class="source-note">
+            본 글은 발표 영상과 제공된 발표 노트를 바탕으로 재구성한 연구 해설이다.
+            성공률, 처리량, 온라인 데이터 시간과 비교 결과는 발표자가 보고한 수치이며,
+            독립적인 재현 결과를 의미하지 않는다. 논문별 실험 조건, 오차 범위, 베이스라인
+            설정은 원문에서 추가 확인할 필요가 있다.
+          </p>
+        </section>
+      </article>
+    </div>
+
+    <aside class="share-box" aria-labelledby="share-title">
+      <div>
+        <h2 id="share-title">한 문장으로 공유하���</h2>
+        <p>아래 문장은 선택해 복사할 수 있는 정적 공유용 요약이다.</p>
+      </div>
+      <div class="share-copy">
+        모방학습 VLA에 실세계 경험과 사람의 교정을 더하자 에스프레소 성공률은
+        40%에서 90% 이상으로 올랐다. π*0.6와 EXPO-FT는 로봇 신뢰성의 핵심이
+        ‘한 번의 거대한 학습’보다 안정적인 반복 개선 루프에 있음을 보여준다.
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    <div class="footer__inner">
+      <span>Research Report · Editorial Edition</span>
+      <span>원본 발표: Chelsea Finn &amp; Perry Dong · ICRA 2026 RL4IL Workshop</span>
+    </div>
+  </footer>
 </body>
 </html>
