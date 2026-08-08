@@ -1,7 +1,19 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-08T01:07:01.769Z",
+  "updatedAt": "2026-08-08T01:12:50.933Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-georgia-chalvatzaki-rl-from-for-with-demonstrations-%EC%9A%94%EC%95%BD/",
+      "excerpt": "Georgia Chalvatzaki (TU Darmstadt): Reinforcement Learning From, For and With Demonstrations 영상 정보 채널 : Zhanpeng He (ICRA 2026 RL4IL 워크샵) 게시일 : 2026 06 08 길이 : 30분 45초 링크 : https://www.youtube.com/watch?v=ieStIXBGriU <div style=\"position: r",
+      "shortId": "1y6niw0",
+      "slug": "yt-georgia-chalvatzaki-rl-from-for-with-demonstrations-요약",
+      "sourcePath": "clippings/yt_Georgia_Chalvatzaki_RL_From_For_With_Demonstrations_요약.md",
+      "tags": [],
+      "title": "Georgia Chalvatzaki (TU Darmstadt): Reinforcement Learning From, For and With Demonstrations",
+      "updatedAt": "2026-08-08T01:12:50.933Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/1y6niw0/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-robert-platt-model-matters-leveraging-geometry-%EC%9A%94%EC%95%BD/",
@@ -76,21 +88,6 @@
       "title": "Chelsea Finn & Perry Dong (Stanford & PI): Reliable VLA Post-Training with Real-World RL",
       "updatedAt": "2026-08-08T00:42:48.995Z",
       "url": "https://hanminy.github.io/marktl-blog/marktl/s/ci37ov/"
-    },
-    {
-      "artifactType": "research-report",
-      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-georgia-chalvatzaki-rl-from-for-with-demonstrations-%EC%9A%94%EC%95%BD/",
-      "excerpt": "Georgia Chalvatzaki (TU Darmstadt): Reinforcement Learning From, For and With Demonstrations 영상 정보 채널 : Zhanpeng He (ICRA 2026 RL4IL 워크샵) 게시일 : 2026 06 08 길이 : 30분 45초 링크 : https://www.youtube.com/watch?v=ieStIXBGriU <div style=\"position: r",
-      "shortId": "1y6niw0",
-      "slug": "yt-georgia-chalvatzaki-rl-from-for-with-demonstrations-요약",
-      "sourcePath": "clippings/yt_Georgia_Chalvatzaki_RL_From_For_With_Demonstrations_요약.md",
-      "tags": [
-        "youtube",
-        "연구자료"
-      ],
-      "title": "Georgia Chalvatzaki (TU Darmstadt): Reinforcement Learning From, For and With Demonstrations",
-      "updatedAt": "2026-08-07T15:55:53.378Z",
-      "url": "https://hanminy.github.io/marktl-blog/marktl/s/1y6niw0/"
     },
     {
       "artifactType": "research-report",
