@@ -1,7 +1,22 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-08T00:49:11.738Z",
+  "updatedAt": "2026-08-08T00:54:53.592Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-pulkit-agrawal-on-rl-and-il-%EC%9A%94%EC%95%BD/",
+      "excerpt": "Pulkit Agrawal (MIT & EKA Robotics): On RL & IL 영상 정보 채널 : Zhanpeng He (ICRA 2026 RL4IL 워크샵) 게시일 : 2026 06 08 길이 : 42분 18초 링크 : https://www.youtube.com/watch?v=2 2pR 8pA4U <div style=\"position: relative; width: 100%; padding bottom: 56.25%;",
+      "shortId": "zc3b2z",
+      "slug": "yt-pulkit-agrawal-on-rl-and-il-요약",
+      "sourcePath": "clippings/yt_Pulkit_Agrawal_On_RL_and_IL_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료"
+      ],
+      "title": "Pulkit Agrawal (MIT & EKA Robotics): On RL & IL",
+      "updatedAt": "2026-08-08T00:54:53.592Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/zc3b2z/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-jason-ma-rl-for-real-world-production-robotics-%EC%9A%94%EC%95%BD/",
@@ -76,21 +91,6 @@
       "title": "David Held (CMU): A Case Study of RL — Robot Assisted Dressing",
       "updatedAt": "2026-08-07T15:41:10.366Z",
       "url": "https://hanminy.github.io/marktl-blog/marktl/s/12ifdub/"
-    },
-    {
-      "artifactType": "research-report",
-      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-pulkit-agrawal-on-rl-and-il-%EC%9A%94%EC%95%BD/",
-      "excerpt": "Pulkit Agrawal (MIT & EKA Robotics): On RL & IL 영상 정보 채널 : Zhanpeng He (ICRA 2026 RL4IL 워크샵) 게시일 : 2026 06 08 길이 : 42분 18초 링크 : https://www.youtube.com/watch?v=2 2pR 8pA4U <div style=\"position: relative; width: 100%; padding bottom: 56.25%;",
-      "shortId": "zc3b2z",
-      "slug": "yt-pulkit-agrawal-on-rl-and-il-요약",
-      "sourcePath": "clippings/yt_Pulkit_Agrawal_On_RL_and_IL_요약.md",
-      "tags": [
-        "youtube",
-        "연구자료"
-      ],
-      "title": "Pulkit Agrawal (MIT & EKA Robotics): On RL & IL",
-      "updatedAt": "2026-08-07T15:32:50.924Z",
-      "url": "https://hanminy.github.io/marktl-blog/marktl/s/zc3b2z/"
     },
     {
       "artifactType": "research-report",
