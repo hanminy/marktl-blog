@@ -1,7 +1,22 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-07T15:55:53.378Z",
+  "updatedAt": "2026-08-08T00:26:21.734Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-chelsea-finn-reliable-vla-post-training-%EC%9A%94%EC%95%BD/",
+      "excerpt": "Chelsea Finn & Perry Dong (Stanford & PI): Reliable VLA Post Training with Real World RL 영상 정보 채널 : Zhanpeng He (ICRA 2026 RL4IL 워크샵) 게시일 : 2026 06 08 길이 : 31분 59초 링크 : https://www.youtube.com/watch?v=fAqgJMyxBbo <div style=\"position: relat",
+      "shortId": "ci37ov",
+      "slug": "yt-chelsea-finn-reliable-vla-post-training-요약",
+      "sourcePath": "clippings/yt_Chelsea_Finn_Reliable_VLA_Post-Training_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료"
+      ],
+      "title": "Chelsea Finn & Perry Dong (Stanford & PI): Reliable VLA Post-Training with Real-World RL",
+      "updatedAt": "2026-08-08T00:26:21.734Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/ci37ov/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-georgia-chalvatzaki-rl-from-for-with-demonstrations-%EC%9A%94%EC%95%BD/",
@@ -76,21 +91,6 @@
       "title": "Jason Ma (Dyna): Reinforcement Learning for Real-World Production Robotic Systems",
       "updatedAt": "2026-08-07T15:25:35.853Z",
       "url": "https://hanminy.github.io/marktl-blog/marktl/s/1yg0m8e/"
-    },
-    {
-      "artifactType": "research-report",
-      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-chelsea-finn-reliable-vla-post-training-%EC%9A%94%EC%95%BD/",
-      "excerpt": "Chelsea Finn & Perry Dong (Stanford & PI): Reliable VLA Post Training with Real World RL 영상 정보 채널 : Zhanpeng He (ICRA 2026 RL4IL 워크샵) 게시일 : 2026 06 08 길이 : 31분 59초 링크 : https://www.youtube.com/watch?v=fAqgJMyxBbo <div style=\"position: relat",
-      "shortId": "ci37ov",
-      "slug": "yt-chelsea-finn-reliable-vla-post-training-요약",
-      "sourcePath": "clippings/yt_Chelsea_Finn_Reliable_VLA_Post-Training_요약.md",
-      "tags": [
-        "youtube",
-        "연구자료"
-      ],
-      "title": "Chelsea Finn & Perry Dong (Stanford & PI): Reliable VLA Post-Training with Real-World RL",
-      "updatedAt": "2026-08-07T15:03:34.972Z",
-      "url": "https://hanminy.github.io/marktl-blog/marktl/s/ci37ov/"
     },
     {
       "artifactType": "research-report",
