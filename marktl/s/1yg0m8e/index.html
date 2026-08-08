@@ -1,25 +1,897 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Jason Ma (Dyna): Reinforcement Learning for Real-World Production Robotic Systems</title>
-<style>
-      body { margin: 0; font-family: Georgia, "Times New Roman", serif; color: #202124; background: #faf7f2; }
-      main { max-width: 900px; margin: 0 auto; padding: 56px 36px 80px; box-sizing: border-box; }
-      article { background: #fffdf8; border: 1px solid #e6ddcf; padding: 44px; }
-      h1 { font-size: 44px; line-height: 1.05; margin-top: 0; }
-      h2 { margin-top: 42px; border-top: 1px solid #dfd5c8; padding-top: 24px; }
-      p, li { font-size: 18px; line-height: 1.75; }
-      a { color: #8b3a2b; }
-      pre { overflow: auto; padding: 18px; background: #25211d; color: #f7efe4; border-radius: 6px; }
-      table { width: 100%; border-collapse: collapse; margin: 22px 0; background: #fff; }
-      th, td { border-bottom: 1px solid #e6ddcf; padding: 10px 12px; }
-      img { max-width: 100%; height: auto; display: block; margin: 24px auto; }
-      .frontmatter { white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: #f1eadf; padding: 14px; color: #5f574f; }
-      .callout { border: 1px solid #d8b98c; background: #fff6e5; padding: 16px 18px; margin: 24px 0; }
-      .callout-title { font-family: ui-sans-serif, system-ui, sans-serif; font-weight: 800; text-transform: uppercase; font-size: 12px; letter-spacing: .08em; }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RL보다 시스템이 먼저다 — 99.4% 로봇이 보여준 프로덕션 학습의 조건</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      --paper: #f7f3eb;
+      --paper-deep: #eee7da;
+      --ink: #17211d;
+      --muted: #5c6862;
+      --faint: #7d8782;
+      --line: rgba(23, 33, 29, 0.14);
+      --green: #145c45;
+      --green-dark: #0d4433;
+      --green-soft: #dfece5;
+      --coral: #c8553d;
+      --coral-soft: #f5dfd7;
+      --gold: #b78937;
+      --white: #fffdf8;
+      --shadow: 0 22px 65px rgba(37, 43, 39, 0.10);
+      --radius: 22px;
+      --content: 760px;
+      --wide: 1120px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--paper);
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 90% 3%, rgba(20, 92, 69, 0.10), transparent 28rem),
+        linear-gradient(180deg, #faf7f0 0, var(--paper) 42rem);
+      font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+      font-size: 17px;
+      line-height: 1.82;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+
+    a {
+      color: var(--green);
+      text-decoration-color: rgba(20, 92, 69, 0.35);
+      text-underline-offset: 0.18em;
+    }
+
+    a:hover,
+    a:focus-visible {
+      color: var(--coral);
+      text-decoration-color: currentColor;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    .skip-link {
+      position: absolute;
+      top: -4rem;
+      left: 1rem;
+      z-index: 20;
+      padding: 0.7rem 1rem;
+      color: white;
+      background: var(--ink);
+      border-radius: 0 0 10px 10px;
+    }
+
+    .skip-link:focus {
+      top: 0;
+    }
+
+    .masthead {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: 0 auto;
+      padding: 1.25rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      color: var(--ink);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .masthead-meta {
+      color: var(--muted);
+      font-size: 0.75rem;
+      letter-spacing: 0.04em;
+    }
+
+    .hero {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: 0 auto;
+      padding: clamp(4rem, 10vw, 8.5rem) 0 3rem;
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 0 0 1.4rem;
+      color: var(--coral);
+      font-size: 0.76rem;
+      font-weight: 850;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 2.7rem;
+      height: 2px;
+      background: currentColor;
+    }
+
+    h1,
+    h2,
+    h3,
+    .display-serif {
+      font-family: "Noto Serif KR", "Nanum Myeongjo", "Batang", Georgia, serif;
+      letter-spacing: -0.035em;
+    }
+
+    h1 {
+      max-width: 980px;
+      margin: 0;
+      font-size: clamp(2.8rem, 7.8vw, 6.75rem);
+      font-weight: 700;
+      line-height: 1.04;
+    }
+
+    h1 .accent {
+      color: var(--green);
+    }
+
+    .dek {
+      max-width: 850px;
+      margin: 2.1rem 0 0;
+      color: #3f4c46;
+      font-size: clamp(1.15rem, 2.2vw, 1.55rem);
+      line-height: 1.65;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-grid {
+      margin-top: 3rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 2.5rem;
+      align-items: end;
+    }
+
+    .byline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1.1rem;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .byline strong {
+      color: var(--ink);
+    }
+
+    .hero-stat {
+      padding: 1.4rem 1.5rem;
+      color: var(--white);
+      background: var(--green-dark);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-stat strong {
+      display: block;
+      margin-bottom: 0.18rem;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 2.5rem;
+      line-height: 1;
+    }
+
+    .hero-stat span {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.78);
+    }
+
+    .lead-visual {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: 1rem auto 0;
+    }
+
+    .lead-visual figure {
+      margin: 0;
+      position: relative;
+      overflow: hidden;
+      background: #0d1512;
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .lead-visual img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+    }
+
+    .lead-visual figcaption {
+      display: flex;
+      justify-content: space-between;
+      gap: 1.5rem;
+      padding: 1rem 1.25rem;
+      color: rgba(255, 255, 255, 0.74);
+      background: #0d1512;
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+
+    .article-layout {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: 4.5rem auto 0;
+      display: grid;
+      grid-template-columns: 220px minmax(0, var(--content));
+      justify-content: space-between;
+      gap: 3.5rem;
+    }
+
+    .toc {
+      position: sticky;
+      top: 1.5rem;
+      align-self: start;
+      padding-top: 0.5rem;
+    }
+
+    .toc-label {
+      margin: 0 0 1rem;
+      color: var(--faint);
+      font-size: 0.68rem;
+      font-weight: 850;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .toc ol {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: toc;
+    }
+
+    .toc li {
+      counter-increment: toc;
+      margin: 0.55rem 0;
+      display: grid;
+      grid-template-columns: 1.6rem 1fr;
+      gap: 0.2rem;
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+
+    .toc li::before {
+      content: "0" counter(toc);
+      color: var(--gold);
+      font-family: Georgia, serif;
+    }
+
+    .toc a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .toc a:hover,
+    .toc a:focus-visible {
+      color: var(--coral);
+    }
+
+    main {
+      min-width: 0;
+    }
+
+    section {
+      scroll-margin-top: 2rem;
+    }
+
+    .section {
+      margin: 0 0 6.5rem;
+    }
+
+    .section-kicker {
+      margin: 0 0 0.65rem;
+      color: var(--coral);
+      font-size: 0.72rem;
+      font-weight: 850;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 0 0 1.7rem;
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      line-height: 1.22;
+    }
+
+    h3 {
+      margin: 3.2rem 0 1rem;
+      font-size: clamp(1.35rem, 3vw, 1.8rem);
+      line-height: 1.4;
+    }
+
+    p {
+      margin: 0 0 1.35rem;
+    }
+
+    .abstract {
+      padding: clamp(1.5rem, 4vw, 2.4rem);
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 12px 40px rgba(37, 43, 39, 0.05);
+    }
+
+    .abstract h2 {
+      margin-bottom: 1rem;
+      font-size: 1.45rem;
+    }
+
+    .abstract p:last-child {
+      margin-bottom: 0;
+    }
+
+    .finding-grid {
+      margin: 2.1rem 0 0;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .finding {
+      min-height: 190px;
+      padding: 1.35rem;
+      background: var(--green-soft);
+      border-radius: 18px;
+    }
+
+    .finding:nth-child(2),
+    .finding:nth-child(3) {
+      background: var(--coral-soft);
+    }
+
+    .finding-number {
+      display: block;
+      margin-bottom: 1.2rem;
+      color: var(--green);
+      font-family: Georgia, serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .finding h3 {
+      margin: 0 0 0.55rem;
+      font-family: inherit;
+      font-size: 1rem;
+      line-height: 1.5;
+      letter-spacing: -0.02em;
+    }
+
+    .finding p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.65;
+    }
+
+    .pullquote {
+      margin: 4rem 0;
+      padding: 1.7rem 0 1.7rem 2rem;
+      border-left: 5px solid var(--coral);
+    }
+
+    .pullquote p {
+      margin: 0;
+      color: var(--green-dark);
+      font-family: "Noto Serif KR", "Nanum Myeongjo", "Batang", Georgia, serif;
+      font-size: clamp(1.45rem, 3.5vw, 2.15rem);
+      font-weight: 700;
+      line-height: 1.5;
+      letter-spacing: -0.035em;
+    }
+
+    .pullquote cite {
+      display: block;
+      margin-top: 0.9rem;
+      color: var(--faint);
+      font-size: 0.75rem;
+      font-style: normal;
+    }
+
+    .media {
+      margin: 2.4rem 0 3rem;
+    }
+
+    .media img {
+      width: 100%;
+      background: #d8d8d3;
+      border: 1px solid rgba(23, 33, 29, 0.10);
+      border-radius: 16px;
+      box-shadow: 0 12px 35px rgba(37, 43, 39, 0.08);
+    }
+
+    .media figcaption {
+      margin-top: 0.75rem;
+      color: var(--faint);
+      font-size: 0.76rem;
+      line-height: 1.55;
+    }
+
+    .timestamp {
+      display: inline-block;
+      margin-right: 0.35rem;
+      color: var(--coral);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.72rem;
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .media-grid {
+      margin: 2.4rem 0 3rem;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.1rem;
+    }
+
+    .media-grid .media {
+      margin: 0;
+    }
+
+    .media-grid .media.wide {
+      grid-column: 1 / -1;
+    }
+
+    .media-grid img {
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+    }
+
+    .evidence-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      margin: 0 0 1.2rem;
+      padding: 0.38rem 0.65rem;
+      color: var(--green-dark);
+      background: var(--green-soft);
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 800;
+    }
+
+    .evidence-label::before {
+      content: "";
+      width: 0.45rem;
+      height: 0.45rem;
+      background: var(--green);
+      border-radius: 50%;
+    }
+
+    .pipeline {
+      margin: 2.5rem 0;
+      padding: 1.4rem;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.65rem;
+      background: var(--ink);
+      border-radius: var(--radius);
+    }
+
+    .pipeline-step {
+      position: relative;
+      min-height: 128px;
+      padding: 1rem 0.85rem;
+      color: var(--white);
+      background: rgba(255, 255, 255, 0.075);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 13px;
+    }
+
+    .pipeline-step:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      top: 50%;
+      right: -0.62rem;
+      z-index: 2;
+      color: #d8b66e;
+      transform: translateY(-50%);
+    }
+
+    .pipeline-step b {
+      display: block;
+      margin-bottom: 0.45rem;
+      color: #e3c782;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+    }
+
+    .pipeline-step span {
+      display: block;
+      font-size: 0.78rem;
+      line-height: 1.55;
+    }
+
+    .formula {
+      margin: 2rem 0;
+      padding: 1.25rem 1.35rem;
+      overflow-x: auto;
+      color: var(--green-dark);
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--gold);
+      border-radius: 12px;
+      font-family: "Times New Roman", Georgia, serif;
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+
+    .formula small {
+      display: block;
+      margin-top: 0.6rem;
+      color: var(--muted);
+      font-family: Pretendard, "Noto Sans KR", sans-serif;
+      font-size: 0.76rem;
+    }
+
+    .table-wrap {
+      margin: 2.5rem 0;
+      overflow-x: auto;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 650px;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+
+    th,
+    td {
+      padding: 1rem;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--line);
+    }
+
+    th {
+      color: var(--green-dark);
+      background: var(--green-soft);
+      font-size: 0.74rem;
+      letter-spacing: 0.02em;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .claim-box {
+      margin: 2.5rem 0;
+      padding: 1.7rem;
+      color: var(--white);
+      background: var(--green-dark);
+      border-radius: var(--radius);
+    }
+
+    .claim-box h3 {
+      margin: 0 0 0.9rem;
+      color: #f0d590;
+      font-family: inherit;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .claim-box ol {
+      margin: 0;
+      padding-left: 1.35rem;
+    }
+
+    .claim-box li {
+      margin: 0.8rem 0;
+      padding-left: 0.25rem;
+    }
+
+    .checklist {
+      margin: 2rem 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .checklist li {
+      position: relative;
+      margin: 0.85rem 0;
+      padding: 0.9rem 1rem 0.9rem 3rem;
+      background: rgba(255, 255, 255, 0.58);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    .checklist li::before {
+      content: "✓";
+      position: absolute;
+      top: 0.92rem;
+      left: 1rem;
+      width: 1.25rem;
+      height: 1.25rem;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: var(--green);
+      border-radius: 50%;
+      font-size: 0.72rem;
+      font-weight: 900;
+    }
+
+    .limitations {
+      padding: 1.6rem 1.8rem;
+      background: #f3e9da;
+      border-top: 4px solid var(--gold);
+      border-radius: 4px 4px 18px 18px;
+    }
+
+    .limitations h3 {
+      margin-top: 0;
+    }
+
+    .limitations ul {
+      margin-bottom: 0;
+      padding-left: 1.3rem;
+    }
+
+    .limitations li {
+      margin: 0.75rem 0;
+    }
+
+    .share-copy {
+      margin-top: 3rem;
+      padding: 1.7rem;
+      background: var(--coral-soft);
+      border: 1px solid rgba(200, 85, 61, 0.20);
+      border-radius: 18px;
+    }
+
+    .share-copy h3 {
+      margin: 0 0 0.7rem;
+      font-family: inherit;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .share-copy p {
+      margin: 0;
+      font-family: "Noto Serif KR", "Nanum Myeongjo", Georgia, serif;
+      font-size: 1.08rem;
+      font-weight: 700;
+      line-height: 1.7;
+    }
+
+    .source-card {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+
+    .source-card h3 {
+      margin: 0 0 0.8rem;
+      font-family: inherit;
+      font-size: 0.84rem;
+    }
+
+    .source-card dl {
+      margin: 0;
+      display: grid;
+      grid-template-columns: 6rem 1fr;
+      gap: 0.45rem 1rem;
+      font-size: 0.79rem;
+    }
+
+    .source-card dt {
+      color: var(--faint);
+    }
+
+    .source-card dd {
+      margin: 0;
+    }
+
+    .ending {
+      margin-bottom: 3rem;
+      padding: clamp(2rem, 6vw, 4rem);
+      color: var(--white);
+      background: var(--ink);
+      border-radius: 28px;
+    }
+
+    .ending h2 {
+      max-width: 640px;
+      color: var(--white);
+    }
+
+    .ending p {
+      color: rgba(255, 255, 255, 0.76);
+    }
+
+    .ending .final-line {
+      margin: 2.2rem 0 0;
+      color: #f0d590;
+      font-family: "Noto Serif KR", "Nanum Myeongjo", Georgia, serif;
+      font-size: clamp(1.25rem, 3vw, 1.8rem);
+      font-weight: 700;
+    }
+
+    footer {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: 0 auto;
+      padding: 2rem 0 4rem;
+      color: var(--faint);
+      border-top: 1px solid var(--line);
+      font-size: 0.74rem;
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-stat {
+        max-width: 360px;
+      }
+
+      .article-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+        padding: 1rem 0 2rem;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .toc ol {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0 1rem;
+      }
+
+      .pipeline {
+        grid-template-columns: 1fr;
+      }
+
+      .pipeline-step {
+        min-height: auto;
+      }
+
+      .pipeline-step:not(:last-child)::after {
+        content: "↓";
+        top: auto;
+        right: 50%;
+        bottom: -0.85rem;
+        transform: translateX(50%);
+      }
+    }
+
+    @media (max-width: 620px) {
+      body {
+        font-size: 16px;
+        line-height: 1.78;
+      }
+
+      .masthead-meta {
+        display: none;
+      }
+
+      .hero {
+        padding-top: 3.7rem;
+      }
+
+      h1 {
+        font-size: clamp(2.55rem, 15vw, 4rem);
+      }
+
+      .lead-visual figcaption {
+        display: block;
+      }
+
+      .lead-visual figcaption span {
+        display: block;
+        margin-top: 0.4rem;
+      }
+
+      .finding-grid,
+      .media-grid,
+      .toc ol {
+        grid-template-columns: 1fr;
+      }
+
+      .media-grid .media.wide {
+        grid-column: auto;
+      }
+
+      .finding {
+        min-height: auto;
+      }
+
+      .pullquote {
+        padding-left: 1.2rem;
+      }
+
+      .source-card dl {
+        grid-template-columns: 1fr;
+      }
+
+      .source-card dd {
+        margin-bottom: 0.5rem;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+        font-size: 11pt;
+      }
+
+      .masthead,
+      .toc,
+      .share-copy {
+        display: none;
+      }
+
+      .hero,
+      .lead-visual,
+      .article-layout,
+      footer {
+        width: 100%;
+      }
+
+      .article-layout {
+        display: block;
+      }
+
+      .section {
+        break-inside: avoid;
+      }
+
+      .media img,
+      .abstract,
+      .finding,
+      .ending {
+        box-shadow: none;
+      }
+
+      a {
+        color: inherit;
+      }
+    }
+  </style>
 <meta property="og:type" content="article">
 <meta property="og:title" content="Jason Ma (Dyna): Reinforcement Learning for Real-World Production Robotic Systems">
 <meta property="og:description" content="Jason Ma (Dyna): Reinforcement Learning for Real World Production Robotic Systems 영상 정보 채널 : Zhanpeng He (ICRA 2026 RL4IL 워크샵) 게시일 : 2026 06 08 길이 : 36분 08초 링크 : https://www.youtube.com/watch?v=f8ckFlzGWGo &lt;div style=&quot;position: relative; wi">
@@ -32,79 +904,582 @@
 <link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-jason-ma-rl-for-real-world-production-robotics-%EC%9A%94%EC%95%BD/">
 </head>
 <body>
-<main data-template="editorial">
-<article>
-<pre class="frontmatter">title: &quot;Jason Ma (Dyna): Reinforcement Learning for Real-World Production Robotic Systems&quot;
-tags:
-  - youtube
-  - 연구자료
-source: &quot;https://www.youtube.com/watch?v=f8ckFlzGWGo&quot;
-channel: &quot;Zhanpeng He&quot;
-video_id: &quot;f8ckFlzGWGo&quot;
-date: 2026-08-08</pre>
-<h1>Jason Ma (Dyna): Reinforcement Learning for Real-World Production Robotic Systems</h1>
-<h2>영상 정보</h2>
-<ul><li><strong>채널</strong>: Zhanpeng He (ICRA 2026 RL4IL 워크샵)</li><li><strong>게시일</strong>: 2026-06-08</li><li><strong>길이</strong>: 36분 08초</li><li><strong>링크</strong>: https://www.youtube.com/watch?v=f8ckFlzGWGo</li></ul>
-<p>&lt;div relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;&quot;&gt; &lt;iframe absolute; top: 0; left: 0; width: 100%; height: 100%;&quot; src=&quot;https://www.youtube.com/embed/f8ckFlzGWGo&quot; frameborder=&quot;0&quot; allowfullscreen&gt;&lt;/iframe&gt; &lt;/div&gt;</p>
-<h2>한줄 요약</h2>
-<p>Dyna Robotics 공동창업자가 실제 고객 사이트에 로봇을 배치하며 얻은 결론을 발표한다. <strong>99.4% 성공률로 24시간에 냅킨 850장</strong>을 접는 데 쓰인 것은 정교한 RL 알고리즘이 아니라 보상 모델을 감독 도구로 쓴 human-in-the-loop 능동 학습이었고, &quot;실세계 RL은 아직 프로덕션급 조작의 병목이 아니다&quot;라는 도발적 주장으로 이어진다.</p>
-<h2>핵심 장면 분석</h2>
-<h3>00:02:30 — 박사 연구: 로봇 학습을 위한 범용 보상 모델</h3>
-<p><img src="assets/f8ckflzgwgo-ts-00-02-30.jpg" alt="f8ckFlzGWGo_ts_00-02-30.jpg"> Ma의 연구 주제를 한 장으로 정의한다. 목표는 <strong>로봇 피드백을 학습하는 범용 알고리즘과 모델</strong>이다. 여기서 피드백이란 로봇과 세계 상태의 표현(예: 이미지)을 받아 &quot;얼마나 잘하고 있는가&quot;를 수치로 내놓는 보상·비용·가치 함수를 뜻한다. 슬라이드는 같은 장면에 0.3(좋음)과 0.1(나쁨)을 매기는 예로 이를 보여준다.</p>
-<h3>00:03:20 — 두 갈래 접근</h3>
-<p><img src="assets/f8ckflzgwgo-ts-00-03-20.jpg" alt="f8ckFlzGWGo_ts_00-03-20.jpg"> 왼쪽은 <strong>LLM으로 보상 함수를 자동 작성</strong>해 sim-to-real RL을 돌리는 계열(Eureka 등), 오른쪽은 <strong>에고센트릭 비디오 같은 대규모 실세계 데이터에서 가치함수를 학습</strong>하는 계열이다. 이 발표는 두 번째 갈래를 프로덕션 규모로 확장한 이야기다.</p>
-<h3>00:04:20 — VIP/LIV: 임베딩 거리가 곧 가치함수</h3>
-<p><img src="assets/f8ckflzgwgo-ts-00-04-20.jpg" alt="f8ckFlzGWGo_ts_00-04-20.jpg"> 아이디어는 단순하다. 입력 이미지와 목표 이미지를 각각 임베딩해 <strong>잠재 공간에서의 거리를 가치함수로 삼는다</strong>. 언어 목표(ψ)도 같은 공간에 넣을 수 있어 &quot;Put the glass away&quot; 같은 지시로 과제를 지정할 수 있다. Ego4D로 학습한 이 모델은 훈련 중 본 적 없는 로봇 영상에 대해서도 합리적인 과제 진행도를 추정했다.</p>
-<h3>00:06:10 — 보상 모델로 실세계 RL 감독</h3>
-<p><img src="assets/f8ckflzgwgo-ts-00-06-10.jpg" alt="f8ckFlzGWGo_ts_00-06-10.jpg"> 학습된 보상 모델의 직접적 응용. 서랍 열기를 <strong>처음부터 학습</strong>한 정책 사례를 보여주며, Ma는 &quot;오늘날 기준으로는 상당히 비효율적&quot;이라고 솔직하게 평가한다. 이 평가가 발표 후반의 주장으로 이어지는 복선이다.</p>
-<h3>00:07:00 — 연구실에서 실세계로</h3>
-<p><img src="assets/f8ckflzgwgo-ts-00-07-00.jpg" alt="f8ckFlzGWGo_ts_00-07-00.jpg"> Dyna 창업의 동기. 연구실 환경에서 설득력 있는 결과를 낸 뒤 &quot;이 아이디어를 실제 프로덕션 시스템으로 바꾸려면 무엇이 필요한가&quot;를 물었다고 말한다. <strong>실제 고객 사이트에 배치해야 가장 풍부한 피드백을 얻고, 학계 환경에서는 보이지 않는 격차가 드러난다</strong>는 것이 핵심 신념이다.</p>
-<h3>00:07:50 — Sacramento의 실제 세탁소</h3>
-<p><img src="assets/f8ckflzgwgo-ts-00-07-50.jpg" alt="f8ckFlzGWGo_ts_00-07-50.jpg"> 데모가 아니라 영업 중인 세탁소다. 로봇이 회색 수건을 실패 없이 연속으로 접어 단정하게 쌓고, 직원이 가져갈 수 있도록 옆에 놓는다(20배속).</p>
-<h3>00:08:30 — Red Bull 협업: 도구 사용</h3>
-<p><img src="assets/f8ckflzgwgo-ts-00-08-30.jpg" alt="f8ckFlzGWGo_ts_00-08-30.jpg"> 행사장에서 로봇이 <strong>도구를 써서 캔을 딴다</strong>. Ma는 자사의 차별점으로 범용성뿐 아니라 <strong>실수로부터의 회복</strong>과 도구 사용이 필요한 복잡한 과제 수행을 든다.</p>
-<h3>00:09:10 — 학회 부스에서의 zero-shot 데모</h3>
-<p><img src="assets/f8ckflzgwgo-ts-00-09-10.jpg" alt="f8ckFlzGWGo_ts_00-09-10.jpg"> CoRL 2025 부스 영상. 참관객들이 다가와 로봇을 방해하고 티셔츠를 헝클어뜨리지만, 모델은 회복해 <strong>처음 보는 셔츠</strong>를 접는다. 통제된 환경이 아닌 곳에서의 강건성 시연이다.</p>
-<h3>00:11:30 — 하나의 모델로 모든 과제의 진행도를 추정</h3>
-<p><img src="assets/f8ckflzgwgo-ts-00-11-30.jpg" alt="f8ckFlzGWGo_ts_00-11-30.jpg"> Dyna의 보상 모델은 박사 시절의 짧은 pick-and-place가 아니라 <strong>1분이 넘는 장기 과제</strong>(티셔츠·냅킨 접기)의 진행도를 정확히 추정한다. 각 그래프는 에피소드 재생과 나란히 놓여 진행도 곡선이 실제 동작과 일치함을 보인다.</p>
-<h3>00:12:10 — 사례 연구: 냅킨 접기</h3>
-<p><img src="assets/f8ckflzgwgo-ts-00-12-10.jpg" alt="f8ckFlzGWGo_ts_00-12-10.jpg"> 상업적 판단이 드러나는 대목이다. 범용 문제와 시스템 문제를 동시에 풀지 않기 위해 <strong>의도적으로 범위를 좁혀</strong> 레스토랑 냅킨 접기를 골랐다. 식당 뒷방에서 직원이 하루 수백 번 반복하는, 수요가 확실한 작업이다.</p>
-<h3>00:13:50 — 24시간 신뢰성에 도달한 첫 정책, 그리고 그 한계</h3>
-<p><img src="assets/f8ckflzgwgo-ts-00-13-50.jpg" alt="f8ckFlzGWGo_ts_00-13-50.jpg"> 레시피는 세 단계다. ① 보유한 멀티태스크 데이터로 VLA 사전학습 ② <strong>같은 데이터로 보상 모델 학습</strong> ③ <strong>reward-weighted regression으로 post-training</strong>. 보상 모델이 냅킨 데이터셋의 상태-행동 전이에 점수를 매기고, 좋다고 판정된 샘플의 가중치를 올린다. 온라인 탐색이 전혀 없는 오프라인 RL이다. 붉은 글씨의 단서가 중요하다. <strong>신뢰성은 확보했지만 느렸고, 에러 상태에서 2~3분씩 멈췄다.</strong> 상업적으로 쓰기엔 throughput이 부족했다.</p>
-<h3>00:15:20 — Human-in-the-Loop 능동 학습</h3>
-<p><img src="assets/f8ckflzgwgo-ts-00-15-20.jpg" alt="f8ckFlzGWGo_ts_00-15-20.jpg"> 발표의 방법론적 핵심이다. 정책이 잘 돌 때는 진행도가 <strong>단조 증가</strong>하지만, 실수하거나 멈추면 그 패턴이 깨진다. 따라서 보상 모델을 정책과 <strong>나란히 실시간으로 돌리면</strong> 에러가 나는 지점을 즉시 포착할 수 있고, 데이터 수집 인력을 바로 그 어려운 사례에 투입할 수 있다. 백지 상태 탐색에 로봇 스테이션 시간을 쓰는 것보다 훨씬 효율적이라는 주장이다.</p>
-<h3>00:16:40 — DYNA-1: 24시간에 850장, 99.4%</h3>
-<p><img src="assets/f8ckflzgwgo-ts-00-16-40.jpg" alt="f8ckFlzGWGo_ts_00-16-40.jpg"> 그 결과가 제품 릴리스로 이어졌다. <strong>99.4% 성공률로 24시간 무중단, 냅킨 850장 이상</strong>. 발표 시점 기준으로 throughput은 여기서 다시 약 80% 향상되었고, 24시간 시험을 사무실에서 네 차례 반복해 매번 좋은 결과를 얻었다고 덧붙인다.</p>
-<h3>00:17:30 — 학습하지 않은 실수에서도 회복</h3>
-<p><img src="assets/f8ckflzgwgo-ts-00-17-30.jpg" alt="f8ckFlzGWGo_ts_00-17-30.jpg"> 촬영 중 만난 최악의 상황. 로봇이 <strong>냅킨 더미 전체를 쓰러뜨렸는데 스스로 수습</strong>한다. 변형체 조작은 모든 실패 사례를 망라해 수집하는 것이 불가능한데, 능동 데이터 수집을 몇 라운드 돌린 것만으로 <strong>데이터셋에 없던 실수에 대해서도 회복 행동이 일반화</strong>되었다는 점을 Ma는 가장 놀라운 결과로 꼽는다.</p>
-<h3>00:22:50 — 도발적 주장: RL이 필요한가</h3>
-<p><img src="assets/f8ckflzgwgo-ts-00-22-50.jpg" alt="f8ckFlzGWGo_ts_00-22-50.jpg"> 발표의 논쟁적 핵심이 세 항목으로 정리된다.</p>
-<ol><li><strong>실세계 RL은 프로덕션급 조작의 병목이 (아직) 아니다. 먼저 human parity에 도달하자.</strong> RL이 잘하는 것은 사람이 데모를 주기 어렵거나 초인적 성능이 필요한 문제(AlphaGo, AlphaFold)인데, 조작은 아직 사람 수준에도 못 미친다.</li><li><strong>실세계 탐색은 너무 비효율적이다. 로봇 시간을 쓰는 더 나은 방법이 있다.</strong> 로봇 스테이션 8시간을 무작위 탐색에 쓸지, 사람 개입 기반 능동 학습에 쓸지의 선택 문제로 환원한다.</li><li><strong>다시 대학원생이라면 (Real)-to-Sim-to-Real RL을 하겠다.</strong> sim-to-real은 보행에서 잘 작동함이 입증됐지만 조작에서는 아직이며, 실세계 데이터로 sim-to-real 과정 자체를 개선하는 방향이 유망하다고 본다.</li></ol>
-<p>Ma는 자사 경험을 근거로 든다. <strong>실세계 RL이 해결해주리라 기대했던 문제들을 결국 더 나은 엔지니어링·사전학습·인프라로 해결했다.</strong></p>
-<h3>00:23:30 — 모델 관측성이라는 시스템 문제</h3>
-<p><img src="assets/f8ckflzgwgo-ts-00-23-30.jpg" alt="f8ckFlzGWGo_ts_00-23-30.jpg"> 학계에서 거의 다루지 않는 실무 문제를 제기한다. 여러 고객 사이트에서 로봇이 대부분 자율로 돌아갈 때, <strong>오늘 모델이 주문을 제대로 처리했는지 아니면 엔지니어가 들여다봐야 하는지를 어떻게 아는가.</strong> 보상 모델이 여기서 두 번째 역할을 얻는다.</p>
-<h3>00:24:20 — 진행도 신호를 프로덕션 모니터링으로</h3>
-<p><img src="assets/f8ckflzgwgo-ts-00-24-20.jpg" alt="f8ckFlzGWGo_ts_00-24-20.jpg"> 프로토타입을 실제 운영 시스템으로 만든 화면이다. 진행도가 0→1로 오르면 한 장을 접는 중이고, 0으로 돌아가면 새 작업이 시작된 것이므로 <strong>완료 시각을 자동으로 분절</strong>할 수 있다. 접기 완료 건수, 평균·중앙값 소요 시간 같은 통계가 그대로 나온다.</p>
-<h3>00:25:40 — 이상치가 잡아낸 뜻밖의 장면</h3>
-<p><img src="assets/f8ckflzgwgo-ts-00-25-40.jpg" alt="f8ckFlzGWGo_ts_00-25-40.jpg"> 중앙값이 25초인데 14~15초짜리 이상치가 있었다. 해당 구간을 뽑아 보니 <strong>호기심 많은 식당 직원이 냅킨을 로봇 앞에 놓아준 것</strong>이었고, 진행도 모델은 이를 매우 빠른 성공으로 기록했다. 이 도구가 없으면 16시간 영상을 사람이 훑어야 한다.</p>
-<h3>00:27:10 — 요약: 알고리즘보다 시스템</h3>
-<p><img src="assets/f8ckflzgwgo-ts-00-27-10.jpg" alt="f8ckFlzGWGo_ts_00-27-10.jpg"> 두 문장으로 끝맺는다. ① <strong>보상 모델링은 여전히 과소탐구된 영역</strong>이며 로봇 학습 시스템에 응용처가 많다. ② <strong>가장 성능이 좋은 &quot;RL 시스템&quot;은 RL보다 시스템에 더 집중한다.</strong> Ma는 이 두 번째 교훈이 로보틱스를 넘어 추론·코딩 등 오늘날 프론티어 RL 시스템 전반에 해당한다고 덧붙인다. <strong>RL을 돌리는 인프라가 어떤 RL 알고리즘을 쓰느냐보다 중요하다.</strong></p>
-<h2>주요 내용 요약</h2>
-<h3>핵심 포인트</h3>
-<ul><li><strong>배치 기준선은 99.9%대다.</strong> 70~80% 성공률은 데모나 논문에는 충분하지만 실제 배치에는 못 미친다는 지적이 발표 전반의 전제다.</li><li><strong>24시간 신뢰성을 만든 것은 오프라인 RL(RWR)이었지만, 상업성을 만든 것은 human-in-the-loop 능동 학습이었다.</strong> 전자는 신뢰성을, 후자는 throughput과 에러 회복을 담당했다.</li><li><strong>보상 모델의 진정한 가치는 정책 학습이 아니라 &quot;어디에 사람 시간을 쓸지&quot; 결정하는 데 있었다.</strong> 진행도 곡선의 단조성이 깨지는 지점이 곧 데이터 수집 대상이다.</li><li>나중에는 시스템·하드웨어·기반 모델을 개선한 결과, <strong>1시간 미만의 과제별 데이터와 표준 SFT만으로</strong> 더 나은 결과를 얻었다. RL 비중은 오히려 줄었다.</li><li><strong>보상 모델은 학습 신호가 아니라 관측(observability) 도구로 재사용되었다.</strong> 이것이 이 발표에서 가장 이식성 높은 아이디어다.</li><li>같은 워크샵의 Finn 발표와 정면으로 대비된다. Finn은 RL 후속 학습으로 신뢰성을 끌어올렸고, Ma는 <strong>RL을 최소화하고 시스템으로 풀었다.</strong> 두 발표를 함께 읽어야 균형이 잡힌다.</li></ul>
-<h3>기술적 내용</h3>
-<ul><li><strong>VIP/LIV</strong>: 이미지 임베딩 φ(o)와 목표 임베딩(이미지 φ(g) 또는 언어 ψ(g))의 잠재 거리를 −V*(o;g)로 해석. Ego4D 등 대규모 인간 비디오로 학습해 로봇 도메인에 전이.</li><li><strong>GVL(VLM In-Context Progress Estimation)</strong>: 사전학습 VLM(Gemini 1.5급)의 컨텍스트만으로 진행도 추정. 과제별·로봇별 학습 없이 동작하며, 데모를 컨텍스트에 더 넣을수록 정확도가 향상.</li><li><strong>Reward-Weighted Regression</strong>: θ\* = argmax_θ 𝔼₍ₛ,ₐ₎∼D [ exp(R(s,a)/β) · log π_θ(a|s) ]. 보상 모델이 매긴 점수로 샘플 가중치를 조절하는 오프라인 RL. 표준 VLA post-training과 형태가 거의 같다.</li><li><strong>Human-in-the-Loop Active Learning</strong>: 온라인 보상 모델이 진행도 이상을 감지 → 해당 상황에 데이터 수집 집중 → 재학습. 탐색 대신 사람 개입에 로봇 시간을 배분하는 전략.</li><li><strong>모델 관측성</strong>: 진행도 0→1 사이클을 작업 완료 이벤트로 분절해 처리량 통계와 이상치 탐지를 자동화.</li></ul>
-<h3>Q&amp;A에서 나온 실무 정보</h3>
-<ul><li><strong>비용</strong>: 질문자는 고객이 시스템 전체를 5만 달러 이하로 기대한다고 전했다. Ma는 Dyna가 저가 양팔 암을 쓰고 자체 semi-humanoid를 개발 중이며, <strong>5만 달러보다 상당히 낮은 가격대</strong>로 미국 사업체가 수용 가능한 수준이라고 답했다.</li><li><strong>롱테일 사례를 능동적으로 찾는 법</strong>: 결국 최신 체크포인트를 돌려 실패를 유발해야 한다. 다만 진행도 추정이 함께 돌기 때문에 <strong>실패를 지켜볼 필요 없이, 예상보다 오래 걸린 구간만 사후에 뽑아 분석</strong>하면 된다. 장면을 능동적으로 교란해 실패를 유도하는 것도 방법이며, 반복하다 보면 모델이 어디서 실패할지 감이 생겨 탐색 주기가 짧아진다.</li><li><strong>시뮬레이션 활용</strong>: 변형체 물리는 실세계와 차이가 크고 고충실도로 맞추면 속도가 급락한다. 이 과제에서는 <strong>시뮬레이터 튜닝보다 실세계 반복이 오히려 시간이 덜 든다</strong>고 판단했다.</li><li><strong>VLA에 보상 헤드를 함께 붙이는 것</strong>: 원리적으로 문제없고 진행도를 보조 신호로 쓰면 표현 학습에 도움이 된다. 다만 <strong>시스템 관점에서는 분리를 권한다.</strong> 정책은 계속 post-training으로 바뀌지만 진행도 추정까지 표류하면 모니터링 기준선이 흔들리기 때문이다.</li></ul>
-<h2>시사점과 한계</h2>
-<h3>한계</h3>
-<ul><li>주장의 상당 부분이 <strong>한 회사의, 좁게 선택된 과제(냅킨·수건 접기)</strong> 경험에 근거한다. 발표자 스스로 &quot;개인적 견해이자 hot take&quot;라고 전제한다.</li><li>&quot;RL은 아직 병목이 아니다&quot;는 명제는 <strong>현재 조작 성능이 사람 이하</strong>라는 조건에 붙어 있다. 사람 수준에 근접한 뒤에는 결론이 달라질 수 있음을 본인도 인정한다.</li><li>진행도 기반 관측성은 <strong>작업이 반복적이고 사이클이 뚜렷할 때</strong> 잘 작동한다. 사이클 경계가 모호한 작업에는 그대로 적용하기 어렵다.</li><li>학습 데이터에 없는 실수에서의 회복 일반화는 인상적이지만, <strong>왜 그렇게 되는지에 대한 분석은 제시되지 않았다.</strong></li></ul>
-<h3>현장 적용 관점에서의 시사점</h3>
-<ul><li><strong>이 발표는 굴착기처럼 &quot;현장에서 값을 받고 돌아야 하는&quot; 목표에 가장 직접적으로 대응한다.</strong> 알고리즘 우위보다 배치 가능성을 기준으로 삼는 관점 자체가 참고할 만하다.</li><li><strong>보상 모델을 관측 도구로 쓰는 아이디어는 중장비에 거의 그대로 이식 가능하다.</strong> 굴착·상차 사이클은 냅킨 접기보다 오히려 경계가 뚜렷해 진행도 0→1 분절이 자연스럽다. 사이클 타임 분포, 이상치 자동 추출, 원격 모니터링이 곧바로 KPI가 된다.</li><li><strong>&quot;실세계 탐색 대신 개입 데이터&quot;</strong> 전략은 숙련 오퍼레이터가 있는 건설 현장과 잘 맞는다. 안전 규정상 무작위 탐색이 애초에 불가능한 도메인이므로, 개입 기반 능동 학습이 현실적으로 유일한 선택지에 가깝다.</li><li><strong>범위를 의도적으로 좁히라는 조언</strong>도 실무적이다. 범용 자율 굴착을 한 번에 겨냥하는 대신, 반복성이 높고 수요가 확실한 단일 공정(예: 정해진 적재 사이클)으로 좁히면 시스템 문제와 범용성 문제를 분리할 수 있다.</li><li>다만 <strong>비용 기준선(5만 달러)</strong> 논의는 테이블탑 양팔 로봇 기준이다. 중장비는 장비 단가 자체가 다르므로, 여기서 유효한 것은 절대 금액이 아니라 &quot;고객이 수용 가능한 가격대를 먼저 확인하고 거기서 역산한다&quot;는 접근이다.</li></ul>
-<h2>관련 노트</h2>
-<ul><li>[[yt_Chelsea_Finn_Reliable_VLA_Post-Training_요약]] — 같은 워크샵. RL 후속 학습으로 신뢰성을 끌어올린 정반대 입장이라 함께 읽으면 대비가 뚜렷하다.</li><li>[[yt_Sergey_Levine_RL_for_Robot_Foundation_Models_요약]] — 같은 워크샵의 기조 발표.</li></ul>
-</article>
-</main>
+  <a class="skip-link" href="#article">본문으로 이동</a>
 
+  <header class="masthead">
+    <a class="brand" href="#top">Field Notes / Robotics</a>
+    <div class="masthead-meta">Research Report · 2026.08.08</div>
+  </header>
+
+  <header class="hero" id="top">
+    <p class="eyebrow">Production Robotics</p>
+    <h1><span class="accent">RL보다 시스템이 먼저다</span><br>99.4% 로봇이 보여준 프로덕션 학습의 조건</h1>
+    <p class="dek">
+      Dyna Robotics 공동창업자 Jason Ma는 24시간 동안 냅킨 850장 이상을 접은 로봇에서
+      가장 중요했던 것이 정교한 실세계 강화학습이 아니었다고 말한다. 보상 모델을
+      사람의 개입과 운영 관측성을 배분하는 도구로 바꾼 것이 결정적이었다.
+    </p>
+
+    <div class="hero-grid">
+      <div class="byline">
+        <span><strong>발표자</strong> Jason Ma, Dyna Robotics</span>
+        <span><strong>무대</strong> ICRA 2026 RL4IL Workshop</span>
+        <span><strong>분석</strong> Editorial Research Note</span>
+      </div>
+      <div class="hero-stat" aria-label="핵심 성과">
+        <strong>99.4%</strong>
+        <span>24시간 연속 시험에서 보고된 작업 성공률</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="lead-visual">
+    <figure>
+      <img src="assets/f8ckflzgwgo-ts-00-16-40.jpg" alt="DYNA-1의 24시간 냅킨 접기 결과를 보여주는 발표 슬라이드">
+      <figcaption>
+        <span>DYNA-1: 24시간 동안 냅킨 850장 이상을 접은 프로덕션 시험.</span>
+        <span>발표 화면 · 16:40</span>
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="article-layout">
+    <nav class="toc" aria-label="목차">
+      <p class="toc-label">Contents</p>
+      <ol>
+        <li><a href="#abstract">초록과 핵심 발견</a></li>
+        <li><a href="#reward-model">보상 모델의 출발점</a></li>
+        <li><a href="#production">연구실에서 프로덕션으로</a></li>
+        <li><a href="#active-learning">능동 학습의 전환</a></li>
+        <li><a href="#rl-claim">“RL이 병목인가”</a></li>
+        <li><a href="#observability">모델 관측성</a></li>
+        <li><a href="#implications">현장 적용 시사점</a></li>
+        <li><a href="#limits">한계와 출처</a></li>
+      </ol>
+    </nav>
+
+    <main id="article">
+      <section class="section" id="abstract">
+        <div class="abstract">
+          <p class="section-kicker">Abstract</p>
+          <h2>알고리즘의 성능보다 실패를 발견하고 고치는 시스템이 중요해진다</h2>
+          <p>
+            이 보고서는 Jason Ma의 발표를 바탕으로 Dyna Robotics가 연구용 보상 모델을
+            상업용 로봇 학습·운영 시스템으로 확장한 과정을 분석한다. 초기에는
+            reward-weighted regression을 이용한 오프라인 RL로 24시간 신뢰성을 확보했지만,
+            정책은 에러 상태에서 2~3분씩 멈추며 상업적 처리량을 내지 못했다.
+          </p>
+          <p>
+            전환점은 보상 모델을 정책 최적화용 점수 함수가 아니라
+            <strong>실패 위치를 찾고 사람의 데이터 수집 시간을 배분하는 감독 도구</strong>로
+            사용한 것이었다. 같은 진행도 신호는 배치 후 작업 완료 분절, 사이클 시간 측정,
+            이상치 탐지에도 재사용됐다. 사례가 제시하는 중심 명제는 단순하다.
+            프로덕션 로보틱스에서 현재의 병목은 실세계 RL 자체보다 사전학습, 데이터 루프,
+            인프라, 하드웨어, 모니터링을 결합하는 시스템 설계에 더 가깝다는 것이다.
+          </p>
+        </div>
+
+        <div class="finding-grid" aria-label="핵심 발견">
+          <article class="finding">
+            <span class="finding-number">01</span>
+            <h3>신뢰성과 상업성은 서로 다른 문제였다</h3>
+            <p>오프라인 RL은 24시간 신뢰성을 만들었지만, 처리량과 빠른 에러 회복은 사람 개입 기반 능동 학습이 개선했다.</p>
+          </article>
+          <article class="finding">
+            <span class="finding-number">02</span>
+            <h3>보상 모델의 가장 큰 가치는 자원 배분이었다</h3>
+            <p>진행도 곡선이 깨지는 구간만 찾아 데이터 수집 인력을 투입함으로써 로봇 시간을 무작위 탐색보다 효율적으로 사용했다.</p>
+          </article>
+          <article class="finding">
+            <span class="finding-number">03</span>
+            <h3>학습 신호가 운영 관측성으로 확장됐다</h3>
+            <p>진행도 0→1 사이클은 완료 건수, 작업 시간, 이상치를 자동으로 추출하는 프로덕션 모니터가 됐다.</p>
+          </article>
+          <article class="finding">
+            <span class="finding-number">04</span>
+            <h3>RL의 역할은 시스템이 좋아질수록 오히려 줄었다</h3>
+            <p>기반 모델과 인프라를 개선한 뒤에는 1시간 미만의 과제 데이터와 표준 SFT만으로 더 나은 결과를 얻었다고 보고했다.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="reward-model">
+        <p class="section-kicker">Evidence 01</p>
+        <h2>보상 모델: “얼마나 잘하고 있는가”를 하나의 숫자로 만들기</h2>
+        <p class="evidence-label">연구 기반 · 발표자의 박사 연구와 Dyna 확장 사례</p>
+
+        <p>
+          Ma의 연구 질문은 로봇과 세계의 상태를 보고 과제 진행도를 평가하는
+          범용 피드백 모델을 만들 수 있는가였다. 입력은 이미지 같은 관측이며 출력은 보상,
+          비용 또는 가치다. 같은 장면이라도 목표에 가까우면 높은 점수, 멀면 낮은 점수를
+          주도록 학습한다.
+        </p>
+
+        <div class="media-grid">
+          <figure class="media">
+            <img src="assets/f8ckflzgwgo-ts-00-02-30.jpg" alt="로봇 피드백 학습을 위한 범용 보상 모델의 개념을 설명하는 슬라이드" loading="lazy">
+            <figcaption><a class="timestamp">02:30</a> 이미지 상태를 받아 수행 품질을 수치화하는 범용 피드백 모델.</figcaption>
+          </figure>
+          <figure class="media">
+            <img src="assets/f8ckflzgwgo-ts-00-03-20.jpg" alt="LLM 보상 함수 생성과 대규모 실세계 데이터 가치함수 학습을 비교한 슬라이드" loading="lazy">
+            <figcaption><a class="timestamp">03:20</a> 보상 함수를 작성하는 접근과 실세계 데이터에서 가치를 학습하는 접근.</figcaption>
+          </figure>
+        </div>
+
+        <h3>VIP와 LIV: 임베딩 거리를 과제 진행도로 읽는다</h3>
+        <p>
+          VIP/LIV 계열의 아이디어는 입력 관측과 목표를 같은 잠재 공간에 배치한 뒤,
+          두 임베딩 사이의 거리를 가치함수처럼 사용하는 것이다. 목표는 이미지뿐 아니라
+          “유리잔을 치워라” 같은 언어 지시로도 표현할 수 있다. Ego4D 같은 대규모 인간
+          비디오로 학습한 표현이 학습 중 보지 못한 로봇 영상에서도 합리적인 진행도를
+          추정했다는 것이 출발점이다.
+        </p>
+
+        <div class="formula" aria-label="잠재 공간 가치함수 개념식">
+          −V<sup>*</sup>(o; g) ≈ d(φ(o), φ(g)) &nbsp;or&nbsp; d(φ(o), ψ(g))
+          <small>관측 이미지 임베딩 φ(o)와 이미지 목표 φ(g) 또는 언어 목표 ψ(g)의 거리를 과제 가치로 해석한다.</small>
+        </div>
+
+        <figure class="media">
+          <img src="assets/f8ckflzgwgo-ts-00-04-20.jpg" alt="VIP와 LIV가 이미지 및 언어 목표와 현재 관측의 임베딩 거리를 가치함수로 사용하는 방법" loading="lazy">
+          <figcaption><a class="timestamp">04:20</a> 현재 관측과 목표 사이의 잠재 거리가 과제 진행도를 구성한다.</figcaption>
+        </figure>
+
+        <h3>첫 응용은 실세계 RL의 자동 감독이었다</h3>
+        <p>
+          학습한 보상 모델로 로봇이 서랍 열기 정책을 처음부터 학습하도록 감독할 수 있었다.
+          그러나 Ma는 이 방법을 오늘날 기준으로 “상당히 비효율적”이라고 평가한다.
+          가능한 연구 결과와 배치 가능한 제품 사이에는 로봇 시간, 실패 복구, 데이터 운영이라는
+          별도의 문제가 있었기 때문이다.
+        </p>
+
+        <figure class="media">
+          <img src="assets/f8ckflzgwgo-ts-00-06-10.jpg" alt="보상 모델을 이용해 서랍 열기 정책을 처음부터 학습한 실세계 강화학습 사례" loading="lazy">
+          <figcaption><a class="timestamp">06:10</a> 보상 모델로 실세계 정책을 직접 학습한 초기 연구 사례.</figcaption>
+        </figure>
+      </section>
+
+      <section class="section" id="production">
+        <p class="section-kicker">Evidence 02</p>
+        <h2>연구실 밖의 기준은 성공 여부가 아니라 24시간 운영이다</h2>
+        <p class="evidence-label">현장 사례 · 고객 사이트와 공개 데모</p>
+
+        <p>
+          Dyna의 창업 동기는 연구실에서 유효했던 아이디어를 실제 고객 환경으로 옮겼을 때
+          무엇이 깨지는지 확인하는 것이었다. Ma가 제시한 배치 기준선은 70~80%가 아니라
+          99.9%에 가까운 신뢰성이다. 논문이나 짧은 데모에서 허용되는 작은 실패율도
+          하루 수백 번 반복되는 작업에서는 지속적인 운영 중단으로 누적된다.
+        </p>
+
+        <figure class="media">
+          <img src="assets/f8ckflzgwgo-ts-00-07-00.jpg" alt="연구실 연구를 실제 프로덕션 시스템으로 확장하려는 Dyna의 문제의식을 보여주는 슬라이드" loading="lazy">
+          <figcaption><a class="timestamp">07:00</a> 실제 고객 사이트가 연구실에서는 보이지 않던 시스템 격차를 드러낸다.</figcaption>
+        </figure>
+
+        <div class="media-grid">
+          <figure class="media">
+            <img src="assets/f8ckflzgwgo-ts-00-07-50.jpg" alt="Sacramento의 실제 세탁소에서 회색 수건을 접는 로봇" loading="lazy">
+            <figcaption><a class="timestamp">07:50</a> 영업 중인 세탁소에서 수건을 접어 쌓는 현장 배치.</figcaption>
+          </figure>
+          <figure class="media">
+            <img src="assets/f8ckflzgwgo-ts-00-08-30.jpg" alt="Red Bull 행사에서 도구를 사용해 캔을 여는 로봇" loading="lazy">
+            <figcaption><a class="timestamp">08:30</a> 도구 사용과 복잡한 조작을 시연한 행사 사례.</figcaption>
+          </figure>
+          <figure class="media wide">
+            <img src="assets/f8ckflzgwgo-ts-00-09-10.jpg" alt="CoRL 2025 부스에서 방해를 받은 뒤 처음 보는 티셔츠 접기를 회복하는 로봇" loading="lazy">
+            <figcaption><a class="timestamp">09:10</a> 참관객의 방해와 처음 보는 셔츠에도 작업을 회복한 공개 부스 데모.</figcaption>
+          </figure>
+        </div>
+
+        <h3>짧은 조작을 넘어 1분 이상의 장기 과제로</h3>
+        <p>
+          Dyna의 진행도 모델은 단순한 pick-and-place를 넘어 티셔츠와 냅킨 접기처럼
+          1분 이상 이어지는 변형체 조작의 진행도를 추정했다. 장기 과제에서는 단순한
+          성공·실패 라벨보다 “어느 시점에서 진전이 멈췄는가”가 훨씬 유용한 운영 정보가 된다.
+        </p>
+
+        <figure class="media">
+          <img src="assets/f8ckflzgwgo-ts-00-11-30.jpg" alt="여러 장기 로봇 과제에서 하나의 모델이 진행도를 추정하는 그래프" loading="lazy">
+          <figcaption><a class="timestamp">11:30</a> 하나의 모델로 여러 장기 과제의 진행도 곡선을 추정한다.</figcaption>
+        </figure>
+
+        <h3>의도적으로 좁힌 첫 시장: 레스토랑 냅킨 접기</h3>
+        <p>
+          팀은 범용 로봇 문제와 프로덕션 시스템 문제를 동시에 풀지 않기 위해 범위를 좁혔다.
+          레스토랑 뒷방에서 하루 수백 번 반복되고 수요가 명확한 냅킨 접기를 선택했다.
+          이는 단순한 데모 선정이 아니라 상업적 학습 전략이었다. 과제의 범위를 고정해야
+          처리량, 신뢰성, 비용, 원격 운영 같은 시스템 변수를 별도로 최적화할 수 있기 때문이다.
+        </p>
+
+        <figure class="media">
+          <img src="assets/f8ckflzgwgo-ts-00-12-10.jpg" alt="레스토랑 냅킨 접기를 첫 상업 과제로 선정한 사례 연구 슬라이드" loading="lazy">
+          <figcaption><a class="timestamp">12:10</a> 반복성과 수요가 확실한 단일 공정으로 문제 범위를 제한했다.</figcaption>
+        </figure>
+
+        <h3>첫 24시간 정책: 성공했지만 너무 느렸다</h3>
+        <p>
+          초기 레시피는 세 단계였다. 멀티태스크 데이터로 VLA를 사전학습하고, 같은 데이터로
+          보상 모델을 학습한 뒤, 보상이 높다고 평가한 샘플에 더 큰 가중치를 주는
+          reward-weighted regression으로 정책을 후속 학습했다. 온라인 탐색을 사용하지 않은
+          오프라인 RL이다.
+        </p>
+
+        <div class="formula" aria-label="Reward-Weighted Regression 목적함수">
+          θ<sup>*</sup> = arg max<sub>θ</sub>
+          E<sub>(s,a)∼D</sub>[exp(R(s,a)/β) · log π<sub>θ</sub>(a|s)]
+          <small>보상 모델이 좋은 전이에 더 큰 학습 가중치를 부여한다. 구현 형태는 가중 행동복제 또는 VLA 후속 학습과 가깝다.</small>
+        </div>
+
+        <p>
+          이 정책은 장시간 신뢰성을 달성했지만 에러 상태에서 2~3분씩 멈췄다.
+          “끝까지 성공한다”는 조건은 만족했어도 한 시간에 처리할 수 있는 냅킨 수가 부족했다.
+          프로덕션에서는 성공률과 함께 복구 시간과 처리량이 독립적인 KPI라는 사실이 드러났다.
+        </p>
+
+        <figure class="media">
+          <img src="assets/f8ckflzgwgo-ts-00-13-50.jpg" alt="VLA 사전학습, 보상 모델, reward-weighted regression으로 구성된 냅킨 접기 정책과 속도 한계" loading="lazy">
+          <figcaption><a class="timestamp">13:50</a> 24시간 신뢰성은 확보했지만 긴 정지 시간 때문에 상업적 처리량에는 미달했다.</figcaption>
+        </figure>
+      </section>
+
+      <section class="section" id="active-learning">
+        <p class="section-kicker">Evidence 03</p>
+        <h2>보상 모델을 학습기에서 감독관으로 바꾸다</h2>
+        <p class="evidence-label">핵심 방법 · Human-in-the-loop active learning</p>
+
+        <p>
+          정상 작업에서는 진행도 점수가 대체로 0에서 1을 향해 상승한다. 로봇이 실수하거나
+          멈추면 이 단조 증가 패턴이 깨진다. Dyna는 정책과 보상 모델을 동시에 실행해
+          이상 구간을 자동 표시하고, 데이터 수집 인력을 바로 그 실패 상태에 투입했다.
+        </p>
+
+        <div class="pipeline" aria-label="능동 학습과 운영 관측성 흐름">
+          <div class="pipeline-step">
+            <b>01 · Observe</b>
+            <span>정책과 진행도 모델을 고객 환경에서 함께 실행</span>
+          </div>
+          <div class="pipeline-step">
+            <b>02 · Detect</b>
+            <span>정체, 하락, 비정상적으로 긴 사이클을 탐지</span>
+          </div>
+          <div class="pipeline-step">
+            <b>03 · Intervene</b>
+            <span>사람이 어려운 상태에서 시범 또는 복구 데이터를 제공</span>
+          </div>
+          <div class="pipeline-step">
+            <b>04 · Retrain</b>
+            <span>롱테일 사례를 집중 반영해 정책을 다시 학습</span>
+          </div>
+          <div class="pipeline-step">
+            <b>05 · Monitor</b>
+            <span>같은 진행도 신호로 배치 성능과 이상치를 추적</span>
+          </div>
+        </div>
+
+        <figure class="media">
+          <img src="assets/f8ckflzgwgo-ts-00-15-20.jpg" alt="정상 진행도와 오류 진행도를 비교하며 human-in-the-loop 능동 학습을 설명하는 슬라이드" loading="lazy">
+          <figcaption><a class="timestamp">15:20</a> 진행도 패턴이 깨지는 순간을 데이터 수집의 우선순위로 바꾼다.</figcaption>
+        </figure>
+
+        <div class="pullquote">
+          <p>보상 모델의 가장 큰 가치는 정책에 점수를 주는 것이 아니라, 사람의 시간을 어디에 쓸지 알려주는 데 있었다.</p>
+          <cite>발표 내용에 대한 본 보고서의 핵심 해석</cite>
+        </div>
+
+        <h3>결과: 24시간, 냅킨 850장 이상, 성공률 99.4%</h3>
+        <p>
+          능동 학습 루프를 거친 DYNA-1은 24시간 무중단 시험에서 냅킨 850장 이상을 접었고
+          99.4% 성공률을 기록했다. Ma는 발표 시점의 처리량이 이 시험보다 다시 약 80%
+          개선됐으며, 사무실에서 네 차례 진행한 24시간 시험도 모두 좋은 결과를 보였다고
+          설명했다. 수치는 발표자가 보고한 결과이며 독립적인 외부 검증치는 아니다.
+        </p>
+
+        <figure class="media">
+          <img src="assets/f8ckflzgwgo-ts-00-16-40.jpg" alt="99.4퍼센트 성공률과 24시간 냅킨 850장 이상의 DYNA-1 결과" loading="lazy">
+          <figcaption><a class="timestamp">16:40</a> DYNA-1의 장시간 신뢰성 및 처리량 결과.</figcaption>
+        </figure>
+
+        <h3>데이터셋에 없던 실패에서도 나타난 회복 행동</h3>
+        <p>
+          촬영 도중 로봇이 냅킨 더미 전체를 쓰러뜨리는 심각한 실패가 발생했지만,
+          정책은 스스로 상태를 수습하고 작업을 이어갔다. 모든 실패를 열거하기 어려운
+          변형체 조작에서 몇 차례의 능동 수집만으로 훈련 데이터에 없던 실수까지 회복이
+          일반화됐다는 점을 Ma는 가장 놀라운 결과로 꼽았다. 다만 발표에는 이러한 일반화가
+          발생한 원인이나 체계적인 범위 분석은 포함되지 않았다.
+        </p>
+
+        <figure class="media">
+          <img src="assets/f8ckflzgwgo-ts-00-17-30.jpg" alt="로봇이 쓰러진 냅킨 더미를 스스로 수습하는 회복 사례" loading="lazy">
+          <figcaption><a class="timestamp">17:30</a> 학습 데이터에 명시적으로 포함되지 않은 대형 실패에서의 회복 사례.</figcaption>
+        </figure>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>접근</th>
+                <th>로봇 시간의 사용</th>
+                <th>주요 효용</th>
+                <th>프로덕션 위험</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>실세계 온라인 RL</td>
+                <td>환경에서 탐색하고 시행착오를 축적</td>
+                <td>사람이 제공하기 어려운 행동 발견 가능</td>
+                <td>느린 탐색, 안전 부담, 장비 점유</td>
+              </tr>
+              <tr>
+                <td>오프라인 RWR</td>
+                <td>기존 데이터에 보상 기반 가중치 적용</td>
+                <td>온라인 탐색 없이 신뢰성 개선</td>
+                <td>데이터 밖의 실패 상태가 남을 수 있음</td>
+              </tr>
+              <tr>
+                <td>사람 개입형 능동 학습</td>
+                <td>모델이 어려워하는 구간에만 수집 집중</td>
+                <td>처리량과 에러 회복을 빠르게 개선</td>
+                <td>운영 인력과 정확한 이상 탐지가 필요</td>
+              </tr>
+              <tr>
+                <td>표준 SFT</td>
+                <td>작은 과제별 데이터로 정책 적응</td>
+                <td>시스템과 기반 모델이 충분할 때 단순하고 효율적</td>
+                <td>기반 표현과 데이터 품질에 크게 의존</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="rl-claim">
+        <p class="section-kicker">Evidence 04</p>
+        <h2>도발적 주장: 실세계 RL은 아직 병목이 아니다</h2>
+
+        <p>
+          발표 후반부에서 Ma는 자신의 견해를 명시적으로 “hot take”라고 부른다.
+          그가 RL 자체를 부정하는 것은 아니다. 현재 프로덕션 조작이 아직 인간 수준에
+          못 미치는 상황에서, 초인적 최적화를 위해 강점을 발휘하는 RL을 먼저 적용하는 것이
+          자원 배분상 최선인지 묻는다.
+        </p>
+
+        <figure class="media">
+          <img src="assets/f8ckflzgwgo-ts-00-22-50.jpg" alt="실세계 강화학습이 프로덕션 로봇 조작의 병목인지 질문하는 세 가지 주장" loading="lazy">
+          <figcaption><a class="timestamp">22:50</a> 실세계 RL, 탐색 효율, Real-to-Sim-to-Real에 관한 세 가지 주장.</figcaption>
+        </figure>
+
+        <div class="claim-box">
+          <h3>Jason Ma의 세 가지 주장</h3>
+          <ol>
+            <li><strong>먼저 human parity에 도달해야 한다.</strong> 실세계 RL은 아직 프로덕션급 조작의 첫 번째 병목이 아니다.</li>
+            <li><strong>실세계 탐색은 너무 비싸다.</strong> 같은 로봇 시간을 사람 개입과 어려운 사례 수집에 쓰는 편이 현재는 더 효율적이다.</li>
+            <li><strong>유망한 연구 방향은 Real-to-Sim-to-Real이다.</strong> 실제 데이터로 시뮬레이션과 전이 과정을 개선한 뒤 RL을 활용하는 경로가 조작에서 더 현실적일 수 있다.</li>
+          </ol>
+        </div>
+
+        <p>
+          Dyna가 실세계 RL에 기대했던 문제는 결과적으로 더 나은 엔지니어링, 사전학습,
+          하드웨어, 데이터 인프라로 해결됐다. 시스템이 개선된 뒤에는 한 시간 미만의
+          과제별 데이터와 표준 지도 후속 학습만으로 이전보다 좋은 결과를 얻었다고 한다.
+          이 사례에서 RL의 비중은 제품이 발전할수록 커지지 않고 오히려 줄었다.
+        </p>
+
+        <p>
+          다만 이 결론은 “현재 조작 성능이 사람 이하”라는 조건에 묶여 있다. 사람이 쉽게
+          시범을 제공할 수 없거나 초인적 성능이 필요한 단계에 도달하면 탐색과 장기 최적화의
+          상대적 가치가 다시 커질 수 있다. 따라서 더 정확한 해석은 “RL이 불필요하다”가 아니라
+          <strong>“현재의 프로덕션 병목을 확인하기 전에 RL부터 선택하지 말라”</strong>에 가깝다.
+        </p>
+      </section>
+
+      <section class="section" id="observability">
+        <p class="section-kicker">Evidence 05</p>
+        <h2>배치 이후의 문제: 모델이 오늘 제대로 일했는지 어떻게 아는가</h2>
+        <p class="evidence-label">운영 시스템 · Progress-based observability</p>
+
+        <p>
+          여러 고객 사이트에서 로봇이 자율로 작동하면 엔지니어는 모든 영상을 볼 수 없다.
+          성공률을 계산하려면 먼저 작업의 시작과 종료를 알아야 하고, 문제가 발생한 구간을
+          수십 시간의 영상에서 찾아야 한다. 보상 모델은 이때 학습 신호가 아니라
+          운영 관측성 계층이 된다.
+        </p>
+
+        <div class="media-grid">
+          <figure class="media">
+            <img src="assets/f8ckflzgwgo-ts-00-23-30.jpg" alt="여러 고객 사이트의 로봇 상태를 파악하는 모델 관측성 문제를 설명하는 슬라이드" loading="lazy">
+            <figcaption><a class="timestamp">23:30</a> 자율 운영 중인 로봇을 언제 사람이 검토해야 하는가.</figcaption>
+          </figure>
+          <figure class="media">
+            <img src="assets/f8ckflzgwgo-ts-00-24-20.jpg" alt="진행도 신호를 이용해 냅킨 접기 완료 시점과 소요 시간 통계를 표시하는 대시보드" loading="lazy">
+            <figcaption><a class="timestamp">24:20</a> 진행도 0→1 사이클로 완료 이벤트와 작업 시간을 자동 분절한다.</figcaption>
+          </figure>
+        </div>
+
+        <p>
+          진행도가 0에서 1로 상승하면 한 번의 접기 사이클이고, 다시 0으로 돌아가면 새 작업의
+          시작으로 해석할 수 있다. 이 신호만으로 완료 건수, 평균·중앙값 소요 시간, 긴 정체
+          구간을 자동 산출할 수 있다. 정책과 진행도 추정기를 분리하면 정책이 계속 후속
+          학습되더라도 모니터링 기준선은 안정적으로 유지할 수 있다.
+        </p>
+
+        <h3>14초짜리 이상치가 찾아낸 뜻밖의 성공</h3>
+        <p>
+          중앙값이 약 25초인 작업에서 14~15초 만에 끝난 기록이 발견됐다. 해당 영상만
+          추출해 확인하자 호기심 많은 식당 직원이 냅킨을 로봇 앞에 놓아준 장면이었다.
+          모델은 이를 비정상적으로 빠른 성공으로 기록했다. 이상 탐지 도구가 없었다면
+          엔지니어는 최대 16시간 분량의 영상을 직접 훑어야 했다.
+        </p>
+
+        <figure class="media">
+          <img src="assets/f8ckflzgwgo-ts-00-25-40.jpg" alt="식당 직원이 냅킨을 로봇 앞에 놓아 작업 시간이 짧아진 이상치 장면" loading="lazy">
+          <figcaption><a class="timestamp">25:40</a> 통계적 이상치에서 찾아낸 사람 개입 장면.</figcaption>
+        </figure>
+
+        <div class="pullquote">
+          <p>가장 성능이 좋은 ‘RL 시스템’은 RL보다 시스템에 더 집중한다.</p>
+          <cite>Jason Ma 발표의 결론을 한국어로 요약</cite>
+        </div>
+
+        <figure class="media">
+          <img src="assets/f8ckflzgwgo-ts-00-27-10.jpg" alt="보상 모델링은 과소탐구되었으며 RL 시스템은 알고리즘보다 시스템이 중요하다는 결론 슬라이드" loading="lazy">
+          <figcaption><a class="timestamp">27:10</a> 보상 모델의 확장성과 시스템 중심 RL이라는 최종 메시지.</figcaption>
+        </figure>
+      </section>
+
+      <section class="section" id="implications">
+        <p class="section-kicker">Implications</p>
+        <h2>현장 로봇과 중장비에 옮길 수 있는 다섯 가지 원칙</h2>
+
+        <p>
+          냅킨 접기와 굴착·상차는 규모와 위험이 크게 다르다. 그러나 실제 현장에서 값을 만들고
+          원격으로 운영해야 한다는 시스템 조건은 닮아 있다. 특히 안전상 무작위 탐색이
+          불가능한 중장비에서는 이 발표의 데이터 운영 방식이 더 직접적인 의미를 가진다.
+        </p>
+
+        <ul class="checklist">
+          <li><strong>과제 범위를 먼저 좁힌다.</strong> 범용 자율 굴착보다 정해진 적재 위치와 반복 사이클을 가진 단일 공정부터 시작한다.</li>
+          <li><strong>성공률과 복구 시간을 분리해 측정한다.</strong> 결국 성공한 작업도 몇 분씩 멈춘다면 상업적 처리량을 충족하지 못한다.</li>
+          <li><strong>실세계 탐색 대신 숙련자 개입 데이터를 우선한다.</strong> 진행도가 멈춘 순간에 오퍼레이터의 복구 행동을 수집하면 안전과 데이터 효율을 함께 확보할 수 있다.</li>
+          <li><strong>진행도 모델을 원격 관측성에 재사용한다.</strong> 굴착·선회·상차처럼 경계가 분명한 사이클을 분절해 사이클 시간과 이상 구간을 자동 추출한다.</li>
+          <li><strong>고객이 감당할 총비용에서 역산한다.</strong> 테이블탑 로봇의 5만 달러 기준을 그대로 적용할 수는 없지만, 수용 가능한 가격과 회수 기간을 먼저 확인하는 접근은 동일하다.</li>
+        </ul>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>냅킨 접기 시스템</th>
+                <th>중장비 적용 예</th>
+                <th>관측 가능한 KPI</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>진행도 0→1</td>
+                <td>굴착→선회→배출→복귀 사이클</td>
+                <td>사이클 완료 수, 평균·중앙값 시간</td>
+              </tr>
+              <tr>
+                <td>진행도 정체 또는 하락</td>
+                <td>버킷 진입 실패, 토질 변화, 장애물 회피</td>
+                <td>정체 시간, 수동 개입률, 복구 성공률</td>
+              </tr>
+              <tr>
+                <td>빠르거나 느린 이상치</td>
+                <td>불완전 적재, 작업자 개입, 예외 경로</td>
+                <td>이상 사이클 자동 추출 및 검토 우선순위</td>
+              </tr>
+              <tr>
+                <td>능동 데이터 수집</td>
+                <td>숙련 오퍼레이터가 실패 상태에서 복구 시범 제공</td>
+                <td>수집 시간당 신규 실패 유형, 재발률 감소</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>실무 Q&amp;A에서 드러난 운영 판단</h3>
+        <p>
+          롱테일 실패를 찾으려면 결국 최신 정책을 현장에서 실행해야 한다. 차이는 사람이 계속
+          지켜보는 대신 예상보다 오래 걸린 구간만 나중에 추출한다는 점이다. 필요하다면 장면을
+          의도적으로 교란해 실패를 유도할 수도 있다. 반복 과정에서 모델의 취약 패턴을 알게 되면
+          탐색 주기도 짧아진다.
+        </p>
+        <p>
+          변형체 시뮬레이션은 현실과의 물리 차이가 크고, 충실도를 높이면 속도가 크게 떨어진다.
+          Dyna는 냅킨 접기에서는 시뮬레이터를 조정하는 것보다 실세계 반복이 더 빨랐다고 판단했다.
+          반대로 사람과 장비의 안전이 중요한 도메인에서는 Real-to-Sim-to-Real 경로의 가치가
+          더 커질 수 있다.
+        </p>
+        <p>
+          VLA에 진행도 예측 헤드를 함께 붙이는 것은 표현 학습에는 도움이 될 수 있지만,
+          운영 기준선의 안정성을 위해 정책과 모니터를 분리하는 편이 낫다는 조언도 주목할 만하다.
+          정책이 새 데이터로 계속 변할 때 모니터까지 함께 표류하면 장기간의 성능 비교가 어려워진다.
+        </p>
+      </section>
+
+      <section class="section" id="limits">
+        <p class="section-kicker">Limitations &amp; Source Notes</p>
+        <h2>이 주장을 어디까지 믿을 것인가</h2>
+
+        <div class="limitations">
+          <h3>해석상의 한계</h3>
+          <ul>
+            <li>핵심 근거는 한 회사가 의도적으로 좁힌 냅킨·수건 접기 과제에서 얻은 경험이다. 다른 로봇 형태와 작업으로의 일반화는 추가 검증이 필요하다.</li>
+            <li>99.4%, 850장 이상, 처리량 80% 개선, 네 차례의 장기 시험은 발표자가 보고한 수치다. 본 보고서는 원시 로그나 독립 평가 자료를 확인하지 않았다.</li>
+            <li>진행도 기반 관측성은 반복 사이클과 명확한 완료 상태가 있는 작업에서 특히 유효하다. 경계가 모호하거나 목표가 계속 변하는 작업에는 별도의 분절 방법이 필요하다.</li>
+            <li>학습 데이터에 없던 실패로부터의 회복은 인상적이지만, 발생 원인과 재현 범위에 대한 정량 분석은 발표에 제시되지 않았다.</li>
+            <li>“RL은 아직 병목이 아니다”라는 결론은 현재 로봇 조작이 인간 수준보다 낮다는 조건에 의존한다. 인간 수준에 가까워진 뒤에는 최적화 우선순위가 달라질 수 있다.</li>
+          </ul>
+        </div>
+
+        <div class="source-card">
+          <h3>주요 출처</h3>
+          <dl>
+            <dt>발표</dt>
+            <dd>Jason Ma, “Reinforcement Learning for Real-World Production Robotic Systems”</dd>
+            <dt>행사</dt>
+            <dd>ICRA 2026 RL4IL Workshop</dd>
+            <dt>채널</dt>
+            <dd>Zhanpeng He</dd>
+            <dt>게시일</dt>
+            <dd>2026년 6월 8일</dd>
+            <dt>영상 길이</dt>
+            <dd>36분 08초</dd>
+            <dt>원문 영상</dt>
+            <dd><a>YouTube에서 발표 보기</a></dd>
+            <dt>출처 성격</dt>
+            <dd>기업 공동창업자의 연구·제품 발표. 성능 수치는 발표자 보고 기준.</dd>
+          </dl>
+        </div>
+
+        <div class="share-copy">
+          <h3>Share-ready summary</h3>
+          <p>“24시간 99.4% 로봇을 만든 결정적 요소는 더 복잡한 RL이 아니라, 실패를 찾아 사람의 시간을 배분하고 배치 후에도 모델을 관찰할 수 있게 만든 시스템이었다.”</p>
+        </div>
+      </section>
+
+      <section class="ending">
+        <p class="section-kicker">Closing Perspective</p>
+        <h2>프로덕션 로봇은 정책 하나가 아니라 학습하고 관찰하고 복구하는 전체 루프다</h2>
+        <p>
+          이 발표의 가장 이식성 높은 아이디어는 특정 RL 알고리즘이 아니다. 학습을 위해 만든
+          진행도 모델을 데이터 수집의 우선순위 결정, 원격 모니터링, 사이클 통계, 이상치 추출에
+          연속적으로 재사용한 시스템 설계다.
+        </p>
+        <p>
+          프로덕션에서 좋은 모델은 더 높은 벤치마크 점수만 내는 모델이 아니다. 실패했을 때
+          무엇이 잘못됐는지 알려주고, 다음 데이터 한 시간을 어디에 써야 하는지 결정하며,
+          현장에 배치된 뒤에도 오늘 제대로 일했는지를 설명할 수 있어야 한다.
+        </p>
+        <p class="final-line">먼저 로봇을 인간 수준으로 신뢰할 수 있게 만들고, 그다음 인간을 넘어서는 최적화를 묻는다.</p>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <p>Research report based on a public workshop presentation. 모든 이미지의 저작권은 원 발표 및 영상 권리자에게 있습니다.</p>
+  </footer>
 </body>
 </html>

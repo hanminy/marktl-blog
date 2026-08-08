@@ -1,7 +1,22 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-08T00:42:48.995Z",
+  "updatedAt": "2026-08-08T00:49:11.738Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-jason-ma-rl-for-real-world-production-robotics-%EC%9A%94%EC%95%BD/",
+      "excerpt": "Jason Ma (Dyna): Reinforcement Learning for Real World Production Robotic Systems 영상 정보 채널 : Zhanpeng He (ICRA 2026 RL4IL 워크샵) 게시일 : 2026 06 08 길이 : 36분 08초 링크 : https://www.youtube.com/watch?v=f8ckFlzGWGo <div style=\"position: relative; wi",
+      "shortId": "1yg0m8e",
+      "slug": "yt-jason-ma-rl-for-real-world-production-robotics-요약",
+      "sourcePath": "clippings/yt_Jason_Ma_RL_for_Real-World_Production_Robotics_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료"
+      ],
+      "title": "Jason Ma (Dyna): Reinforcement Learning for Real-World Production Robotic Systems",
+      "updatedAt": "2026-08-08T00:49:11.738Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/1yg0m8e/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-chelsea-finn-reliable-vla-post-training-%EC%9A%94%EC%95%BD/",
@@ -76,21 +91,6 @@
       "title": "Pulkit Agrawal (MIT & EKA Robotics): On RL & IL",
       "updatedAt": "2026-08-07T15:32:50.924Z",
       "url": "https://hanminy.github.io/marktl-blog/marktl/s/zc3b2z/"
-    },
-    {
-      "artifactType": "research-report",
-      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-jason-ma-rl-for-real-world-production-robotics-%EC%9A%94%EC%95%BD/",
-      "excerpt": "Jason Ma (Dyna): Reinforcement Learning for Real World Production Robotic Systems 영상 정보 채널 : Zhanpeng He (ICRA 2026 RL4IL 워크샵) 게시일 : 2026 06 08 길이 : 36분 08초 링크 : https://www.youtube.com/watch?v=f8ckFlzGWGo <div style=\"position: relative; wi",
-      "shortId": "1yg0m8e",
-      "slug": "yt-jason-ma-rl-for-real-world-production-robotics-요약",
-      "sourcePath": "clippings/yt_Jason_Ma_RL_for_Real-World_Production_Robotics_요약.md",
-      "tags": [
-        "youtube",
-        "연구자료"
-      ],
-      "title": "Jason Ma (Dyna): Reinforcement Learning for Real-World Production Robotic Systems",
-      "updatedAt": "2026-08-07T15:25:35.853Z",
-      "url": "https://hanminy.github.io/marktl-blog/marktl/s/1yg0m8e/"
     },
     {
       "artifactType": "research-report",
