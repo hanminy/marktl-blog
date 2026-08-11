@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-11T06:47:17.316Z",
+  "updatedAt": "2026-08-11T06:51:46.721Z",
   "items": [
     {
       "slug": "260811-apex-프로젝트-현황-종합-점검",
@@ -8,9 +8,30 @@
       "url": "https://hanminy.github.io/marktl-blog/marktl/marktl/s/18ar77w/",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/marktl/260811-apex-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%ED%98%84%ED%99%A9-%EC%A2%85%ED%95%A9-%EC%A0%90%EA%B2%80/",
       "sourcePath": "08_devlog/260811_APEX 프로젝트 현황 종합 점검.md",
-      "artifactType": "interactive-explainer",
+      "artifactType": "faithful-note",
       "title": "APEX 프로젝트 현황 종합 점검",
       "excerpt": "한 줄 결론 APEX는 시뮬레이터·센서·ROS2·GridMap 통합 기반을 갖추고 논문 기반 굴착 경로 계획을 실제 AGX 굴착까지 연결한 연구 프로토타입이다. 다만 최신 Phase B 성과가 아직 Claude 로컬 브랜치에만 있고, 작업 트리 정리·자동 회귀시험·실시간 동역학 MPC·실차 안전 계층은 남아 있다. 이 문",
+      "tags": [
+        "apex",
+        "unity",
+        "agx",
+        "ros2",
+        "gridmap",
+        "mpc",
+        "project-status",
+        "devlog"
+      ],
+      "updatedAt": "2026-08-11T06:51:46.721Z"
+    },
+    {
+      "slug": "260811-apex-íë¡ì í¸-íí©-ì¢í©-ì ê²",
+      "shortId": "18ar77w",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/marktl/s/18ar77w/",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/marktl/260811-apex-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%ED%98%84%ED%99%A9-%EC%A2%85%ED%95%A9-%EC%A0%90%EA%B2%80/",
+      "sourcePath": "08_devlog/260811_APEX íë¡ì í¸ íí© ì¢í© ì ê².md",
+      "artifactType": "interactive-explainer",
+      "title": "APEX íë¡ì í¸ íí© ì¢í© ì ê²",
+      "excerpt": "í ì¤ ê²°ë¡  APEXë ìë®¬ë ì´í°Â·ì¼ìÂ·ROS2Â·GridMap íµí© ê¸°ë°ì ê°ì¶ê³  ë¼ë¬¸ ê¸°ë° êµ´ì°© ê²½ë¡ ê³íì ì¤ì  AGX êµ´ì°©ê¹ì§ ì°ê²°í ì°êµ¬ íë¡í íìì´ë¤. ë¤ë§ ìµì  Phase B ì±ê³¼ê° ìì§ Claude ë¡ì»¬ ë¸ëì¹ìë§ ìê³ , ìì í¸ë¦¬ ì ë¦¬Â·ìë íê·ìíÂ·ì¤ìê° ëì­í MPCÂ·ì¤ì°¨ ìì  ê³ì¸µì ë¨ì ìë¤. ì´ ë¬¸",
       "tags": [
         "apex",
         "unity",
@@ -24,11 +45,11 @@
       "updatedAt": "2026-08-11T06:47:17.316Z"
     },
     {
-      "slug": "íë¯¼íì¸-yt-sergey-levine-rl-for-robot-foundation-models-ìì½",
+      "slug": "Ã­ÂÂÃ«Â¯Â¼Ã­ÂÂÃ¬ÂÂ¸-yt-sergey-levine-rl-for-robot-foundation-models-Ã¬ÂÂÃ¬ÂÂ½",
       "shortId": "72ym5b",
       "url": "https://hanminy.github.io/marktl-blog/marktl/s/72ym5b/",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/%ED%95%9C%EB%AF%BC%ED%99%95%EC%9D%B8-yt-sergey-levine-rl-for-robot-foundation-models-%EC%9A%94%EC%95%BD/",
-      "sourcePath": "clippings/(íë¯¼íì¸)yt_Sergey_Levine_RL_for_Robot_Foundation_Models_ìì½.md",
+      "sourcePath": "clippings/(Ã­ÂÂÃ«Â¯Â¼Ã­ÂÂÃ¬ÂÂ¸)yt_Sergey_Levine_RL_for_Robot_Foundation_Models_Ã¬ÂÂÃ¬ÂÂ½.md",
       "artifactType": "research-report",
       "title": "Sergey Levine (UC Berkeley & PI): RL for Robot Foundation Models",
       "excerpt": "type: youtubesummary title: 'Sergey Levine (UC Berkeley & PI): RL for Robot Foundation Models' sourcetitle: 'Sergey Levine (UC Berkeley & PI): RL for Robot Foundation Models' sourc",
@@ -36,11 +57,11 @@
       "updatedAt": "2026-08-11T02:47:29.947Z"
     },
     {
-      "slug": "Ã­ÂÂÃ«Â¯Â¼Ã­ÂÂÃ¬ÂÂ¸-yt-sergey-levine-rl-for-robot-foundation-models-Ã¬ÂÂÃ¬ÂÂ½",
+      "slug": "ÃÂ­ÃÂÃÂÃÂ«ÃÂ¯ÃÂ¼ÃÂ­ÃÂÃÂÃÂ¬ÃÂÃÂ¸-yt-sergey-levine-rl-for-robot-foundation-models-ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½",
       "shortId": "72ym5b",
       "url": "https://hanminy.github.io/marktl-blog/marktl/s/72ym5b/",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/%ED%95%9C%EB%AF%BC%ED%99%95%EC%9D%B8-yt-sergey-levine-rl-for-robot-foundation-models-%EC%9A%94%EC%95%BD/",
-      "sourcePath": "clippings/(Ã­ÂÂÃ«Â¯Â¼Ã­ÂÂÃ¬ÂÂ¸)yt_Sergey_Levine_RL_for_Robot_Foundation_Models_Ã¬ÂÂÃ¬ÂÂ½.md",
+      "sourcePath": "clippings/(ÃÂ­ÃÂÃÂÃÂ«ÃÂ¯ÃÂ¼ÃÂ­ÃÂÃÂÃÂ¬ÃÂÃÂ¸)yt_Sergey_Levine_RL_for_Robot_Foundation_Models_ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½.md",
       "artifactType": "slide-deck",
       "title": "Sergey Levine (UC Berkeley & PI): RL for Robot Foundation Models",
       "excerpt": "type: youtubesummary title: 'Sergey Levine (UC Berkeley & PI): RL for Robot Foundation Models' sourcetitle: 'Sergey Levine (UC Berkeley & PI): RL for Robot Foundation Models' sourc",
@@ -50,10 +71,10 @@
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-georgia-chalvatzaki-rl-from-for-with-demonstrations-%EC%9A%94%EC%95%BD/",
-      "excerpt": "Georgia Chalvatzaki (TU Darmstadt): Reinforcement Learning From, For and With Demonstrations Ã¬ÂÂÃ¬ÂÂ Ã¬Â ÂÃ«Â³Â´ Ã¬Â±ÂÃ«ÂÂ : Zhanpeng He (ICRA 2026 RL4IL Ã¬ÂÂÃ­ÂÂ¬Ã¬ÂÂµ) ÃªÂ²ÂÃ¬ÂÂÃ¬ÂÂ¼ : 2026 06 08 ÃªÂ¸Â¸Ã¬ÂÂ´ : 30Ã«Â¶Â 45Ã¬Â´Â Ã«Â§ÂÃ­ÂÂ¬ : https://www.youtube.com/watch?v=ieStIXBGriU <div style=\"position: r",
+      "excerpt": "Georgia Chalvatzaki (TU Darmstadt): Reinforcement Learning From, For and With Demonstrations ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ ÃÂ¬ÃÂ ÃÂÃÂ«ÃÂ³ÃÂ´ ÃÂ¬ÃÂ±ÃÂÃÂ«ÃÂÃÂ : Zhanpeng He (ICRA 2026 RL4IL ÃÂ¬ÃÂÃÂÃÂ­ÃÂÃÂ¬ÃÂ¬ÃÂÃÂµ) ÃÂªÃÂ²ÃÂÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ¼ : 2026 06 08 ÃÂªÃÂ¸ÃÂ¸ÃÂ¬ÃÂÃÂ´ : 30ÃÂ«ÃÂ¶ÃÂ 45ÃÂ¬ÃÂ´ÃÂ ÃÂ«ÃÂ§ÃÂÃÂ­ÃÂÃÂ¬ : https://www.youtube.com/watch?v=ieStIXBGriU <div style=\"position: r",
       "shortId": "1y6niw0",
-      "slug": "yt-georgia-chalvatzaki-rl-from-for-with-demonstrations-Ã¬ÂÂÃ¬ÂÂ½",
-      "sourcePath": "clippings/yt_Georgia_Chalvatzaki_RL_From_For_With_Demonstrations_Ã¬ÂÂÃ¬ÂÂ½.md",
+      "slug": "yt-georgia-chalvatzaki-rl-from-for-with-demonstrations-ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½",
+      "sourcePath": "clippings/yt_Georgia_Chalvatzaki_RL_From_For_With_Demonstrations_ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½.md",
       "tags": [],
       "title": "Georgia Chalvatzaki (TU Darmstadt): Reinforcement Learning From, For and With Demonstrations",
       "updatedAt": "2026-08-08T01:12:50.933Z",
@@ -62,43 +83,43 @@
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-robert-platt-model-matters-leveraging-geometry-%EC%9A%94%EC%95%BD/",
-      "excerpt": "Robert Platt (Northeastern University): Model Matters Ã¢ÂÂ Leveraging Geometry in Robot Learning Ã¬ÂÂÃ¬ÂÂ Ã¬Â ÂÃ«Â³Â´ Ã¬Â±ÂÃ«ÂÂ : Zhanpeng He (ICRA 2026 RL4IL Ã¬ÂÂÃ­ÂÂ¬Ã¬ÂÂµ) ÃªÂ²ÂÃ¬ÂÂÃ¬ÂÂ¼ : 2026 06 08 ÃªÂ¸Â¸Ã¬ÂÂ´ : 30Ã«Â¶Â 03Ã¬Â´Â Ã«Â§ÂÃ­ÂÂ¬ : https://www.youtube.com/watch?v=4K9pg K9Ync <div style=\"position: ",
+      "excerpt": "Robert Platt (Northeastern University): Model Matters ÃÂ¢ÃÂÃÂ Leveraging Geometry in Robot Learning ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ ÃÂ¬ÃÂ ÃÂÃÂ«ÃÂ³ÃÂ´ ÃÂ¬ÃÂ±ÃÂÃÂ«ÃÂÃÂ : Zhanpeng He (ICRA 2026 RL4IL ÃÂ¬ÃÂÃÂÃÂ­ÃÂÃÂ¬ÃÂ¬ÃÂÃÂµ) ÃÂªÃÂ²ÃÂÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ¼ : 2026 06 08 ÃÂªÃÂ¸ÃÂ¸ÃÂ¬ÃÂÃÂ´ : 30ÃÂ«ÃÂ¶ÃÂ 03ÃÂ¬ÃÂ´ÃÂ ÃÂ«ÃÂ§ÃÂÃÂ­ÃÂÃÂ¬ : https://www.youtube.com/watch?v=4K9pg K9Ync <div style=\"position: ",
       "shortId": "c1q5zk",
-      "slug": "yt-robert-platt-model-matters-leveraging-geometry-Ã¬ÂÂÃ¬ÂÂ½",
-      "sourcePath": "clippings/yt_Robert_Platt_Model_Matters_Leveraging_Geometry_Ã¬ÂÂÃ¬ÂÂ½.md",
+      "slug": "yt-robert-platt-model-matters-leveraging-geometry-ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½",
+      "sourcePath": "clippings/yt_Robert_Platt_Model_Matters_Leveraging_Geometry_ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½.md",
       "tags": [
         "youtube",
-        "Ã¬ÂÂ°ÃªÂµÂ¬Ã¬ÂÂÃ«Â£Â"
+        "ÃÂ¬ÃÂÃÂ°ÃÂªÃÂµÃÂ¬ÃÂ¬ÃÂÃÂÃÂ«ÃÂ£ÃÂ"
       ],
-      "title": "Robert Platt (Northeastern University): Model Matters Ã¢ÂÂ Leveraging Geometry in Robot Learning",
+      "title": "Robert Platt (Northeastern University): Model Matters ÃÂ¢ÃÂÃÂ Leveraging Geometry in Robot Learning",
       "updatedAt": "2026-08-08T01:07:01.769Z",
       "url": "https://hanminy.github.io/marktl-blog/marktl/s/c1q5zk/"
     },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-david-held-rl-case-study-robot-assisted-dressing-%EC%9A%94%EC%95%BD/",
-      "excerpt": "David Held (CMU): A Case Study of RL Ã¢ÂÂ Robot Assisted Dressing Ã¬ÂÂÃ¬ÂÂ Ã¬Â ÂÃ«Â³Â´ Ã¬Â±ÂÃ«ÂÂ : Zhanpeng He (ICRA 2026 RL4IL Ã¬ÂÂÃ­ÂÂ¬Ã¬ÂÂµ) ÃªÂ²ÂÃ¬ÂÂÃ¬ÂÂ¼ : 2026 06 08 ÃªÂ¸Â¸Ã¬ÂÂ´ : 28Ã«Â¶Â 50Ã¬Â´Â Ã«Â§ÂÃ­ÂÂ¬ : https://www.youtube.com/watch?v=qgTLr3h6BuA <div style=\"position: relative; width: 100%; padding ",
+      "excerpt": "David Held (CMU): A Case Study of RL ÃÂ¢ÃÂÃÂ Robot Assisted Dressing ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ ÃÂ¬ÃÂ ÃÂÃÂ«ÃÂ³ÃÂ´ ÃÂ¬ÃÂ±ÃÂÃÂ«ÃÂÃÂ : Zhanpeng He (ICRA 2026 RL4IL ÃÂ¬ÃÂÃÂÃÂ­ÃÂÃÂ¬ÃÂ¬ÃÂÃÂµ) ÃÂªÃÂ²ÃÂÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ¼ : 2026 06 08 ÃÂªÃÂ¸ÃÂ¸ÃÂ¬ÃÂÃÂ´ : 28ÃÂ«ÃÂ¶ÃÂ 50ÃÂ¬ÃÂ´ÃÂ ÃÂ«ÃÂ§ÃÂÃÂ­ÃÂÃÂ¬ : https://www.youtube.com/watch?v=qgTLr3h6BuA <div style=\"position: relative; width: 100%; padding ",
       "shortId": "12ifdub",
-      "slug": "yt-david-held-rl-case-study-robot-assisted-dressing-Ã¬ÂÂÃ¬ÂÂ½",
-      "sourcePath": "clippings/yt_David_Held_RL_Case_Study_Robot_Assisted_Dressing_Ã¬ÂÂÃ¬ÂÂ½.md",
+      "slug": "yt-david-held-rl-case-study-robot-assisted-dressing-ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½",
+      "sourcePath": "clippings/yt_David_Held_RL_Case_Study_Robot_Assisted_Dressing_ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½.md",
       "tags": [
         "youtube",
-        "Ã¬ÂÂ°ÃªÂµÂ¬Ã¬ÂÂÃ«Â£Â"
+        "ÃÂ¬ÃÂÃÂ°ÃÂªÃÂµÃÂ¬ÃÂ¬ÃÂÃÂÃÂ«ÃÂ£ÃÂ"
       ],
-      "title": "David Held (CMU): A Case Study of RL Ã¢ÂÂ Robot Assisted Dressing",
+      "title": "David Held (CMU): A Case Study of RL ÃÂ¢ÃÂÃÂ Robot Assisted Dressing",
       "updatedAt": "2026-08-08T01:01:32.762Z",
       "url": "https://hanminy.github.io/marktl-blog/marktl/s/12ifdub/"
     },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-pulkit-agrawal-on-rl-and-il-%EC%9A%94%EC%95%BD/",
-      "excerpt": "Pulkit Agrawal (MIT & EKA Robotics): On RL & IL Ã¬ÂÂÃ¬ÂÂ Ã¬Â ÂÃ«Â³Â´ Ã¬Â±ÂÃ«ÂÂ : Zhanpeng He (ICRA 2026 RL4IL Ã¬ÂÂÃ­ÂÂ¬Ã¬ÂÂµ) ÃªÂ²ÂÃ¬ÂÂÃ¬ÂÂ¼ : 2026 06 08 ÃªÂ¸Â¸Ã¬ÂÂ´ : 42Ã«Â¶Â 18Ã¬Â´Â Ã«Â§ÂÃ­ÂÂ¬ : https://www.youtube.com/watch?v=2 2pR 8pA4U <div style=\"position: relative; width: 100%; padding bottom: 56.25%;",
+      "excerpt": "Pulkit Agrawal (MIT & EKA Robotics): On RL & IL ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ ÃÂ¬ÃÂ ÃÂÃÂ«ÃÂ³ÃÂ´ ÃÂ¬ÃÂ±ÃÂÃÂ«ÃÂÃÂ : Zhanpeng He (ICRA 2026 RL4IL ÃÂ¬ÃÂÃÂÃÂ­ÃÂÃÂ¬ÃÂ¬ÃÂÃÂµ) ÃÂªÃÂ²ÃÂÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ¼ : 2026 06 08 ÃÂªÃÂ¸ÃÂ¸ÃÂ¬ÃÂÃÂ´ : 42ÃÂ«ÃÂ¶ÃÂ 18ÃÂ¬ÃÂ´ÃÂ ÃÂ«ÃÂ§ÃÂÃÂ­ÃÂÃÂ¬ : https://www.youtube.com/watch?v=2 2pR 8pA4U <div style=\"position: relative; width: 100%; padding bottom: 56.25%;",
       "shortId": "zc3b2z",
-      "slug": "yt-pulkit-agrawal-on-rl-and-il-Ã¬ÂÂÃ¬ÂÂ½",
-      "sourcePath": "clippings/yt_Pulkit_Agrawal_On_RL_and_IL_Ã¬ÂÂÃ¬ÂÂ½.md",
+      "slug": "yt-pulkit-agrawal-on-rl-and-il-ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½",
+      "sourcePath": "clippings/yt_Pulkit_Agrawal_On_RL_and_IL_ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½.md",
       "tags": [
         "youtube",
-        "Ã¬ÂÂ°ÃªÂµÂ¬Ã¬ÂÂÃ«Â£Â"
+        "ÃÂ¬ÃÂÃÂ°ÃÂªÃÂµÃÂ¬ÃÂ¬ÃÂÃÂÃÂ«ÃÂ£ÃÂ"
       ],
       "title": "Pulkit Agrawal (MIT & EKA Robotics): On RL & IL",
       "updatedAt": "2026-08-08T00:54:53.592Z",
@@ -107,13 +128,13 @@
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-jason-ma-rl-for-real-world-production-robotics-%EC%9A%94%EC%95%BD/",
-      "excerpt": "Jason Ma (Dyna): Reinforcement Learning for Real World Production Robotic Systems Ã¬ÂÂÃ¬ÂÂ Ã¬Â ÂÃ«Â³Â´ Ã¬Â±ÂÃ«ÂÂ : Zhanpeng He (ICRA 2026 RL4IL Ã¬ÂÂÃ­ÂÂ¬Ã¬ÂÂµ) ÃªÂ²ÂÃ¬ÂÂÃ¬ÂÂ¼ : 2026 06 08 ÃªÂ¸Â¸Ã¬ÂÂ´ : 36Ã«Â¶Â 08Ã¬Â´Â Ã«Â§ÂÃ­ÂÂ¬ : https://www.youtube.com/watch?v=f8ckFlzGWGo <div style=\"position: relative; wi",
+      "excerpt": "Jason Ma (Dyna): Reinforcement Learning for Real World Production Robotic Systems ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ ÃÂ¬ÃÂ ÃÂÃÂ«ÃÂ³ÃÂ´ ÃÂ¬ÃÂ±ÃÂÃÂ«ÃÂÃÂ : Zhanpeng He (ICRA 2026 RL4IL ÃÂ¬ÃÂÃÂÃÂ­ÃÂÃÂ¬ÃÂ¬ÃÂÃÂµ) ÃÂªÃÂ²ÃÂÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ¼ : 2026 06 08 ÃÂªÃÂ¸ÃÂ¸ÃÂ¬ÃÂÃÂ´ : 36ÃÂ«ÃÂ¶ÃÂ 08ÃÂ¬ÃÂ´ÃÂ ÃÂ«ÃÂ§ÃÂÃÂ­ÃÂÃÂ¬ : https://www.youtube.com/watch?v=f8ckFlzGWGo <div style=\"position: relative; wi",
       "shortId": "1yg0m8e",
-      "slug": "yt-jason-ma-rl-for-real-world-production-robotics-Ã¬ÂÂÃ¬ÂÂ½",
-      "sourcePath": "clippings/yt_Jason_Ma_RL_for_Real-World_Production_Robotics_Ã¬ÂÂÃ¬ÂÂ½.md",
+      "slug": "yt-jason-ma-rl-for-real-world-production-robotics-ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½",
+      "sourcePath": "clippings/yt_Jason_Ma_RL_for_Real-World_Production_Robotics_ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½.md",
       "tags": [
         "youtube",
-        "Ã¬ÂÂ°ÃªÂµÂ¬Ã¬ÂÂÃ«Â£Â"
+        "ÃÂ¬ÃÂÃÂ°ÃÂªÃÂµÃÂ¬ÃÂ¬ÃÂÃÂÃÂ«ÃÂ£ÃÂ"
       ],
       "title": "Jason Ma (Dyna): Reinforcement Learning for Real-World Production Robotic Systems",
       "updatedAt": "2026-08-08T00:49:11.738Z",
@@ -122,13 +143,13 @@
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-chelsea-finn-reliable-vla-post-training-%EC%9A%94%EC%95%BD/",
-      "excerpt": "Chelsea Finn & Perry Dong (Stanford & PI): Reliable VLA Post Training with Real World RL Ã¬ÂÂÃ¬ÂÂ Ã¬Â ÂÃ«Â³Â´ Ã¬Â±ÂÃ«ÂÂ : Zhanpeng He (ICRA 2026 RL4IL Ã¬ÂÂÃ­ÂÂ¬Ã¬ÂÂµ) ÃªÂ²ÂÃ¬ÂÂÃ¬ÂÂ¼ : 2026 06 08 ÃªÂ¸Â¸Ã¬ÂÂ´ : 31Ã«Â¶Â 59Ã¬Â´Â Ã«Â§ÂÃ­ÂÂ¬ : https://www.youtube.com/watch?v=fAqgJMyxBbo <div style=\"position: relat",
+      "excerpt": "Chelsea Finn & Perry Dong (Stanford & PI): Reliable VLA Post Training with Real World RL ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ ÃÂ¬ÃÂ ÃÂÃÂ«ÃÂ³ÃÂ´ ÃÂ¬ÃÂ±ÃÂÃÂ«ÃÂÃÂ : Zhanpeng He (ICRA 2026 RL4IL ÃÂ¬ÃÂÃÂÃÂ­ÃÂÃÂ¬ÃÂ¬ÃÂÃÂµ) ÃÂªÃÂ²ÃÂÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ¼ : 2026 06 08 ÃÂªÃÂ¸ÃÂ¸ÃÂ¬ÃÂÃÂ´ : 31ÃÂ«ÃÂ¶ÃÂ 59ÃÂ¬ÃÂ´ÃÂ ÃÂ«ÃÂ§ÃÂÃÂ­ÃÂÃÂ¬ : https://www.youtube.com/watch?v=fAqgJMyxBbo <div style=\"position: relat",
       "shortId": "ci37ov",
-      "slug": "yt-chelsea-finn-reliable-vla-post-training-Ã¬ÂÂÃ¬ÂÂ½",
-      "sourcePath": "clippings/yt_Chelsea_Finn_Reliable_VLA_Post-Training_Ã¬ÂÂÃ¬ÂÂ½.md",
+      "slug": "yt-chelsea-finn-reliable-vla-post-training-ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½",
+      "sourcePath": "clippings/yt_Chelsea_Finn_Reliable_VLA_Post-Training_ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½.md",
       "tags": [
         "youtube",
-        "Ã¬ÂÂ°ÃªÂµÂ¬Ã¬ÂÂÃ«Â£Â"
+        "ÃÂ¬ÃÂÃÂ°ÃÂªÃÂµÃÂ¬ÃÂ¬ÃÂÃÂÃÂ«ÃÂ£ÃÂ"
       ],
       "title": "Chelsea Finn & Perry Dong (Stanford & PI): Reliable VLA Post-Training with Real-World RL",
       "updatedAt": "2026-08-08T00:42:48.995Z",
@@ -137,33 +158,33 @@
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/2026-towards-learning-boulder-excavation-with-hydraulic-excavators-%EC%9A%94%EC%95%BD/",
-      "excerpt": "Towards Learning Boulder Excavation with Hydraulic Excavators [!abstract] Ã­ÂÂ Ã«Â¬Â¸Ã¬ÂÂ¥ Ã¬ÂÂÃ¬ÂÂ½ 12Ã­ÂÂ¤ Ã¬ÂÂ Ã¬ÂÂ ÃªÂµÂ´Ã¬Â°Â©ÃªÂ¸Â°ÃªÂ°Â Ã­ÂÂÃ¬Â¤Â Ã«Â²ÂÃ­ÂÂ· , Ã¬ÂÂ Ã¬ÂÂÃ­ÂÂ Ã­ÂÂ¼Ã«ÂÂÃ«Â°Â±, Ã¬ÂÂÃ¬ÂÂÃ«ÂÂ¹ 20ÃªÂ°Â LiDAR Ã¬Â Â Ã«Â§ÂÃ¬ÂÂ¼Ã«Â¡Â Ã«Â¶ÂÃªÂ·ÂÃ¬Â¹Â Ã¬ÂÂÃ¬ÂÂÃ¬ÂÂ Ã¬Â ÂÃ«Â Â¬ÃÂ·Ã­ÂÂ¼Ã«ÂÂ´ÃªÂ¸Â°ÃÂ·Ã¬ÂÂ¸Ã¬ÂÂÃ­ÂÂÃ«ÂÂÃ«Â¡Â ÃªÂ°ÂÃ­ÂÂÃ­ÂÂÃ¬ÂÂµÃ­ÂÂ ÃªÂ²Â°ÃªÂ³Â¼, Ã­ÂÂÃ¬ÂÂ¥ 40Ã­ÂÂ Ã¬ÂÂÃ­ÂÂÃ¬ÂÂÃ¬ÂÂ 70% Ã¬ÂÂ±ÃªÂ³ÂµÃ«Â¥Â  Ã¬ÂÂ Ã«ÂÂ¬Ã¬ÂÂ±Ã­ÂÂÃ«ÂÂ¤(Ã¬ÂÂÃ«Â Â¨Ã«ÂÂ Ã¬ÂÂ½ 300Ã¬ÂÂÃªÂ°ÂÃ¬ÂÂ¸ Ã¬ÂÂ¸ÃªÂ°Â Ã¬ÂÂ´Ã¬Â ÂÃ¬ÂÂ: 83% ). 1. Ã¬ÂÂ°ÃªÂµÂ¬Ã¬ÂÂ Ã­ÂÂµÃ¬ÂÂ¬ Ã¬Â§ÂÃ«Â¬Â¸ Ã«ÂÂµÃ«Â³Â Ã«Â¬Â´Ã¬ÂÂÃ¬ÂÂ Ã¬ÂÂÃ«ÂÂ",
+      "excerpt": "Towards Learning Boulder Excavation with Hydraulic Excavators [!abstract] ÃÂ­ÃÂÃÂ ÃÂ«ÃÂ¬ÃÂ¸ÃÂ¬ÃÂÃÂ¥ ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½ 12ÃÂ­ÃÂÃÂ¤ ÃÂ¬ÃÂÃÂ ÃÂ¬ÃÂÃÂ ÃÂªÃÂµÃÂ´ÃÂ¬ÃÂ°ÃÂ©ÃÂªÃÂ¸ÃÂ°ÃÂªÃÂ°ÃÂ ÃÂ­ÃÂÃÂÃÂ¬ÃÂ¤ÃÂ ÃÂ«ÃÂ²ÃÂÃÂ­ÃÂÃÂ· , ÃÂ¬ÃÂÃÂ ÃÂ¬ÃÂÃÂÃÂ­ÃÂÃÂ ÃÂ­ÃÂÃÂ¼ÃÂ«ÃÂÃÂÃÂ«ÃÂ°ÃÂ±, ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂÃÂ«ÃÂÃÂ¹ 20ÃÂªÃÂ°ÃÂ LiDAR ÃÂ¬ÃÂ ÃÂ ÃÂ«ÃÂ§ÃÂÃÂ¬ÃÂÃÂ¼ÃÂ«ÃÂ¡ÃÂ ÃÂ«ÃÂ¶ÃÂÃÂªÃÂ·ÃÂÃÂ¬ÃÂ¹ÃÂ ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ ÃÂ¬ÃÂ ÃÂÃÂ«ÃÂ ÃÂ¬ÃÂÃÂ·ÃÂ­ÃÂÃÂ¼ÃÂ«ÃÂÃÂ´ÃÂªÃÂ¸ÃÂ°ÃÂÃÂ·ÃÂ¬ÃÂÃÂ¸ÃÂ¬ÃÂÃÂÃÂ­ÃÂÃÂÃÂ«ÃÂÃÂÃÂ«ÃÂ¡ÃÂ ÃÂªÃÂ°ÃÂÃÂ­ÃÂÃÂÃÂ­ÃÂÃÂÃÂ¬ÃÂÃÂµÃÂ­ÃÂÃÂ ÃÂªÃÂ²ÃÂ°ÃÂªÃÂ³ÃÂ¼, ÃÂ­ÃÂÃÂÃÂ¬ÃÂÃÂ¥ 40ÃÂ­ÃÂÃÂ ÃÂ¬ÃÂÃÂÃÂ­ÃÂÃÂÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ 70% ÃÂ¬ÃÂÃÂ±ÃÂªÃÂ³ÃÂµÃÂ«ÃÂ¥ÃÂ  ÃÂ¬ÃÂÃÂ ÃÂ«ÃÂÃÂ¬ÃÂ¬ÃÂÃÂ±ÃÂ­ÃÂÃÂÃÂ«ÃÂÃÂ¤(ÃÂ¬ÃÂÃÂÃÂ«ÃÂ ÃÂ¨ÃÂ«ÃÂÃÂ ÃÂ¬ÃÂÃÂ½ 300ÃÂ¬ÃÂÃÂÃÂªÃÂ°ÃÂÃÂ¬ÃÂÃÂ¸ ÃÂ¬ÃÂÃÂ¸ÃÂªÃÂ°ÃÂ ÃÂ¬ÃÂÃÂ´ÃÂ¬ÃÂ ÃÂÃÂ¬ÃÂÃÂ: 83% ). 1. ÃÂ¬ÃÂÃÂ°ÃÂªÃÂµÃÂ¬ÃÂ¬ÃÂÃÂ ÃÂ­ÃÂÃÂµÃÂ¬ÃÂÃÂ¬ ÃÂ¬ÃÂ§ÃÂÃÂ«ÃÂ¬ÃÂ¸ ÃÂ«ÃÂÃÂµÃÂ«ÃÂ³ÃÂ ÃÂ«ÃÂ¬ÃÂ´ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ ÃÂ¬ÃÂÃÂÃÂ«ÃÂÃÂ",
       "shortId": "ypked0",
-      "slug": "2026-towards-learning-boulder-excavation-with-hydraulic-excavators-Ã¬ÂÂÃ¬ÂÂ½",
-      "sourcePath": "02_research/Ã­ÂÂÃ«ÂÂÃ«Â¡ÂÃ«Â´Â/2026 Towards Learning Boulder Excavation with Hydraulic Excavators_Ã¬ÂÂÃ¬ÂÂ½.md",
+      "slug": "2026-towards-learning-boulder-excavation-with-hydraulic-excavators-ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½",
+      "sourcePath": "02_research/ÃÂ­ÃÂÃÂÃÂ«ÃÂÃÂÃÂ«ÃÂ¡ÃÂÃÂ«ÃÂ´ÃÂ/2026 Towards Learning Boulder Excavation with Hydraulic Excavators_ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½.md",
       "tags": [
-        "Ã«ÂÂ¼Ã«Â¬Â¸Ã¬ÂÂÃ¬ÂÂ½",
-        "ÃªÂµÂ´Ã¬Â°Â©Ã«Â¡ÂÃ«Â´Â",
-        "ÃªÂ°ÂÃ­ÂÂÃ­ÂÂÃ¬ÂÂµ",
-        "ÃªÂ±Â´Ã¬ÂÂ¤Ã«Â¡ÂÃ«Â´Â"
+        "ÃÂ«ÃÂÃÂ¼ÃÂ«ÃÂ¬ÃÂ¸ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½",
+        "ÃÂªÃÂµÃÂ´ÃÂ¬ÃÂ°ÃÂ©ÃÂ«ÃÂ¡ÃÂÃÂ«ÃÂ´ÃÂ",
+        "ÃÂªÃÂ°ÃÂÃÂ­ÃÂÃÂÃÂ­ÃÂÃÂÃÂ¬ÃÂÃÂµ",
+        "ÃÂªÃÂ±ÃÂ´ÃÂ¬ÃÂÃÂ¤ÃÂ«ÃÂ¡ÃÂÃÂ«ÃÂ´ÃÂ"
       ],
-      "title": "Towards Learning Boulder Excavation with Hydraulic Excavators Ã¢ÂÂ Ã­ÂÂÃªÂµÂ­Ã¬ÂÂ´ Ã¬ÂÂÃ¬ÂÂ½",
+      "title": "Towards Learning Boulder Excavation with Hydraulic Excavators ÃÂ¢ÃÂÃÂ ÃÂ­ÃÂÃÂÃÂªÃÂµÃÂ­ÃÂ¬ÃÂÃÂ´ ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½",
       "updatedAt": "2026-08-07T07:00:43.482Z",
       "url": "https://hanminy.github.io/marktl-blog/marktl/s/ypked0/"
     },
     {
-      "slug": "yt-yann-lecun-world-models-Ã¬ÂÂÃ¬ÂÂ½",
+      "slug": "yt-yann-lecun-world-models-ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½",
       "shortId": "ksm4c5",
       "url": "https://hanminy.github.io/marktl-blog/marktl/s/ksm4c5/",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-yann-lecun-world-models-%EC%9A%94%EC%95%BD/",
-      "sourcePath": "clippings/yt_Yann_LeCun_World_Models_Ã¬ÂÂÃ¬ÂÂ½.md",
+      "sourcePath": "clippings/yt_Yann_LeCun_World_Models_ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½.md",
       "artifactType": "research-report",
       "title": "Yann LeCun: World Models: Enabling the next AI revolution",
-      "excerpt": "Ã¬ÂÂÃ¬ÂÂ Ã¬Â ÂÃ«Â³Â´ Ã¬Â±ÂÃ«ÂÂ: Computer Vision and Geometry Group, ETH Zurich Ã«ÂÂ Ã¬Â§Â: 20260609 ÃªÂ¸Â¸Ã¬ÂÂ´: 58Ã«Â¶Â 54Ã¬Â´Â Ã«Â§ÂÃ­ÂÂ¬: https://www.youtube.com/watch?v=72Xj8k5WQX4 <div style=\"position: relative; width: 100%; paddi",
+      "excerpt": "ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ ÃÂ¬ÃÂ ÃÂÃÂ«ÃÂ³ÃÂ´ ÃÂ¬ÃÂ±ÃÂÃÂ«ÃÂÃÂ: Computer Vision and Geometry Group, ETH Zurich ÃÂ«ÃÂÃÂ ÃÂ¬ÃÂ§ÃÂ: 20260609 ÃÂªÃÂ¸ÃÂ¸ÃÂ¬ÃÂÃÂ´: 58ÃÂ«ÃÂ¶ÃÂ 54ÃÂ¬ÃÂ´ÃÂ ÃÂ«ÃÂ§ÃÂÃÂ­ÃÂÃÂ¬: https://www.youtube.com/watch?v=72Xj8k5WQX4 <div style=\"position: relative; width: 100%; paddi",
       "tags": [
         "- youtube",
         "youtube",
-        "Ã¬ÂÂ°ÃªÂµÂ¬Ã¬ÂÂÃ«Â£Â",
+        "ÃÂ¬ÃÂÃÂ°ÃÂªÃÂµÃÂ¬ÃÂ¬ÃÂÃÂÃÂ«ÃÂ£ÃÂ",
         "AI",
         "world-model",
         "JEPA",
@@ -173,53 +194,53 @@
       "updatedAt": "2026-08-07T02:54:09.368Z"
     },
     {
-      "slug": "ÃÂ¬ÃÂÃÂ°ÃÂªÃÂµÃÂ¬ÃÂ¬ÃÂÃÂÃÂ«ÃÂ¥ÃÂ¼-ÃÂ¬ÃÂÃÂÃÂ­ÃÂÃÂ-ÃÂ­ÃÂÃÂÃÂ«ÃÂÃÂ¤ÃÂ¬ÃÂÃÂ¤-ÃÂ¬ÃÂÃÂÃÂ¬ÃÂ§ÃÂÃÂ«ÃÂÃÂÃÂ¬ÃÂÃÂ´ÃÂ«ÃÂ§ÃÂ-1ÃÂªÃÂ°ÃÂ-ÃÂ«ÃÂ¹ÃÂÃÂ«ÃÂÃÂÃÂ¬ÃÂºÃÂ ÃÂ­ÃÂÃÂ-4ÃÂªÃÂ¸ÃÂ°-ÃÂ¬ÃÂ½ÃÂÃÂ«ÃÂÃÂÃÂ¬ÃÂÃÂ¤-conanssam",
+      "slug": "ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ°ÃÂÃÂªÃÂÃÂµÃÂÃÂ¬ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ«ÃÂÃÂ¥ÃÂÃÂ¼-ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ­ÃÂÃÂÃÂÃÂ-ÃÂÃÂ­ÃÂÃÂÃÂÃÂÃÂÃÂ«ÃÂÃÂÃÂÃÂ¤ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¤-ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂ§ÃÂÃÂÃÂÃÂ«ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ´ÃÂÃÂ«ÃÂÃÂ§ÃÂÃÂ-1ÃÂÃÂªÃÂÃÂ°ÃÂÃÂ-ÃÂÃÂ«ÃÂÃÂ¹ÃÂÃÂÃÂÃÂ«ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂºÃÂÃÂ ÃÂÃÂ­ÃÂÃÂÃÂÃÂ-4ÃÂÃÂªÃÂÃÂ¸ÃÂÃÂ°-ÃÂÃÂ¬ÃÂÃÂ½ÃÂÃÂÃÂÃÂ«ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¤-conanssam",
       "shortId": "fxqrth",
       "url": "https://hanminy.github.io/marktl-blog/marktl/s/fxqrth/",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/%EC%97%B0%EA%B5%AC%EC%9E%90%EB%A5%BC-%EC%9C%84%ED%95%9C-%ED%95%98%EB%84%A4%EC%8A%A4-%EC%97%94%EC%A7%80%EB%8B%88%EC%96%B4%EB%A7%81-1%EA%B0%95-%EB%B9%8C%EB%93%9C%EC%BA%A0%ED%94%84-4%EA%B8%B0-%EC%BD%94%EB%82%9C%EC%8C%A4-conanssam/",
-      "sourcePath": "02_research/AI/ÃÂ¬ÃÂÃÂ°ÃÂªÃÂµÃÂ¬ÃÂ¬ÃÂÃÂÃÂ«ÃÂ¥ÃÂ¼ ÃÂ¬ÃÂÃÂÃÂ­ÃÂÃÂ ÃÂ­ÃÂÃÂÃÂ«ÃÂÃÂ¤ÃÂ¬ÃÂÃÂ¤ ÃÂ¬ÃÂÃÂÃÂ¬ÃÂ§ÃÂÃÂ«ÃÂÃÂÃÂ¬ÃÂÃÂ´ÃÂ«ÃÂ§ÃÂ 1ÃÂªÃÂ°ÃÂ (ÃÂ«ÃÂ¹ÃÂÃÂ«ÃÂÃÂÃÂ¬ÃÂºÃÂ ÃÂ­ÃÂÃÂ 4ÃÂªÃÂ¸ÃÂ°) - ÃÂ¬ÃÂ½ÃÂÃÂ«ÃÂÃÂÃÂ¬ÃÂÃÂ¤ conanssam.md",
+      "sourcePath": "02_research/AI/ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ°ÃÂÃÂªÃÂÃÂµÃÂÃÂ¬ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ«ÃÂÃÂ¥ÃÂÃÂ¼ ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ­ÃÂÃÂÃÂÃÂ ÃÂÃÂ­ÃÂÃÂÃÂÃÂÃÂÃÂ«ÃÂÃÂÃÂÃÂ¤ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¤ ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂ§ÃÂÃÂÃÂÃÂ«ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ´ÃÂÃÂ«ÃÂÃÂ§ÃÂÃÂ 1ÃÂÃÂªÃÂÃÂ°ÃÂÃÂ (ÃÂÃÂ«ÃÂÃÂ¹ÃÂÃÂÃÂÃÂ«ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂºÃÂÃÂ ÃÂÃÂ­ÃÂÃÂÃÂÃÂ 4ÃÂÃÂªÃÂÃÂ¸ÃÂÃÂ°) - ÃÂÃÂ¬ÃÂÃÂ½ÃÂÃÂÃÂÃÂ«ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¤ conanssam.md",
       "artifactType": "research-report",
-      "title": "[ÃÂ«ÃÂ¹ÃÂÃÂ«ÃÂÃÂÃÂ¬ÃÂºÃÂ ÃÂ­ÃÂÃÂ 4ÃÂªÃÂ¸ÃÂ°] ÃÂ¬ÃÂÃÂ°ÃÂªÃÂµÃÂ¬ÃÂ¬ÃÂÃÂÃÂ«ÃÂ¥ÃÂ¼ ÃÂ¬ÃÂÃÂÃÂ­ÃÂÃÂ ÃÂ­ÃÂÃÂÃÂ«ÃÂÃÂ¤ÃÂ¬ÃÂÃÂ¤ ÃÂ¬ÃÂÃÂÃÂ¬ÃÂ§ÃÂÃÂ«ÃÂÃÂÃÂ¬ÃÂÃÂ´ÃÂ«ÃÂ§ÃÂ 1ÃÂªÃÂ°ÃÂ",
-      "excerpt": "ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ ÃÂ¬ÃÂ ÃÂÃÂ«ÃÂ³ÃÂ´ ÃÂ¬ÃÂ±ÃÂÃÂ«ÃÂÃÂ: ÃÂ¬ÃÂ½ÃÂÃÂ«ÃÂÃÂÃÂ¬ÃÂÃÂ¤ conanssam ÃÂ«ÃÂÃÂ ÃÂ¬ÃÂ§ÃÂ: 20260607 ÃÂªÃÂ¸ÃÂ¸ÃÂ¬ÃÂÃÂ´: 26ÃÂ«ÃÂ¶ÃÂ 26ÃÂ¬ÃÂ´ÃÂ ÃÂªÃÂ°ÃÂÃÂ¬ÃÂÃÂ¬: ÃÂ¬ÃÂÃÂ´ÃÂ¬ÃÂÃÂ°ÃÂ¬ÃÂ§ÃÂ(Woojin Lee) ÃÂ¢ÃÂÃÂ ETRI ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ¬ÃÂ­ÃÂÃÂÃÂ¬ÃÂÃÂ°ÃÂªÃÂµÃÂ¬ÃÂ¬ÃÂÃÂ, ÃÂªÃÂ±ÃÂ´ÃÂªÃÂµÃÂ­ÃÂ«ÃÂÃÂ AI ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ¬ ÃÂ«ÃÂ§ÃÂÃÂ­ÃÂÃÂ¬: https://www.youtube.com/watch?v=fvLSIHoYvMo ÃÂªÃÂ°ÃÂÃÂ¬ÃÂ¢ÃÂ ÃÂ­ÃÂÃÂÃÂ¬ÃÂÃÂ´ÃÂ¬ÃÂ§ÃÂ: https://aifrenz.liveklass.com/",
+      "title": "[ÃÂÃÂ«ÃÂÃÂ¹ÃÂÃÂÃÂÃÂ«ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂºÃÂÃÂ ÃÂÃÂ­ÃÂÃÂÃÂÃÂ 4ÃÂÃÂªÃÂÃÂ¸ÃÂÃÂ°] ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ°ÃÂÃÂªÃÂÃÂµÃÂÃÂ¬ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ«ÃÂÃÂ¥ÃÂÃÂ¼ ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ­ÃÂÃÂÃÂÃÂ ÃÂÃÂ­ÃÂÃÂÃÂÃÂÃÂÃÂ«ÃÂÃÂÃÂÃÂ¤ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¤ ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂ§ÃÂÃÂÃÂÃÂ«ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ´ÃÂÃÂ«ÃÂÃÂ§ÃÂÃÂ 1ÃÂÃÂªÃÂÃÂ°ÃÂÃÂ",
+      "excerpt": "ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ ÃÂÃÂ¬ÃÂÃÂ ÃÂÃÂÃÂÃÂ«ÃÂÃÂ³ÃÂÃÂ´ ÃÂÃÂ¬ÃÂÃÂ±ÃÂÃÂÃÂÃÂ«ÃÂÃÂÃÂÃÂ: ÃÂÃÂ¬ÃÂÃÂ½ÃÂÃÂÃÂÃÂ«ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¤ conanssam ÃÂÃÂ«ÃÂÃÂÃÂÃÂ ÃÂÃÂ¬ÃÂÃÂ§ÃÂÃÂ: 20260607 ÃÂÃÂªÃÂÃÂ¸ÃÂÃÂ¸ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ´: 26ÃÂÃÂ«ÃÂÃÂ¶ÃÂÃÂ 26ÃÂÃÂ¬ÃÂÃÂ´ÃÂÃÂ ÃÂÃÂªÃÂÃÂ°ÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¬: ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ´ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ°ÃÂÃÂ¬ÃÂÃÂ§ÃÂÃÂ(Woojin Lee) ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ ETRI ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¬ÃÂÃÂ­ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ°ÃÂÃÂªÃÂÃÂµÃÂÃÂ¬ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ, ÃÂÃÂªÃÂÃÂ±ÃÂÃÂ´ÃÂÃÂªÃÂÃÂµÃÂÃÂ­ÃÂÃÂ«ÃÂÃÂÃÂÃÂ AI ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¬ ÃÂÃÂ«ÃÂÃÂ§ÃÂÃÂÃÂÃÂ­ÃÂÃÂÃÂÃÂ¬: https://www.youtube.com/watch?v=fvLSIHoYvMo ÃÂÃÂªÃÂÃÂ°ÃÂÃÂÃÂÃÂ¬ÃÂÃÂ¢ÃÂÃÂ ÃÂÃÂ­ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ´ÃÂÃÂ¬ÃÂÃÂ§ÃÂÃÂ: https://aifrenz.liveklass.com/",
       "tags": [
         "youtube",
-        "ÃÂ¬ÃÂÃÂ°ÃÂªÃÂµÃÂ¬ÃÂ¬ÃÂÃÂÃÂ«ÃÂ£ÃÂ",
+        "ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ°ÃÂÃÂªÃÂÃÂµÃÂÃÂ¬ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ«ÃÂÃÂ£ÃÂÃÂ",
         "AI",
-        "ÃÂ­ÃÂÃÂÃÂ«ÃÂÃÂ¤ÃÂ¬ÃÂÃÂ¤ÃÂ¬ÃÂÃÂÃÂ¬ÃÂ§ÃÂÃÂ«ÃÂÃÂÃÂ¬ÃÂÃÂ´ÃÂ«ÃÂ§ÃÂ"
+        "ÃÂÃÂ­ÃÂÃÂÃÂÃÂÃÂÃÂ«ÃÂÃÂÃÂÃÂ¤ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¤ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂ§ÃÂÃÂÃÂÃÂ«ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ´ÃÂÃÂ«ÃÂÃÂ§ÃÂÃÂ"
       ],
       "updatedAt": "08/07/2026 02:32:53"
     },
     {
-      "slug": "2025-towards-fully-integrated-autonomous-excavation-ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ¸ÃÂ«ÃÂÃÂ-ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½",
+      "slug": "2025-towards-fully-integrated-autonomous-excavation-ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¸ÃÂÃÂ«ÃÂÃÂÃÂÃÂ-ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ½",
       "shortId": "l992hf",
       "url": "https://hanminy.github.io/marktl-blog/marktl/s/l992hf/",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/2025-towards-fully-integrated-autonomous-excavation-%EC%84%9C%EC%9A%B8%EB%8C%80-%EC%9A%94%EC%95%BD/",
-      "sourcePath": "02_research/ÃÂ­ÃÂÃÂÃÂ«ÃÂÃÂÃÂ«ÃÂ¡ÃÂÃÂ«ÃÂ´ÃÂ/2025 Towards Fully Integrated Autonomous Excavation-ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ¸ÃÂ«ÃÂÃÂ_ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½.md",
+      "sourcePath": "02_research/ÃÂÃÂ­ÃÂÃÂÃÂÃÂÃÂÃÂ«ÃÂÃÂÃÂÃÂÃÂÃÂ«ÃÂÃÂ¡ÃÂÃÂÃÂÃÂ«ÃÂÃÂ´ÃÂÃÂ/2025 Towards Fully Integrated Autonomous Excavation-ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¸ÃÂÃÂ«ÃÂÃÂÃÂÃÂ_ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ½.md",
       "artifactType": "research-report",
-      "title": "Towards Fully Integrated Autonomous Excavation - ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½",
-      "excerpt": "ÃÂ­ÃÂÃÂÃÂ¬ÃÂ¤ÃÂ ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½ 30ÃÂ­ÃÂÃÂ¤ ÃÂ¬ÃÂÃÂ¤ÃÂ¬ÃÂ ÃÂ ÃÂªÃÂµÃÂ´ÃÂ¬ÃÂ°ÃÂ©ÃÂªÃÂ¸ÃÂ°ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ ÃÂ¬ÃÂ§ÃÂÃÂ­ÃÂÃÂ ÃÂ¬ÃÂÃÂ¸ÃÂ¬ÃÂÃÂ ÃÂ¢ÃÂÃÂ ÃÂªÃÂµÃÂ´ÃÂ¬ÃÂ°ÃÂ© ÃÂªÃÂ²ÃÂ½ÃÂ«ÃÂ¡ÃÂ ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ± ÃÂ¢ÃÂÃÂ MPC ÃÂ¬ÃÂ ÃÂÃÂ¬ÃÂÃÂ´ ÃÂ¢ÃÂÃÂ ÃÂ¬ÃÂ ÃÂÃÂ«ÃÂ°ÃÂ ÃÂ¬ÃÂ§ÃÂÃÂ­ÃÂÃÂ ÃÂªÃÂ²ÃÂÃÂ¬ÃÂÃÂ¬ÃÂ«ÃÂ¥ÃÂ¼ ÃÂ«ÃÂªÃÂ¨ÃÂ«ÃÂÃÂ ÃÂ¬ÃÂÃÂ¨ÃÂ«ÃÂ³ÃÂ´ÃÂ«ÃÂÃÂ ÃÂ¬ÃÂÃÂ¼ÃÂ¬ÃÂÃÂÃÂ«ÃÂ§ÃÂÃÂ¬ÃÂÃÂ¼ÃÂ«ÃÂ¡ÃÂ ÃÂ¬ÃÂÃÂÃÂ­ÃÂÃÂÃÂ­ÃÂÃÂÃÂ«ÃÂÃÂ ÃÂ¬ÃÂÃÂÃÂ¬ÃÂ ÃÂ ÃÂ­ÃÂÃÂµÃÂ­ÃÂÃÂ© ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ¨ ÃÂªÃÂµÃÂ´ÃÂ¬ÃÂ°ÃÂ© ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ¤ÃÂ­ÃÂÃÂ(AES) ÃÂ¬ÃÂÃÂ ÃÂ¬ÃÂ ÃÂÃÂ¬ÃÂÃÂÃÂ­ÃÂÃÂÃÂªÃÂ³ÃÂ , 45ÃÂÃÂ° ÃÂªÃÂ²ÃÂ½ÃÂ¬ÃÂÃÂ¬ÃÂ«ÃÂ©ÃÂ´ ÃÂ¬ÃÂ ÃÂÃÂ­ÃÂÃÂ ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ cm ÃÂ¬ÃÂÃÂÃÂ¬ÃÂ¤ÃÂ ÃÂ¬ÃÂ ÃÂÃÂ«ÃÂ°ÃÂÃÂ«ÃÂÃÂÃÂ«ÃÂ¥ÃÂ¼ ÃÂ«ÃÂÃÂ¬ÃÂ¬ÃÂÃÂ±ÃÂ­ÃÂÃÂÃÂ«ÃÂÃÂ¤. 1. ÃÂ¬ÃÂÃÂ°ÃÂªÃÂµÃÂ¬ ÃÂ«ÃÂ°ÃÂ°ÃÂªÃÂ²ÃÂ½ ÃÂ«ÃÂ°ÃÂ ÃÂ«ÃÂÃÂÃÂªÃÂ¸ÃÂ° ÃÂ«ÃÂ¬ÃÂ¸ÃÂ¬ÃÂ ÃÂ ÃÂªÃÂ±ÃÂ´ÃÂ¬ÃÂÃÂ¤ ÃÂ­ÃÂÃÂÃÂ¬ÃÂÃÂ¥ÃÂ¬ÃÂÃÂ ÃÂ«ÃÂÃÂ¸ÃÂ«ÃÂÃÂÃÂ«ÃÂ ÃÂ¥ ÃÂ«ÃÂ¶ÃÂÃÂ¬ÃÂ¡ÃÂ±, ÃÂ¬ÃÂÃÂ¸ÃÂªÃÂ±ÃÂ´ÃÂ«ÃÂ¹ÃÂ ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ¹, ÃÂ¬ÃÂÃÂÃÂ¬ÃÂ ÃÂ ÃÂ¬ÃÂÃÂÃÂ­ÃÂÃÂ ",
+      "title": "Towards Fully Integrated Autonomous Excavation - ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ½",
+      "excerpt": "ÃÂÃÂ­ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂ¤ÃÂÃÂ ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ½ 30ÃÂÃÂ­ÃÂÃÂÃÂÃÂ¤ ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¤ÃÂÃÂ¬ÃÂÃÂ ÃÂÃÂ ÃÂÃÂªÃÂÃÂµÃÂÃÂ´ÃÂÃÂ¬ÃÂÃÂ°ÃÂÃÂ©ÃÂÃÂªÃÂÃÂ¸ÃÂÃÂ°ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ ÃÂÃÂ¬ÃÂÃÂ§ÃÂÃÂÃÂÃÂ­ÃÂÃÂÃÂÃÂ ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¸ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ ÃÂÃÂªÃÂÃÂµÃÂÃÂ´ÃÂÃÂ¬ÃÂÃÂ°ÃÂÃÂ© ÃÂÃÂªÃÂÃÂ²ÃÂÃÂ½ÃÂÃÂ«ÃÂÃÂ¡ÃÂÃÂ ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ± ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ MPC ÃÂÃÂ¬ÃÂÃÂ ÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ´ ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ ÃÂÃÂ¬ÃÂÃÂ ÃÂÃÂÃÂÃÂ«ÃÂÃÂ°ÃÂÃÂ ÃÂÃÂ¬ÃÂÃÂ§ÃÂÃÂÃÂÃÂ­ÃÂÃÂÃÂÃÂ ÃÂÃÂªÃÂÃÂ²ÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¬ÃÂÃÂ«ÃÂÃÂ¥ÃÂÃÂ¼ ÃÂÃÂ«ÃÂÃÂªÃÂÃÂ¨ÃÂÃÂ«ÃÂÃÂÃÂÃÂ ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¨ÃÂÃÂ«ÃÂÃÂ³ÃÂÃÂ´ÃÂÃÂ«ÃÂÃÂÃÂÃÂ ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¼ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ«ÃÂÃÂ§ÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¼ÃÂÃÂ«ÃÂÃÂ¡ÃÂÃÂ ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ­ÃÂÃÂÃÂÃÂÃÂÃÂ­ÃÂÃÂÃÂÃÂÃÂÃÂ«ÃÂÃÂÃÂÃÂ ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂ ÃÂÃÂ ÃÂÃÂ­ÃÂÃÂÃÂÃÂµÃÂÃÂ­ÃÂÃÂÃÂÃÂ© ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¨ ÃÂÃÂªÃÂÃÂµÃÂÃÂ´ÃÂÃÂ¬ÃÂÃÂ°ÃÂÃÂ© ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¤ÃÂÃÂ­ÃÂÃÂÃÂÃÂ(AES) ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ ÃÂÃÂ¬ÃÂÃÂ ÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ­ÃÂÃÂÃÂÃÂÃÂÃÂªÃÂÃÂ³ÃÂÃÂ , 45ÃÂÃÂÃÂÃÂ° ÃÂÃÂªÃÂÃÂ²ÃÂÃÂ½ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¬ÃÂÃÂ«ÃÂÃÂ©ÃÂÃÂ´ ÃÂÃÂ¬ÃÂÃÂ ÃÂÃÂÃÂÃÂ­ÃÂÃÂÃÂÃÂ ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ cm ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂ¤ÃÂÃÂ ÃÂÃÂ¬ÃÂÃÂ ÃÂÃÂÃÂÃÂ«ÃÂÃÂ°ÃÂÃÂÃÂÃÂ«ÃÂÃÂÃÂÃÂÃÂÃÂ«ÃÂÃÂ¥ÃÂÃÂ¼ ÃÂÃÂ«ÃÂÃÂÃÂÃÂ¬ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ±ÃÂÃÂ­ÃÂÃÂÃÂÃÂÃÂÃÂ«ÃÂÃÂÃÂÃÂ¤. 1. ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ°ÃÂÃÂªÃÂÃÂµÃÂÃÂ¬ ÃÂÃÂ«ÃÂÃÂ°ÃÂÃÂ°ÃÂÃÂªÃÂÃÂ²ÃÂÃÂ½ ÃÂÃÂ«ÃÂÃÂ°ÃÂÃÂ ÃÂÃÂ«ÃÂÃÂÃÂÃÂÃÂÃÂªÃÂÃÂ¸ÃÂÃÂ° ÃÂÃÂ«ÃÂÃÂ¬ÃÂÃÂ¸ÃÂÃÂ¬ÃÂÃÂ ÃÂÃÂ ÃÂÃÂªÃÂÃÂ±ÃÂÃÂ´ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¤ ÃÂÃÂ­ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¥ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ ÃÂÃÂ«ÃÂÃÂÃÂÃÂ¸ÃÂÃÂ«ÃÂÃÂÃÂÃÂÃÂÃÂ«ÃÂÃÂ ÃÂÃÂ¥ ÃÂÃÂ«ÃÂÃÂ¶ÃÂÃÂÃÂÃÂ¬ÃÂÃÂ¡ÃÂÃÂ±, ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¸ÃÂÃÂªÃÂÃÂ±ÃÂÃÂ´ÃÂÃÂ«ÃÂÃÂ¹ÃÂÃÂ ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¹, ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂ ÃÂÃÂ ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ­ÃÂÃÂÃÂÃÂ ",
       "tags": [
-        "ÃÂ«ÃÂÃÂ¼ÃÂ«ÃÂ¬ÃÂ¸ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½",
-        "ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ¨ÃÂªÃÂµÃÂ´ÃÂ¬ÃÂ°ÃÂ©",
-        "ÃÂ­ÃÂÃÂÃÂ«ÃÂÃÂÃÂ«ÃÂ¡ÃÂÃÂ«ÃÂ´ÃÂ"
+        "ÃÂÃÂ«ÃÂÃÂÃÂÃÂ¼ÃÂÃÂ«ÃÂÃÂ¬ÃÂÃÂ¸ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ½",
+        "ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¨ÃÂÃÂªÃÂÃÂµÃÂÃÂ´ÃÂÃÂ¬ÃÂÃÂ°ÃÂÃÂ©",
+        "ÃÂÃÂ­ÃÂÃÂÃÂÃÂÃÂÃÂ«ÃÂÃÂÃÂÃÂÃÂÃÂ«ÃÂÃÂ¡ÃÂÃÂÃÂÃÂ«ÃÂÃÂ´ÃÂÃÂ"
       ],
       "updatedAt": "08/07/2026 01:52:30"
     },
     {
-      "slug": "yt-sergey-levine-rl-for-robot-foundation-models-ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½",
+      "slug": "yt-sergey-levine-rl-for-robot-foundation-models-ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ½",
       "shortId": "5iazpp",
       "url": "https://hanminy.github.io/marktl-blog/marktl/s/5iazpp/",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-sergey-levine-rl-for-robot-foundation-models-%EC%9A%94%EC%95%BD/",
-      "sourcePath": "clippings/yt_Sergey_Levine_RL_for_Robot_Foundation_Models_ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½.md",
+      "sourcePath": "clippings/yt_Sergey_Levine_RL_for_Robot_Foundation_Models_ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ½.md",
       "artifactType": "research-report",
       "title": "Sergey Levine (UC Berkeley & PI): RL for Robot Foundation Models",
-      "excerpt": "ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ ÃÂ¬ÃÂ ÃÂÃÂ«ÃÂ³ÃÂ´ ÃÂ¬ÃÂ±ÃÂÃÂ«ÃÂÃÂ: Zhanpeng He ÃÂ«ÃÂÃÂ ÃÂ¬ÃÂ§ÃÂ: 20260608 ÃÂªÃÂ¸ÃÂ¸ÃÂ¬ÃÂÃÂ´: 32ÃÂ«ÃÂ¶ÃÂ 14ÃÂ¬ÃÂ´ÃÂ ÃÂ­ÃÂÃÂÃÂ¬ÃÂÃÂ¬: ICRA 2026 Workshop on RL in the Era of IL (rl4ilicra.github.io) ÃÂ«ÃÂ§ÃÂÃÂ­ÃÂÃÂ¬: https://www.youtube.com/watch?v=u0WJXi8PC6Y <div style=\"posit",
+      "excerpt": "ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ ÃÂÃÂ¬ÃÂÃÂ ÃÂÃÂÃÂÃÂ«ÃÂÃÂ³ÃÂÃÂ´ ÃÂÃÂ¬ÃÂÃÂ±ÃÂÃÂÃÂÃÂ«ÃÂÃÂÃÂÃÂ: Zhanpeng He ÃÂÃÂ«ÃÂÃÂÃÂÃÂ ÃÂÃÂ¬ÃÂÃÂ§ÃÂÃÂ: 20260608 ÃÂÃÂªÃÂÃÂ¸ÃÂÃÂ¸ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ´: 32ÃÂÃÂ«ÃÂÃÂ¶ÃÂÃÂ 14ÃÂÃÂ¬ÃÂÃÂ´ÃÂÃÂ ÃÂÃÂ­ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ¬: ICRA 2026 Workshop on RL in the Era of IL (rl4ilicra.github.io) ÃÂÃÂ«ÃÂÃÂ§ÃÂÃÂÃÂÃÂ­ÃÂÃÂÃÂÃÂ¬: https://www.youtube.com/watch?v=u0WJXi8PC6Y <div style=\"posit",
       "tags": [
         "youtube",
-        "ÃÂ¬ÃÂÃÂ°ÃÂªÃÂµÃÂ¬ÃÂ¬ÃÂÃÂÃÂ«ÃÂ£ÃÂ",
-        "ÃÂ«ÃÂ¡ÃÂÃÂ«ÃÂ´ÃÂ",
-        "ÃÂªÃÂ°ÃÂÃÂ­ÃÂÃÂÃÂ­ÃÂÃÂÃÂ¬ÃÂÃÂµ",
-        "ÃÂ­ÃÂÃÂÃÂ¬ÃÂÃÂ´ÃÂ«ÃÂÃÂ°ÃÂ¬ÃÂÃÂ´ÃÂ¬ÃÂÃÂÃÂ«ÃÂªÃÂ¨ÃÂ«ÃÂÃÂ¸"
+        "ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ°ÃÂÃÂªÃÂÃÂµÃÂÃÂ¬ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ«ÃÂÃÂ£ÃÂÃÂ",
+        "ÃÂÃÂ«ÃÂÃÂ¡ÃÂÃÂÃÂÃÂ«ÃÂÃÂ´ÃÂÃÂ",
+        "ÃÂÃÂªÃÂÃÂ°ÃÂÃÂÃÂÃÂ­ÃÂÃÂÃÂÃÂÃÂÃÂ­ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂµ",
+        "ÃÂÃÂ­ÃÂÃÂÃÂÃÂÃÂÃÂ¬ÃÂÃÂÃÂÃÂ´ÃÂÃÂ«ÃÂÃÂÃÂÃÂ°ÃÂÃÂ¬ÃÂÃÂÃÂÃÂ´ÃÂÃÂ¬ÃÂÃÂÃÂÃÂÃÂÃÂ«ÃÂÃÂªÃÂÃÂ¨ÃÂÃÂ«ÃÂÃÂÃÂÃÂ¸"
       ],
       "updatedAt": "08/06/2026 08:36:05"
     }
