@@ -1,7 +1,19 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-08T01:12:50.933Z",
+  "updatedAt": "2026-08-11T02:38:21.407Z",
   "items": [
+    {
+      "slug": "한민확인-yt-sergey-levine-rl-for-robot-foundation-models-요약",
+      "shortId": "72ym5b",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/72ym5b/",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/%ED%95%9C%EB%AF%BC%ED%99%95%EC%9D%B8-yt-sergey-levine-rl-for-robot-foundation-models-%EC%9A%94%EC%95%BD/",
+      "sourcePath": "clippings/(한민확인)yt_Sergey_Levine_RL_for_Robot_Foundation_Models_요약.md",
+      "artifactType": "slide-deck",
+      "title": "Sergey Levine (UC Berkeley & PI): RL for Robot Foundation Models",
+      "excerpt": "type: youtubesummary title: 'Sergey Levine (UC Berkeley & PI): RL for Robot Foundation Models' sourcetitle: 'Sergey Levine (UC Berkeley & PI): RL for Robot Foundation Models' sourc",
+      "tags": [],
+      "updatedAt": "2026-08-11T02:38:21.407Z"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-georgia-chalvatzaki-rl-from-for-with-demonstrations-%EC%9A%94%EC%95%BD/",
