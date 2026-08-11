@@ -24,51 +24,6 @@
       "updatedAt": "2026-08-11T06:51:46.721Z"
     },
     {
-      "slug": "260811-apex-íë¡ì í¸-íí©-ì¢í©-ì ê²",
-      "shortId": "18ar77w",
-      "url": "https://hanminy.github.io/marktl-blog/marktl/s/18ar77w/",
-      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/260811-apex-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%ED%98%84%ED%99%A9-%EC%A2%85%ED%95%A9-%EC%A0%90%EA%B2%80/",
-      "sourcePath": "08_devlog/260811_APEX íë¡ì í¸ íí© ì¢í© ì ê².md",
-      "artifactType": "interactive-explainer",
-      "title": "APEX íë¡ì í¸ íí© ì¢í© ì ê²",
-      "excerpt": "í ì¤ ê²°ë¡  APEXë ìë®¬ë ì´í°Â·ì¼ìÂ·ROS2Â·GridMap íµí© ê¸°ë°ì ê°ì¶ê³  ë¼ë¬¸ ê¸°ë° êµ´ì°© ê²½ë¡ ê³íì ì¤ì  AGX êµ´ì°©ê¹ì§ ì°ê²°í ì°êµ¬ íë¡í íìì´ë¤. ë¤ë§ ìµì  Phase B ì±ê³¼ê° ìì§ Claude ë¡ì»¬ ë¸ëì¹ìë§ ìê³ , ìì í¸ë¦¬ ì ë¦¬Â·ìë íê·ìíÂ·ì¤ìê° ëì­í MPCÂ·ì¤ì°¨ ìì  ê³ì¸µì ë¨ì ìë¤. ì´ ë¬¸",
-      "tags": [
-        "apex",
-        "unity",
-        "agx",
-        "ros2",
-        "gridmap",
-        "mpc",
-        "project-status",
-        "devlog"
-      ],
-      "updatedAt": "2026-08-11T06:47:17.316Z"
-    },
-    {
-      "slug": "Ã­ÂÂÃ«Â¯Â¼Ã­ÂÂÃ¬ÂÂ¸-yt-sergey-levine-rl-for-robot-foundation-models-Ã¬ÂÂÃ¬ÂÂ½",
-      "shortId": "72ym5b",
-      "url": "https://hanminy.github.io/marktl-blog/marktl/s/72ym5b/",
-      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/%ED%95%9C%EB%AF%BC%ED%99%95%EC%9D%B8-yt-sergey-levine-rl-for-robot-foundation-models-%EC%9A%94%EC%95%BD/",
-      "sourcePath": "clippings/(Ã­ÂÂÃ«Â¯Â¼Ã­ÂÂÃ¬ÂÂ¸)yt_Sergey_Levine_RL_for_Robot_Foundation_Models_Ã¬ÂÂÃ¬ÂÂ½.md",
-      "artifactType": "research-report",
-      "title": "Sergey Levine (UC Berkeley & PI): RL for Robot Foundation Models",
-      "excerpt": "type: youtubesummary title: 'Sergey Levine (UC Berkeley & PI): RL for Robot Foundation Models' sourcetitle: 'Sergey Levine (UC Berkeley & PI): RL for Robot Foundation Models' sourc",
-      "tags": [],
-      "updatedAt": "2026-08-11T02:47:29.947Z"
-    },
-    {
-      "slug": "ÃÂ­ÃÂÃÂÃÂ«ÃÂ¯ÃÂ¼ÃÂ­ÃÂÃÂÃÂ¬ÃÂÃÂ¸-yt-sergey-levine-rl-for-robot-foundation-models-ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½",
-      "shortId": "72ym5b",
-      "url": "https://hanminy.github.io/marktl-blog/marktl/s/72ym5b/",
-      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/%ED%95%9C%EB%AF%BC%ED%99%95%EC%9D%B8-yt-sergey-levine-rl-for-robot-foundation-models-%EC%9A%94%EC%95%BD/",
-      "sourcePath": "clippings/(ÃÂ­ÃÂÃÂÃÂ«ÃÂ¯ÃÂ¼ÃÂ­ÃÂÃÂÃÂ¬ÃÂÃÂ¸)yt_Sergey_Levine_RL_for_Robot_Foundation_Models_ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ½.md",
-      "artifactType": "slide-deck",
-      "title": "Sergey Levine (UC Berkeley & PI): RL for Robot Foundation Models",
-      "excerpt": "type: youtubesummary title: 'Sergey Levine (UC Berkeley & PI): RL for Robot Foundation Models' sourcetitle: 'Sergey Levine (UC Berkeley & PI): RL for Robot Foundation Models' sourc",
-      "tags": [],
-      "updatedAt": "2026-08-11T02:38:21.407Z"
-    },
-    {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-georgia-chalvatzaki-rl-from-for-with-demonstrations-%EC%9A%94%EC%95%BD/",
       "excerpt": "Georgia Chalvatzaki (TU Darmstadt): Reinforcement Learning From, For and With Demonstrations ÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ ÃÂ¬ÃÂ ÃÂÃÂ«ÃÂ³ÃÂ´ ÃÂ¬ÃÂ±ÃÂÃÂ«ÃÂÃÂ : Zhanpeng He (ICRA 2026 RL4IL ÃÂ¬ÃÂÃÂÃÂ­ÃÂÃÂ¬ÃÂ¬ÃÂÃÂµ) ÃÂªÃÂ²ÃÂÃÂ¬ÃÂÃÂÃÂ¬ÃÂÃÂ¼ : 2026 06 08 ÃÂªÃÂ¸ÃÂ¸ÃÂ¬ÃÂÃÂ´ : 30ÃÂ«ÃÂ¶ÃÂ 45ÃÂ¬ÃÂ´ÃÂ ÃÂ«ÃÂ§ÃÂÃÂ­ÃÂÃÂ¬ : https://www.youtube.com/watch?v=ieStIXBGriU <div style=\"position: r",
