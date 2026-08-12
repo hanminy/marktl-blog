@@ -4,664 +4,694 @@
   
   
   
-  
-  
   <title>강화학습 기초 — 로봇 VLA 논문·발표 읽기용</title>
+  
+  
+  
   <style>
     :root {
-      color-scheme: light;
-      --paper: #f8f7f3;
-      --surface: #ffffff;
-      --surface-soft: #f1f4f2;
-      --ink: #18211d;
-      --muted: #627069;
-      --line: #dce3df;
-      --accent: #176b58;
-      --accent-dark: #0d4c3e;
-      --accent-soft: #e4f2ed;
-      --blue: #245d86;
-      --blue-soft: #e9f2f8;
-      --amber: #9a5c08;
-      --amber-soft: #fff2d6;
-      --red: #9a3838;
-      --red-soft: #fbeaea;
-      --violet: #6552a3;
-      --violet-soft: #efebfb;
-      --shadow: 0 18px 45px rgba(22, 37, 31, .08);
+      --paper: #f7f5ef;
+      --surface: #fffefa;
+      --surface-2: #f0eee6;
+      --ink: #1e2928;
+      --muted: #62706d;
+      --line: #d8ddd8;
+      --accent: #176b62;
+      --accent-soft: #dff1ec;
+      --blue: #315f82;
+      --blue-soft: #e8f1f7;
+      --amber: #8b5c13;
+      --amber-soft: #fff2d7;
+      --red: #9a403a;
+      --red-soft: #fbe9e6;
+      --green: #246b45;
+      --green-soft: #e6f3e9;
+      --violet: #62518b;
+      --violet-soft: #eeeafa;
+      --shadow: 0 18px 50px rgba(32, 49, 46, .08);
       --radius: 18px;
       --content: 860px;
-      --nav: 270px;
+      --nav: 260px;
     }
 
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 2rem;
+    }
+
     body {
       margin: 0;
-      background:
-        radial-gradient(circle at 8% 0%, rgba(23,107,88,.07), transparent 28rem),
-        var(--paper);
       color: var(--ink);
-      font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 8% 0%, rgba(23,107,98,.10), transparent 28rem),
+        linear-gradient(180deg, #f3f1e9 0, var(--paper) 28rem);
+      font-family:
+        Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", Inter,
+        system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 17px;
-      line-height: 1.78;
+      line-height: 1.82;
       word-break: keep-all;
       overflow-wrap: anywhere;
     }
 
-    a { color: var(--accent-dark); text-decoration-thickness: .08em; text-underline-offset: .18em; }
-    a:hover { color: var(--accent); }
-    code, pre, .formula {
-      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-    }
-    code {
-      padding: .14em .38em;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      background: #f4f6f5;
-      font-size: .88em;
-    }
-    pre {
-      margin: 1.2rem 0;
-      padding: 1.1rem 1.25rem;
-      overflow-x: auto;
-      border: 1px solid #d7dfdb;
-      border-radius: 13px;
-      background: #17211d;
-      color: #eaf4ef;
-      font-size: .88rem;
-      line-height: 1.65;
-      white-space: pre;
-      box-shadow: inset 0 1px rgba(255,255,255,.04);
-    }
-    pre code { padding: 0; border: 0; background: transparent; color: inherit; font-size: inherit; }
-    strong { color: #102b22; }
-    em { color: #35443e; }
-    mark { background: var(--amber-soft); }
-
-    .page {
-      display: grid;
-      grid-template-columns: var(--nav) minmax(0, var(--content));
-      gap: clamp(2rem, 5vw, 5rem);
-      width: min(1240px, calc(100% - 40px));
-      margin: 0 auto;
-      padding: 28px 0 90px;
-      align-items: start;
-    }
-
-    .sidebar {
-      position: sticky;
-      top: 18px;
-      max-height: calc(100vh - 36px);
-      overflow: auto;
-      scrollbar-width: thin;
-      padding: 1rem 1rem 1.2rem;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: rgba(255,255,255,.86);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 12px 30px rgba(28,45,38,.06);
-    }
-    .sidebar .eyebrow {
-      margin: 0 0 .5rem;
+    a {
       color: var(--accent);
-      font-size: .72rem;
-      font-weight: 800;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-    }
-    .sidebar h2 { margin: 0 0 .85rem; font-size: 1rem; }
-    .toc { margin: 0; padding: 0; list-style: none; }
-    .toc li + li { margin-top: .18rem; }
-    .toc a {
-      display: block;
-      padding: .4rem .52rem;
-      border-radius: 8px;
-      color: #425049;
-      font-size: .79rem;
-      line-height: 1.35;
-      text-decoration: none;
-    }
-    .toc a:hover { background: var(--accent-soft); color: var(--accent-dark); }
-    .toc .appendix a { color: var(--violet); }
-    .sidebar-meta {
-      display: grid;
-      gap: .45rem;
-      margin-top: 1rem;
-      padding-top: .9rem;
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-      font-size: .74rem;
+      text-decoration-thickness: .08em;
+      text-underline-offset: .18em;
     }
 
-    main { min-width: 0; }
-    .hero {
-      position: relative;
-      overflow: hidden;
-      padding: clamp(2rem, 6vw, 4.5rem);
-      border: 1px solid #cfe0d9;
-      border-radius: 26px;
-      background:
-        linear-gradient(135deg, rgba(255,255,255,.98), rgba(232,244,239,.92)),
-        var(--surface);
-      box-shadow: var(--shadow);
-    }
-    .hero::after {
-      content: "";
+    a:hover { color: #0e4d47; }
+
+    .skip {
       position: absolute;
-      right: -110px;
-      top: -145px;
-      width: 330px;
-      height: 330px;
-      border: 52px solid rgba(23,107,88,.07);
-      border-radius: 50%;
+      left: 1rem;
+      top: -5rem;
+      z-index: 10;
+      padding: .7rem 1rem;
+      color: white;
+      background: var(--accent);
+      border-radius: 8px;
     }
-    .hero .kicker {
-      position: relative;
-      z-index: 1;
-      margin: 0 0 .8rem;
+
+    .skip:focus { top: 1rem; }
+
+    .masthead {
+      padding: 5rem max(1.25rem, calc((100vw - 1180px) / 2)) 3.4rem;
+      border-bottom: 1px solid rgba(23,107,98,.16);
+    }
+
+    .eyebrow {
+      margin: 0 0 .7rem;
       color: var(--accent);
       font-size: .78rem;
-      font-weight: 850;
+      font-weight: 800;
       letter-spacing: .13em;
       text-transform: uppercase;
     }
-    .hero h1 {
-      position: relative;
-      z-index: 1;
-      max-width: 740px;
+
+    h1 {
+      max-width: 940px;
       margin: 0;
-      font-size: clamp(2.15rem, 6vw, 4.15rem);
+      font-family: Georgia, "Noto Serif KR", serif;
+      font-size: clamp(2.2rem, 5vw, 4.65rem);
       line-height: 1.12;
       letter-spacing: -.045em;
     }
+
+    .dek {
+      max-width: 780px;
+      margin: 1.35rem 0 0;
+      color: var(--muted);
+      font-size: 1.08rem;
+    }
+
     .meta {
-      position: relative;
-      z-index: 1;
       display: flex;
       flex-wrap: wrap;
-      gap: .5rem;
-      margin-top: 1.5rem;
+      gap: .55rem;
+      margin-top: 1.6rem;
     }
-    .tag {
-      display: inline-flex;
-      align-items: center;
-      min-height: 29px;
-      padding: .2rem .65rem;
-      border: 1px solid #caddd5;
+
+    .chip {
+      padding: .35rem .68rem;
+      color: #31504b;
+      background: rgba(255,255,255,.66);
+      border: 1px solid rgba(23,107,98,.2);
       border-radius: 999px;
-      background: rgba(255,255,255,.75);
-      color: var(--accent-dark);
-      font-size: .76rem;
+      font-size: .78rem;
       font-weight: 700;
     }
 
-    .document-purpose { margin: 1.5rem 0 3.8rem; }
-    article > section {
-      margin: 4.5rem 0;
-      scroll-margin-top: 28px;
+    .layout {
+      display: grid;
+      grid-template-columns: var(--nav) minmax(0, var(--content));
+      justify-content: center;
+      gap: 3.25rem;
+      padding: 2.5rem 1.25rem 6rem;
     }
-    article > section > header {
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 2px solid var(--ink);
+
+    nav {
+      position: sticky;
+      top: 1rem;
+      align-self: start;
+      max-height: calc(100vh - 2rem);
+      overflow: auto;
+      padding: 1.1rem;
+      background: rgba(255,254,250,.82);
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      box-shadow: 0 10px 28px rgba(32,49,46,.05);
+      backdrop-filter: blur(12px);
     }
-    .part-number {
-      display: inline-block;
-      margin-bottom: .45rem;
-      color: var(--accent);
-      font-size: .77rem;
-      font-weight: 850;
-      letter-spacing: .11em;
+
+    nav h2 {
+      margin: 0 0 .7rem;
+      font-size: .75rem;
+      letter-spacing: .12em;
       text-transform: uppercase;
     }
-    h2 {
-      margin: 0;
-      font-size: clamp(1.65rem, 4vw, 2.5rem);
-      line-height: 1.25;
-      letter-spacing: -.035em;
-    }
-    h3 {
-      margin: 2.8rem 0 1rem;
-      color: #163a2f;
-      font-size: clamp(1.22rem, 2.5vw, 1.55rem);
-      line-height: 1.35;
-      letter-spacing: -.02em;
-      scroll-margin-top: 30px;
-    }
-    h4 { margin: 2rem 0 .65rem; font-size: 1.03rem; }
-    p { margin: .85rem 0; }
-    ul, ol { padding-left: 1.45rem; }
-    li + li { margin-top: .28rem; }
 
-    .lead {
-      color: #34433c;
-      font-size: 1.08rem;
+    nav ol {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: toc;
     }
-    .formula {
-      margin: 1.25rem 0;
-      padding: 1rem 1.2rem;
-      overflow-x: auto;
-      border: 1px solid #cfe0d9;
+
+    nav li { counter-increment: toc; }
+
+    nav a {
+      display: grid;
+      grid-template-columns: 1.75rem 1fr;
+      gap: .15rem;
+      padding: .38rem .3rem;
+      color: #52625f;
+      border-radius: 7px;
+      font-size: .8rem;
+      line-height: 1.42;
+      text-decoration: none;
+    }
+
+    nav a::before {
+      content: counter(toc, decimal-leading-zero);
+      color: #94a09e;
+      font-variant-numeric: tabular-nums;
+    }
+
+    nav a:hover {
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    main { min-width: 0; }
+
+    .callout,
+    .part {
+      background: rgba(255,254,250,.96);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .purpose {
+      margin-bottom: 2rem;
+      padding: 1.5rem 1.65rem;
+      border-left: 5px solid var(--accent);
+    }
+
+    .purpose h2 {
+      margin: 0 0 .55rem;
+      color: var(--accent);
+      font-size: 1.05rem;
+    }
+
+    .part {
+      margin: 0 0 2rem;
+      padding: clamp(1.25rem, 4vw, 2.6rem);
+    }
+
+    .part > header {
+      margin: calc(-1 * clamp(1.25rem, 4vw, 2.6rem));
+      margin-bottom: 2rem;
+      padding: 1.65rem clamp(1.25rem, 4vw, 2.6rem);
+      background: linear-gradient(115deg, #e4f1ed, #f8f7f1 72%);
+      border-bottom: 1px solid var(--line);
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .part-number {
+      display: block;
+      margin-bottom: .32rem;
+      color: var(--accent);
+      font-size: .74rem;
+      font-weight: 900;
+      letter-spacing: .14em;
+    }
+
+    .part h2 {
+      margin: 0;
+      font-family: Georgia, "Noto Serif KR", serif;
+      font-size: clamp(1.65rem, 4vw, 2.45rem);
+      line-height: 1.25;
+      letter-spacing: -.025em;
+    }
+
+    h3 {
+      margin: 2.5rem 0 .8rem;
+      padding-bottom: .45rem;
+      border-bottom: 2px solid var(--accent-soft);
+      font-size: 1.3rem;
+      line-height: 1.4;
+    }
+
+    h4 {
+      margin: 1.75rem 0 .5rem;
+      color: #294a46;
+      font-size: 1.03rem;
+    }
+
+    p { margin: .75rem 0 1rem; }
+    ul, ol { padding-left: 1.35rem; }
+    li + li { margin-top: .34rem; }
+    strong { color: #152d2a; }
+    em { color: #475c58; }
+
+    code {
+      padding: .13em .35em;
+      color: #334e4a;
+      background: #edf1ed;
+      border-radius: 5px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: .88em;
+    }
+
+    pre {
+      margin: 1.2rem 0;
+      padding: 1.1rem 1.25rem;
+      overflow: auto;
+      color: #d9efe8;
+      background: #18312e;
+      border: 1px solid #294a45;
       border-radius: 12px;
-      background: #f2f8f5;
-      color: #123c30;
-      font-size: 1rem;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: .85rem;
+      line-height: 1.65;
+      white-space: pre;
+      tab-size: 2;
+    }
+
+    .math {
+      margin: 1.15rem 0;
+      padding: .8rem 1rem;
+      overflow-x: auto;
+      color: #203f3b;
+      background: #f1f6f3;
+      border: 1px solid #d9e6e0;
+      border-radius: 10px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.08rem;
       text-align: center;
       white-space: nowrap;
     }
-    .boxed { border-width: 2px; font-weight: 800; }
 
     .callout {
       margin: 1.4rem 0;
-      padding: 1.15rem 1.25rem 1.2rem;
-      border: 1px solid #cbded6;
-      border-left: 5px solid var(--accent);
-      border-radius: 12px;
-      background: var(--accent-soft);
+      padding: 1.15rem 1.3rem;
+      box-shadow: none;
     }
+
     .callout-title {
-      margin: 0 0 .35rem;
-      color: var(--accent-dark);
-      font-size: .82rem;
-      font-weight: 850;
-      letter-spacing: .04em;
+      display: block;
+      margin-bottom: .38rem;
+      color: var(--accent);
+      font-size: .83rem;
+      font-weight: 900;
+      letter-spacing: .06em;
     }
-    .callout p:last-child, .callout ul:last-child { margin-bottom: 0; }
-    .important { border-color: #c9dcea; border-left-color: var(--blue); background: var(--blue-soft); }
-    .important .callout-title { color: var(--blue); }
-    .warning { border-color: #efd9aa; border-left-color: var(--amber); background: var(--amber-soft); }
-    .warning .callout-title { color: var(--amber); }
-    .question { border-color: #d9cfee; border-left-color: var(--violet); background: var(--violet-soft); }
+
+    .important { background: var(--amber-soft); border-color: #ebd295; }
+    .important .callout-title { color: var(--amber); }
+    .warning { background: var(--red-soft); border-color: #ebc0ba; }
+    .warning .callout-title { color: var(--red); }
+    .success { background: var(--green-soft); border-color: #bcdcc6; }
+    .success .callout-title { color: var(--green); }
+    .question { background: var(--violet-soft); border-color: #d3c8ee; }
     .question .callout-title { color: var(--violet); }
-    .danger { border-color: #edcaca; border-left-color: var(--red); background: var(--red-soft); }
-    .danger .callout-title { color: var(--red); }
+    .example, .tip, .note { background: var(--blue-soft); border-color: #c4d8e8; }
+    .example .callout-title,
+    .tip .callout-title,
+    .note .callout-title { color: var(--blue); }
 
     .table-wrap {
-      margin: 1.35rem 0;
+      margin: 1.2rem 0 1.7rem;
       overflow-x: auto;
       border: 1px solid var(--line);
-      border-radius: 14px;
-      background: var(--surface);
-      box-shadow: 0 8px 24px rgba(31,46,40,.045);
+      border-radius: 12px;
     }
+
     table {
       width: 100%;
-      min-width: 580px;
+      min-width: 560px;
       border-collapse: collapse;
+      background: #fff;
       font-size: .9rem;
       line-height: 1.55;
     }
+
     th, td {
-      padding: .8rem .9rem;
-      border-bottom: 1px solid var(--line);
+      padding: .75rem .85rem;
+      border-bottom: 1px solid #e2e5e1;
       text-align: left;
       vertical-align: top;
     }
+
     th {
-      background: #edf3f0;
-      color: #18392f;
-      font-weight: 800;
+      color: #274a45;
+      background: #edf4f0;
+      font-size: .8rem;
+      font-weight: 850;
     }
+
     tr:last-child td { border-bottom: 0; }
-    tbody tr:nth-child(even) td { background: #fbfcfb; }
+    tbody tr:nth-child(even) td { background: #fbfcf9; }
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 1rem;
-      margin: 1.4rem 0;
-    }
-    .card {
-      padding: 1.1rem 1.2rem;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: var(--surface);
-      box-shadow: 0 8px 22px rgba(24,40,33,.045);
-    }
-    .card h4 { margin-top: 0; color: var(--accent-dark); }
-
-    .note-links, .references {
-      margin: 1rem 0;
-      padding: 0;
-      list-style: none;
-    }
-    .note-links li, .references li {
-      padding: .65rem 0;
-      border-bottom: 1px solid var(--line);
-    }
-    .note-links li:last-child, .references li:last-child { border-bottom: 0; }
-
-    .back {
-      display: inline-block;
-      margin-top: 1rem;
-      color: var(--muted);
-      font-size: .78rem;
+    .related a {
+      display: block;
+      margin: .5rem 0;
+      padding: .65rem .8rem;
+      background: var(--surface-2);
+      border-radius: 8px;
       text-decoration: none;
     }
+
     footer {
-      margin-top: 5rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--line);
+      padding: 2rem 1.25rem 3rem;
       color: var(--muted);
-      font-size: .82rem;
+      text-align: center;
+      font-size: .8rem;
+    }
+
+    .top-link {
+      display: inline-block;
+      margin-top: 1rem;
+      font-size: .78rem;
+      font-weight: 800;
+      text-decoration: none;
     }
 
     @media (max-width: 1050px) {
-      .page { grid-template-columns: 1fr; width: min(900px, calc(100% - 30px)); }
-      .sidebar { position: static; max-height: none; }
-      .toc { columns: 2; column-gap: 1rem; }
-      .toc li { break-inside: avoid; }
+      .layout { grid-template-columns: minmax(0, var(--content)); }
+      nav {
+        position: static;
+        max-height: none;
+      }
+      nav ol {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
     }
-    @media (max-width: 680px) {
-      body { font-size: 16px; line-height: 1.72; word-break: normal; }
-      .page { width: min(100% - 20px, 900px); padding-top: 10px; }
-      .hero { padding: 1.5rem 1.25rem 1.8rem; border-radius: 18px; }
-      .toc { columns: 1; }
-      .cards { grid-template-columns: 1fr; }
-      article > section { margin: 3.7rem 0; }
-      table { font-size: .82rem; }
-      th, td { padding: .65rem .7rem; }
-      .formula { text-align: left; }
+
+    @media (max-width: 640px) {
+      body { font-size: 16px; line-height: 1.75; }
+      .masthead { padding-top: 3.3rem; }
+      .layout { padding-inline: .75rem; }
+      .part { border-radius: 13px; }
+      nav ol { display: block; }
+      .math { text-align: left; }
     }
+
     @media print {
-      body { background: white; font-size: 11pt; }
-      .page { display: block; width: 100%; padding: 0; }
-      .sidebar { position: static; box-shadow: none; break-after: page; }
-      .hero, .card, .table-wrap { box-shadow: none; }
-      article > section { break-before: page; }
+      body { background: white; font-size: 10.5pt; }
+      .masthead { padding: 2rem 0; }
+      .layout { display: block; padding: 0; }
+      nav { position: static; box-shadow: none; margin-bottom: 1rem; }
+      .part { box-shadow: none; break-inside: avoid-page; }
       a { color: inherit; }
+      .top-link { display: none; }
     }
   </style>
 <meta property="og:type" content="article">
 <meta property="og:title" content="강화학습 기초 — 로봇 VLA 논문·발표 읽기용">
 <meta property="og:description" content="[!abstract] 이 문서의 목적 [[clippings/ytChelseaFinnReliableVLAPostTraining요약.md|Chelsea Finn 발표]]와 [[(한민확인)ytSergeyLevineRLforRobotFoundationModels요약|Sergey Levine 발표]]를 완전히 이해하기 위한 강화학">
-<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/marktl/s/nmcjy8/">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/nmcjy8/">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="강화학습 기초 — 로봇 VLA 논문·발표 읽기용">
 <meta name="twitter:description" content="[!abstract] 이 문서의 목적 [[clippings/ytChelseaFinnReliableVLAPostTraining요약.md|Chelsea Finn 발표]]와 [[(한민확인)ytSergeyLevineRLforRobotFoundationModels요약|Sergey Levine 발표]]를 완전히 이해하기 위한 강화학">
-<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/marktl/s/nmcjy8/">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/s/nmcjy8/">
 </head>
-<body>
-  <div class="page" id="top">
-    <aside class="sidebar" aria-label="문서 목차">
-      <p class="eyebrow">Research Note</p>
+<body id="top">
+  <a class="skip" href="#content">본문으로 건너뛰기</a>
+
+  <header class="masthead">
+    <p class="eyebrow">Research Note · Reinforcement Learning</p>
+    <h1>강화학습 기초<br>로봇 VLA 논문·발표 읽기용</h1>
+    <p class="dek">Chelsea Finn과 Sergey Levine의 로봇 VLA 발표에서 전제하는 강화학습의 기초 용어와 이론을 처음부터 연결해 읽는 문서.</p>
+    <div class="meta" aria-label="문서 정보">
+      <span class="chip">research-note</span>
+      <span class="chip">2026-08-08</span>
+      <span class="chip">강화학습</span>
+      <span class="chip">AI</span>
+      <span class="chip">로봇</span>
+      <span class="chip">기초이론</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav aria-label="목차">
       <h2>목차</h2>
-      <nav>
-        <ol class="toc">
-          <li><a href="#purpose">문서의 목적</a></li>
-          <li><a href="#part-0">PART 0 · 강화학습이란 무엇인가</a></li>
-          <li><a href="#part-1">PART 1 · 기본 어휘 — MDP</a></li>
-          <li><a href="#part-2">PART 2 · 가치 — V, Q, A</a></li>
-          <li><a href="#part-3">PART 3 · MC vs TD</a></li>
-          <li><a href="#part-4">PART 4 · 경사하강</a></li>
-          <li><a href="#part-5">PART 5 · on-policy vs off-policy</a></li>
-          <li><a href="#part-6">PART 6 · 가우시안 vs 디퓨전</a></li>
-          <li><a href="#part-7">PART 7 · Actor-Critic</a></li>
-          <li><a href="#part-8">PART 8 · Policy Gradient</a></li>
-          <li><a href="#part-9">PART 9 · Offline RL과 정책 추출</a></li>
-          <li><a href="#part-10">PART 10 · 모방학습 어휘</a></li>
-          <li><a href="#part-11">PART 11 · 모든 방법 한 표에</a></li>
-          <li class="appendix"><a href="#part-12">PART 12 · 빠른 참조 용어 사전</a></li>
-          <li class="appendix"><a href="#part-13">PART 13 · 자주 헷갈리는 것</a></li>
-          <li><a href="#related">관련 노트</a></li>
-          <li><a href="#references">참고 문헌</a></li>
-        </ol>
-      </nav>
-      <div class="sidebar-meta">
-        <span>유형 · research-note</span>
-        <span>작성일 · 2026-08-08</span>
-        <span>읽기 순서 · PART 0–5 순차, 이후 참조식</span>
-      </div>
-    </aside>
+      <ol>
+        <li><a href="#part-0">강화학습이란 무엇인가</a></li>
+        <li><a href="#part-1">기본 어휘 — MDP</a></li>
+        <li><a href="#part-2">가치 — V, Q, A</a></li>
+        <li><a href="#part-3">몬테카를로 vs TD</a></li>
+        <li><a href="#part-4">경사하강</a></li>
+        <li><a href="#part-5">on-policy vs off-policy</a></li>
+        <li><a href="#part-6">가우시안 vs 디퓨전</a></li>
+        <li><a href="#part-7">Actor-Critic — SAC와 TD3</a></li>
+        <li><a href="#part-8">Policy Gradient — PPO</a></li>
+        <li><a href="#part-9">Offline RL과 정책 추출</a></li>
+        <li><a href="#part-10">모방학습 쪽 어휘</a></li>
+        <li><a href="#part-11">모든 방법 한 표에</a></li>
+        <li><a href="#part-12">빠른 참조 — 용어 사전</a></li>
+        <li><a href="#part-13">자주 헷갈리는 것</a></li>
+        <li><a href="#related">관련 노트와 참고 문헌</a></li>
+      </ol>
+    </nav>
 
-    <main>
-      <header class="hero">
-        <p class="kicker">Reinforcement Learning · Robot VLA</p>
-        <h1>강화학습 기초<br>로봇 VLA 논문·발표 읽기용</h1>
-        <div class="meta" aria-label="태그">
-          <span class="tag">강화학습</span>
-          <span class="tag">AI</span>
-          <span class="tag">로봇</span>
-          <span class="tag">기초이론</span>
-          <span class="tag">2026-08-08</span>
-        </div>
-      </header>
+    <main id="content">
+      <aside class="callout purpose">
+        <h2>이 문서의 목적</h2>
+        <p><a href="#related">Chelsea Finn 발표</a>와 <a href="#related">Sergey Levine 발표</a>를 <strong>완전히</strong> 이해하기 위한 강화학습 기초를 아예 처음부터 정리한 문서.</p>
+        <p>두 노트는 <em>방법론</em>(RLPD, RLT, CFGRL, RECAP, EXPO…)을 깊이 다루지만, 그 방법들이 전제하는 <em>기초 용어와 이론</em>은 설명하지 않는다. 이 문서가 그 빈칸이다.</p>
+        <p><strong>읽는 순서:</strong> PART 0~5는 순서대로 읽어야 한다. PART 6 이후는 필요할 때 찾아 읽으면 된다. PART 12가 빠른 참조용 용어 사전.</p>
+      </aside>
 
-      <article>
-        <section class="document-purpose" id="purpose">
-          <div class="callout">
-            <p class="callout-title">ABSTRACT · 이 문서의 목적</p>
-            <p><a href="#related">Chelsea Finn 발표</a>와 <a href="#related">Sergey Levine 발표</a>를 <strong>완전히</strong> 이해하기 위한 강화학습 기초를 아예 처음부터 정리한 문서.</p>
-            <p>두 노트는 <em>방법론</em>(RLPD, RLT, CFGRL, RECAP, EXPO…)을 깊이 다루지만, 그 방법들이 전제하는 <em>기초 용어와 이론</em>은 설명하지 않는다. 이 문서가 그 빈칸이다.</p>
-            <p><strong>읽는 순서</strong>: PART 0~5는 순서대로 읽어야 한다. PART 6 이후는 필요할 때 찾아 읽으면 된다. PART 12가 빠른 참조용 용어 사전.</p>
-          </div>
-        </section>
+      <section class="part" id="part-0">
+        <header>
+          <span class="part-number">PART 00</span>
+          <h2>강화학습이란 무엇인가 — 지도학습과의 두 가지 차이</h2>
+        </header>
 
-        <section id="part-0">
-          <header>
-            <span class="part-number">PART 0</span>
-            <h2>강화학습이란 무엇인가 — 지도학습과의 두 가지 차이</h2>
-          </header>
+        <h3>지도학습 (supervised learning)</h3>
+        <p>우리가 이미 아는 것. <strong>(입력, 정답) 쌍</strong>이 주어진다.</p>
+        <pre>사진 → "고양이"
+사진 → "개"</pre>
+        <p>모델은 입력을 보고 정답을 맞히도록 학습한다. <strong>정답이 무엇인지 누군가 알려준다.</strong></p>
+        <p>로봇에 적용하면 이것이 <strong>모방학습(imitation learning)</strong> 또는 <strong>행동 복제(behavior cloning, BC)</strong>다.</p>
+        <pre>(카메라 화면, "커피 만들어") → 사람이 그 순간 취한 행동</pre>
 
-          <h3>지도학습 (supervised learning)</h3>
-          <p>우리가 이미 아는 것. <strong>(입력, 정답) 쌍</strong>이 주어진다.</p>
-          <pre><code>사진 → "고양이"
-사진 → "개"</code></pre>
-          <p>모델은 입력을 보고 정답을 맞히도록 학습한다. <strong>정답이 무엇인지 누군가 알려준다.</strong></p>
-          <p>로봇에 적용하면 이것이 <strong>모방학습(imitation learning)</strong> 또는 <strong>행동 복제(behavior cloning, BC)</strong>다.</p>
-          <pre><code>(카메라 화면, "커피 만들어") → 사람이 그 순간 취한 행동</code></pre>
+        <h3>강화학습 (reinforcement learning, RL)</h3>
+        <p>두 가지가 다르다. 이 둘이 RL의 모든 어려움의 원천이다.</p>
 
-          <h3>강화학습 (reinforcement learning, RL)</h3>
-          <p>두 가지가 다르다. 이 둘이 RL의 모든 어려움의 원천이다.</p>
-
-          <h4>차이 ①: 정답이 없고 점수만 있다</h4>
-          <p>“이 상황에서 무엇이 정답인가”를 아무도 모른다. 대신 행동을 하고 나면 <strong>점수(보상)</strong>가 온다.</p>
-          <pre><code>지도학습:  이 상황에서는 왼쪽으로 3cm 움직이는 게 정답이야
+        <h4>차이 ①: 정답이 없고 점수만 있다</h4>
+        <p>“이 상황에서 무엇이 정답인가”를 아무도 모른다. 대신 행동을 하고 나면 <strong>점수(보상)</strong>가 온다.</p>
+        <pre>지도학습:  이 상황에서는 왼쪽으로 3cm 움직이는 게 정답이야
 강화학습:  (움직여봐) … 음, 7점.
-           (다르게 움직여봐) … 이번엔 2점.</code></pre>
-          <p>정답을 배우는 게 아니라, <strong>점수를 높이는 방법을 스스로 찾아야</strong> 한다.</p>
+           (다르게 움직여봐) … 이번엔 2점.</pre>
+        <p>정답을 배우는 게 아니라, <strong>점수를 높이는 방법을 스스로 찾아야</strong> 한다.</p>
 
-          <h4>차이 ②: 내 행동이 다음에 볼 데이터를 바꾼다</h4>
-          <p>지도학습에서 데이터셋은 고정이다. 내가 무엇을 예측하든 다음 사진은 그대로 온다.</p>
-          <p>RL에서는 <strong>내가 지금 한 행동이 다음 상황을 결정한다.</strong> 커피잔을 쏟으면, 그 다음부터 보는 화면은 “쏟은 상태”다. 데이터 분포가 내 정책에 의존한다.</p>
+        <h4>차이 ②: 내 행동이 다음에 볼 데이터를 바꾼다</h4>
+        <p>지도학습에서 데이터셋은 고정이다. 내가 무엇을 예측하든 다음 사진은 그대로 온다.</p>
+        <p>RL에서는 <strong>내가 지금 한 행동이 다음 상황을 결정한다.</strong> 커피잔을 쏟으면, 그 다음부터 보는 화면은 “쏟은 상태”다. 데이터 분포가 내 정책에 의존한다.</p>
 
-          <div class="callout important">
-            <p class="callout-title">IMPORTANT · 차이 ②가 왜 결정적인가</p>
-            <p>이것이 지도학습의 모든 이론이 RL에서 깨지는 이유다. 지도학습은 “학습 데이터와 테스트 데이터가 같은 분포”를 가정하는데, RL에서는 <strong>정책이 바뀌면 데이터 분포도 바뀐다.</strong> PART 5의 on-policy/off-policy 구분, PART 10의 covariate shift가 모두 여기서 나온다.</p>
-          </div>
+        <aside class="callout important">
+          <span class="callout-title">IMPORTANT · 차이 ②가 왜 결정적인가</span>
+          <p>이것이 지도학습의 모든 이론이 RL에서 깨지는 이유다. 지도학습은 “학습 데이터와 테스트 데이터가 같은 분포”를 가정하는데, RL에서는 <strong>정책이 바뀌면 데이터 분포도 바뀐다.</strong> PART 5의 on-policy/off-policy 구분, PART 10의 covariate shift가 모두 여기서 나온다.</p>
+        </aside>
 
-          <h3>두 발표의 출발점</h3>
-          <p>Levine 발표 장면 4의 핵심 주장이 정확히 이 대비다.</p>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th></th><th>담당</th><th>결과</th></tr></thead>
-              <tbody>
-                <tr><td><strong>지도학습 (pre-training)</strong></td><td>지식, 일반화, 언어 이해</td><td>많은 것을 “그럭저럭”</td></tr>
-                <tr><td><strong>강화학습 (post-training)</strong></td><td>특정 과제의 숙달, 속도</td><td>그 과제를 “완벽하고 빠르게”</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p><strong>대체재가 아니라 상보재</strong>다. 지도학습만으로는 40%에서 멈추고(Finn 발표), RL만으로는 일반화가 없다(Levine 발표 장면 8의 스페셜리스트 한계).</p>
-          <a class="back" href="#top">↑ 목차로</a>
-        </section>
+        <h3>두 발표의 출발점</h3>
+        <p>Levine 발표 장면 4의 핵심 주장이 정확히 이 대비다.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th></th><th>담당</th><th>결과</th></tr></thead>
+            <tbody>
+              <tr><td><strong>지도학습 (pre-training)</strong></td><td>지식, 일반화, 언어 이해</td><td>많은 것을 “그럭저럭”</td></tr>
+              <tr><td><strong>강화학습 (post-training)</strong></td><td>특정 과제의 숙달, 속도</td><td>그 과제를 “완벽하고 빠르게”</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p><strong>대체재가 아니라 상보재</strong>다. 지도학습만으로는 40%에서 멈추고(Finn 발표), RL만으로는 일반화가 없다(Levine 발표 장면 8의 스페셜리스트 한계).</p>
+        <a class="top-link" href="#top">↑ 맨 위로</a>
+      </section>
 
-        <section id="part-1">
-          <header>
-            <span class="part-number">PART 1</span>
-            <h2>기본 어휘 — MDP</h2>
-          </header>
-          <p class="lead">RL의 문제 설정을 <strong>MDP(Markov Decision Process, 마르코프 결정 과정)</strong>라 부른다. 다섯 개의 부품이 있다.</p>
+      <section class="part" id="part-1">
+        <header>
+          <span class="part-number">PART 01</span>
+          <h2>기본 어휘 — MDP</h2>
+        </header>
 
-          <h3>상태 <span class="formula-inline">s</span> (state) / 관측 <span class="formula-inline">o</span> (observation)</h3>
-          <p>지금 세계가 어떤 상태인지. 로봇에서는 보통:</p>
+        <p>RL의 문제 설정을 <strong>MDP(Markov Decision Process, 마르코프 결정 과정)</strong>라 부른다. 다섯 개의 부품이 있다.</p>
+
+        <h3>상태 <i>s</i> (state) / 관측 <i>o</i> (observation)</h3>
+        <p>지금 세계가 어떤 상태인지. 로봇에서는 보통:</p>
+        <ul>
+          <li><strong>관측 <i>o</i>:</strong> 카메라 이미지, 관절 각도(고유수용성 상태, proprioception)</li>
+          <li><strong>상태 <i>s</i>:</strong> 세계의 진짜 완전한 상태</li>
+        </ul>
+        <p>카메라로는 세계를 다 볼 수 없으므로(가림, 시야 밖) 로봇 문제는 엄밀히는 <strong>POMDP</strong>(부분 관측 MDP)다. 논문들이 <i>s</i>와 <i>o</i>를 섞어 쓰는 이유이고, Finn 발표에서 가치함수 입력을 <i>o</i>로 쓴 이유이기도 하다.</p>
+        <blockquote class="callout note">실용적으로는 <i>s ≈ o</i>로 읽어도 대부분 문제없다.</blockquote>
+
+        <h3>행동 <i>a</i> (action)</h3>
+        <p>로봇이 하는 것. 보통 <strong>연속값 벡터</strong>다.</p>
+        <pre>a = [관절1 각도 변화, 관절2 각도 변화, …, 그리퍼 열림/닫힘]</pre>
+        <p>예: 7자유도 팔 + 그리퍼 → <i>a</i> ∈ ℝ<sup>8</sup></p>
+
+        <h3>보상 <i>r</i> (reward)</h3>
+        <p>행동 후 받는 점수. 두 종류가 있고 이 구분이 매우 중요하다.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>종류</th><th>뜻</th><th>예</th></tr></thead>
+            <tbody>
+              <tr><td><strong>희소 보상 (sparse)</strong></td><td>성공하면 1, 아니면 0</td><td>“에스프레소가 완성됐나?”</td></tr>
+              <tr><td><strong>밀집 보상 (dense)</strong></td><td>매 스텝 세밀한 점수</td><td>“포터필터와 그룹헤드의 거리에 반비례”</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p><strong>두 발표 모두 희소 보상을 쓴다.</strong> 이유는 밀집 보상을 손으로 설계하는 비용이 크고, 잘못 설계하면 로봇이 보상만 챙기고 과제는 안 하는 <strong>보상 해킹(reward hacking)</strong>이 생기기 때문이다.</p>
+        <ul>
+          <li>Levine 장면 6 (RLPD): “이진 이미지 분류기가 주는 희소 보상”</li>
+          <li>Finn 00:25:00 (EXPO-FT): “규칙 기반 분류기의 sparse binary 신호”</li>
+        </ul>
+        <aside class="callout warning">
+          <span class="callout-title">WARNING · 희소 보상의 대가</span>
+          <p>설계는 쉬워지지만 <strong>학습이 극도로 어려워진다.</strong> 몇 분짜리 과제에서 끝에 1점 하나만 받으면, 수천 개 행동 중 어느 것이 좋았는지 알 수 없다. 이것이 <strong>credit assignment 문제</strong>이고, PART 2의 가치함수가 이 문제를 푸는 도구다.</p>
+        </aside>
+
+        <h3>정책 π (policy)</h3>
+        <p><strong>상태를 받아 행동을 내놓는 것.</strong> RL이 학습하려는 대상이 바로 이것이다.</p>
+        <div class="math">π(a | s)</div>
+        <p>이 표기는 “<i>s</i>가 주어졌을 때 <i>a</i>의 <strong>확률분포</strong>”라는 뜻이다. 하나의 행동을 딱 내놓는 게 아니라 확률적이다.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>종류</th><th>표기</th><th>뜻</th></tr></thead>
+            <tbody>
+              <tr><td><strong>결정론적</strong></td><td><i>a</i> = μ(<i>s</i>)</td><td>같은 상태 → 항상 같은 행동</td></tr>
+              <tr><td><strong>확률적</strong></td><td><i>a</i> ∼ π(<i>a</i>|<i>s</i>)</td><td>같은 상태 → 뽑을 때마다 다른 행동</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>확률적이어야 하는 이유는 <strong>탐색(exploration)</strong>. 항상 같은 행동만 하면 더 나은 방법을 발견할 수 없다.</p>
+        <p>VLA는 π(<i>a</i> | <i>o</i>, 언어 프롬프트)다. 언어가 조건에 추가된 정책일 뿐이다.</p>
+
+        <h3>에피소드와 궤적</h3>
+        <ul>
+          <li><strong>에피소드 (episode):</strong> 시작부터 끝(성공/실패/시간초과)까지 한 번의 시도</li>
+          <li><strong>궤적 (trajectory) τ:</strong> 그 에피소드에서 일어난 일의 기록</li>
+        </ul>
+        <div class="math">τ = (s₀, a₀, r₀, s₁, a₁, r₁, …, s<sub>T</sub>)</div>
+        <ul>
+          <li><strong>전이 (transition):</strong> 한 스텝 분량 (<i>s</i>, <i>a</i>, <i>r</i>, <i>s′</i>). 리플레이 버퍼에 저장되는 단위.</li>
+          <li><strong>롤아웃 (rollout):</strong> 정책을 실제로 돌려서 궤적을 만드는 행위</li>
+        </ul>
+
+        <h3>할인율 γ (gamma, discount factor)</h3>
+        <p>0 &lt; γ ≤ 1 사이의 수. 보통 0.99. <strong>“미래의 보상은 현재의 보상보다 조금 덜 소중하다”</strong>는 뜻이다.</p>
+        <div class="math">리턴 G<sub>t</sub> = r<sub>t</sub> + γr<sub>t+1</sub> + γ²r<sub>t+2</sub> + γ³r<sub>t+3</sub> + ···</div>
+        <p>이 <strong>리턴(return)</strong>이 RL이 최대화하려는 대상이다. “지금부터 끝까지 받을 보상의 할인 합”.</p>
+        <p>γ가 필요한 이유 세 가지:</p>
+        <ol>
+          <li><strong>수학적 안정성</strong> — 무한히 계속되는 과제에서 합이 발산하지 않게</li>
+          <li><strong>불확실성 반영</strong> — 먼 미래는 예측이 불확실하므로 덜 신뢰</li>
+          <li><strong>빠른 완수 유도</strong> — 같은 보상이면 빨리 받는 게 유리 → 자연히 속도 최적화</li>
+        </ol>
+        <aside class="callout tip">
+          <span class="callout-title">TIP · γ와 “속도”의 연결</span>
+          <p>Levine 장면 8에서 RL 정책의 사이클 타임이 BC의 절반이었던 이유 중 하나가 γ다. 늦게 성공하면 γ<sup>T</sup>로 할인되므로, <strong>빠른 성공이 수학적으로 더 높은 리턴</strong>을 받는다. 아무도 “빨리 해”라고 말하지 않았는데 빨라진다.</p>
+        </aside>
+
+        <h3>마르코프 성질 (Markov property)</h3>
+        <div class="math">P(s<sub>t+1</sub> | s<sub>t</sub>, a<sub>t</sub>) = P(s<sub>t+1</sub> | s₀, a₀, …, s<sub>t</sub>, a<sub>t</sub>)</div>
+        <p>말로 하면: <strong>“다음에 무슨 일이 일어날지는 지금 상태만 알면 충분하다. 과거 이력은 필요 없다.”</strong></p>
+        <p><strong>마르코프 정책</strong>이란 지금 관측만 보고 행동을 정하는 정책이다. 같은 화면이면 항상 같은 행동 분포.</p>
+        <aside class="callout example">
+          <span class="callout-title">EXAMPLE · 왜 이게 RLDG의 핵심인가</span>
+          <p>Levine 장면 9의 “RL 데이터가 같은 개수의 사람 데모보다 낫다”는 발견은 마르코프 성질 때문이다.</p>
+          <p><strong>사람은 마르코프가 아니다.</strong> 똑같아 보이는 화면에서 어떤 날은 왼쪽, 어떤 날은 오른쪽으로 돈다(그날의 기분, 앞선 이력, 딴생각). 그러면 데이터에 “같은 입력 → 다른 정답”이 섞인다.</p>
+          <p>BC는 이걸 <strong>평균 낸다.</strong> 왼쪽 30% / 오른쪽 70%를 평균하면 어느 쪽도 아닌 방향이 나오고 커넥터는 안 꽂힌다. 이것이 <strong>mode averaging</strong> 문제.</p>
+          <p><strong>RL 정책은 정의상 상태의 함수</strong>라 이 모순이 구조적으로 없다. 그래서 RL 롤아웃이 더 깨끗한 교재가 된다.</p>
+        </aside>
+        <a class="top-link" href="#top">↑ 맨 위로</a>
+      </section>
+
+      <section class="part" id="part-2">
+        <header>
+          <span class="part-number">PART 02</span>
+          <h2>가치 — V, Q, A 세 글자</h2>
+        </header>
+
+        <p>RL 논문에서 가장 많이 나오는 세 기호. 전부 <strong>“얼마나 좋은가”</strong>를 재는 것이고, 무엇에 대해 재는지만 다르다.</p>
+
+        <h3>V(s) — 상태 가치 함수</h3>
+        <div class="math">V(s) = 𝔼[G<sub>t</sub> | s<sub>t</sub> = s]</div>
+        <p><strong>“이 상태에 있으면, 앞으로 총 얼마나 좋을까(리턴의 기대값)”</strong></p>
+        <ul>
+          <li>포터필터가 잘 물린 상태 → V 높음</li>
+          <li>커피를 쏟은 상태 → V 낮음</li>
+        </ul>
+        <p>𝔼(기대값)가 붙은 게 중요하다. <strong>평균</strong>이다. 한 번의 결과가 아니라 “이런 상태에서 보통 어떻게 되는가”.</p>
+
+        <h3>Q(s,a) — 행동 가치 함수</h3>
+        <div class="math">Q(s,a) = 𝔼[G<sub>t</sub> | s<sub>t</sub> = s, a<sub>t</sub> = a]</div>
+        <p><strong>“이 상태에서 이 행동을 하면, 앞으로 총 얼마나 좋을까”</strong></p>
+        <p>V와의 차이는 <strong>행동을 지정했다</strong>는 것. 그래서 Q가 있으면 행동을 고를 수 있다.</p>
+        <div class="math">a* = arg max<sub>a</sub> Q(s,a)</div>
+        <p>이것이 EXPO의 <code>argmax Q</code>가 하는 일이다.</p>
+        <div class="math">V(s) = 𝔼<sub>a∼π</sub>[Q(s,a)]</div>
+        <p>즉 <strong>V는 Q를 정책에 대해 평균 낸 것.</strong> “이 상태의 가치 = 이 상태에서 내가 할 행동들의 평균 가치”.</p>
+
+        <h3>A(s,a) — 어드밴티지</h3>
+        <div class="math"><strong>A(s,a) = Q(s,a) − V(s)</strong></div>
+        <p><strong>“이 행동이 평균보다 얼마나 나은가”</strong></p>
+        <aside class="callout example">
+          <span class="callout-title">EXAMPLE · 왜 상대적으로 재야 하나</span>
+          <p>시험 점수 80점이 좋은가? 반 평균이 50점이면 훌륭하고, 95점이면 나쁘다. <strong>기준선(baseline)을 빼야 의미가 생긴다.</strong></p>
+          <p>로봇에서도 같다. 에스프레소를 거의 다 만든 상태에서는 아무 행동이나 해도 Q가 높다(어차피 곧 성공). 그 상태의 V가 이미 높으니까. A = Q − V로 빼주면 “이 행동이 진짜 기여한 몫”만 남는다.</p>
+        </aside>
+        <p>A의 성질:</p>
+        <ul>
+          <li>A &gt; 0: 평균보다 좋은 행동 → 확률을 <strong>올려야</strong> 함</li>
+          <li>A &lt; 0: 평균보다 나쁜 행동 → 확률을 <strong>내려야</strong> 함</li>
+          <li>𝔼<sub>a∼π</sub>[A(s,a)] = 0 — 정의상 평균은 0</li>
+        </ul>
+        <p>기술적으로 baseline을 빼면 <strong>분산이 줄어</strong> 학습이 안정된다. 이것이 policy gradient에서 A를 쓰는 이유(PART 8).</p>
+
+        <h3>두 발표의 advantage 정의 읽기</h3>
+        <p><strong>Levine 장면 19 / π*0.6 (RECAP):</strong></p>
+        <div class="math">A(o,a) = r<sub>t:N</sub> + V(o<sub>t+N</sub>) − V(o<sub>t</sub>)</div>
+        <ul>
+          <li><i>r</i><sub>t:N</sub>: <i>t</i>부터 <i>N</i>스텝 동안 받은 보상</li>
+          <li>V(<i>o</i><sub>t+N</sub>): <i>N</i>스텝 후 상태의 가치</li>
+          <li>V(<i>o</i><sub>t</sub>): 지금 상태의 가치</li>
+        </ul>
+        <p>앞의 두 항 <i>r</i><sub>t:N</sub> + V(<i>o</i><sub>t+N</sub>)이 <strong>“N스텝 실제로 가본 뒤 추정한 Q”</strong>다. 거기서 V(<i>o</i><sub>t</sub>)를 빼면 정확히 A = Q − V 형태. 이것을 <strong>N-step advantage</strong>라 부른다.</p>
+        <p><strong>Finn 00:10:50:</strong> “advantage는 행동 전후 가치의 차이로 계산한다.” 같은 것을 말로 표현한 것이다. 희소 보상이라 중간 <i>r</i>이 0이므로 A ≈ V(이후) − V(이전)로 단순화된다.</p>
+
+        <aside class="callout question">
+          <span class="callout-title">QUESTION · “가치가 단조 감소하는데 왜 advantage에 음수가 나오나”</span>
+          <p>자주 생기는 혼동이다. 한 에피소드 안에서 “끝까지 남은 시간” <strong>라벨</strong>은 단조 감소한다. 하지만 V는 라벨을 외우는 게 아니라 <strong>상태를 보고 기댓값을 예측하는 함수</strong>다.</p>
           <ul>
-            <li><strong>관측 o</strong>: 카메라 이미지, 관절 각도(고유수용성 상태, proprioception)</li>
-            <li><strong>상태 s</strong>: 세계의 진짜 완전한 상태</li>
+            <li>“포터필터 잘 물림” 상태 → 이 상태가 등장한 에피소드들의 평균 잔여 시간 20초</li>
+            <li>“포터필터 떨어뜨림” 상태 → 평균 잔여 시간 50초</li>
           </ul>
-          <p>카메라로는 세계를 다 볼 수 없으므로(가림, 시야 밖) 로봇 문제는 엄밀히는 <strong>POMDP</strong>(부분 관측 MDP)다. 논문들이 s와 o를 섞어 쓰는 이유이고, Finn 발표에서 가치함수 입력을 o로 쓴 이유이기도 하다.</p>
-          <div class="callout"><p>실용적으로는 <strong>s ≈ o</strong>로 읽어도 대부분 문제없다.</p></div>
+          <p>떨어뜨리는 행동은 V가 높은 상태에서 낮은 상태로 <strong>이동</strong>시키므로 A &lt; 0. 에피소드 내 라벨은 단조지만 <strong>상태의 함수로서의 V는 단조가 아니다.</strong></p>
+          <p>따라서 <strong>가치함수는 실패 데이터도 학습해야 한다.</strong> 떨어뜨린 장면이 데이터에 없으면 그 상태의 가치를 알 수 없다.</p>
+        </aside>
+        <a class="top-link" href="#top">↑ 맨 위로</a>
+      </section>
 
-          <h3>행동 a (action)</h3>
-          <p>로봇이 하는 것. 보통 <strong>연속값 벡터</strong>다.</p>
-          <pre><code>a = [관절1 각도 변화, 관절2 각도 변화, …, 그리퍼 열림/닫힘]</code></pre>
-          <p>예: 7자유도 팔 + 그리퍼 → <strong>a ∈ ℝ⁸</strong></p>
+      <section class="part" id="part-3">
+        <header>
+          <span class="part-number">PART 03</span>
+          <h2>가치를 어떻게 배우나 — 몬테카를로 vs TD</h2>
+        </header>
 
-          <h3>보상 r (reward)</h3>
-          <p>행동 후 받는 점수. 두 종류가 있고 이 구분이 매우 중요하다.</p>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>종류</th><th>뜻</th><th>예</th></tr></thead>
-              <tbody>
-                <tr><td><strong>희소 보상 (sparse)</strong></td><td>성공하면 1, 아니면 0</td><td>“에스프레소가 완성됐나?”</td></tr>
-                <tr><td><strong>밀집 보상 (dense)</strong></td><td>매 스텝 세밀한 점수</td><td>“포터필터와 그룹헤드의 거리에 반비례”</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p><strong>두 발표 모두 희소 보상을 쓴다.</strong> 이유는 밀집 보상을 손으로 설계하는 비용이 크고, 잘못 설계하면 로봇이 보상만 챙기고 과제는 안 하는 <strong>보상 해킹(reward hacking)</strong>이 생기기 때문이다.</p>
-          <ul>
-            <li>Levine 장면 6 (RLPD): “이진 이미지 분류기가 주는 희소 보상”</li>
-            <li>Finn 00:25:00 (EXPO-FT): “규칙 기반 분류기의 sparse binary 신호”</li>
-          </ul>
-          <div class="callout warning">
-            <p class="callout-title">WARNING · 희소 보상의 대가</p>
-            <p>설계는 쉬워지지만 <strong>학습이 극도로 어려워진다.</strong> 몇 분짜리 과제에서 끝에 1점 하나만 받으면, 수천 개 행동 중 어느 것이 좋았는지 알 수 없다. 이것이 <strong>credit assignment 문제</strong>이고, PART 2의 가치함수가 이 문제를 푸는 도구다.</p>
-          </div>
+        <p>V나 Q를 어떻게 학습할까. 두 가지 근본적으로 다른 방법이 있고, <strong>두 발표가 서로 다른 쪽을 골랐다.</strong></p>
 
-          <h3>정책 π (policy)</h3>
-          <p><strong>상태를 받아 행동을 내놓는 것.</strong> RL이 학습하려는 대상이 바로 이것이다.</p>
-          <div class="formula">π(a ∣ s)</div>
-          <p>이 표기가 중요하다. “s가 주어졌을 때 a의 <strong>확률분포</strong>”라는 뜻이다. 하나의 행동을 딱 내놓는 게 아니라 확률적이다.</p>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>종류</th><th>표기</th><th>뜻</th></tr></thead>
-              <tbody>
-                <tr><td><strong>결정론적 (deterministic)</strong></td><td>a = μ(s)</td><td>같은 상태 → 항상 같은 행동</td></tr>
-                <tr><td><strong>확률적 (stochastic)</strong></td><td>a ∼ π(a∣s)</td><td>같은 상태 → 뽑을 때마다 다른 행동</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p>확률적이어야 하는 이유는 <strong>탐색(exploration)</strong>. 항상 같은 행동만 하면 더 나은 방법을 발견할 수 없다.</p>
-          <p>VLA는 <strong>π(a ∣ o, 언어 프롬프트)</strong>다. 언어가 조건에 추가된 정책일 뿐이다.</p>
-
-          <h3>에피소드와 궤적</h3>
-          <ul>
-            <li><strong>에피소드 (episode)</strong>: 시작부터 끝(성공/실패/시간초과)까지 한 번의 시도</li>
-            <li><strong>궤적 (trajectory) τ</strong>: 그 에피소드에서 일어난 일의 기록</li>
-          </ul>
-          <div class="formula">τ = (s₀, a₀, r₀, s₁, a₁, r₁, …, s<sub>T</sub>)</div>
-          <ul>
-            <li><strong>전이 (transition)</strong>: 한 스텝 분량 (s, a, r, s′). 리플레이 버퍼에 저장되는 단위.</li>
-            <li><strong>롤아웃 (rollout)</strong>: 정책을 실제로 돌려서 궤적을 만드는 행위</li>
-          </ul>
-
-          <h3>할인율 γ (gamma, discount factor)</h3>
-          <p>0 &lt; γ ≤ 1 사이의 수. 보통 0.99.</p>
-          <p><strong>“미래의 보상은 현재의 보상보다 조금 덜 소중하다”</strong>는 뜻이다.</p>
-          <div class="formula">리턴 G<sub>t</sub> = r<sub>t</sub> + γr<sub>t+1</sub> + γ²r<sub>t+2</sub> + γ³r<sub>t+3</sub> + ···</div>
-          <p>이 <strong>리턴(return)</strong>이 RL이 최대화하려는 대상이다. “지금부터 끝까지 받을 보상의 할인 합”.</p>
-          <p>γ가 필요한 이유 세 가지:</p>
-          <ol>
-            <li><strong>수학적 안정성</strong> — 무한히 계속되는 과제에서 합이 발산하지 않게</li>
-            <li><strong>불확실성 반영</strong> — 먼 미래는 예측이 불확실하므로 덜 신뢰</li>
-            <li><strong>빠른 완수 유도</strong> — 같은 보상이면 빨리 받는 게 유리 → 자연히 속도 최적화</li>
-          </ol>
-          <div class="callout">
-            <p class="callout-title">TIP · γ와 “속도”의 연결</p>
-            <p>Levine 장면 8에서 RL 정책의 사이클 타임이 BC의 절반이었던 이유 중 하나가 γ다. 늦게 성공하면 γ<sup>T</sup>로 할인되므로, <strong>빠른 성공이 수학적으로 더 높은 리턴</strong>을 받는다. 아무도 “빨리 해”라고 말하지 않았는데 빨라진다.</p>
-          </div>
-
-          <h3>마르코프 성질 (Markov property)</h3>
-          <div class="formula">P(s<sub>t+1</sub> ∣ s<sub>t</sub>, a<sub>t</sub>) = P(s<sub>t+1</sub> ∣ s₀, a₀, …, s<sub>t</sub>, a<sub>t</sub>)</div>
-          <p>말로 하면: <strong>“다음에 무슨 일이 일어날지는 지금 상태만 알면 충분하다. 과거 이력은 필요 없다.”</strong></p>
-          <p><strong>마르코프 정책</strong>이란 지금 관측만 보고 행동을 정하는 정책이다. 같은 화면이면 항상 같은 행동 분포.</p>
-          <div class="callout">
-            <p class="callout-title">EXAMPLE · 왜 이게 RLDG의 핵심인가</p>
-            <p>Levine 장면 9의 “RL 데이터가 같은 개수의 사람 데모보다 낫다”는 발견은 마르코프 성질 때문이다.</p>
-            <p><strong>사람은 마르코프가 아니다.</strong> 똑같아 보이는 화면에서 어떤 날은 왼쪽, 어떤 날은 오른쪽으로 돈다(그날의 기분, 앞선 이력, 딴생각). 그러면 데이터에 “같은 입력 → 다른 정답”이 섞인다.</p>
-            <p>BC는 이걸 <strong>평균 낸다.</strong> 왼쪽 30% / 오른쪽 70%를 평균하면 어느 쪽도 아닌 방향이 나오고 커넥터는 안 꽂힌다. 이것이 <strong>mode averaging</strong> 문제.</p>
-            <p><strong>RL 정책은 정의상 상태의 함수</strong>라 이 모순이 구조적으로 없다. 그래서 RL 롤아웃이 더 깨끗한 교재가 된다.</p>
-          </div>
-          <a class="back" href="#top">↑ 목차로</a>
-        </section>
-
-        <section id="part-2">
-          <header>
-            <span class="part-number">PART 2</span>
-            <h2>가치 — V, Q, A 세 글자</h2>
-          </header>
-          <p class="lead">RL 논문에서 가장 많이 나오는 세 기호. 전부 <strong>“얼마나 좋은가”</strong>를 재는 것이고, 무엇에 대해 재는지만 다르다.</p>
-
-          <h3>V(s) — 상태 가치 함수 (state value function)</h3>
-          <div class="formula">V(s) = 𝔼[G<sub>t</sub> ∣ s<sub>t</sub> = s]</div>
-          <p><strong>“이 상태에 있으면, 앞으로 총 얼마나 좋을까(리턴의 기대값)”</strong></p>
-          <ul>
-            <li>포터필터가 잘 물린 상태 → V 높음</li>
-            <li>커피를 쏟은 상태 → V 낮음</li>
-          </ul>
-          <p>𝔼(기대값)가 붙은 게 중요하다. <strong>평균</strong>이다. 한 번의 결과가 아니라 “이런 상태에서 보통 어떻게 되는가”.</p>
-
-          <h3>Q(s,a) — 행동 가치 함수 (action value function)</h3>
-          <div class="formula">Q(s,a) = 𝔼[G<sub>t</sub> ∣ s<sub>t</sub> = s, a<sub>t</sub> = a]</div>
-          <p><strong>“이 상태에서 이 행동을 하면, 앞으로 총 얼마나 좋을까”</strong></p>
-          <p>V와의 차이는 <strong>행동을 지정했다</strong>는 것. 그래서 Q가 있으면 행동을 고를 수 있다.</p>
-          <div class="formula">a* = arg max<sub>a</sub> Q(s,a)</div>
-          <p>이것이 EXPO의 <code>argmax Q</code>가 하는 일이다.</p>
-          <p>V와 Q의 관계:</p>
-          <div class="formula">V(s) = 𝔼<sub>a ∼ π</sub>[Q(s,a)]</div>
-          <p>즉 <strong>V는 Q를 정책에 대해 평균 낸 것</strong>. “이 상태의 가치 = 이 상태에서 내가 할 행동들의 평균 가치”.</p>
-
-          <h3>A(s,a) — 어드밴티지 (advantage)</h3>
-          <div class="formula boxed">A(s,a) = Q(s,a) − V(s)</div>
-          <p><strong>“이 행동이 평균보다 얼마나 나은가”</strong></p>
-          <div class="callout">
-            <p class="callout-title">EXAMPLE · 왜 상대적으로 재야 하나</p>
-            <p>시험 점수 80점이 좋은가? 반 평균이 50점이면 훌륭하고, 95점이면 나쁘다. <strong>기준선(baseline)을 빼야 의미가 생긴다.</strong></p>
-            <p>로봇에서도 같다. 에스프레소를 거의 다 만든 상태에서는 아무 행동이나 해도 Q가 높다(어차피 곧 성공). 그 상태의 V가 이미 높으니까. A = Q − V로 빼주면 “이 행동이 진짜 기여한 몫”만 남는다.</p>
-          </div>
-          <p>A의 성질:</p>
-          <ul>
-            <li>A &gt; 0: 평균보다 좋은 행동 → 확률을 <strong>올려야</strong> 함</li>
-            <li>A &lt; 0: 평균보다 나쁜 행동 → 확률을 <strong>내려야</strong> 함</li>
-            <li>𝔼<sub>a ∼ π</sub>[A(s,a)] = 0 (정의상 평균은 0)</li>
-          </ul>
-          <p>기술적으로 baseline을 빼면 <strong>분산이 줄어</strong> 학습이 안정된다. 이것이 policy gradient에서 A를 쓰는 이유(PART 8).</p>
-
-          <h3>두 발표의 advantage 정의 읽기</h3>
-          <p><strong>Levine 장면 19 / π*0.6 (RECAP)</strong>:</p>
-          <div class="formula">A(o,a) = r<sub>t:N</sub> + V(o<sub>t+N</sub>) − V(o<sub>t</sub>)</div>
-          <p>이걸 뜯어보면:</p>
-          <ul>
-            <li>r<sub>t:N</sub>: t부터 N스텝 동안 받은 보상</li>
-            <li>V(o<sub>t+N</sub>): N스텝 후 상태의 가치</li>
-            <li>V(o<sub>t</sub>): 지금 상태의 가치</li>
-          </ul>
-          <p>앞의 두 항 r<sub>t:N</sub> + V(o<sub>t+N</sub>)이 <strong>“N스텝 실제로 가본 뒤 추정한 Q”</strong>다. 거기서 V(o<sub>t</sub>)를 빼면 정확히 A = Q − V 형태. 이것을 <strong>N-step advantage</strong>라 부른다.</p>
-          <p><strong>Finn 00:10:50</strong>: “advantage는 행동 전후 가치의 차이로 계산한다”</p>
-          <p>같은 것을 말로 표현한 것이다. 희소 보상이라 중간 r이 0이므로 A ≈ V(이후) − V(이전)로 단순화된다.</p>
-
-          <div class="callout question">
-            <p class="callout-title">QUESTION · “가치가 단조 감소하는데 왜 advantage에 음수가 나오나”</p>
-            <p>자주 생기는 혼동이다. 한 에피소드 안에서 “끝까지 남은 시간” <strong>라벨</strong>은 단조 감소한다. 하지만 V는 라벨을 외우는 게 아니라 <strong>상태를 보고 기댓값을 예측하는 함수</strong>다.</p>
-            <ul>
-              <li>“포터필터 잘 물림” 상태 → 이 상태가 등장한 에피소드들의 평균 잔여 시간 20초</li>
-              <li>“포터필터 떨어뜨림” 상태 → 평균 잔여 시간 50초</li>
-            </ul>
-            <p>떨어뜨리는 행동은 V가 높은 상태에서 낮은 상태로 <strong>이동</strong>시키므로 A &lt; 0. 에피소드 내 라벨은 단조지만 <strong>상태의 함수로서의 V는 단조가 아니다.</strong></p>
-            <p>따라서 <strong>가치함수는 실패 데이터도 학습해야 한다.</strong> 떨어뜨린 장면이 데이터에 없으면 그 상태의 가치를 알 수 없다.</p>
-          </div>
-          <a class="back" href="#top">↑ 목차로</a>
-        </section>
-
-        <section id="part-3">
-          <header>
-            <span class="part-number">PART 3</span>
-            <h2>가치를 어떻게 배우나 — 몬테카를로 vs TD</h2>
-          </header>
-          <p class="lead">V나 Q를 어떻게 학습할까. 두 가지 근본적으로 다른 방법이 있고, <strong>두 발표가 서로 다른 쪽을 골랐다.</strong></p>
-
-          <h3>방법 1: 몬테카를로 (Monte Carlo, MC) — “끝까지 가보고 실제 결과로 배운다”</h3>
-          <p>에피소드를 끝까지 돌린 뒤, 각 시점의 <strong>실제 리턴</strong>을 계산해서 그걸 정답으로 회귀한다.</p>
-          <pre><code>에피소드:  s0 → s1 → s2 → ... → s40 (성공!)
+        <h3>방법 1: 몬테카를로 — “끝까지 가보고 실제 결과로 배운다”</h3>
+        <p>에피소드를 끝까지 돌린 뒤, 각 시점의 <strong>실제 리턴</strong>을 계산해서 그걸 정답으로 회귀한다.</p>
+        <pre>에피소드:  s0 → s1 → s2 → ... → s40 (성공!)
 
 라벨 만들기:
   s0 의 정답 = 40 (남은 스텝)
@@ -669,879 +699,848 @@
   ...
   s39 의 정답 = 1
 
-학습: V(s) 가 이 숫자를 맞히도록 회귀 (MSE 손실)</code></pre>
-          <p><strong>이것이 그냥 지도학습이다.</strong> 입력은 이미지, 정답은 숫자. 특별한 RL 기법이 하나도 없다.</p>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>장점</th><th>단점</th></tr></thead>
-              <tbody>
-                <tr><td><strong>편향 없음</strong> (실제 결과가 정답)</td><td><strong>분산 큼</strong> (한 에피소드의 운에 좌우)</td></tr>
-                <tr><td><strong>극도로 안정적</strong></td><td>에피소드가 <strong>끝나야</strong> 학습 가능</td></tr>
-                <tr><td>지도학습이라 <strong>대형 모델로 확장 쉬움</strong></td><td>데이터 효율이 낮음</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="callout">
-            <p class="callout-title">SUCCESS · Finn 발표가 MC를 고른 이유</p>
-            <p>Finn 00:10:00의 가치함수가 정확히 이것이다. “몬테카를로 방식의 단순 지도학습 목적함수라 대형 모델·대규모 데이터로 확장하기 쉽다.”</p>
-            <p>수십억 파라미터 VLM에 value head를 얹어 학습해야 하는데, <strong>대형 모델에서 검증된 안정적 도구는 지도학습뿐</strong>이다. TD의 불안정성을 감당할 수 없다. 편향 없음과 안정성을 얻고 데이터 효율을 포기한 것.</p>
-          </div>
+학습: V(s) 가 이 숫자를 맞히도록 회귀 (MSE 손실)</pre>
+        <p><strong>이것이 그냥 지도학습이다.</strong> 입력은 이미지, 정답은 숫자. 특별한 RL 기법이 하나도 없다.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>장점</th><th>단점</th></tr></thead>
+            <tbody>
+              <tr><td><strong>편향 없음</strong> — 실제 결과가 정답</td><td><strong>분산 큼</strong> — 한 에피소드의 운에 좌우</td></tr>
+              <tr><td><strong>극도로 안정적</strong></td><td>에피소드가 <strong>끝나야</strong> 학습 가능</td></tr>
+              <tr><td>지도학습이라 <strong>대형 모델로 확장 쉬움</strong></td><td>데이터 효율이 낮음</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <aside class="callout success">
+          <span class="callout-title">SUCCESS · Finn 발표가 MC를 고른 이유</span>
+          <p>Finn 00:10:00의 가치함수가 정확히 이것이다. “몬테카를로 방식의 단순 지도학습 목적함수라 대형 모델·대규모 데이터로 확장하기 쉽다.”</p>
+          <p>수십억 파라미터 VLM에 value head를 얹어 학습해야 하는데, <strong>대형 모델에서 검증된 안정적 도구는 지도학습뿐</strong>이다. TD의 불안정성을 감당할 수 없다. 편향 없음과 안정성을 얻고 데이터 효율을 포기한 것.</p>
+        </aside>
 
-          <h3>방법 2: TD 학습 (Temporal Difference) — “다음 상태의 추정치를 빌려 쓴다”</h3>
-          <p>끝까지 갈 필요 없이, <strong>한 스텝만 가보고</strong> 나머지는 자기 자신의 예측으로 때운다.</p>
-          <div class="formula">V(s) ← r + γV(s′)</div>
-          <p>말로 하면: “이 상태의 가치 = 지금 받은 보상 + 다음 상태의 가치(내 예측)”.</p>
-          <p>이것을 <strong>벨만 방정식(Bellman equation)</strong>이라 하고, 이 갱신을 <strong>벨만 백업(Bellman backup)</strong>이라 한다.</p>
-          <p>Q 버전(<strong>Q-learning</strong>):</p>
-          <div class="formula">Q(s,a) ← r + γ max<sub>a′</sub> Q(s′,a′)</div>
-          <p><strong>TD 오차(TD error)</strong>: δ = r + γV(s′) − V(s) — 예측과 실제의 차이. 이 값이 곧 advantage의 1-스텝 추정이기도 하다.</p>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>장점</th><th>단점</th></tr></thead>
-              <tbody>
-                <tr><td><strong>데이터 효율 높음</strong></td><td><strong>편향 있음</strong> (내 예측을 정답으로 씀)</td></tr>
-                <tr><td>에피소드 안 끝나도 <strong>온라인 학습</strong></td><td><strong>불안정</strong> — 오류가 자기 강화됨</td></tr>
-                <tr><td>off-policy 학습 가능</td><td>하이퍼파라미터에 민감</td></tr>
-              </tbody>
-            </table>
-          </div>
+        <h3>방법 2: TD 학습 — “다음 상태의 추정치를 빌려 쓴다”</h3>
+        <p>끝까지 갈 필요 없이, <strong>한 스텝만 가보고</strong> 나머지는 자기 자신의 예측으로 때운다.</p>
+        <div class="math">V(s) ← r + γV(s′)</div>
+        <p>말로 하면: “이 상태의 가치 = 지금 받은 보상 + 다음 상태의 가치(내 예측)”. 이것을 <strong>벨만 방정식(Bellman equation)</strong>이라 하고, 이 갱신을 <strong>벨만 백업(Bellman backup)</strong>이라 한다.</p>
+        <p>Q 버전(<strong>Q-learning</strong>):</p>
+        <div class="math">Q(s,a) ← r + γ max<sub>a′</sub> Q(s′,a′)</div>
+        <p><strong>TD 오차:</strong> δ = r + γV(s′) − V(s) — 예측과 실제의 차이. 이 값이 곧 advantage의 1-스텝 추정이기도 하다.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>장점</th><th>단점</th></tr></thead>
+            <tbody>
+              <tr><td><strong>데이터 효율 높음</strong></td><td><strong>편향 있음</strong> — 내 예측을 정답으로 씀</td></tr>
+              <tr><td>에피소드 안 끝나도 <strong>온라인 학습</strong></td><td><strong>불안정</strong> — 오류가 자기 강화됨</td></tr>
+              <tr><td>off-policy 학습 가능</td><td>하이퍼파라미터에 민감</td></tr>
+            </tbody>
+          </table>
+        </div>
 
-          <h3>부트스트랩 (bootstrapping) — TD의 축복이자 저주</h3>
-          <p>TD가 “자기 예측을 정답으로 쓰는 것”을 <strong>부트스트랩</strong>이라 한다. 이게 데이터 효율의 원천이자 모든 불안정성의 원천이다.</p>
-          <pre><code>critic이 본 적 없는 행동 a* 의 Q값을 과대평가
+        <h3>부트스트랩 — TD의 축복이자 저주</h3>
+        <p>TD가 “자기 예측을 정답으로 쓰는 것”을 <strong>부트스트랩</strong>이라 한다. 이게 데이터 효율의 원천이자 모든 불안정성의 원천이다.</p>
+        <pre>critic이 본 적 없는 행동 a* 의 Q값을 과대평가
   → actor가 "a* 가 최고네" 하고 그쪽으로 이동
   → 과대평가된 값이 벨만 백업으로 이전 상태에 전파
-  → 전체 Q함수가 부풀어 오름 → 발산</code></pre>
-          <p>자기 강화 루프다. 이것이 offline RL의 핵심 난점이고, RLPD가 LayerNorm과 critic 앙상블로 막으려 한 것이다. (상세: Sergey 노트 심화 해설 ② Q2)</p>
+  → 전체 Q함수가 부풀어 오름 → 발산</pre>
+        <p>자기 강화 루프다. 이것이 offline RL의 핵심 난점이고, RLPD가 LayerNorm과 critic 앙상블로 막으려 한 것이다.</p>
 
-          <h3>중간 지점: N-step과 GAE</h3>
-          <p>MC(끝까지)와 TD(1스텝)는 스펙트럼의 양 끝이다. 중간을 쓸 수 있다.</p>
-          <div class="formula">r<sub>t</sub> <small>(TD, N=1)</small> ··· r<sub>t</sub> + γr<sub>t+1</sub> + ··· + γ<sup>N−1</sup>r<sub>t+N−1</sub> + γ<sup>N</sup>V(s<sub>t+N</sub>) <small>(N-step)</small> ··· Σ<sub>t</sub>γ<sup>t</sup>r<sub>t</sub> <small>(MC, N=∞)</small></div>
-          <p>N이 클수록 편향↓ 분산↑. π*0.6의 A(o,a) = r<sub>t:N</sub> + V(o<sub>t+N</sub>) − V(o<sub>t</sub>)가 바로 N-step이다.</p>
-          <p><strong>GAE (Generalized Advantage Estimation)</strong>는 여러 N의 결과를 λ로 지수 가중 평균하는 기법. PPO와 거의 항상 함께 쓰인다.</p>
+        <h3>중간 지점: N-step과 GAE</h3>
+        <p>MC(끝까지)와 TD(1스텝)는 스펙트럼의 양 끝이다. 중간을 쓸 수 있다.</p>
+        <div class="math">r<sub>t</sub> &nbsp;…&nbsp; r<sub>t</sub> + γr<sub>t+1</sub> + ··· + γ<sup>N−1</sup>r<sub>t+N−1</sub> + γ<sup>N</sup>V(s<sub>t+N</sub>) &nbsp;…&nbsp; Σ<sub>t</sub>γ<sup>t</sup>r<sub>t</sub></div>
+        <p>N이 클수록 편향↓ 분산↑. π*0.6의 A(o,a) = r<sub>t:N</sub> + V(o<sub>t+N</sub>) − V(o<sub>t</sub>)가 바로 N-step이다.</p>
+        <p><strong>GAE (Generalized Advantage Estimation)</strong>는 여러 N의 결과를 λ로 지수 가중 평균하는 기법. PPO와 거의 항상 함께 쓰인다.</p>
 
-          <h3>두 발표의 선택 비교</h3>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th></th><th>가치 학습법</th><th>왜</th></tr></thead>
-              <tbody>
-                <tr><td><strong>π*0.6 (Finn 1부)</strong></td><td><strong>MC 회귀</strong></td><td>대형 VLM에 얹어야 함 → 안정성 최우선</td></tr>
-                <tr><td><strong>EXPO (Finn 2부)</strong></td><td><strong>TD / Q-learning</strong></td><td>off-policy 온라인 개선이 목적 → 데이터 효율 필요</td></tr>
-                <tr><td><strong>RLPD (Levine)</strong></td><td><strong>TD / SAC</strong></td><td>실세계 1~2시간 학습 → 데이터 효율이 생명</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p>같은 워크샵의 두 발표가 정반대를 골랐고, <strong>둘 다 자기 목적에 맞다.</strong> 이 표가 두 영상을 관통하는 축이다.</p>
-          <a class="back" href="#top">↑ 목차로</a>
-        </section>
+        <h3>두 발표의 선택 비교</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th></th><th>가치 학습법</th><th>왜</th></tr></thead>
+            <tbody>
+              <tr><td><strong>π*0.6 (Finn 1부)</strong></td><td><strong>MC 회귀</strong></td><td>대형 VLM에 얹어야 함 → 안정성 최우선</td></tr>
+              <tr><td><strong>EXPO (Finn 2부)</strong></td><td><strong>TD / Q-learning</strong></td><td>off-policy 온라인 개선이 목적 → 데이터 효율 필요</td></tr>
+              <tr><td><strong>RLPD (Levine)</strong></td><td><strong>TD / SAC</strong></td><td>실세계 1~2시간 학습 → 데이터 효율이 생명</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>같은 워크샵의 두 발표가 정반대를 골랐고, <strong>둘 다 자기 목적에 맞다.</strong> 이 표가 두 영상을 관통하는 축이다.</p>
+        <a class="top-link" href="#top">↑ 맨 위로</a>
+      </section>
 
-        <section id="part-4">
-          <header>
-            <span class="part-number">PART 4</span>
-            <h2>경사하강 (gradient descent) — “학습”이 실제로 무엇인가</h2>
-          </header>
-          <p>RL 특유의 개념은 아니지만, EXPO의 “Q함수 뒤처짐”을 이해하려면 필요하다.</p>
+      <section class="part" id="part-4">
+        <header>
+          <span class="part-number">PART 04</span>
+          <h2>경사하강 — “학습”이 실제로 무엇인가</h2>
+        </header>
 
-          <h3>기본</h3>
-          <p>신경망은 수백만~수십억 개의 <strong>파라미터 θ</strong>(가중치)를 가진 함수다. 학습이란 이 숫자들을 조금씩 바꿔 손실을 줄이는 것.</p>
-          <div class="formula">θ ← θ − α∇<sub>θ</sub>L(θ)</div>
+        <p>RL 특유의 개념은 아니지만, EXPO의 “Q함수 뒤처짐”을 이해하려면 필요하다.</p>
+
+        <h3>기본</h3>
+        <p>신경망은 수백만~수십억 개의 <strong>파라미터 θ</strong>(가중치)를 가진 함수다. 학습이란 이 숫자들을 조금씩 바꿔 손실을 줄이는 것.</p>
+        <div class="math">θ ← θ − α∇<sub>θ</sub>L(θ)</div>
+        <ul>
+          <li><strong>L(θ):</strong> 손실함수 — 지금 얼마나 틀렸는지</li>
+          <li><strong>∇<sub>θ</sub>L:</strong> 기울기 — 각 파라미터를 어느 방향으로 바꾸면 손실이 커지는지</li>
+          <li><strong>α:</strong> 학습률 — 한 번에 얼마나 움직일지. 보통 10<sup>−4</sup> 정도</li>
+          <li><strong>마이너스 부호:</strong> 손실이 줄어드는 쪽으로 가려고</li>
+        </ul>
+        <aside class="callout example">
+          <span class="callout-title">EXAMPLE · 안개 속 하산</span>
+          <p>산에서 안개 때문에 앞이 안 보인다. 발밑의 기울기만 느낄 수 있다. 전략은 <strong>가장 급하게 내려가는 방향으로 한 걸음씩</strong> 반복.</p>
           <ul>
-            <li>L(θ): <strong>손실함수</strong> — 지금 얼마나 틀렸는지</li>
-            <li>∇<sub>θ</sub>L: <strong>기울기(gradient)</strong> — 각 파라미터를 어느 방향으로 바꾸면 손실이 커지는지</li>
-            <li>α: <strong>학습률(learning rate)</strong> — 한 번에 얼마나 움직일지. 보통 10<sup>−4</sup> 정도</li>
-            <li>마이너스 부호: 손실이 <strong>줄어드는</strong> 쪽으로 가려고</li>
+            <li>기울기 = 발밑 경사</li>
+            <li>학습률 = 한 걸음의 크기</li>
+            <li>걸음이 너무 크면 계곡을 뛰어넘고, 너무 작으면 평생 못 내려간다</li>
           </ul>
-          <div class="callout">
-            <p class="callout-title">EXAMPLE · 비유 — 안개 속 하산</p>
-            <p>산에서 안개 때문에 앞이 안 보인다. 발밑의 기울기만 느낄 수 있다.</p>
-            <p>전략: <strong>가장 급하게 내려가는 방향으로 한 걸음씩</strong> 반복.</p>
-            <ul>
-              <li>기울기 = 발밑 경사</li>
-              <li>학습률 = 한 걸음의 크기</li>
-              <li>걸음이 너무 크면 계곡을 뛰어넘고, 너무 작으면 평생 못 내려간다</li>
-            </ul>
-          </div>
+        </aside>
 
-          <h3>핵심: 경사하강은 느리다</h3>
-          <p>한 번의 갱신으로 정답에 도달하지 않는다. <strong>조금씩 수천~수만 번</strong> 반복해야 수렴한다.</p>
-          <div class="callout important">
-            <p class="callout-title">IMPORTANT · 이것이 EXPO “뒤처짐”의 정체</p>
-            <p>Finn 00:22:00에서 edit policy가 Q를 못 따라가는 이유가 이것이다.</p>
-            <pre><code>시각 t:      Q_t 를 최대화하도록 π_edit 경사하강 시작
+        <h3>핵심: 경사하강은 느리다</h3>
+        <p>한 번의 갱신으로 정답에 도달하지 않는다. <strong>조금씩 수천~수만 번</strong> 반복해야 수렴한다.</p>
+        <aside class="callout important">
+          <span class="callout-title">IMPORTANT · 이것이 EXPO “뒤처짐”의 정체</span>
+          <p>Finn 00:22:00에서 edit policy가 Q를 못 따라가는 이유가 이것이다.</p>
+          <pre>시각 t:      Q_t 를 최대화하도록 π_edit 경사하강 시작
 시각 t+50:   π_edit 가 겨우 Q_t 를 따라잡음
-             그런데 Q 는 이미 Q_{t+50} 으로 바뀜   ← 영원히 한 발 늦음</code></pre>
-            <p><strong>온라인 RL에서는 목표(Q)가 계속 움직인다.</strong> 경사하강은 움직이는 목표를 느리게 쫓아가는 도구다.</p>
-            <p>EXPO의 해법 <code>argmax Q</code>는 <strong>경사하강이 아니라 탐색(search)</strong>이다. 학습 스텝이 0회이므로 최신 Q를 즉시 쓸 수 있다. 두 개의 시간 척도를 겹친 것:</p>
-            <ul>
-              <li><code>π_edit</code> 학습 = 느린 개선 (경사하강, 수백 스텝)</li>
-              <li><code>argmax Q</code> = 즉석 보정 (탐색, 0 스텝)</li>
-            </ul>
-          </div>
-
-          <h3>관련 용어</h3>
+             그런데 Q 는 이미 Q_{t+50} 으로 바뀜   ← 영원히 한 발 늦음</pre>
+          <p><strong>온라인 RL에서는 목표(Q)가 계속 움직인다.</strong> 경사하강은 움직이는 목표를 느리게 쫓아가는 도구다.</p>
+          <p>EXPO의 해법 <code>argmax Q</code>는 <strong>경사하강이 아니라 탐색(search)</strong>이다. 학습 스텝이 0회이므로 최신 Q를 즉시 쓸 수 있다.</p>
           <ul>
-            <li><strong>역전파 (backpropagation)</strong>: 기울기를 출력에서 입력 방향으로 연쇄법칙으로 계산하는 알고리즘</li>
-            <li><strong>배치 (batch)</strong>: 한 번의 갱신에 쓰는 데이터 묶음. 보통 256개</li>
-            <li><strong>에폭 (epoch)</strong>: 데이터셋 전체를 한 바퀴</li>
-            <li><strong>UTD (Update-To-Data) 비율</strong>: 환경 스텝 1회당 경사하강 몇 번? 보통 SAC는 1, RLPD는 <strong>20</strong>. 실세계에서 비싼 건 로봇 시간이고 GPU는 싸므로 같은 경험을 20배 짜낸다. 이것이 “1~2시간 학습”의 정체.</li>
-            <li><strong>긴 체인을 통한 역전파의 문제</strong>: 디퓨전 정책은 denoising을 수십~수백 번 반복하는데, 그 전체를 통과해 기울기를 보내면 기울기가 소실/폭발한다. Finn 00:19:50의 “가치를 diffusion으로 직접 역전파 → 긴 denoising 체인 탓에 불안정”이 이것.</li>
+            <li><code>π_edit</code> 학습 = 느린 개선 — 경사하강, 수백 스텝</li>
+            <li><code>argmax Q</code> = 즉석 보정 — 탐색, 0 스텝</li>
           </ul>
-          <a class="back" href="#top">↑ 목차로</a>
-        </section>
+        </aside>
 
-        <section id="part-5">
-          <header>
-            <span class="part-number">PART 5</span>
-            <h2>on-policy vs off-policy — 가장 중요한 구분</h2>
-          </header>
-          <p class="lead">로봇 RL 논문을 읽을 때 <strong>가장 먼저 확인해야 할 축</strong>이다. 두 발표의 알고리즘 선택이 거의 전부 이 축으로 설명된다.</p>
+        <h3>관련 용어</h3>
+        <ul>
+          <li><strong>역전파:</strong> 기울기를 출력에서 입력 방향으로 연쇄법칙으로 계산하는 알고리즘</li>
+          <li><strong>배치:</strong> 한 번의 갱신에 쓰는 데이터 묶음. 보통 256개</li>
+          <li><strong>에폭:</strong> 데이터셋 전체를 한 바퀴</li>
+          <li><strong>UTD 비율:</strong> 환경 스텝 1회당 경사하강 몇 번? 보통 SAC는 1, RLPD는 <strong>20</strong>. 실세계에서 비싼 건 로봇 시간이고 GPU는 싸므로 같은 경험을 20배 짜낸다.</li>
+          <li><strong>긴 체인을 통한 역전파의 문제:</strong> 디퓨전 정책은 denoising을 수십~수백 번 반복한다. 전체를 통과해 기울기를 보내면 기울기가 소실·폭발한다. Finn 00:19:50의 “긴 denoising 체인 탓에 불안정”이 이것.</li>
+        </ul>
+        <a class="top-link" href="#top">↑ 맨 위로</a>
+      </section>
 
-          <h3>정의</h3>
-          <div class="callout"><p><strong>학습에 쓰는 데이터가 “지금 학습 중인 정책”이 만든 것이어야 하는가?</strong></p></div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th></th><th>on-policy</th><th>off-policy</th></tr></thead>
-              <tbody>
-                <tr><td>데이터 출처</td><td><strong>반드시 현재 정책</strong></td><td><strong>아무 정책이든 무관</strong></td></tr>
-                <tr><td>정책 갱신 후 과거 데이터</td><td><strong>버려야 함</strong> ❌</td><td><strong>계속 재사용</strong> ✅</td></tr>
-                <tr><td>리플레이 버퍼</td><td>못 씀 (또는 아주 짧게)</td><td>필수 부품</td></tr>
-                <tr><td>사람 데모 활용</td><td>어려움</td><td><strong>그냥 버퍼에 넣으면 됨</strong></td></tr>
-                <tr><td>데이터 효율</td><td>낮음</td><td>높음</td></tr>
-                <tr><td>안정성</td><td>상대적으로 안정</td><td>부트스트랩 발산 위험</td></tr>
-                <tr><td>대표 알고리즘</td><td><strong>PPO</strong>, TRPO, A3C, REINFORCE</td><td><strong>SAC</strong>, TD3, DDPG, Q-learning, RLPD</td></tr>
-              </tbody>
-            </table>
-          </div>
+      <section class="part" id="part-5">
+        <header>
+          <span class="part-number">PART 05</span>
+          <h2>on-policy vs off-policy — 가장 중요한 구분</h2>
+        </header>
 
-          <h3>on-policy가 왜 데이터를 버려야 하는가</h3>
-          <p>RL의 목적함수는 이렇게 생겼다.</p>
-          <div class="formula">J(π) = 𝔼<sub>τ ∼ p(τ∣π)</sub>[Σ<sub>t</sub> γ<sup>t</sup>r<sub>t</sub>]</div>
-          <p>𝔼<sub>τ ∼ p(τ∣π)</sub>를 잘 보자. <strong>“정책 π가 만드는 궤적 분포에 대한 기대값”</strong>이다. 즉 목적함수 자체가 <strong>현재 정책이 방문하는 상태 분포</strong>를 전제한다.</p>
-          <p>정책을 조금이라도 바꾸면 방문 분포도 바뀌므로, 옛 정책이 모은 데이터는 <strong>다른 분포에서 온 샘플</strong>이 되어 기대값 추정이 틀린다.</p>
-          <ul>
-            <li><strong>importance sampling</strong>으로 보정할 수는 있다: π<sub>new</sub>(a∣s) / π<sub>old</sub>(a∣s)를 곱해준다.</li>
-            <li>하지만 두 정책이 조금만 멀어져도 이 비율이 폭발해 분산이 감당 불가가 된다.</li>
-            <li>그래서 PPO는 <strong>비율을 강제로 clip</strong>해서 “너무 멀어지지 마”라고 제약한다(PART 8).</li>
-          </ul>
+        <p>로봇 RL 논문을 읽을 때 <strong>가장 먼저 확인해야 할 축</strong>이다. 두 발표의 알고리즘 선택이 거의 전부 이 축으로 설명된다.</p>
 
-          <h3>off-policy는 왜 자유로운가</h3>
-          <p>off-policy 알고리즘은 목적을 다르게 잡는다. <strong>“Q(s,a)가 벨만 방정식을 만족하도록”</strong> 학습한다.</p>
-          <div class="formula">Q(s,a) = r + γ max<sub>a′</sub> Q(s′,a′)</div>
-          <p>이 식에는 <strong>정책이 등장하지 않는다.</strong> 그냥 전이 (s,a,r,s′) 하나만 있으면 검사할 수 있다. 그 전이를 누가 만들었는지는 <strong>상관없다.</strong></p>
-          <ul>
-            <li>옛 정책이 만든 것 ✅</li>
-            <li>사람이 원격조작한 것 ✅</li>
-            <li>완전히 엉망인 랜덤 행동 ✅</li>
-          </ul>
-          <p>전부 유효한 학습 신호다.</p>
+        <h3>정의</h3>
+        <blockquote class="callout note"><strong>학습에 쓰는 데이터가 “지금 학습 중인 정책”이 만든 것이어야 하는가?</strong></blockquote>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th></th><th>on-policy</th><th>off-policy</th></tr></thead>
+            <tbody>
+              <tr><td>데이터 출처</td><td><strong>반드시 현재 정책</strong></td><td><strong>아무 정책이든 무관</strong></td></tr>
+              <tr><td>정책 갱신 후 과거 데이터</td><td><strong>버려야 함</strong> ❌</td><td><strong>계속 재사용</strong> ✅</td></tr>
+              <tr><td>리플레이 버퍼</td><td>못 씀 — 또는 아주 짧게</td><td>필수 부품</td></tr>
+              <tr><td>사람 데모 활용</td><td>어려움</td><td><strong>그냥 버퍼에 넣으면 됨</strong></td></tr>
+              <tr><td>데이터 효율</td><td>낮음</td><td>높음</td></tr>
+              <tr><td>안정성</td><td>상대적으로 안정</td><td>부트스트랩 발산 위험</td></tr>
+              <tr><td>대표 알고리즘</td><td><strong>PPO</strong>, TRPO, A3C, REINFORCE</td><td><strong>SAC</strong>, TD3, DDPG, Q-learning, RLPD</td></tr>
+            </tbody>
+          </table>
+        </div>
 
-          <h3>로봇에서 off-policy가 사실상 필수인 이유</h3>
-          <div class="callout important">
-            <p class="callout-title">IMPORTANT · 실세계 데이터는 사람 시간과 로봇 시간이 든다</p>
-            <p>on-policy는 정책을 갱신할 때마다 데이터를 버린다. 시뮬레이터에서는 다시 모으면 되지만, <strong>실세계에서는 다시 모으는 데 몇 시간이 걸린다.</strong> 치명적이다.</p>
-          </div>
-          <p>게다가 로봇 RL이 쓰고 싶은 데이터가 전부 off-policy다.</p>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>데이터</th><th>on-policy에서</th><th>off-policy에서</th></tr></thead>
-              <tbody>
-                <tr><td>사람 데모</td><td>못 씀 (내 정책이 만든 게 아님)</td><td>버퍼에 넣으면 끝</td></tr>
-                <tr><td>사람 개입/교정</td><td>못 씀</td><td>버퍼에 넣으면 끝</td></tr>
-                <tr><td>과거 이터레이션 롤아웃</td><td>버려야 함</td><td>계속 재사용</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <ul>
-            <li><strong>Levine 장면 6</strong>: “off-policy라 리플레이 버퍼에 그냥 넣으면 되고, 탐색에 큰 도움”</li>
-            <li><strong>Finn 00:25:00</strong>: “정책의 자율 예측과 사람이 덮어쓴 행동이 <strong>모두</strong> 리플레이 버퍼에 들어간다”</li>
-          </ul>
-          <p>둘 다 off-policy 성질에 완전히 의존한다.</p>
+        <h3>on-policy가 왜 데이터를 버려야 하는가</h3>
+        <div class="math">J(π) = 𝔼<sub>τ∼p(τ|π)</sub>[Σ<sub>t</sub>γ<sup>t</sup>r<sub>t</sub>]</div>
+        <p>“정책 π가 만드는 궤적 분포에 대한 기대값”이다. 즉 목적함수 자체가 <strong>현재 정책이 방문하는 상태 분포</strong>를 전제한다.</p>
+        <p>정책을 조금이라도 바꾸면 방문 분포도 바뀌므로, 옛 정책이 모은 데이터는 <strong>다른 분포에서 온 샘플</strong>이 되어 기대값 추정이 틀린다.</p>
+        <ul>
+          <li><strong>importance sampling</strong>으로 π<sub>new</sub>(a|s) / π<sub>old</sub>(a|s)를 곱해 보정할 수 있다.</li>
+          <li>하지만 두 정책이 조금만 멀어져도 이 비율이 폭발해 분산이 감당 불가가 된다.</li>
+          <li>그래서 PPO는 <strong>비율을 강제로 clip</strong>해서 “너무 멀어지지 마”라고 제약한다.</li>
+        </ul>
 
-          <h3>그래서 PPO가 왜 졌는가</h3>
-          <p>Finn 00:16:40: “이 설정에서 AWR과 PPO는 SFT 대비 개선이 없었다.”</p>
-          <p>PPO는 LLM의 RLHF에서는 표준이다. 왜 로봇에서는 안 되나?</p>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th></th><th>LLM (RLHF)</th><th>로봇 (실세계)</th></tr></thead>
-              <tbody>
-                <tr><td>샘플 1개 비용</td><td>텍스트 생성 — <strong>거의 공짜</strong></td><td>로봇 몇 초~몇 분 — <strong>매우 비쌈</strong></td></tr>
-                <tr><td>병렬화</td><td>수천 개 동시</td><td>로봇 대수만큼</td></tr>
-                <tr><td>on-policy 샘플 확보</td><td>쉬움 (수백만 개)</td><td>사실상 불가능</td></tr>
-                <tr><td>사람 데모 재활용 필요성</td><td>낮음</td><td><strong>필수</strong></td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p><strong>PPO는 “샘플이 싸다”는 전제 위에 설계된 알고리즘</strong>이다. 그 전제가 무너지는 실세계 로봇에서는 구조적으로 불리하다. 알고리즘이 나쁜 게 아니라 <strong>문제 설정이 다르다.</strong></p>
+        <h3>off-policy는 왜 자유로운가</h3>
+        <p>off-policy 알고리즘은 <strong>“Q(s,a)가 벨만 방정식을 만족하도록”</strong> 학습한다.</p>
+        <div class="math">Q(s,a) = r + γ max<sub>a′</sub>Q(s′,a′)</div>
+        <p>이 식에는 <strong>정책이 등장하지 않는다.</strong> 전이 (s,a,r,s′) 하나만 있으면 검사할 수 있다. 그 전이를 누가 만들었는지는 상관없다.</p>
+        <ul>
+          <li>옛 정책이 만든 것 ✅</li>
+          <li>사람이 원격조작한 것 ✅</li>
+          <li>완전히 엉망인 랜덤 행동 ✅</li>
+        </ul>
+        <p>전부 유효한 학습 신호다.</p>
 
-          <h3>offline RL — 제3의 범주</h3>
-          <p>혼동하기 쉬우므로 분리해둔다.</p>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th></th><th>환경과 상호작용?</th><th>데이터</th></tr></thead>
-              <tbody>
-                <tr><td><strong>on-policy</strong></td><td>함 (현재 정책으로만)</td><td>매번 새로</td></tr>
-                <tr><td><strong>off-policy (online)</strong></td><td>함</td><td>버퍼 재사용 + 새 데이터</td></tr>
-                <tr><td><strong>offline (batch RL)</strong></td><td><strong>안 함</strong></td><td>고정된 데이터셋만</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p>offline RL은 “주어진 데이터셋만으로 최선의 정책을 뽑아내는” 문제다. 새 데이터를 못 모으므로 <strong>분포 밖 행동(OOD)의 과대평가</strong>를 막는 게 전부다.</p>
-          <ul>
-            <li>Levine 장면 20의 “OfflineRL Pretrain” 막대가 이것</li>
-            <li>π*0.6의 사전학습이 offline RL</li>
-            <li><strong>π*0.6의 반복 루프는 엄밀히는 “반복적 offline RL”</strong>에 가깝다 — 롤아웃 뭉치를 모아 재라벨링하고 통째로 재학습하므로</li>
-          </ul>
-          <a class="back" href="#top">↑ 목차로</a>
-        </section>
+        <h3>로봇에서 off-policy가 사실상 필수인 이유</h3>
+        <aside class="callout important">
+          <span class="callout-title">IMPORTANT · 실세계 데이터는 사람 시간과 로봇 시간이 든다</span>
+          <p>on-policy는 정책을 갱신할 때마다 데이터를 버린다. 시뮬레이터에서는 다시 모으면 되지만, <strong>실세계에서는 다시 모으는 데 몇 시간이 걸린다.</strong> 치명적이다.</p>
+        </aside>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>데이터</th><th>on-policy에서</th><th>off-policy에서</th></tr></thead>
+            <tbody>
+              <tr><td>사람 데모</td><td>못 씀</td><td>버퍼에 넣으면 끝</td></tr>
+              <tr><td>사람 개입/교정</td><td>못 씀</td><td>버퍼에 넣으면 끝</td></tr>
+              <tr><td>과거 이터레이션 롤아웃</td><td>버려야 함</td><td>계속 재사용</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <ul>
+          <li><strong>Levine 장면 6:</strong> “off-policy라 리플레이 버퍼에 그냥 넣으면 되고, 탐색에 큰 도움”</li>
+          <li><strong>Finn 00:25:00:</strong> 정책의 자율 예측과 사람이 덮어쓴 행동이 <strong>모두</strong> 리플레이 버퍼에 들어간다.</li>
+        </ul>
 
-        <section id="part-6">
-          <header>
-            <span class="part-number">PART 6</span>
-            <h2>정책의 형태 — 가우시안 vs 디퓨전</h2>
-          </header>
-          <p class="lead">π(a∣s)를 신경망으로 <strong>어떻게 표현할까.</strong> 이 선택이 EXPO 전체의 이유다.</p>
+        <h3>그래서 PPO가 왜 졌는가</h3>
+        <p>Finn 00:16:40: “이 설정에서 AWR과 PPO는 SFT 대비 개선이 없었다.”</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th></th><th>LLM (RLHF)</th><th>로봇 (실세계)</th></tr></thead>
+            <tbody>
+              <tr><td>샘플 1개 비용</td><td>텍스트 생성 — <strong>거의 공짜</strong></td><td>로봇 몇 초~몇 분 — <strong>매우 비쌈</strong></td></tr>
+              <tr><td>병렬화</td><td>수천 개 동시</td><td>로봇 대수만큼</td></tr>
+              <tr><td>on-policy 샘플 확보</td><td>쉬움</td><td>사실상 불가능</td></tr>
+              <tr><td>사람 데모 재활용 필요성</td><td>낮음</td><td><strong>필수</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p><strong>PPO는 “샘플이 싸다”는 전제 위에 설계된 알고리즘</strong>이다. 그 전제가 무너지는 실세계 로봇에서는 구조적으로 불리하다. 알고리즘이 나쁜 게 아니라 <strong>문제 설정이 다르다.</strong></p>
 
-          <h3>가우시안 정책 (Gaussian policy)</h3>
-          <p>신경망이 행동을 직접 출력하지 않고, <strong>정규분포의 평균과 표준편차</strong>를 출력한다.</p>
-          <div class="formula">π(a ∣ s) = 𝒩(μ<sub>θ</sub>(s), σ<sub>θ</sub>(s))</div>
-          <pre><code>상태 s → [신경망] → μ = [0.3, -0.1, 0.5, ...]   (평균)
-                    σ = [0.05, 0.05, 0.1, ...]  (표준편차)
+        <h3>offline RL — 제3의 범주</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th></th><th>환경과 상호작용?</th><th>데이터</th></tr></thead>
+            <tbody>
+              <tr><td><strong>on-policy</strong></td><td>함 — 현재 정책으로만</td><td>매번 새로</td></tr>
+              <tr><td><strong>off-policy (online)</strong></td><td>함</td><td>버퍼 재사용 + 새 데이터</td></tr>
+              <tr><td><strong>offline (batch RL)</strong></td><td><strong>안 함</strong></td><td>고정된 데이터셋만</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>offline RL은 “주어진 데이터셋만으로 최선의 정책을 뽑아내는” 문제다. 새 데이터를 못 모으므로 <strong>분포 밖 행동(OOD)의 과대평가</strong>를 막는 게 전부다.</p>
+        <ul>
+          <li>Levine 장면 20의 “OfflineRL Pretrain” 막대가 이것</li>
+          <li>π*0.6의 사전학습이 offline RL</li>
+          <li><strong>π*0.6의 반복 루프는 엄밀히는 “반복적 offline RL”</strong>에 가깝다 — 롤아웃 뭉치를 모아 재라벨링하고 통째로 재학습하므로</li>
+        </ul>
+        <a class="top-link" href="#top">↑ 맨 위로</a>
+      </section>
 
-행동 뽑기: a = μ + σ · ε ,   ε ~ N(0, 1)</code></pre>
-          <p><strong>왜 RL 알고리즘들이 가우시안을 전제하는가</strong> — 세 가지가 다 쉽다.</p>
-          <ol>
-            <li><strong>확률 계산이 닫힌 형태로 가능</strong> — log π(a∣s)를 공식으로 바로 계산. policy gradient에 필수.</li>
-            <li><strong>재파라미터화 트릭 (reparameterization trick)</strong> — a = μ + σε로 쓰면 샘플링을 통과해 미분할 수 있다. SAC/TD3가 actor를 학습하는 방식.</li>
-            <li><strong>엔트로피 계산 가능</strong> — SAC의 엔트로피 항을 공식으로 구할 수 있다.</li>
-          </ol>
-          <p><strong>가우시안의 치명적 한계: 단봉(unimodal)</strong></p>
-          <p>정규분포는 봉우리가 <strong>하나</strong>다. “왼쪽으로 돌기”와 “오른쪽으로 돌기” 둘 다 정답인 상황에서 가우시안은 둘 중 하나를 고르거나 <strong>둘의 평균(= 직진, 오답)</strong>을 낸다.</p>
-          <p>이것이 PART 1에서 본 <strong>mode averaging</strong>이고, 사람 데모를 BC할 때 커넥터가 안 꽂히는 이유다.</p>
+      <section class="part" id="part-6">
+        <header>
+          <span class="part-number">PART 06</span>
+          <h2>정책의 형태 — 가우시안 vs 디퓨전</h2>
+        </header>
 
-          <h3>디퓨전 정책 (diffusion policy) / 플로우 매칭 (flow matching)</h3>
-          <p>노이즈에서 시작해 <strong>여러 번의 denoising 스텝</strong>을 거쳐 행동을 만든다.</p>
-          <pre><code>a_K ~ N(0,1)  (순수 노이즈)
+        <p>π(a|s)를 신경망으로 <strong>어떻게 표현할까.</strong> 이 선택이 EXPO 전체의 이유다.</p>
+
+        <h3>가우시안 정책</h3>
+        <div class="math">π(a | s) = 𝒩(μ<sub>θ</sub>(s), σ<sub>θ</sub>(s))</div>
+        <pre>상태 s → [신경망] → μ = [0.3, -0.1, 0.5, ...]  (평균)
+                    σ = [0.05, 0.05, 0.1, ...]   (표준편차)
+
+행동 뽑기: a = μ + σ · ε,  ε ~ N(0, 1)</pre>
+        <p><strong>왜 RL 알고리즘들이 가우시안을 전제하는가:</strong></p>
+        <ol>
+          <li><strong>확률 계산이 닫힌 형태로 가능</strong> — log π(a|s)를 공식으로 바로 계산. policy gradient에 필수.</li>
+          <li><strong>재파라미터화 트릭</strong> — a = μ + σε로 쓰면 샘플링을 통과해 미분할 수 있다. SAC/TD3가 actor를 학습하는 방식.</li>
+          <li><strong>엔트로피 계산 가능</strong> — SAC의 엔트로피 항을 공식으로 구할 수 있다.</li>
+        </ol>
+        <p><strong>가우시안의 치명적 한계: 단봉(unimodal).</strong> “왼쪽으로 돌기”와 “오른쪽으로 돌기” 둘 다 정답인 상황에서 둘 중 하나를 고르거나 <strong>둘의 평균(직진, 오답)</strong>을 낸다. 이것이 <strong>mode averaging</strong>이다.</p>
+
+        <h3>디퓨전 정책 / 플로우 매칭</h3>
+        <p>노이즈에서 시작해 <strong>여러 번의 denoising 스텝</strong>을 거쳐 행동을 만든다.</p>
+        <pre>a_K ~ N(0,1)  (순수 노이즈)
   → denoise → a_{K-1}
   → denoise → a_{K-2}
   → ...
-  → denoise → a_0  (최종 행동)</code></pre>
-          <p>이미지 생성(Stable Diffusion)과 같은 원리를 행동에 쓴 것.</p>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>장점</th><th>단점</th></tr></thead>
-              <tbody>
-                <tr><td><strong>멀티모달 분포 표현 가능</strong> (봉우리 여러 개)</td><td>log π(a∣s) 계산이 <strong>불가능/비쌈</strong></td></tr>
-                <tr><td>복잡한 행동 분포를 정확히 모델링</td><td>미분이 <strong>긴 체인</strong>을 통과 → 불안정</td></tr>
-                <tr><td>사람 데모의 다양성을 죽이지 않음</td><td>샘플링에 forward pass 수십~수백 회</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p><strong>현대 VLA는 거의 다 디퓨전/플로우다.</strong> π₀, π₀.₅, π*0.6 모두. 표현력이 필요하니까.</p>
+  → denoise → a_0  (최종 행동)</pre>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>장점</th><th>단점</th></tr></thead>
+            <tbody>
+              <tr><td><strong>멀티모달 분포 표현 가능</strong></td><td>log π(a|s) 계산이 <strong>불가능/비쌈</strong></td></tr>
+              <tr><td>복잡한 행동 분포를 정확히 모델링</td><td>미분이 <strong>긴 체인</strong>을 통과 → 불안정</td></tr>
+              <tr><td>사람 데모의 다양성을 죽이지 않음</td><td>샘플링에 forward pass 수십~수백 회</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p><strong>현대 VLA는 거의 다 디퓨전/플로우다.</strong> π₀, π₀.₅, π*0.6 모두. 표현력이 필요하니까.</p>
 
-          <h3>그래서 디퓨전에 RL을 어떻게 걸까 — Finn 00:19:50의 세 갈래</h3>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>기존 시도</th><th>방법</th><th>문제</th></tr></thead>
-              <tbody>
-                <tr><td>① 가치를 직접 역전파</td><td>denoising 체인 전체를 통과해 미분</td><td><strong>불안정</strong> (PART 4의 긴 체인 문제)</td></tr>
-                <tr><td>② 여러 액션 뽑아 argmax Q</td><td>후보 n개 중 최선 선택</td><td><strong>정책 자체가 개선 안 됨</strong> — 제안 분포가 영원히 그대로</td></tr>
-                <tr><td>③ denoising을 가치로 유도</td><td>매 스텝을 Q 기울기로 밀기</td><td><strong>정책 자체가 개선 안 됨</strong></td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p>②③의 공통 문제가 중요하다. <strong>정책이 학습되지 않으므로</strong>, base 정책이 애초에 못 만드는 행동은 n을 아무리 키워도 나오지 않는다.</p>
+        <h3>그래서 디퓨전에 RL을 어떻게 걸까</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>기존 시도</th><th>방법</th><th>문제</th></tr></thead>
+            <tbody>
+              <tr><td>① 가치를 직접 역전파</td><td>denoising 체인 전체를 통과해 미분</td><td><strong>불안정</strong></td></tr>
+              <tr><td>② 여러 액션 뽑아 argmax Q</td><td>후보 n개 중 최선 선택</td><td><strong>정책 자체가 개선 안 됨</strong></td></tr>
+              <tr><td>③ denoising을 가치로 유도</td><td>매 스텝을 Q 기울기로 밀기</td><td><strong>정책 자체가 개선 안 됨</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>②③의 공통 문제: <strong>정책이 학습되지 않으므로</strong> base 정책이 애초에 못 만드는 행동은 n을 아무리 키워도 나오지 않는다.</p>
 
-          <h3>EXPO의 해법 — 역할 분담</h3>
-          <div class="formula">π<sub>base</sub>: 디퓨전 (표현력) &nbsp; + &nbsp; π<sub>edit</sub>: 가우시안 (가치 최대화)</div>
-          <pre><code>π_edit(ã | s, a)   ← 상태 s와 base 액션 a를 받아 "수정된 액션" ã 를 출력</code></pre>
-          <ul>
-            <li><code>π_base</code>는 <strong>지도학습(imitation loss)만</strong> 받으므로 절대 무너지지 않는다</li>
-            <li><code>π_edit</code>는 <strong>가우시안이므로</strong> SAC/TD3의 검증된 off-policy 목적함수를 그대로 쓸 수 있다</li>
-            <li>그리고 <code>argmax Q</code>가 원본과 수정본을 <strong>함께 심사</strong>하므로, edit이 망가져도 base가 안전망</li>
-          </ul>
-          <p><strong>표현력은 base가, 가치 최대화는 edit이</strong> — 각자 잘하는 도구를 쓴 것이다. 이 분업이 성립하는 이유가 결국 “가우시안은 RL하기 쉽고 디퓨전은 표현력이 좋다”는 PART 6의 대비다.</p>
+        <h3>EXPO의 해법 — 역할 분담</h3>
+        <div class="math">π<sub>base</sub>: 디퓨전(표현력) &nbsp;+&nbsp; π<sub>edit</sub>: 가우시안(가치 최대화)</div>
+        <pre>π_edit(ã | s, a) ← 상태 s와 base 액션 a를 받아 "수정된 액션" ã를 출력</pre>
+        <ul>
+          <li><code>π_base</code>는 <strong>지도학습(imitation loss)만</strong> 받으므로 절대 무너지지 않는다.</li>
+          <li><code>π_edit</code>는 <strong>가우시안</strong>이므로 SAC/TD3의 검증된 off-policy 목적함수를 그대로 쓸 수 있다.</li>
+          <li><code>argmax Q</code>가 원본과 수정본을 <strong>함께 심사</strong>하므로 edit이 망가져도 base가 안전망이다.</li>
+        </ul>
+        <p><strong>표현력은 base가, 가치 최대화는 edit이.</strong> 이 분업이 성립하는 이유가 “가우시안은 RL하기 쉽고 디퓨전은 표현력이 좋다”는 대비다.</p>
 
-          <h3>액션 청킹 (action chunking)</h3>
-          <p>한 스텝의 행동 하나를 내놓는 대신, <strong>앞으로 H스텝 분량의 행동 묶음</strong>을 한 번에 출력한다.</p>
-          <div class="formula">π(a<sub>t:t+H</sub> ∣ o<sub>t</sub>)</div>
-          <ul>
-            <li>왜 필요한가: 고주파 제어에서 매 스텝 추론하면 지연이 크고, 행동이 시간적으로 일관되지 않아 떨린다</li>
-            <li>Levine 장면 14 어블레이션: <strong>“w/o Chunk → 개선 실패”</strong></li>
-            <li>Finn 00:25:00: EXPO-FT = EXPO + <strong>action chunking</strong> + human-in-the-loop</li>
-          </ul>
-          <p>RL 관점에서는 행동 공간이 ℝ⁸에서 ℝ<sup>8×H</sup>로 커지는 것이라 원래는 불리한데, 실전에서는 압도적으로 이득이다. <strong>로봇 RL의 필수 부품</strong>으로 자리잡았다.</p>
-          <a class="back" href="#top">↑ 목차로</a>
-        </section>
+        <h3>액션 청킹</h3>
+        <div class="math">π(a<sub>t:t+H</sub> | o<sub>t</sub>)</div>
+        <p>한 스텝의 행동 하나 대신, <strong>앞으로 H스텝 분량의 행동 묶음</strong>을 한 번에 출력한다.</p>
+        <ul>
+          <li>고주파 제어에서 매 스텝 추론하면 지연이 크고, 행동이 시간적으로 일관되지 않아 떨린다.</li>
+          <li>Levine 장면 14 어블레이션: <strong>“w/o Chunk → 개선 실패”</strong></li>
+          <li>Finn 00:25:00: EXPO-FT = EXPO + <strong>action chunking</strong> + human-in-the-loop</li>
+        </ul>
+        <p>행동 공간이 ℝ<sup>8</sup>에서 ℝ<sup>8×H</sup>로 커져 원래는 불리하지만, 실전에서는 압도적으로 이득이다. <strong>로봇 RL의 필수 부품</strong>으로 자리잡았다.</p>
+        <a class="top-link" href="#top">↑ 맨 위로</a>
+      </section>
 
-        <section id="part-7">
-          <header>
-            <span class="part-number">PART 7</span>
-            <h2>Actor-Critic 계열 — SAC와 TD3</h2>
-          </header>
-          <p class="lead">off-policy RL의 표준 골격. Levine 발표의 RLPD가 이 계열이고, EXPO의 edit policy도 여기에 얹힌다.</p>
+      <section class="part" id="part-7">
+        <header>
+          <span class="part-number">PART 07</span>
+          <h2>Actor-Critic 계열 — SAC와 TD3</h2>
+        </header>
 
-          <h3>기본 구조</h3>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>부품</th><th>역할</th><th>비유</th></tr></thead>
-              <tbody>
-                <tr><td><strong>Actor π(a∣s)</strong></td><td>상태를 보고 행동을 낸다</td><td>실제로 손을 움직이는 선수</td></tr>
-                <tr><td><strong>Critic Q(s,a)</strong></td><td>그 행동이 얼마나 좋을지 채점</td><td>옆에서 채점하는 코치</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p>학습 루프:</p>
-          <pre><code>1. Critic 학습: 벨만 백업으로 Q 를 정확하게 만든다 (TD 학습)
-      target = r + γ Q(s', π(s'))
-2. Actor 학습: Q 를 최대화하는 방향으로 정책을 민다
-      maximize  Q(s, π(s))
-3. 반복</code></pre>
-          <p><strong>왜 둘이 필요한가</strong>: Critic 없이는 “이 행동이 좋았나”를 알 수 없고, Actor 없이는 연속 행동 공간에서 argmax<sub>a</sub> Q를 계산할 수 없다(무한히 많은 행동을 다 시도할 수 없으므로). Actor가 그 argmax를 <strong>근사하는 신경망</strong> 역할을 한다.</p>
-          <div class="callout">
-            <p class="callout-title">TIP · EXPO를 다시 보기</p>
-            <p>EXPO의 <code>argmax Q</code>는 이 근사를 <strong>샘플링으로 직접</strong> 하는 것이다. Actor(=edit policy)의 출력을 믿는 대신, 후보를 여러 개 뽑아 진짜 argmax에 가깝게 계산한다. Actor는 “제안 분포를 좋은 쪽으로 옮기는” 보조 역할로 격하된다.</p>
-          </div>
+        <p>off-policy RL의 표준 골격. Levine 발표의 RLPD가 이 계열이고, EXPO의 edit policy도 여기에 얹힌다.</p>
 
-          <h3>계보: DDPG → TD3 → SAC</h3>
-          <h4>DDPG (Deep Deterministic Policy Gradient)</h4>
-          <p>결정론적 actor + Q critic. 최초의 실용적 연속 행동 off-policy 알고리즘이지만 <strong>Q값 과대평가로 자주 발산</strong>한다.</p>
+        <h3>기본 구조</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>부품</th><th>역할</th><th>비유</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Actor π(a|s)</strong></td><td>상태를 보고 행동을 낸다</td><td>실제로 손을 움직이는 선수</td></tr>
+              <tr><td><strong>Critic Q(s,a)</strong></td><td>그 행동이 얼마나 좋을지 채점</td><td>옆에서 채점하는 코치</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <pre>1. Critic 학습: 벨만 백업으로 Q를 정확하게 만든다
+   target = r + γ Q(s', π(s'))
 
-          <h4>TD3 (Twin Delayed DDPG) — DDPG의 세 가지 수정</h4>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>트릭</th><th>내용</th><th>목적</th></tr></thead>
-              <tbody>
-                <tr><td><strong>Twin critic</strong></td><td>Critic 2개 학습, 타깃에 <strong>min</strong> 사용</td><td>과대평가 억제</td></tr>
-                <tr><td><strong>Delayed policy update</strong></td><td>Critic 2번당 Actor 1번 갱신</td><td>Critic이 안정된 뒤 Actor가 움직이게</td></tr>
-                <tr><td><strong>Target policy smoothing</strong></td><td>타깃 계산 시 행동에 노이즈 추가</td><td>Q함수가 뾰족해지는 것 방지</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p><code>min(Q1, Q2)</code>가 왜 과대평가를 막는가: 두 critic이 독립적으로 학습되면 각자 다른 곳에서 오차를 낸다. 둘 중 <strong>작은 값</strong>을 쓰면 “한쪽이 과대평가해도 다른 쪽이 견제”한다. 낙관적 오차만 골라 억제하는 셈.</p>
+2. Actor 학습: Q를 최대화하는 방향으로 정책을 민다
+   maximize Q(s, π(s))
 
-          <h4>SAC (Soft Actor-Critic) — 현재 로봇 실세계 RL의 사실상 표준</h4>
-          <p>TD3의 twin critic을 가져오고, <strong>확률적 가우시안 actor</strong> + <strong>엔트로피 최대화</strong>를 추가한다.</p>
-          <div class="formula">J(π) = 𝔼[Σ<sub>t</sub> r<sub>t</sub> + αℋ(π(·∣s<sub>t</sub>))]</div>
-          <p><strong>엔트로피 항의 의미</strong>: “보상도 높이고, 동시에 <strong>최대한 다양하게 행동</strong>해라.”</p>
-          <ul>
-            <li>정책이 너무 빨리 하나의 행동으로 굳는 것을 막는다 → <strong>탐색 유지</strong></li>
-            <li>여러 좋은 해법이 있으면 다 유지한다 → 강건성</li>
-            <li>α(온도)로 강도 조절, 보통 자동 조정</li>
-          </ul>
-          <p>이것을 <strong>maximum entropy RL</strong>이라 한다. Levine 그룹의 대표 기여이고, 로봇에서 SAC가 기본값이 된 이유다.</p>
+3. 반복</pre>
+        <p>Critic 없이는 “이 행동이 좋았나”를 알 수 없고, Actor 없이는 연속 행동 공간에서 argmax<sub>a</sub> Q를 계산할 수 없다. Actor가 그 argmax를 <strong>근사하는 신경망</strong>이다.</p>
+        <aside class="callout tip">
+          <span class="callout-title">TIP · EXPO를 다시 보기</span>
+          <p>EXPO의 <code>argmax Q</code>는 이 근사를 <strong>샘플링으로 직접</strong> 하는 것이다. Actor의 출력을 믿는 대신 후보를 여러 개 뽑아 진짜 argmax에 가깝게 계산한다. Actor는 “제안 분포를 좋은 쪽으로 옮기는” 보조 역할로 격하된다.</p>
+        </aside>
 
-          <h3>RLPD — SAC에 얹은 다섯 개의 설계 선택</h3>
-          <p>Levine 장면 6의 알고리즘. 새 알고리즘이라기보다 SAC를 실세계에서 작동시키는 레시피.</p>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>재료</th><th>내용</th></tr></thead>
-              <tbody>
-                <tr><td>① <strong>Symmetric sampling</strong></td><td>배치 256개 중 <strong>항상 절반은 사람 데모</strong>에서. 데모가 희석되지 않게</td></tr>
-                <tr><td>② <strong>Critic에 LayerNorm</strong></td><td>어블레이션에서 가장 중요. Q값이 무한히 커지는 것을 구조적으로 차단</td></tr>
-                <tr><td>③ <strong>Critic 앙상블 + 랜덤 min</strong></td><td>10개 학습, 타깃 계산 시 무작위 2개의 min (REDQ)</td></tr>
-                <tr><td>④ <strong>높은 UTD (=20)</strong></td><td>로봇 스텝 1회당 경사하강 20회. 샘플효율의 직접적 원천</td></tr>
-                <tr><td>⑤ <strong>SAC 엔트로피 유지</strong></td><td>탐색 유지</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p>②③④는 <strong>세트</strong>다. UTD를 올리면 적은 데이터에 과적합하므로 ②③의 안정화가 반드시 필요하다.</p>
-          <div class="callout"><p>상세 해설은 Sergey 노트 심화 해설 ② Q2에 있다.</p></div>
-          <a class="back" href="#top">↑ 목차로</a>
-        </section>
+        <h3>계보: DDPG → TD3 → SAC</h3>
+        <h4>DDPG</h4>
+        <p>결정론적 actor + Q critic. 최초의 실용적 연속 행동 off-policy 알고리즘이지만 <strong>Q값 과대평가로 자주 발산</strong>한다.</p>
 
-        <section id="part-8">
-          <header>
-            <span class="part-number">PART 8</span>
-            <h2>Policy Gradient 계열 — REINFORCE와 PPO</h2>
-          </header>
-          <p class="lead">on-policy 쪽 계보. <strong>두 발표에서 모두 “졌다”고 보고된 쪽</strong>이지만, 왜 졌는지 알려면 무엇인지 알아야 한다.</p>
+        <h4>TD3 — DDPG의 세 가지 수정</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>트릭</th><th>내용</th><th>목적</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Twin critic</strong></td><td>Critic 2개 학습, 타깃에 <strong>min</strong> 사용</td><td>과대평가 억제</td></tr>
+              <tr><td><strong>Delayed policy update</strong></td><td>Critic 2번당 Actor 1번 갱신</td><td>Critic이 안정된 뒤 Actor가 움직이게</td></tr>
+              <tr><td><strong>Target policy smoothing</strong></td><td>타깃 계산 시 행동에 노이즈 추가</td><td>Q함수가 뾰족해지는 것 방지</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p><code>min(Q1, Q2)</code>는 한쪽이 과대평가해도 다른 쪽이 견제하게 한다. 낙관적 오차만 골라 억제하는 셈.</p>
 
-          <h3>핵심 아이디어</h3>
-          <p>정책의 파라미터를 <strong>리턴이 커지는 방향으로 직접</strong> 민다.</p>
-          <div class="formula">∇<sub>θ</sub>J(θ) = 𝔼[∇<sub>θ</sub> log π<sub>θ</sub>(a ∣ s) · A(s,a)]</div>
-          <p>이 식이 policy gradient theorem이다. 무섭게 생겼지만 뜻은 단순하다.</p>
-          <div class="callout important">
-            <p><strong>“좋았던 행동(A&gt;0)의 확률은 올리고, 나빴던 행동(A&lt;0)의 확률은 내려라.”</strong><br>
-            <strong>“그리고 좋았던 정도(A의 크기)에 비례해서 세게 밀어라.”</strong></p>
-          </div>
-          <ul>
-            <li>∇<sub>θ</sub> log π<sub>θ</sub>(a∣s): “이 행동의 확률을 올리는 방향”</li>
-            <li>A(s,a): 그 방향으로 얼마나 밀지의 크기와 부호</li>
-          </ul>
-          <p>A가 필요한 이유가 여기서 명확해진다. 만약 A 대신 그냥 리턴 G를 쓰면, 모든 보상이 양수인 문제에서는 <strong>모든 행동의 확률을 다 올리려</strong> 한다. baseline V를 빼서 “평균보다 나은가”로 바꿔야 방향이 생긴다.</p>
+        <h4>SAC — 현재 로봇 실세계 RL의 사실상 표준</h4>
+        <p>TD3의 twin critic을 가져오고, <strong>확률적 가우시안 actor</strong>와 <strong>엔트로피 최대화</strong>를 추가한다.</p>
+        <div class="math">J(π) = 𝔼[Σ<sub>t</sub> r<sub>t</sub> + αℋ(π(·|s<sub>t</sub>))]</div>
+        <p><strong>엔트로피 항의 의미:</strong> “보상도 높이고, 동시에 <strong>최대한 다양하게 행동</strong>해라.”</p>
+        <ul>
+          <li>정책이 너무 빨리 하나의 행동으로 굳는 것을 막는다 → <strong>탐색 유지</strong></li>
+          <li>여러 좋은 해법이 있으면 다 유지한다 → 강건성</li>
+          <li>α(온도)로 강도 조절, 보통 자동 조정</li>
+        </ul>
+        <p>이것을 <strong>maximum entropy RL</strong>이라 한다. Levine 그룹의 대표 기여이고, 로봇에서 SAC가 기본값이 된 이유다.</p>
 
-          <h3>REINFORCE</h3>
-          <p>가장 단순한 policy gradient. MC로 G를 구해 위 식을 그대로 쓴다. 편향은 없지만 <strong>분산이 극도로 커서</strong> 실용적이지 않다.</p>
+        <h3>RLPD — SAC에 얹은 다섯 개의 설계 선택</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>재료</th><th>내용</th></tr></thead>
+            <tbody>
+              <tr><td>① <strong>Symmetric sampling</strong></td><td>배치 256개 중 항상 절반은 사람 데모에서. 데모가 희석되지 않게</td></tr>
+              <tr><td>② <strong>Critic에 LayerNorm</strong></td><td>Q값이 무한히 커지는 것을 구조적으로 차단</td></tr>
+              <tr><td>③ <strong>Critic 앙상블 + 랜덤 min</strong></td><td>10개 학습, 타깃 계산 시 무작위 2개의 min (REDQ)</td></tr>
+              <tr><td>④ <strong>높은 UTD (=20)</strong></td><td>로봇 스텝 1회당 경사하강 20회</td></tr>
+              <tr><td>⑤ <strong>SAC 엔트로피 유지</strong></td><td>탐색 유지</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>②③④는 <strong>세트</strong>다. UTD를 올리면 적은 데이터에 과적합하므로 ②③의 안정화가 반드시 필요하다.</p>
+        <a class="top-link" href="#top">↑ 맨 위로</a>
+      </section>
 
-          <h3>Trust region — “한 번에 너무 많이 바꾸지 마”</h3>
-          <p>policy gradient의 근본 문제: 기울기는 <strong>현재 정책 근처에서만</strong> 유효하다. 크게 움직이면 추정이 무의미해지고 정책이 붕괴한다.</p>
-          <p><strong>TRPO</strong>는 KL 발산으로 제약을 건다.</p>
-          <div class="formula">max<sub>θ</sub> J(θ) &nbsp; subject to &nbsp; D<sub>KL</sub>(π<sub>θold</sub> ∥ π<sub>θ</sub>) &lt; δ</div>
-          <p>정확하지만 계산이 무겁다(2차 미분 필요).</p>
+      <section class="part" id="part-8">
+        <header>
+          <span class="part-number">PART 08</span>
+          <h2>Policy Gradient 계열 — REINFORCE와 PPO</h2>
+        </header>
 
-          <h3>PPO (Proximal Policy Optimization)</h3>
-          <p>TRPO의 제약을 <strong>clipping</strong>이라는 값싼 트릭으로 대체한 것. 현재 가장 널리 쓰이는 on-policy 알고리즘이고, <strong>LLM의 RLHF 표준</strong>이다.</p>
-          <div class="formula">L<sup>CLIP</sup> = 𝔼[min(ρ<sub>t</sub>A<sub>t</sub>, clip(ρ<sub>t</sub>, 1−ε, 1+ε)A<sub>t</sub>)], &nbsp; ρ<sub>t</sub> = π<sub>θ</sub>(a<sub>t</sub>∣s<sub>t</sub>) / π<sub>θold</sub>(a<sub>t</sub>∣s<sub>t</sub>)</div>
-          <ul>
-            <li>ρ<sub>t</sub>: importance sampling 비율 — “새 정책이 이 행동을 옛 정책보다 얼마나 더 좋아하나”</li>
-            <li><code>clip</code>으로 ρ를 [1−ε, 1+ε] (보통 ε=0.2)에 묶는다</li>
-            <li>효과: 정책이 한 번에 20% 이상 바뀌면 <strong>기울기가 0이 되어</strong> 더 안 움직인다</li>
-          </ul>
+        <p>on-policy 쪽 계보. <strong>두 발표에서 모두 “졌다”고 보고된 쪽</strong>이지만, 왜 졌는지 알려면 무엇인지 알아야 한다.</p>
 
-          <h3>왜 로봇에서 졌는가</h3>
-          <p>PART 5에서 이미 답했지만 정리하면:</p>
-          <ol>
-            <li><strong>on-policy라 데이터를 버린다</strong> — 실세계에서 치명적</li>
-            <li><strong>사람 데모/개입을 활용할 수 없다</strong> — 두 발표의 핵심 자산을 못 씀</li>
-            <li><strong>분산이 커서 대량 샘플이 필요</strong> — 실세계에서 확보 불가</li>
-            <li><strong>큰 모델에서 기울기 노이즈에 취약</strong> — 수십억 파라미터 VLA에 policy gradient 노이즈를 직접 넣는 것은 위험</li>
-          </ol>
-          <p>Finn 발표의 실험에서 PPO는 <strong>trust region을 매우 작게(η = 0.01) 잡아야 겨우 안정</strong>됐고, 그러면 개선 폭도 거의 없었다. 안정성과 개선이 상충한 것.</p>
-          <div class="callout">
-            <p class="callout-title">NOTE · LLM에서는 왜 잘 되나</p>
-            <p>텍스트 생성은 샘플이 거의 공짜라 on-policy의 낭비를 감당할 수 있다. 그리고 RLHF는 “이미 아는 것을 배치하는” 정렬 작업이라 큰 정책 변화가 필요 없다 — clip 제약이 오히려 알맞다.</p>
-            <p><strong>알고리즘의 좋고 나쁨이 아니라 문제 설정의 차이다.</strong></p>
-          </div>
-          <a class="back" href="#top">↑ 목차로</a>
-        </section>
+        <h3>핵심 아이디어</h3>
+        <div class="math">∇<sub>θ</sub>J(θ) = 𝔼[∇<sub>θ</sub> log π<sub>θ</sub>(a|s) · A(s,a)]</div>
+        <blockquote class="callout important">
+          <p><strong>“좋았던 행동(A&gt;0)의 확률은 올리고, 나빴던 행동(A&lt;0)의 확률은 내려라.”</strong></p>
+          <p><strong>“그리고 좋았던 정도(A의 크기)에 비례해서 세게 밀어라.”</strong></p>
+        </blockquote>
+        <ul>
+          <li>∇<sub>θ</sub> log π<sub>θ</sub>(a|s): “이 행동의 확률을 올리는 방향”</li>
+          <li>A(s,a): 그 방향으로 얼마나 밀지의 크기와 부호</li>
+        </ul>
+        <p>A 대신 리턴 G를 쓰면, 모든 보상이 양수인 문제에서 <strong>모든 행동의 확률을 다 올리려</strong> 한다. baseline V를 빼서 “평균보다 나은가”로 바꿔야 방향이 생긴다.</p>
 
-        <section id="part-9">
-          <header>
-            <span class="part-number">PART 9</span>
-            <h2>Offline RL과 정책 추출 — 네 가지 방법의 대결</h2>
-          </header>
-          <p class="lead"><strong>“가치함수가 있을 때, 그것으로 정책을 어떻게 개선하나”</strong> — 이 질문이 두 발표의 핵심 논쟁이다. 이 절이 두 영상을 잇는 가장 중요한 부분이다.</p>
+        <h3>REINFORCE</h3>
+        <p>가장 단순한 policy gradient. MC로 G를 구해 위 식을 그대로 쓴다. 편향은 없지만 <strong>분산이 극도로 커서</strong> 실용적이지 않다.</p>
 
-          <h3>문제 설정</h3>
-          <p>데이터셋 𝒟(좋은 것 + 나쁜 것 섞여 있음)와 학습된 A(s,a)가 있다. 정책을 어떻게 뽑아낼까?</p>
-          <p>이것을 <strong>정책 추출(policy extraction)</strong>이라 한다.</p>
+        <h3>Trust region — “한 번에 너무 많이 바꾸지 마”</h3>
+        <p>policy gradient의 근본 문제: 기울기는 <strong>현재 정책 근처에서만</strong> 유효하다. 크게 움직이면 추정이 무의미해지고 정책이 붕괴한다.</p>
+        <div class="math">max<sub>θ</sub> J(θ), &nbsp; subject to &nbsp; D<sub>KL</sub>(π<sub>old</sub> || π<sub>θ</sub>) &lt; δ</div>
+        <p>TRPO는 KL 발산으로 제약을 건다. 정확하지만 계산이 무겁다(2차 미분 필요).</p>
 
-          <h3>방법 1: Filtered BC / SFT — “좋은 것만 골라 모방”</h3>
-          <div class="formula">max<sub>θ</sub> 𝔼<sub>(s,a)∼𝒟, A(s,a)&gt;0</sub>[log π<sub>θ</sub>(a∣s)]</div>
-          <p>성공한 데이터만 남기고 평범한 지도학습.</p>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>장점</th><th>단점</th></tr></thead>
-              <tbody>
-                <tr><td>극도로 단순, 안정적</td><td>데이터 대부분을 <strong>버린다</strong></td></tr>
-                <tr><td>사전학습과 같은 파이프라인</td><td>나쁜 데이터의 <strong>방향 정보</strong>를 못 씀</td></tr>
-                <tr><td></td><td>에피소드 단위 필터링은 <strong>해상도 부족</strong></td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="callout warning">
-            <p class="callout-title">WARNING · π*0.6 논문의 SFT 베이스라인 정의</p>
-            <p>“finetuning the base π*0.6 pre-trained checkpoint with demonstration data for the target task. We refer to this finetuning as ‘SFT’ because <strong>the advantage values are fixed to True for all demonstrations.</strong>”</p>
-            <p>즉 <strong>데모만 쓰고 advantage를 전부 True로 고정</strong>한 것. 발표의 모든 개선 수치가 이 베이스라인 대비다.</p>
-            <p>치명적 문제: 로봇이 실수했지만 사람이 개입해 완료한 에피소드는 “성공”이므로 통째로 포함되고, <strong>로봇의 실수까지 advantage=True로 학습된다.</strong> 실수를 좋은 행동으로 가르치는 셈.</p>
-            <p><strong>성공/실패는 에피소드의 속성인데 좋음/나쁨은 스텝의 속성</strong>이다. 이 해상도 불일치가 filtered BC의 근본 한계다.</p>
-          </div>
+        <h3>PPO</h3>
+        <p>TRPO의 제약을 <strong>clipping</strong>이라는 값싼 트릭으로 대체한 것. 가장 널리 쓰이는 on-policy 알고리즘이고, <strong>LLM의 RLHF 표준</strong>이다.</p>
+        <div class="math">L<sup>CLIP</sup> = 𝔼[min(ρ<sub>t</sub>A<sub>t</sub>, clip(ρ<sub>t</sub>,1−ε,1+ε)A<sub>t</sub>)]</div>
+        <div class="math">ρ<sub>t</sub> = π<sub>θ</sub>(a<sub>t</sub>|s<sub>t</sub>) / π<sub>old</sub>(a<sub>t</sub>|s<sub>t</sub>)</div>
+        <ul>
+          <li>ρ<sub>t</sub>: “새 정책이 이 행동을 옛 정책보다 얼마나 더 좋아하나”</li>
+          <li><code>clip</code>으로 ρ를 [1−ε, 1+ε]에 묶는다. 보통 ε=0.2.</li>
+          <li>정책이 한 번에 20% 이상 바뀌면 <strong>기울기가 0이 되어</strong> 더 안 움직인다.</li>
+        </ul>
 
-          <h3>방법 2: AWR (Advantage-Weighted Regression) — “좋은 정도로 가중치”</h3>
-          <div class="formula">max<sub>θ</sub> 𝔼<sub>(s,a)∼𝒟</sub>[exp(A(s,a)/β) · log π<sub>θ</sub>(a∣s)]</div>
-          <p>버리는 대신 <strong>가중치</strong>를 준다. 이론적으로는 KL 정규화 RL의 정확한 해다(PART 9의 수식 참조).</p>
-          <p><strong>왜 실전에서 무너지는가</strong>: 가중치가 <strong>지수함수</strong>다.</p>
-          <pre><code>배치 256개 중 상위 5~10개가 가중치를 거의 독점
+        <h3>왜 로봇에서 졌는가</h3>
+        <ol>
+          <li><strong>on-policy라 데이터를 버린다</strong> — 실세계에서 치명적</li>
+          <li><strong>사람 데모/개입을 활용할 수 없다</strong></li>
+          <li><strong>분산이 커서 대량 샘플이 필요</strong></li>
+          <li><strong>큰 모델에서 기울기 노이즈에 취약</strong></li>
+        </ol>
+        <p>Finn 발표의 실험에서 PPO는 <strong>trust region을 매우 작게(η = 0.01)</strong> 잡아야 겨우 안정됐고, 그러면 개선 폭도 거의 없었다. 안정성과 개선이 상충한 것.</p>
+        <aside class="callout note">
+          <span class="callout-title">NOTE · LLM에서는 왜 잘 되나</span>
+          <p>텍스트 생성은 샘플이 거의 공짜라 on-policy의 낭비를 감당할 수 있다. 그리고 RLHF는 “이미 아는 것을 배치하는” 정렬 작업이라 큰 정책 변화가 필요 없다 — clip 제약이 오히려 알맞다.</p>
+          <p><strong>알고리즘의 좋고 나쁨이 아니라 문제 설정의 차이다.</strong></p>
+        </aside>
+        <a class="top-link" href="#top">↑ 맨 위로</a>
+      </section>
+
+      <section class="part" id="part-9">
+        <header>
+          <span class="part-number">PART 09</span>
+          <h2>Offline RL과 정책 추출 — 네 가지 방법의 대결</h2>
+        </header>
+
+        <p><strong>“가치함수가 있을 때, 그것으로 정책을 어떻게 개선하나.”</strong> 이 질문이 두 발표의 핵심 논쟁이다. 이 절이 두 영상을 잇는 가장 중요한 부분이다.</p>
+
+        <h3>문제 설정</h3>
+        <p>데이터셋 𝒟(좋은 것 + 나쁜 것 섞여 있음)와 학습된 A(s,a)가 있다. 정책을 어떻게 뽑아낼까? 이것을 <strong>정책 추출(policy extraction)</strong>이라 한다.</p>
+
+        <h3>방법 1: Filtered BC / SFT — “좋은 것만 골라 모방”</h3>
+        <div class="math">max<sub>θ</sub> 𝔼<sub>(s,a)∼𝒟, A(s,a)&gt;0</sub>[log π<sub>θ</sub>(a|s)]</div>
+        <p>성공한 데이터만 남기고 평범한 지도학습.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>장점</th><th>단점</th></tr></thead>
+            <tbody>
+              <tr><td>극도로 단순, 안정적</td><td>데이터 대부분을 <strong>버린다</strong></td></tr>
+              <tr><td>사전학습과 같은 파이프라인</td><td>나쁜 데이터의 <strong>방향 정보</strong>를 못 씀</td></tr>
+              <tr><td></td><td>에피소드 단위 필터링은 <strong>해상도 부족</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <aside class="callout warning">
+          <span class="callout-title">WARNING · π*0.6 논문의 SFT 베이스라인 정의</span>
+          <p>“finetuning the base π*0.6 pre-trained checkpoint with demonstration data for the target task. We refer to this finetuning as ‘SFT’ because <strong>the advantage values are fixed to True for all demonstrations.</strong>”</p>
+          <p>즉 <strong>데모만 쓰고 advantage를 전부 True로 고정</strong>한 것. 로봇이 실수했지만 사람이 개입해 완료한 에피소드는 “성공”이므로 통째로 포함되고, <strong>로봇의 실수까지 advantage=True로 학습된다.</strong></p>
+          <p><strong>성공/실패는 에피소드의 속성인데 좋음/나쁨은 스텝의 속성</strong>이다. 이 해상도 불일치가 filtered BC의 근본 한계다.</p>
+        </aside>
+
+        <h3>방법 2: AWR — “좋은 정도로 가중치”</h3>
+        <div class="math">max<sub>θ</sub> 𝔼<sub>(s,a)∼𝒟</sub>[exp(A(s,a)/β) · log π<sub>θ</sub>(a|s)]</div>
+        <p>버리는 대신 <strong>가중치</strong>를 준다. 이론적으로는 KL 정규화 RL의 정확한 해다.</p>
+        <p><strong>왜 실전에서 무너지는가:</strong> 가중치가 지수함수다.</p>
+        <pre>배치 256개 중 상위 5~10개가 가중치를 거의 독점
 → 나머지 246개는 실질 가중치 ≈ 0
 → 유효 배치 크기가 10 근처로 붕괴
-→ 그래디언트가 요동</code></pre>
-          <p>β에 극도로 민감하고, 잘못 잡으면 학습이 안 된다. Levine 장면 17이 지적한 바로 그 문제.</p>
+→ 그래디언트가 요동</pre>
+        <p>β에 극도로 민감하고, 잘못 잡으면 학습이 안 된다. Levine 장면 17이 지적한 바로 그 문제.</p>
 
-          <h3>방법 3: Advantage Conditioning — “라벨로 입력에 넣기” (π*0.6 / RECAP)</h3>
-          <div class="formula">max<sub>θ</sub> 𝔼<sub>(s,a)∼𝒟</sub>[log π<sub>θ</sub>(a ∣ s, 𝟙[A(s,a)&gt;ε])]</div>
-          <p><strong>손실함수를 건드리지 않는다.</strong> advantage를 이진화해서 <strong>정책의 입력 토큰</strong>으로 넣는다.</p>
-          <ul>
-            <li><strong>학습 시</strong>: advantage는 <strong>사후적으로 계산된 측정값</strong>. good/bad 둘 다 등장. 나쁜 행동도 <code>bad</code> 라벨을 달고 학습됨.</li>
-            <li><strong>추론 시</strong>: advantage를 <strong>계산하지 않는다.</strong> 그냥 <code>good</code>을 박아 넣는다. 측정이 아니라 <strong>주문</strong>.</li>
-          </ul>
-          <div class="callout important">
-            <p class="callout-title">IMPORTANT · “결과인데 어떻게 입력이 되나”</p>
-            <p>advantage는 명백히 행동의 결과다. 트릭은 <strong>학습 때와 추론 때 성격이 다르다</strong>는 것.</p>
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th></th><th>학습 시</th><th>추론 시</th></tr></thead>
-                <tbody>
-                  <tr><td>데이터</td><td>이미 수집됨, 결과를 안다</td><td>아직 행동 안 함</td></tr>
-                  <tr><td>advantage</td><td><strong>계산한다</strong> (채점)</td><td><strong>주문한다</strong> (명령)</td></tr>
-                  <tr><td>값</td><td>good / bad 둘 다</td><td>항상 <code>good</code></td></tr>
-                </tbody>
-              </table>
-            </div>
-            <p>비유: 답안지에 채점자가 나중에 <strong>정답/오답 도장</strong>을 찍는다. 도장은 결과다. 하지만 그 답안지 뭉치로 학습한 뒤에는 <strong>“‘정답’ 도장 찍힐 답을 써봐”</strong>라고 주문할 수 있다.</p>
-            <p>LLM에 “이 문장을 <strong>[긍정적]</strong> 톤으로 써줘”라고 하는 것과 완전히 같은 원리. 톤은 문장을 읽고 나서야 판정되는 속성이지만, (톤, 문장) 쌍으로 학습해두면 <strong>생성 조건</strong>이 된다.</p>
-          </div>
-          <p><strong>같은 장면, 다른 조건 → 다른 행동</strong>이 되는 것이 핵심이다.</p>
+        <h3>방법 3: Advantage Conditioning — “라벨로 입력에 넣기”</h3>
+        <div class="math">max<sub>θ</sub> 𝔼<sub>(s,a)∼𝒟</sub>[log π<sub>θ</sub>(a | s, 𝟙[A(s,a)&gt;ε])]</div>
+        <p><strong>손실함수를 건드리지 않는다.</strong> advantage를 이진화해서 <strong>정책의 입력 토큰</strong>으로 넣는다.</p>
+        <ul>
+          <li><strong>학습 시:</strong> advantage는 사후적으로 계산된 측정값. good/bad 둘 다 등장. 나쁜 행동도 <code>bad</code> 라벨을 달고 학습됨.</li>
+          <li><strong>추론 시:</strong> advantage를 계산하지 않는다. 그냥 <code>good</code>을 박아 넣는다. 측정이 아니라 <strong>주문</strong>.</li>
+        </ul>
+        <aside class="callout important">
+          <span class="callout-title">IMPORTANT · “결과인데 어떻게 입력이 되나”</span>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>조건 토큰</th><th>출력</th></tr></thead>
+              <thead><tr><th></th><th>학습 시</th><th>추론 시</th></tr></thead>
               <tbody>
-                <tr><td><code>good</code></td><td>손목을 돌려 각도 맞춘 뒤 삽입</td></tr>
-                <tr><td><code>bad</code></td><td>기울어진 채 밀어넣음 → 걸림</td></tr>
+                <tr><td>데이터</td><td>이미 수집됨, 결과를 안다</td><td>아직 행동 안 함</td></tr>
+                <tr><td>advantage</td><td><strong>계산한다</strong> — 채점</td><td><strong>주문한다</strong> — 명령</td></tr>
+                <tr><td>값</td><td>good / bad 둘 다</td><td>항상 <code>good</code></td></tr>
               </tbody>
             </table>
           </div>
-          <p>억제(suppression)가 아니라 <strong>분리(separation)</strong>다. <code>good</code>을 넣으면 애초에 다른 분포에서 뽑으므로 나쁜 행동은 후보에 오르지 않는다. 그래서 <strong>추론 비용이 원래 VLA와 동일</strong>하다.</p>
-          <p><strong>이진화하는 이유</strong>: 연속값이면 테스트 때 “얼마나 좋은 값을 요구할까”라는 하이퍼파라미터가 생기고, 욕심내서 학습 분포 밖의 값을 넣으면 엉뚱한 행동이 나온다(Decision Transformer의 고질적 문제). 이진이면 그냥 <code>good</code>.</p>
-          <p><strong>계보</strong>: <strong>Upside-Down RL</strong>(Schmidhuber 2019) → <strong>Decision Transformer</strong>(2021) → <strong>RvS</strong>(2022). “upside-down”이 <em>최대화할 출력이던 보상을, 조건으로 삼을 입력 자리로 뒤집었다</em>는 뜻.</p>
-          <p>π*0.6이 한 걸음 더 나간 지점: Decision Transformer는 <strong>실제 에피소드 수익(return-to-go)</strong>으로 조건화해서 “운 좋게 성공한 궤적”을 걸러내지 못한다. π*0.6은 <strong>학습된 가치함수의 차이</strong>를 쓰므로 V가 이미 확률적 요동을 평균 내준 신호를 쓴다.</p>
+          <p>비유: 답안지에 채점자가 나중에 <strong>정답/오답 도장</strong>을 찍는다. 그 답안지 뭉치로 학습한 뒤에는 <strong>“‘정답’ 도장 찍힐 답을 써봐”</strong>라고 주문할 수 있다.</p>
+          <p>LLM에 “이 문장을 <strong>[긍정적]</strong> 톤으로 써줘”라고 하는 것과 완전히 같은 원리.</p>
+        </aside>
+        <p><strong>같은 장면, 다른 조건 → 다른 행동</strong>이 되는 것이 핵심이다.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>조건 토큰</th><th>출력</th></tr></thead>
+            <tbody>
+              <tr><td><code>good</code></td><td>손목을 돌려 각도 맞춘 뒤 삽입</td></tr>
+              <tr><td><code>bad</code></td><td>기울어진 채 밀어넣음 → 걸림</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>억제(suppression)가 아니라 <strong>분리(separation)</strong>다. <code>good</code>을 넣으면 애초에 다른 분포에서 뽑으므로 나쁜 행동은 후보에 오르지 않는다. 그래서 <strong>추론 비용이 원래 VLA와 동일</strong>하다.</p>
+        <p><strong>이진화하는 이유:</strong> 연속값이면 테스트 때 “얼마나 좋은 값을 요구할까”라는 하이퍼파라미터가 생기고, 학습 분포 밖의 값을 넣으면 엉뚱한 행동이 나온다. 이진이면 그냥 <code>good</code>.</p>
+        <p><strong>계보:</strong> Upside-Down RL(2019) → Decision Transformer(2021) → RvS(2022). “upside-down”은 최대화할 출력이던 보상을 조건으로 삼을 입력 자리로 뒤집었다는 뜻.</p>
+        <p>π*0.6은 실제 에피소드 수익 대신 <strong>학습된 가치함수의 차이</strong>를 쓰므로 V가 확률적 요동을 평균 내준 신호를 쓴다.</p>
 
-          <h3>방법 4: CFGRL — “guidance로 증폭” (Levine 장면 16~17)</h3>
-          <p>Advantage conditioning의 확장. 조건화만 하지 말고 <strong>세기를 증폭</strong>한다.</p>
-          <div class="formula">π̂(a∣s) p(o∣s,a)<sup>w</sup></div>
-          <ul>
-            <li>w = 0: 조건 무시 (데이터 전체 분포)</li>
-            <li>w = 1: 그냥 조건화 — <strong>방향은 맞지만 약함</strong></li>
-            <li>w &gt; 1: <strong>좋은 데이터의 모드로 줌인</strong></li>
-          </ul>
-          <p>지수의 효과가 극적이다. 0.7 대 0.3은 2.3배지만, 5제곱하면 0.7<sup>5</sup> = 0.17 대 0.3<sup>5</sup> = 0.002로 <strong>70배</strong>가 된다. <strong>작은 선호 차이를 큰 선호 차이로 증폭하는 손잡이</strong>가 w다.</p>
-          <p>디퓨전 이미지 생성의 <strong>CFG scale과 완전히 같은 것</strong>. 조건이 “텍스트 프롬프트”가 아니라 “이 행동은 잘된 것”이라는 점만 다르다.</p>
-          <p>가장 중요한 성질: <strong>추론 시점 방법</strong>이다. 학습은 전체 데이터로 한 번만 하고, 보수적/공격적을 w로 실행 순간에 조절한다. 논문 제목의 <em>Controllable</em>이 이 뜻.</p>
-          <div class="callout warning">
-            <p>주의: w를 너무 키우면 다양성이 붕괴하고 데이터 밖(OOD)으로 밀려나 “이론상 최고지만 로봇이 부술 행동”이 나온다. 이미지 생성에서 CFG scale을 20까지 올리면 그림이 타는 것과 같은 현상.</p>
-          </div>
+        <h3>방법 4: CFGRL — “guidance로 증폭”</h3>
+        <div class="math">π̂(a|s) · p(o|s,a)<sup>w</sup></div>
+        <ul>
+          <li><strong>w = 0:</strong> 조건 무시 — 데이터 전체 분포</li>
+          <li><strong>w = 1:</strong> 그냥 조건화 — 방향은 맞지만 약함</li>
+          <li><strong>w &gt; 1:</strong> 좋은 데이터의 모드로 줌인</li>
+        </ul>
+        <p>0.7 대 0.3은 2.3배지만, 5제곱하면 0.7<sup>5</sup> = 0.17 대 0.3<sup>5</sup> = 0.002로 <strong>70배</strong>가 된다. 작은 선호 차이를 큰 선호 차이로 증폭하는 손잡이가 w다.</p>
+        <p>디퓨전 이미지 생성의 <strong>CFG scale과 완전히 같은 것.</strong> 조건이 텍스트 프롬프트가 아니라 “이 행동은 잘된 것”이라는 점만 다르다.</p>
+        <p>가장 중요한 성질: <strong>추론 시점 방법</strong>이다. 학습은 전체 데이터로 한 번만 하고, 보수적/공격적을 w로 실행 순간에 조절한다. 논문 제목의 <em>Controllable</em>이 이 뜻.</p>
+        <blockquote class="callout warning">w를 너무 키우면 다양성이 붕괴하고 데이터 밖(OOD)으로 밀려나 “이론상 최고지만 로봇이 부술 행동”이 나온다. 이미지 생성에서 CFG scale을 20까지 올리면 그림이 타는 것과 같은 현상.</blockquote>
 
-          <h3>네 방법 비교표 — 이 표가 두 발표의 핵심</h3>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th></th><th>데이터 사용</th><th>손실함수</th><th>개선 세기 조절</th><th>안정성</th><th>결과</th></tr></thead>
-              <tbody>
-                <tr><td><strong>Filtered BC / SFT</strong></td><td>좋은 것만 (버림)</td><td>그냥 BC</td><td>불가</td><td>매우 높음</td><td>베이스라인</td></tr>
-                <tr><td><strong>AWR</strong></td><td>전부 (가중치)</td><td>가중 BC</td><td>β (학습 전)</td><td><strong>낮음</strong> (유효 배치 붕괴)</td><td>SFT 대비 개선 없음</td></tr>
-                <tr><td><strong>PPO</strong></td><td>on-policy만</td><td>policy gradient</td><td>clip ε</td><td>낮음 (로봇에서)</td><td>SFT 대비 개선 없음</td></tr>
-                <tr><td><strong>Advantage Conditioning</strong></td><td><strong>전부 (라벨)</strong></td><td><strong>그냥 BC</strong></td><td>이진 (고정)</td><td><strong>매우 높음</strong></td><td><strong>throughput 2배</strong></td></tr>
-                <tr><td><strong>CFGRL</strong></td><td><strong>전부 (라벨)</strong></td><td>그냥 BC + 드롭아웃</td><td><strong>w (추론 시)</strong></td><td>높음</td><td>AWR 능가</td></tr>
-              </tbody>
-            </table>
-          </div>
+        <h3>네 방법 비교표 — 두 발표의 핵심</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th></th><th>데이터 사용</th><th>손실함수</th><th>개선 세기</th><th>안정성</th><th>결과</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Filtered BC / SFT</strong></td><td>좋은 것만</td><td>그냥 BC</td><td>불가</td><td>매우 높음</td><td>베이스라인</td></tr>
+              <tr><td><strong>AWR</strong></td><td>전부 — 가중치</td><td>가중 BC</td><td>β — 학습 전</td><td><strong>낮음</strong></td><td>개선 없음</td></tr>
+              <tr><td><strong>PPO</strong></td><td>on-policy만</td><td>policy gradient</td><td>clip ε</td><td>낮음</td><td>개선 없음</td></tr>
+              <tr><td><strong>Advantage Conditioning</strong></td><td><strong>전부 — 라벨</strong></td><td><strong>그냥 BC</strong></td><td>이진</td><td><strong>매우 높음</strong></td><td><strong>throughput 2배</strong></td></tr>
+              <tr><td><strong>CFGRL</strong></td><td><strong>전부 — 라벨</strong></td><td>BC + 드롭아웃</td><td><strong>w — 추론 시</strong></td><td>높음</td><td>AWR 능가</td></tr>
+            </tbody>
+          </table>
+        </div>
 
-          <h3>관통하는 철학</h3>
-          <p>두 발표가 도달한 결론이 같다.</p>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>원래 RL이 하던 것</th><th>이 레시피들이 바꾼 것</th></tr></thead>
-              <tbody>
-                <tr><td>탐색으로 회복법 발견</td><td>사람이 3초 만에 시연 (DAgger)</td></tr>
-                <tr><td>보상 설계 + TD 학습</td><td>시간 라벨 + MC 회귀</td></tr>
-                <tr><td>policy gradient로 가치 최대화</td><td><strong>조건부 행동 복제</strong></td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p><strong>수십억 파라미터 모델에서 안정적으로 작동한다고 검증된 유일한 도구가 지도학습</strong>이기 때문이다. AWR과 PPO가 진 이유의 본질이 이것.</p>
-          <div class="callout important">
-            <p class="callout-title">IMPORTANT · RL을 버린 게 아니다</p>
-            <p>가치와 advantage라는 RL의 <strong>신호</strong>는 그대로 쓴다. 그것을 <strong>최적화하는 방식</strong>만 지도학습으로 갈아끼운 것이다.</p>
-          </div>
+        <h3>관통하는 철학</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>원래 RL이 하던 것</th><th>이 레시피들이 바꾼 것</th></tr></thead>
+            <tbody>
+              <tr><td>탐색으로 회복법 발견</td><td>사람이 3초 만에 시연 — DAgger</td></tr>
+              <tr><td>보상 설계 + TD 학습</td><td>시간 라벨 + MC 회귀</td></tr>
+              <tr><td>policy gradient로 가치 최대화</td><td><strong>조건부 행동 복제</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p><strong>수십억 파라미터 모델에서 안정적으로 작동한다고 검증된 유일한 도구가 지도학습</strong>이기 때문이다.</p>
+        <aside class="callout important">
+          <span class="callout-title">IMPORTANT · RL을 버린 게 아니다</span>
+          <p>가치와 advantage라는 RL의 <strong>신호</strong>는 그대로 쓴다. 그것을 <strong>최적화하는 방식</strong>만 지도학습으로 갈아끼운 것이다.</p>
+        </aside>
 
-          <h3>Offline RL의 근본 난점 — 분포 이동</h3>
-          <p>offline RL이 왜 어려운지 한 번 더 정리한다. PART 3의 부트스트랩 문제가 여기서 터진다.</p>
-          <p>critic은 타깃 계산에 Q(s′, π(s′))를 쓴다. 그런데 π(s′)가 <strong>데이터에 없던 행동</strong>을 제안하면?</p>
-          <ul>
-            <li>신경망은 그 지점을 아무렇게나 외삽한다</li>
-            <li>보통 <strong>과대평가</strong> 쪽으로 간다 (max 연산이 낙관적 오차를 골라내므로)</li>
-            <li>actor가 그쪽으로 이동 → 과대평가가 벨만 백업으로 전파 → <strong>발산</strong></li>
-          </ul>
-          <p>해법 계열:</p>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>접근</th><th>방법</th><th>예</th></tr></thead>
-              <tbody>
-                <tr><td><strong>명시적 페널티</strong></td><td>OOD 행동의 Q에 벌점</td><td>CQL</td></tr>
-                <tr><td><strong>정책 제약</strong></td><td>데이터 분포에서 멀어지지 못하게</td><td>BCQ, TD3+BC, BC 정규화</td></tr>
-                <tr><td><strong>구조적 억제</strong></td><td>아키텍처로 Q값 폭주 차단</td><td>RLPD의 LayerNorm + 앙상블</td></tr>
-                <tr><td><strong>가치 최대화를 안 함</strong></td><td>조건부 BC로 우회</td><td><strong>advantage conditioning, CFGRL</strong></td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p>마지막 줄이 두 발표가 고른 길이다. <strong>애초에 max<sub>a</sub> Q를 하지 않으므로 OOD 과대평가 문제가 발생할 자리가 없다.</strong></p>
-          <a class="back" href="#top">↑ 목차로</a>
-        </section>
+        <h3>Offline RL의 근본 난점 — 분포 이동</h3>
+        <p>critic은 타깃 계산에 Q(s′, π(s′))를 쓴다. 그런데 π(s′)가 <strong>데이터에 없던 행동</strong>을 제안하면:</p>
+        <ul>
+          <li>신경망은 그 지점을 아무렇게나 외삽한다.</li>
+          <li>보통 <strong>과대평가</strong> 쪽으로 간다 — max 연산이 낙관적 오차를 골라내므로.</li>
+          <li>actor가 그쪽으로 이동 → 과대평가가 벨만 백업으로 전파 → <strong>발산</strong>.</li>
+        </ul>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>접근</th><th>방법</th><th>예</th></tr></thead>
+            <tbody>
+              <tr><td><strong>명시적 페널티</strong></td><td>OOD 행동의 Q에 벌점</td><td>CQL</td></tr>
+              <tr><td><strong>정책 제약</strong></td><td>데이터 분포에서 멀어지지 못하게</td><td>BCQ, TD3+BC, BC 정규화</td></tr>
+              <tr><td><strong>구조적 억제</strong></td><td>아키텍처로 Q값 폭주 차단</td><td>RLPD의 LayerNorm + 앙상블</td></tr>
+              <tr><td><strong>가치 최대화를 안 함</strong></td><td>조건부 BC로 우회</td><td><strong>advantage conditioning, CFGRL</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>마지막 줄이 두 발표가 고른 길이다. <strong>애초에 max<sub>a</sub> Q를 하지 않으므로 OOD 과대평가 문제가 발생할 자리가 없다.</strong></p>
+        <a class="top-link" href="#top">↑ 맨 위로</a>
+      </section>
 
-        <section id="part-10">
-          <header>
-            <span class="part-number">PART 10</span>
-            <h2>모방학습 쪽 어휘</h2>
-          </header>
-          <p class="lead">RL만으로는 로봇이 안 되므로, 모방학습 용어도 필수다.</p>
+      <section class="part" id="part-10">
+        <header>
+          <span class="part-number">PART 10</span>
+          <h2>모방학습 쪽 어휘</h2>
+        </header>
 
-          <h3>BC (Behavior Cloning, 행동 복제)</h3>
-          <div class="formula">max<sub>θ</sub> 𝔼<sub>(o,a)∼𝒟demo</sub>[log π<sub>θ</sub>(a ∣ o)]</div>
-          <p>사람 데모를 지도학습으로 그대로 흉내내는 것. 가장 단순하고 가장 널리 쓰인다.</p>
+        <h3>BC — 행동 복제</h3>
+        <div class="math">max<sub>θ</sub> 𝔼<sub>(o,a)∼𝒟demo</sub>[log π<sub>θ</sub>(a|o)]</div>
+        <p>사람 데모를 지도학습으로 그대로 흉내내는 것. 가장 단순하고 가장 널리 쓰인다.</p>
 
-          <h3>SFT (Supervised Fine-Tuning)</h3>
-          <p>LLM에서 온 용어. <strong>로봇 맥락에서는 BC와 사실상 같다.</strong> 사전학습된 모델을 대상 과제의 데모로 지도학습 파인튜닝하는 것.</p>
-          <div class="callout"><p>용어 주의: π*0.6 논문의 “SFT”는 좀 더 특수하게 <strong>“advantage를 전부 True로 고정한 조건부 BC”</strong>를 뜻한다(PART 9).</p></div>
+        <h3>SFT — Supervised Fine-Tuning</h3>
+        <p>LLM에서 온 용어. <strong>로봇 맥락에서는 BC와 사실상 같다.</strong> 사전학습된 모델을 대상 과제의 데모로 지도학습 파인튜닝하는 것.</p>
+        <blockquote class="callout note">π*0.6 논문의 “SFT”는 좀 더 특수하게 <strong>“advantage를 전부 True로 고정한 조건부 BC”</strong>를 뜻한다.</blockquote>
 
-          <h3>Covariate shift와 compounding error — BC의 고질병</h3>
-          <p>BC의 근본 문제. <strong>학습 분포와 실행 분포가 다르다.</strong></p>
-          <pre><code>데모에는 "잘 되는 길"만 있다
+        <h3>Covariate shift와 compounding error</h3>
+        <pre>데모에는 "잘 되는 길"만 있다
   → 로봇이 조금 벗어난다 (작은 오차)
   → 그 상태는 데모에 없다 → 무엇을 할지 모른다
   → 더 크게 벗어난다
-  → 완전히 낯선 상태 → 완전히 엉망</code></pre>
-          <p>오차가 오차를 부른다. 이론적으로 BC의 오차는 호라이즌 T에 대해 O(εT²)로 쌓이고(Ross &amp; Bagnell), DAgger 같은 교정 기법을 쓰면 O(εT)로 줄어든다.</p>
-          <p><strong>이것이 “모방학습만으로는 40%에서 멈춘다”의 이론적 근거</strong>다.</p>
+  → 완전히 낯선 상태 → 완전히 엉망</pre>
+        <p>오차가 오차를 부른다. 이론적으로 BC의 오차는 호라이즌 T에 대해 O(εT²)로 쌓이고, DAgger 같은 교정 기법을 쓰면 O(εT)로 줄어든다.</p>
+        <p><strong>이것이 “모방학습만으로는 40%에서 멈춘다”의 이론적 근거</strong>다.</p>
 
-          <h3>DAgger (Dataset Aggregation)</h3>
-          <p>covariate shift의 정면 해법.</p>
-          <pre><code>반복:
-  1. 현재 정책으로 롤아웃 (학습자가 실제 방문하는 상태를 만든다)
+        <h3>DAgger — Dataset Aggregation</h3>
+        <pre>반복:
+  1. 현재 정책으로 롤아웃
   2. 그 상태들에서 전문가에게 "여기선 뭘 해야 하나" 질의
-  3. (방문 상태, 전문가 행동) 을 데이터셋에 추가
-  4. 데이터셋 전체로 재학습</code></pre>
-          <p>핵심: <strong>학습자 자신이 방문하는 상태에 라벨을 붙인다.</strong> 전문가가 만든 상태가 아니라. 그래서 “내가 실제로 저지르는 실수의 교정법”만 효율적으로 배운다.</p>
-          <div class="callout">
-            <p class="callout-title">EXAMPLE · 비유 — 운전 교습소</p>
-            <p>강사가 조수석에서 평소엔 가만히 있다가 <strong>위험한 순간에만 핸들을 잡아준다.</strong> 학생은 교과서를 백 번 읽는 것보다 압도적으로 빠르게 배운다.</p>
-          </div>
-          <p><strong>HG-DAgger / human-in-the-loop 변형</strong>: 사람이 매 스텝 질의받는 대신, <strong>필요할 때만 개입</strong>한다. 실용적이라 로봇에서 표준이 되었다.</p>
+  3. (방문 상태, 전문가 행동)을 데이터셋에 추가
+  4. 데이터셋 전체로 재학습</pre>
+        <p>핵심: <strong>학습자 자신이 방문하는 상태에 라벨을 붙인다.</strong> 전문가가 만든 상태가 아니라. 그래서 “내가 실제로 저지르는 실수의 교정법”만 효율적으로 배운다.</p>
+        <aside class="callout example">
+          <span class="callout-title">EXAMPLE · 운전 교습소</span>
+          <p>강사가 조수석에서 평소엔 가만히 있다가 <strong>위험한 순간에만 핸들을 잡아준다.</strong> 학생은 교과서를 백 번 읽는 것보다 압도적으로 빠르게 배운다.</p>
+        </aside>
+        <p><strong>HG-DAgger / human-in-the-loop:</strong> 사람이 매 스텝 질의받는 대신, <strong>필요할 때만 개입</strong>한다. 실용적이라 로봇에서 표준이 되었다.</p>
+        <ul>
+          <li>Finn 00:07:50 설계 ①: “정책 롤아웃과 사람의 교정을 함께 배치로 사용”</li>
+          <li>Finn 00:25:00: EXPO-FT의 원격조작 개입</li>
+          <li>Levine 장면 6: RLPD의 “인간 개입(corrective demonstration)”</li>
+        </ul>
+        <aside class="callout tip">
+          <span class="callout-title">TIP · 개입 한 번이 양성·음성 쌍을 동시에 만든다</span>
           <ul>
-            <li>Finn 00:07:50 설계 ①: “정책 롤아웃과 사람의 교정을 함께 배치로 사용”</li>
-            <li>Finn 00:25:00: EXPO-FT의 원격조작 개입</li>
-            <li>Levine 장면 6: RLPD의 “인간 개입(corrective demonstration)”</li>
+            <li>개입 <strong>직전</strong> 정책의 행동 → “이러면 망함”의 예시</li>
+            <li>개입 <strong>직후</strong> 사람의 행동 → “이렇게 회복함”의 예시</li>
           </ul>
-          <div class="callout">
-            <p class="callout-title">TIP · 개입 한 번이 양성·음성 쌍을 동시에 만든다</p>
-            <ul>
-              <li>개입 <strong>직전</strong> 정책의 행동 → “이러면 망함”의 예시 (negative advantage)</li>
-              <li>개입 <strong>직후</strong> 사람의 행동 → “이렇게 회복함”의 예시 (positive advantage)</li>
-            </ul>
-            <p>그리고 개입 데이터는 <strong>“망친 상태에서 회복하는 데 몇 초가 더 드는지”</strong>를 가치함수에 알려주는 유일한 출처이기도 하다. 설계 ①이 설계 ②를 먹여 살리는 구조.</p>
-            <p>단, π*0.6 논문은 <code>we force I_t = True for all corrections</code> — 사람 교정은 계산된 advantage와 무관하게 <strong>강제로 good</strong> 처리한다. 순수하게 가치함수만으로 라벨이 정해지는 게 아니라 “사람이 한 건 옳다”는 사전 지식이 주입돼 있다.</p>
-          </div>
+          <p>개입 데이터는 “망친 상태에서 회복하는 데 몇 초가 더 드는지”를 가치함수에 알려주는 유일한 출처이기도 하다. 설계 ①이 설계 ②를 먹여 살리는 구조.</p>
+          <p>단, π*0.6 논문은 <code>we force I_t = True for all corrections</code> — 사람 교정은 계산된 advantage와 무관하게 <strong>강제로 good</strong> 처리한다.</p>
+        </aside>
 
-          <h3>증류 (Distillation)</h3>
-          <p>한 모델(교사)의 행동을 다른 모델(학생)에게 옮기는 것. 로봇에서는 <strong>교사 정책을 롤아웃해서 데이터를 만들고, 그 데이터로 학생을 BC</strong>하는 형태가 보통이다.</p>
-          <p>Levine 장면 9(RLDG)의 핵심 도구. <strong>손기술은 스페셜리스트에게서, 일반화는 VLA의 사전학습에서</strong> 온다.</p>
-          <p>경제적으로 중요한 지점: 사람 데모는 데이터 1시간에 사람 1시간이 들지만, RL 정책은 밤새 혼자 돌려도 된다. <strong>데이터 수집 비용이 인건비에서 전기요금으로 바뀐다.</strong></p>
+        <h3>증류</h3>
+        <p>한 모델(교사)의 행동을 다른 모델(학생)에게 옮기는 것. 로봇에서는 <strong>교사 정책을 롤아웃해서 데이터를 만들고, 그 데이터로 학생을 BC</strong> 하는 형태가 보통이다.</p>
+        <p>Levine 장면 9(RLDG)의 핵심 도구. <strong>손기술은 스페셜리스트에게서, 일반화는 VLA의 사전학습에서</strong> 온다.</p>
+        <p>사람 데모는 데이터 1시간에 사람 1시간이 들지만, RL 정책은 밤새 혼자 돌려도 된다. <strong>데이터 수집 비용이 인건비에서 전기요금으로 바뀐다.</strong></p>
 
-          <h3>탐색 (Exploration) — 로봇 RL의 진짜 병목</h3>
-          <p>RL은 “해보고 배우는” 것인데, <strong>애초에 성공을 한 번도 못 하면</strong> 배울 게 없다.</p>
-          <p>무작위로 팔을 흔들어서 USB가 꽂힐 확률은 사실상 0이다. 희소 보상에서 보상을 한 번도 못 받으면 critic이 배울 게 없고, critic이 없으면 actor도 방향을 못 잡는다 → 영원히 제자리.</p>
-          <p>Levine 발표 Q&amp;A의 핵심 답: <strong>파운데이션 모델을 행동 사전확률(prior)로 쓰라.</strong></p>
-          <div class="callout"><p>아기는 구멍에 물건을 넣을 때 구멍을 <strong>보고</strong> 그쪽으로 손을 뻗는다. 손을 무작위로 떨지 않는다.</p></div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>해법</th><th>방식</th><th>출처</th></tr></thead>
-              <tbody>
-                <tr><td><strong>사람 개입</strong></td><td>회복 경로를 직접 시연</td><td>두 발표 공통</td></tr>
-                <tr><td><strong>데모를 버퍼에 섞기</strong></td><td>성공 예시를 항상 배치에 포함</td><td>RLPD</td></tr>
-                <tr><td><strong>BC 정규화</strong></td><td>모를 땐 base 모델을 따르라</td><td>RLT</td></tr>
-                <tr><td><strong>RL 토큰</strong></td><td>파운데이션 모델의 표현·의도를 RL actor에 주입</td><td>RLT</td></tr>
-                <tr><td><strong>의미 공간 탐색</strong></td><td>언어 입력을 바꿔가며 탐색</td><td>Levine Q&amp;A (진행 중 연구)</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p>마지막 것이 특히 흥미롭다. <strong>액션 값을 랜덤하게 흔드는 것보다 언어를 바꿔 탐색하는 게 훨씬 나은 공간</strong>이라는 발상.</p>
+        <h3>탐색 — 로봇 RL의 진짜 병목</h3>
+        <p>RL은 “해보고 배우는” 것인데, <strong>애초에 성공을 한 번도 못 하면</strong> 배울 게 없다.</p>
+        <p>무작위로 팔을 흔들어서 USB가 꽂힐 확률은 사실상 0이다. 희소 보상에서 보상을 한 번도 못 받으면 critic이 배울 게 없고, actor도 방향을 못 잡는다.</p>
+        <p>Levine 발표 Q&amp;A의 핵심 답: <strong>파운데이션 모델을 행동 사전확률(prior)로 쓰라.</strong></p>
+        <blockquote class="callout example">아기는 구멍에 물건을 넣을 때 구멍을 <strong>보고</strong> 그쪽으로 손을 뻗는다. 손을 무작위로 떨지 않는다.</blockquote>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>해법</th><th>방식</th><th>출처</th></tr></thead>
+            <tbody>
+              <tr><td><strong>사람 개입</strong></td><td>회복 경로를 직접 시연</td><td>두 발표 공통</td></tr>
+              <tr><td><strong>데모를 버퍼에 섞기</strong></td><td>성공 예시를 항상 배치에 포함</td><td>RLPD</td></tr>
+              <tr><td><strong>BC 정규화</strong></td><td>모를 땐 base 모델을 따르라</td><td>RLT</td></tr>
+              <tr><td><strong>RL 토큰</strong></td><td>VLA 표현·의도를 RL actor에 주입</td><td>RLT</td></tr>
+              <tr><td><strong>의미 공간 탐색</strong></td><td>언어 입력을 바꿔가며 탐색</td><td>Levine Q&amp;A</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p><strong>액션 값을 랜덤하게 흔드는 것보다 언어를 바꿔 탐색하는 게 훨씬 나은 공간</strong>이라는 발상.</p>
 
-          <h3>Throughput — 평가 지표</h3>
-          <p>Finn 00:15:30이 강조한 지표. <strong>단위 시간당 성공 횟수.</strong></p>
-          <div class="formula">throughput = 성공 횟수 / 경과 시간</div>
-          <p>성공률만 보면 <strong>느리게 성공하는 정책이 과대평가</strong>된다. 실패하면서 시간까지 오래 끄는 정책은 이 지표에서 크게 불리해진다.</p>
-          <p>현장 KPI와 직접 연결되는 지표라, 연구 지표와 산업 지표의 간극을 줄인다.</p>
-          <a class="back" href="#top">↑ 목차로</a>
-        </section>
+        <h3>Throughput — 평가 지표</h3>
+        <div class="math">throughput = 성공 횟수 / 경과 시간</div>
+        <p>성공률만 보면 <strong>느리게 성공하는 정책이 과대평가</strong>된다. 실패하면서 시간까지 오래 끄는 정책은 이 지표에서 크게 불리해진다. 현장 KPI와 직접 연결되는 지표라, 연구 지표와 산업 지표의 간극을 줄인다.</p>
+        <a class="top-link" href="#top">↑ 맨 위로</a>
+      </section>
 
-        <section id="part-11">
-          <header>
-            <span class="part-number">PART 11</span>
-            <h2>두 발표의 모든 방법 한 표에</h2>
-          </header>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>방법</th><th>푸는 문제</th><th>on/off-policy</th><th>정책 형태</th><th>가치 학습</th><th>정책 추출</th></tr></thead>
-              <tbody>
-                <tr><td><strong>BC / SFT</strong></td><td>기본선</td><td>(해당 없음)</td><td>무엇이든</td><td>없음</td><td>지도학습</td></tr>
-                <tr><td><strong>RLPD</strong></td><td>실세계 샘플효율</td><td>off-policy</td><td>가우시안 (작은 모델)</td><td>TD (SAC)</td><td>actor-critic</td></tr>
-                <tr><td><strong>SERL / HIL-SERL</strong></td><td>실세계 RL 인프라</td><td>off-policy</td><td>가우시안</td><td>TD (SAC)</td><td>actor-critic + 사람 개입</td></tr>
-                <tr><td><strong>RLDG</strong></td><td>스페셜리스트 → 제너럴리스트</td><td>(증류)</td><td>VLA</td><td>없음 (증류 단계)</td><td>BC on RL 롤아웃</td></tr>
-                <tr><td><strong>RLT</strong></td><td>제너럴리스트 → 스페셜리스트</td><td>off-policy</td><td>작은 actor + VLA prior</td><td>TD</td><td>actor-critic + BC 정규화</td></tr>
-                <tr><td><strong>CFGRL</strong></td><td>좋은/나쁜 데이터 모두 활용</td><td>offline</td><td>디퓨전</td><td>임의</td><td><strong>guidance (w)</strong></td></tr>
-                <tr><td><strong>RECAP / π*0.6</strong></td><td>대형 VLA를 안정적으로 RL</td><td>반복적 offline</td><td>디퓨전 VLA</td><td><strong>MC 회귀</strong></td><td><strong>advantage 조건화</strong></td></tr>
-                <tr><td><strong>EXPO</strong></td><td>디퓨전 정책의 안정적 온라인 RL</td><td>off-policy</td><td>디퓨전 base + 가우시안 edit</td><td>TD (Q)</td><td><strong>edit + argmax Q 샘플링</strong></td></tr>
-                <tr><td><strong>EXPO-FT</strong></td><td>샘플효율 극대화</td><td>off-policy</td><td>위 + 청킹</td><td>TD (Q)</td><td>위 + 사람 개입</td></tr>
-                <tr><td><strong>FASTER</strong></td><td>샘플링 계산 비용</td><td>—</td><td>—</td><td>—</td><td>denoising 조기 필터링 (MDP로 학습)</td></tr>
-                <tr><td><strong>π0.7</strong></td><td>전부 통합</td><td>대규모 offline</td><td>디퓨전 VLA</td><td>—</td><td>메타데이터 조건화</td></tr>
-              </tbody>
-            </table>
-          </div>
+      <section class="part" id="part-11">
+        <header>
+          <span class="part-number">PART 11</span>
+          <h2>두 발표의 모든 방법 한 표에</h2>
+        </header>
 
-          <h3>세 가지 큰 갈래</h3>
-          <ol>
-            <li><strong>모델을 작게 해서 RL을 쉽게</strong> — RLPD, SERL. 대신 일반화 포기 → 증류로 회수(RLDG)</li>
-            <li><strong>RL을 지도학습처럼 바꿔서 큰 모델에</strong> — RECAP/π*0.6, CFGRL. 조건부 BC</li>
-            <li><strong>구조를 쪼개서 각자 잘하는 도구를</strong> — EXPO(디퓨전+가우시안), RLT(VLA+작은 actor)</li>
-          </ol>
-          <p>Levine 장면 5의 <strong><code>big model × sample-efficient RL × hard task</code> 3중 결합</strong>이 이 모든 우회로의 이유다. 셋을 동시에 만족시키는 방법은 아직 없고, 각 방법은 <strong>어느 하나를 완화</strong>한 것이다.</p>
-          <a class="back" href="#top">↑ 목차로</a>
-        </section>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>방법</th><th>푸는 문제</th><th>on/off-policy</th><th>정책 형태</th><th>가치 학습</th><th>정책 추출</th></tr></thead>
+            <tbody>
+              <tr><td><strong>BC / SFT</strong></td><td>기본선</td><td>해당 없음</td><td>무엇이든</td><td>없음</td><td>지도학습</td></tr>
+              <tr><td><strong>RLPD</strong></td><td>실세계 샘플효율</td><td>off-policy</td><td>가우시안</td><td>TD (SAC)</td><td>actor-critic</td></tr>
+              <tr><td><strong>SERL / HIL-SERL</strong></td><td>실세계 RL 인프라</td><td>off-policy</td><td>가우시안</td><td>TD (SAC)</td><td>actor-critic + 사람 개입</td></tr>
+              <tr><td><strong>RLDG</strong></td><td>스페셜리스트 → 제너럴리스트</td><td>증류</td><td>VLA</td><td>없음</td><td>BC on RL 롤아웃</td></tr>
+              <tr><td><strong>RLT</strong></td><td>제너럴리스트 → 스페셜리스트</td><td>off-policy</td><td>작은 actor + VLA prior</td><td>TD</td><td>actor-critic + BC 정규화</td></tr>
+              <tr><td><strong>CFGRL</strong></td><td>좋은/나쁜 데이터 모두 활용</td><td>offline</td><td>디퓨전</td><td>임의</td><td><strong>guidance (w)</strong></td></tr>
+              <tr><td><strong>RECAP / π*0.6</strong></td><td>대형 VLA를 안정적으로 RL</td><td>반복적 offline</td><td>디퓨전 VLA</td><td><strong>MC 회귀</strong></td><td><strong>advantage 조건화</strong></td></tr>
+              <tr><td><strong>EXPO</strong></td><td>디퓨전 정책의 안정적 온라인 RL</td><td>off-policy</td><td>디퓨전 base + 가우시안 edit</td><td>TD (Q)</td><td><strong>edit + argmax Q</strong></td></tr>
+              <tr><td><strong>EXPO-FT</strong></td><td>샘플효율 극대화</td><td>off-policy</td><td>위 + 청킹</td><td>TD (Q)</td><td>위 + 사람 개입</td></tr>
+              <tr><td><strong>FASTER</strong></td><td>샘플링 계산 비용</td><td>—</td><td>—</td><td>—</td><td>denoising 조기 필터링</td></tr>
+              <tr><td><strong>π0.7</strong></td><td>전부 통합</td><td>대규모 offline</td><td>디퓨전 VLA</td><td>—</td><td>메타데이터 조건화</td></tr>
+            </tbody>
+          </table>
+        </div>
 
-        <section id="part-12">
-          <header>
-            <span class="part-number">PART 12</span>
-            <h2>빠른 참조 — 용어 사전</h2>
-          </header>
+        <h3>세 가지 큰 갈래</h3>
+        <ol>
+          <li><strong>모델을 작게 해서 RL을 쉽게</strong> — RLPD, SERL. 대신 일반화 포기 → 증류로 회수(RLDG)</li>
+          <li><strong>RL을 지도학습처럼 바꿔서 큰 모델에</strong> — RECAP/π*0.6, CFGRL. 조건부 BC</li>
+          <li><strong>구조를 쪼개서 각자 잘하는 도구를</strong> — EXPO(디퓨전+가우시안), RLT(VLA+작은 actor)</li>
+        </ol>
+        <p>Levine 장면 5의 <strong><code>big model × sample-efficient RL × hard task</code> 3중 결합</strong>이 이 모든 우회로의 이유다. 셋을 동시에 만족시키는 방법은 아직 없고, 각 방법은 <strong>어느 하나를 완화</strong>한 것이다.</p>
+        <a class="top-link" href="#top">↑ 맨 위로</a>
+      </section>
 
-          <h3>기호</h3>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>기호</th><th>읽는 법</th><th>뜻</th></tr></thead>
-              <tbody>
-                <tr><td>s, o</td><td>state, observation</td><td>상태 / 관측</td></tr>
-                <tr><td>a</td><td>action</td><td>행동</td></tr>
-                <tr><td>r</td><td>reward</td><td>보상</td></tr>
-                <tr><td>π(a∣s)</td><td>파이</td><td>정책 — 상태를 받아 행동 분포를 내놓음</td></tr>
-                <tr><td>τ</td><td>타우</td><td>궤적 — 한 에피소드의 기록</td></tr>
-                <tr><td>γ</td><td>감마</td><td>할인율 (보통 0.99)</td></tr>
-                <tr><td>G<sub>t</sub></td><td>리턴</td><td>t부터 끝까지 보상의 할인 합</td></tr>
-                <tr><td>V(s)</td><td>브이</td><td>상태 가치 — 이 상태의 기대 리턴</td></tr>
-                <tr><td>Q(s,a)</td><td>큐</td><td>행동 가치 — 이 상태+행동의 기대 리턴</td></tr>
-                <tr><td>A(s,a)</td><td>어드밴티지</td><td>Q − V — 평균보다 얼마나 나은가</td></tr>
-                <tr><td>θ</td><td>세타</td><td>신경망 파라미터</td></tr>
-                <tr><td>α</td><td>알파</td><td>학습률 (또는 SAC의 엔트로피 온도)</td></tr>
-                <tr><td>β</td><td>베타</td><td>정규화 강도 (AWR, KL 페널티)</td></tr>
-                <tr><td>ε</td><td>엡실론</td><td>임계값 (또는 PPO의 clip 범위)</td></tr>
-                <tr><td>w</td><td>—</td><td>CFG guidance weight</td></tr>
-                <tr><td>𝔼</td><td>기대값</td><td>평균</td></tr>
-                <tr><td>𝒩(μ,σ)</td><td>정규분포</td><td>가우시안</td></tr>
-                <tr><td>D<sub>KL</sub></td><td>KL 발산</td><td>두 분포의 차이</td></tr>
-                <tr><td>𝟙[·]</td><td>지시함수</td><td>조건이 참이면 1, 아니면 0</td></tr>
-                <tr><td>∇<sub>θ</sub></td><td>그래디언트</td><td>θ에 대한 기울기</td></tr>
-              </tbody>
-            </table>
-          </div>
+      <section class="part" id="part-12">
+        <header>
+          <span class="part-number">PART 12</span>
+          <h2>빠른 참조 — 용어 사전</h2>
+        </header>
 
-          <h3>약어</h3>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>약어</th><th>원어</th><th>한 줄</th></tr></thead>
-              <tbody>
-                <tr><td><strong>MDP</strong></td><td>Markov Decision Process</td><td>RL의 문제 설정</td></tr>
-                <tr><td><strong>BC</strong></td><td>Behavior Cloning</td><td>데모를 지도학습으로 흉내내기</td></tr>
-                <tr><td><strong>SFT</strong></td><td>Supervised Fine-Tuning</td><td>로봇에선 BC와 사실상 같음</td></tr>
-                <tr><td><strong>IL</strong></td><td>Imitation Learning</td><td>모방학습</td></tr>
-                <tr><td><strong>RL</strong></td><td>Reinforcement Learning</td><td>강화학습</td></tr>
-                <tr><td><strong>MC</strong></td><td>Monte Carlo</td><td>끝까지 가본 실제 결과로 학습</td></tr>
-                <tr><td><strong>TD</strong></td><td>Temporal Difference</td><td>다음 상태의 추정치를 빌려 학습</td></tr>
-                <tr><td><strong>GAE</strong></td><td>Generalized Advantage Estimation</td><td>여러 N-step을 지수 가중 평균</td></tr>
-                <tr><td><strong>PG</strong></td><td>Policy Gradient</td><td>정책을 직접 기울기로 밀기</td></tr>
-                <tr><td><strong>PPO</strong></td><td>Proximal Policy Optimization</td><td>clip으로 제약한 on-policy PG</td></tr>
-                <tr><td><strong>TRPO</strong></td><td>Trust Region Policy Optimization</td><td>KL 제약 PG</td></tr>
-                <tr><td><strong>DDPG</strong></td><td>Deep Deterministic Policy Gradient</td><td>최초 실용 연속 off-policy</td></tr>
-                <tr><td><strong>TD3</strong></td><td>Twin Delayed DDPG</td><td>twin critic + 지연 갱신 + 스무딩</td></tr>
-                <tr><td><strong>SAC</strong></td><td>Soft Actor-Critic</td><td>엔트로피 최대화 off-policy. 로봇 표준</td></tr>
-                <tr><td><strong>AWR</strong></td><td>Advantage-Weighted Regression</td><td>exp(A/β) 가중 BC</td></tr>
-                <tr><td><strong>AWAC</strong></td><td>Advantage-Weighted Actor-Critic</td><td>AWR의 온라인 버전</td></tr>
-                <tr><td><strong>CQL</strong></td><td>Conservative Q-Learning</td><td>OOD 행동에 명시적 벌점</td></tr>
-                <tr><td><strong>REDQ</strong></td><td>Randomized Ensembled Double Q</td><td>critic 앙상블 + 랜덤 min</td></tr>
-                <tr><td><strong>UTD</strong></td><td>Update-To-Data ratio</td><td>환경 스텝 1회당 갱신 횟수</td></tr>
-                <tr><td><strong>OOD</strong></td><td>Out-Of-Distribution</td><td>데이터 분포 밖</td></tr>
-                <tr><td><strong>CFG</strong></td><td>Classifier-Free Guidance</td><td>조건부/무조건부 차이를 증폭</td></tr>
-                <tr><td><strong>DAgger</strong></td><td>Dataset Aggregation</td><td>학습자 방문 상태에 전문가 라벨</td></tr>
-                <tr><td><strong>VLA</strong></td><td>Vision-Language-Action</td><td>로봇 파운데이션 모델</td></tr>
-                <tr><td><strong>POMDP</strong></td><td>Partially Observable MDP</td><td>상태를 완전히 못 보는 MDP</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <a class="back" href="#top">↑ 목차로</a>
-        </section>
+        <h3>기호</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>기호</th><th>읽는 법</th><th>뜻</th></tr></thead>
+            <tbody>
+              <tr><td>s, o</td><td>state, observation</td><td>상태 / 관측</td></tr>
+              <tr><td>a</td><td>action</td><td>행동</td></tr>
+              <tr><td>r</td><td>reward</td><td>보상</td></tr>
+              <tr><td>π(a|s)</td><td>파이</td><td>상태를 받아 행동 분포를 내놓는 정책</td></tr>
+              <tr><td>τ</td><td>타우</td><td>한 에피소드의 기록인 궤적</td></tr>
+              <tr><td>γ</td><td>감마</td><td>할인율 — 보통 0.99</td></tr>
+              <tr><td>G<sub>t</sub></td><td>리턴</td><td>t부터 끝까지 보상의 할인 합</td></tr>
+              <tr><td>V(s)</td><td>브이</td><td>상태 가치 — 이 상태의 기대 리턴</td></tr>
+              <tr><td>Q(s,a)</td><td>큐</td><td>행동 가치 — 이 상태+행동의 기대 리턴</td></tr>
+              <tr><td>A(s,a)</td><td>어드밴티지</td><td>Q−V — 평균보다 얼마나 나은가</td></tr>
+              <tr><td>θ</td><td>세타</td><td>신경망 파라미터</td></tr>
+              <tr><td>α</td><td>알파</td><td>학습률 또는 SAC의 엔트로피 온도</td></tr>
+              <tr><td>β</td><td>베타</td><td>정규화 강도 — AWR, KL 페널티</td></tr>
+              <tr><td>ε</td><td>엡실론</td><td>임계값 또는 PPO의 clip 범위</td></tr>
+              <tr><td>w</td><td>—</td><td>CFG guidance weight</td></tr>
+              <tr><td>𝔼</td><td>기대값</td><td>평균</td></tr>
+              <tr><td>𝒩(μ,σ)</td><td>정규분포</td><td>가우시안</td></tr>
+              <tr><td>D<sub>KL</sub></td><td>KL 발산</td><td>두 분포의 차이</td></tr>
+              <tr><td>𝟙[·]</td><td>지시함수</td><td>조건이 참이면 1, 아니면 0</td></tr>
+              <tr><td>∇<sub>θ</sub></td><td>그래디언트</td><td>θ에 대한 기울기</td></tr>
+            </tbody>
+          </table>
+        </div>
 
-        <section id="part-13">
-          <header>
-            <span class="part-number">PART 13</span>
-            <h2>자주 헷갈리는 것 정리</h2>
-          </header>
+        <h3>약어</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>약어</th><th>원어</th><th>한 줄</th></tr></thead>
+            <tbody>
+              <tr><td><strong>MDP</strong></td><td>Markov Decision Process</td><td>RL의 문제 설정</td></tr>
+              <tr><td><strong>BC</strong></td><td>Behavior Cloning</td><td>데모를 지도학습으로 흉내내기</td></tr>
+              <tr><td><strong>SFT</strong></td><td>Supervised Fine-Tuning</td><td>로봇에선 BC와 사실상 같음</td></tr>
+              <tr><td><strong>IL</strong></td><td>Imitation Learning</td><td>모방학습</td></tr>
+              <tr><td><strong>RL</strong></td><td>Reinforcement Learning</td><td>강화학습</td></tr>
+              <tr><td><strong>MC</strong></td><td>Monte Carlo</td><td>끝까지 가본 실제 결과로 학습</td></tr>
+              <tr><td><strong>TD</strong></td><td>Temporal Difference</td><td>다음 상태의 추정치를 빌려 학습</td></tr>
+              <tr><td><strong>GAE</strong></td><td>Generalized Advantage Estimation</td><td>여러 N-step을 지수 가중 평균</td></tr>
+              <tr><td><strong>PG</strong></td><td>Policy Gradient</td><td>정책을 직접 기울기로 밀기</td></tr>
+              <tr><td><strong>PPO</strong></td><td>Proximal Policy Optimization</td><td>clip으로 제약한 on-policy PG</td></tr>
+              <tr><td><strong>TRPO</strong></td><td>Trust Region Policy Optimization</td><td>KL 제약 PG</td></tr>
+              <tr><td><strong>DDPG</strong></td><td>Deep Deterministic Policy Gradient</td><td>최초 실용 연속 off-policy</td></tr>
+              <tr><td><strong>TD3</strong></td><td>Twin Delayed DDPG</td><td>twin critic + 지연 갱신 + 스무딩</td></tr>
+              <tr><td><strong>SAC</strong></td><td>Soft Actor-Critic</td><td>엔트로피 최대화 off-policy. 로봇 표준</td></tr>
+              <tr><td><strong>AWR</strong></td><td>Advantage-Weighted Regression</td><td>exp(A/β) 가중 BC</td></tr>
+              <tr><td><strong>AWAC</strong></td><td>Advantage-Weighted Actor-Critic</td><td>AWR의 온라인 버전</td></tr>
+              <tr><td><strong>CQL</strong></td><td>Conservative Q-Learning</td><td>OOD 행동에 명시적 벌점</td></tr>
+              <tr><td><strong>REDQ</strong></td><td>Randomized Ensembled Double Q</td><td>critic 앙상블 + 랜덤 min</td></tr>
+              <tr><td><strong>UTD</strong></td><td>Update-To-Data ratio</td><td>환경 스텝 1회당 갱신 횟수</td></tr>
+              <tr><td><strong>OOD</strong></td><td>Out-Of-Distribution</td><td>데이터 분포 밖</td></tr>
+              <tr><td><strong>CFG</strong></td><td>Classifier-Free Guidance</td><td>조건부/무조건부 차이를 증폭</td></tr>
+              <tr><td><strong>DAgger</strong></td><td>Dataset Aggregation</td><td>학습자 방문 상태에 전문가 라벨</td></tr>
+              <tr><td><strong>VLA</strong></td><td>Vision-Language-Action</td><td>로봇 파운데이션 모델</td></tr>
+              <tr><td><strong>POMDP</strong></td><td>Partially Observable MDP</td><td>상태를 완전히 못 보는 MDP</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <a class="top-link" href="#top">↑ 맨 위로</a>
+      </section>
 
-          <h3>V vs Q vs A</h3>
-          <pre><code>V(s)     = 이 상태, 얼마나 좋아?                    (행동 미지정)
+      <section class="part" id="part-13">
+        <header>
+          <span class="part-number">PART 13</span>
+          <h2>자주 헷갈리는 것 정리</h2>
+        </header>
+
+        <h3>V vs Q vs A</h3>
+        <pre>V(s)     = 이 상태, 얼마나 좋아?                    (행동 미지정)
 Q(s,a)   = 이 상태에서 이 행동, 얼마나 좋아?         (행동 지정)
-A(s,a)   = Q - V = 이 행동이 평균보다 얼마나 나아?  (상대적)</code></pre>
-          <p>기억법: <strong>V는 상태만, Q는 상태+행동, A는 그 차이.</strong></p>
+A(s,a)   = Q - V = 이 행동이 평균보다 얼마나 나아?   (상대적)</pre>
+        <p>기억법: <strong>V는 상태만, Q는 상태+행동, A는 그 차이.</strong></p>
 
-          <h3>MC vs TD</h3>
-          <pre><code>MC:  끝까지 가보고 → 실제 결과를 정답으로  → 느리지만 안정적
-TD:  한 스텝 가보고 → 내 예측을 정답으로   → 빠르지만 불안정</code></pre>
-          <p>기억법: <strong>MC는 결산, TD는 가결산.</strong></p>
+        <h3>MC vs TD</h3>
+        <pre>MC: 끝까지 가보고 → 실제 결과를 정답으로 → 느리지만 안정적
+TD: 한 스텝 가보고 → 내 예측을 정답으로  → 빠르지만 불안정</pre>
+        <p>기억법: <strong>MC는 결산, TD는 가결산.</strong></p>
 
-          <h3>on-policy vs off-policy vs offline</h3>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th></th><th>데이터 수집</th><th>과거 데이터</th></tr></thead>
-              <tbody>
-                <tr><td><strong>on-policy</strong></td><td>현재 정책으로 계속</td><td>버림</td></tr>
-                <tr><td><strong>off-policy</strong></td><td>계속 수집</td><td><strong>재사용</strong></td></tr>
-                <tr><td><strong>offline</strong></td><td><strong>안 함</strong></td><td>고정 데이터셋만</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p>기억법: <strong>on = 지금 것만, off = 아무거나, offline = 새로 안 모음.</strong></p>
+        <h3>on-policy vs off-policy vs offline</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th></th><th>데이터 수집</th><th>과거 데이터</th></tr></thead>
+            <tbody>
+              <tr><td><strong>on-policy</strong></td><td>현재 정책으로 계속</td><td>버림</td></tr>
+              <tr><td><strong>off-policy</strong></td><td>계속 수집</td><td><strong>재사용</strong></td></tr>
+              <tr><td><strong>offline</strong></td><td><strong>안 함</strong></td><td>고정 데이터셋만</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>기억법: <strong>on = 지금 것만, off = 아무거나, offline = 새로 안 모음.</strong></p>
 
-          <h3>SFT vs BC vs Filtered BC</h3>
-          <p>세 개가 거의 같은 것이고, 차이는 <strong>데이터를 어떻게 고르는가</strong>뿐이다.</p>
-          <pre><code>BC            : 데모 전부 모방
-Filtered BC   : advantage &gt; 0 인 것만 모방
-SFT (π*0.6)   : 데모만 + advantage 전부 True 로 고정</code></pre>
+        <h3>SFT vs BC vs Filtered BC</h3>
+        <pre>BC            : 데모 전부 모방
+Filtered BC   : advantage > 0 인 것만 모방
+SFT (π*0.6)   : 데모만 + advantage 전부 True로 고정</pre>
 
-          <h3>advantage conditioning vs AWR vs CFG</h3>
-          <p>셋 다 “advantage를 정책 개선에 쓰는” 방법인데, <strong>어디에 쓰는지</strong>가 다르다.</p>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th></th><th>advantage를 어디에</th></tr></thead>
-              <tbody>
-                <tr><td><strong>AWR</strong></td><td>손실함수의 <strong>가중치</strong>로</td></tr>
-                <tr><td><strong>Advantage Conditioning</strong></td><td>정책의 <strong>입력</strong>으로 (이진 라벨)</td></tr>
-                <tr><td><strong>CFG</strong></td><td>입력으로 + <strong>추론 시 w로 증폭</strong></td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p>기억법: <strong>AWR은 가중치, 조건화는 입력, CFG는 입력+증폭.</strong></p>
+        <h3>advantage conditioning vs AWR vs CFG</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th></th><th>advantage를 어디에</th></tr></thead>
+            <tbody>
+              <tr><td><strong>AWR</strong></td><td>손실함수의 <strong>가중치</strong>로</td></tr>
+              <tr><td><strong>Advantage Conditioning</strong></td><td>정책의 <strong>입력</strong>으로 — 이진 라벨</td></tr>
+              <tr><td><strong>CFG</strong></td><td>입력으로 + <strong>추론 시 w로 증폭</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>기억법: <strong>AWR은 가중치, 조건화는 입력, CFG는 입력+증폭.</strong></p>
 
-          <h3>학습 시 advantage vs 추론 시 advantage</h3>
-          <p>가장 헷갈리는 지점. 한 번 더 정리한다.</p>
-          <pre><code>학습 시:  결과를 이미 안다 → 계산한다  → 측정값(채점)  → good/bad 둘 다
-추론 시:  결과를 모른다    → 계산 안 함 → 주문(명령)    → 항상 good</code></pre>
-          <p><strong>결과를 입력 자리로 옮겨서 조건으로 만든 것.</strong> 인과를 뒤집은 게 아니라, 인과를 아는 데이터로 학습해두고 나중에 원하는 결과를 역으로 요구하는 구조.</p>
-          <a class="back" href="#top">↑ 목차로</a>
-        </section>
+        <h3>학습 시 advantage vs 추론 시 advantage</h3>
+        <pre>학습 시: 결과를 이미 안다 → 계산한다  → 측정값(채점) → good/bad 둘 다
+추론 시: 결과를 모른다   → 계산 안 함 → 주문(명령)   → 항상 good</pre>
+        <p><strong>결과를 입력 자리로 옮겨서 조건으로 만든 것.</strong> 인과를 뒤집은 게 아니라, 인과를 아는 데이터로 학습해두고 나중에 원하는 결과를 역으로 요구하는 구조.</p>
+        <a class="top-link" href="#top">↑ 맨 위로</a>
+      </section>
 
-        <section id="related">
-          <header>
-            <span class="part-number">RELATED NOTES</span>
-            <h2>관련 노트</h2>
-          </header>
-          <ul class="note-links">
-            <li><a href="clippings/yt_Chelsea_Finn_Reliable_VLA_Post-Training_요약.html">Chelsea Finn · Reliable VLA Post-Training 요약</a> — π*0.6(RECAP) + EXPO/EXPO-FT</li>
-            <li><a href="(한민확인)yt_Sergey_Levine_RL_for_Robot_Foundation_Models_요약.html">Sergey Levine · RL for Robot Foundation Models 요약</a> — RLPD/SERL/RLDG/RLT/CFGRL/π0.7</li>
-            <li><a href="clippings/yt_30_RLPD%20with%20Isaac%20Sim.html">RLPD with Isaac Sim</a> — RLPD 실습</li>
-            <li><a href="clippings/yt_Pulkit_Agrawal_On_RL_and_IL_요약.html">Pulkit Agrawal · On RL and IL 요약</a> — 같은 워크샵, RL과 IL의 관계</li>
-            <li><a href="clippings/yt_Georgia_Chalvatzaki_RL_From_For_With_Demonstrations_요약.html">Georgia Chalvatzaki · RL From/For/With Demonstrations 요약</a> — 데모를 활용한 RL</li>
-            <li><a href="clippings/yt_Jason_Ma_RL_for_Real-World_Production_Robotics_요약.html">Jason Ma · RL for Real-World Production Robotics 요약</a> — 산업 적용 관점</li>
-          </ul>
-        </section>
+      <section class="part related" id="related">
+        <header>
+          <span class="part-number">APPENDIX</span>
+          <h2>관련 노트와 참고 문헌</h2>
+        </header>
 
-        <section id="references">
-          <header>
-            <span class="part-number">REFERENCES</span>
-            <h2>참고 문헌 (기초)</h2>
-          </header>
-          <ul class="references">
-            <li>Sutton &amp; Barto. <em>Reinforcement Learning: An Introduction</em> (2nd ed.) — RL 표준 교과서. PART 1~3, 8이 이 책 1~13장에 해당</li>
-            <li>Levine et al. <em>Offline Reinforcement Learning: Tutorial, Review, and Perspectives on Open Problems</em>. 2020 — PART 9의 표준 참고문헌</li>
-            <li>Haarnoja et al. <em>Soft Actor-Critic</em>. ICML 2018</li>
-            <li>Fujimoto et al. <em>Addressing Function Approximation Error in Actor-Critic Methods</em> (TD3). ICML 2018</li>
-            <li>Schulman et al. <em>Proximal Policy Optimization Algorithms</em>. 2017</li>
-            <li>Peng et al. <em>Advantage-Weighted Regression</em>. 2019</li>
-            <li>Ross &amp; Bagnell. <em>A Reduction of Imitation Learning and Structured Prediction to No-Regret Online Learning</em> (DAgger). AISTATS 2011</li>
-            <li>Chen et al. <em>Decision Transformer</em>. NeurIPS 2021</li>
-            <li>Ball et al. <em>Efficient Online Reinforcement Learning with Offline Data</em> (RLPD). ICML 2023</li>
-          </ul>
-        </section>
-      </article>
+        <h3>관련 노트</h3>
+        <a href="clippings/yt_Chelsea_Finn_Reliable_VLA_Post-Training_요약.md">Chelsea Finn — π*0.6(RECAP) + EXPO/EXPO-FT</a>
+        <a href="(한민확인)yt_Sergey_Levine_RL_for_Robot_Foundation_Models_요약">Sergey Levine — RLPD/SERL/RLDG/RLT/CFGRL/π0.7</a>
+        <a href="clippings/yt_30_RLPD%20with%20Isaac%20Sim.md">RLPD with Isaac Sim — RLPD 실습</a>
+        <a href="clippings/yt_Pulkit_Agrawal_On_RL_and_IL_요약.md">Pulkit Agrawal — RL과 IL의 관계</a>
+        <a href="clippings/yt_Georgia_Chalvatzaki_RL_From_For_With_Demonstrations_요약.md">Georgia Chalvatzaki — 데모를 활용한 RL</a>
+        <a href="clippings/yt_Jason_Ma_RL_for_Real-World_Production_Robotics_요약.md">Jason Ma — 산업 적용 관점</a>
 
-      <footer>
-        <p>연구 노트 · 강화학습 · AI · 로봇 · 기초이론 · 2026-08-08</p>
-        <p><a href="#top">문서 맨 위로 이동</a></p>
-      </footer>
+        <h3>참고 문헌 — 기초</h3>
+        <ul>
+          <li>Sutton &amp; Barto. <em>Reinforcement Learning: An Introduction</em> (2nd ed.) — RL 표준 교과서. PART 1~3, 8이 이 책 1~13장에 해당</li>
+          <li>Levine et al. <em>Offline Reinforcement Learning: Tutorial, Review, and Perspectives on Open Problems</em>. 2020 — PART 9의 표준 참고문헌</li>
+          <li>Haarnoja et al. <em>Soft Actor-Critic</em>. ICML 2018</li>
+          <li>Fujimoto et al. <em>Addressing Function Approximation Error in Actor-Critic Methods</em> (TD3). ICML 2018</li>
+          <li>Schulman et al. <em>Proximal Policy Optimization Algorithms</em>. 2017</li>
+          <li>Peng et al. <em>Advantage-Weighted Regression</em>. 2019</li>
+          <li>Ross &amp; Bagnell. <em>A Reduction of Imitation Learning and Structured Prediction to No-Regret Online Learning</em> (DAgger). AISTATS 2011</li>
+          <li>Chen et al. <em>Decision Transformer</em>. NeurIPS 2021</li>
+          <li>Ball et al. <em>Efficient Online Reinforcement Learning with Offline Data</em> (RLPD). ICML 2023</li>
+        </ul>
+        <a class="top-link" href="#top">↑ 맨 위로</a>
+      </section>
     </main>
   </div>
+
+  <footer>
+    <p>강화학습 기초 — 로봇 VLA 논문·발표 읽기용 · 2026-08-08</p>
+  </footer>
 </body>
 </html>
