@@ -1,0 +1,1888 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Diffusion in RL and Robotics — 표현력 있는 정책이 연속 행동을 바꾼 방식</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f4f0e8;
+      --paper-deep: #e9e2d6;
+      --surface: #fffdf8;
+      --ink: #17201e;
+      --muted: #64706b;
+      --line: #d8d3c9;
+      --forest: #173c35;
+      --forest-soft: #dce9e3;
+      --mint: #80af9e;
+      --coral: #d86e52;
+      --gold: #c99a3e;
+      --blue: #3f6f87;
+      --shadow: 0 24px 60px rgba(28, 38, 34, .12);
+      --radius: 22px;
+      --content: 760px;
+      --wide: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--paper);
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 3%, rgba(216, 110, 82, .10), transparent 28rem),
+        radial-gradient(circle at 92% 18%, rgba(128, 175, 158, .14), transparent 32rem),
+        var(--paper);
+      font-family:
+        Pretendard, "Noto Sans KR", "Apple SD Gothic Neo",
+        "Malgun Gothic", system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      font-size: 17px;
+      line-height: 1.82;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    a {
+      color: var(--forest);
+      text-decoration-color: rgba(23, 60, 53, .35);
+      text-underline-offset: .2em;
+      text-decoration-thickness: .08em;
+    }
+
+    a:hover {
+      color: var(--coral);
+      text-decoration-color: currentColor;
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--coral);
+      outline-offset: 4px;
+      border-radius: 4px;
+    }
+
+    .skip-link {
+      position: absolute;
+      top: -5rem;
+      left: 1rem;
+      z-index: 100;
+      padding: .7rem 1rem;
+      color: white;
+      background: var(--forest);
+      border-radius: 999px;
+    }
+
+    .skip-link:focus {
+      top: 1rem;
+    }
+
+    .top-rule {
+      height: 6px;
+      background: linear-gradient(90deg, var(--coral), var(--gold), var(--mint), var(--blue));
+    }
+
+    .masthead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: min(calc(100% - 40px), var(--wide));
+      margin: 0 auto;
+      padding: 22px 0;
+      border-bottom: 1px solid rgba(23, 32, 30, .16);
+    }
+
+    .brand {
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: .9rem;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .issue {
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .hero {
+      width: min(calc(100% - 40px), var(--wide));
+      margin: 0 auto;
+      padding: clamp(64px, 10vw, 132px) 0 58px;
+    }
+
+    .hero-copy {
+      max-width: 1040px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      margin: 0 0 22px;
+      color: var(--coral);
+      font-size: .77rem;
+      font-weight: 800;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      width: 34px;
+      height: 2px;
+      content: "";
+      background: currentColor;
+    }
+
+    h1,
+    h2,
+    h3,
+    .display {
+      font-family: Georgia, "Noto Serif KR", "Batang", serif;
+      letter-spacing: -.035em;
+    }
+
+    h1 {
+      max-width: 1050px;
+      margin: 0;
+      font-size: clamp(3.15rem, 8.5vw, 7.3rem);
+      font-weight: 600;
+      line-height: .95;
+    }
+
+    h1 em {
+      color: var(--forest);
+      font-style: italic;
+      font-weight: 500;
+    }
+
+    .hero-deck {
+      max-width: 820px;
+      margin: 34px 0 0;
+      color: #35423e;
+      font-family: Georgia, "Noto Serif KR", serif;
+      font-size: clamp(1.2rem, 2.4vw, 1.68rem);
+      line-height: 1.55;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 26px;
+      margin-top: 34px;
+      padding: 0;
+      color: var(--muted);
+      font-size: .88rem;
+      list-style: none;
+    }
+
+    .hero-meta strong {
+      color: var(--ink);
+    }
+
+    .hero-figure {
+      position: relative;
+      margin: 56px 0 0;
+      overflow: hidden;
+      background: #12221f;
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-figure img {
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+    }
+
+    .hero-figure::after {
+      position: absolute;
+      inset: auto 0 0;
+      height: 38%;
+      pointer-events: none;
+      content: "";
+      background: linear-gradient(transparent, rgba(11, 25, 22, .74));
+    }
+
+    .hero-caption {
+      position: absolute;
+      right: 28px;
+      bottom: 23px;
+      left: 28px;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 24px;
+      color: white;
+      font-size: .82rem;
+      line-height: 1.5;
+    }
+
+    .watch-link {
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: .55rem;
+      padding: .65rem .9rem;
+      color: white;
+      border: 1px solid rgba(255, 255, 255, .44);
+      border-radius: 999px;
+      background: rgba(15, 31, 27, .54);
+      text-decoration: none;
+      backdrop-filter: blur(8px);
+    }
+
+    .watch-link:hover {
+      color: white;
+      background: var(--coral);
+    }
+
+    .watch-link::before {
+      content: "▶";
+      font-size: .7rem;
+    }
+
+    .article-shell {
+      width: min(calc(100% - 40px), var(--wide));
+      margin: 0 auto;
+    }
+
+    .article-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 260px;
+      gap: clamp(42px, 7vw, 96px);
+      align-items: start;
+    }
+
+    .article-body {
+      min-width: 0;
+      max-width: var(--content);
+    }
+
+    .toc {
+      position: sticky;
+      top: 24px;
+      padding: 22px 0 22px 22px;
+      border-left: 1px solid var(--line);
+    }
+
+    .toc-title {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: .69rem;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .toc ol {
+      display: grid;
+      gap: 9px;
+      margin: 0;
+      padding: 0;
+      counter-reset: toc;
+      list-style: none;
+    }
+
+    .toc li {
+      counter-increment: toc;
+    }
+
+    .toc a {
+      display: grid;
+      grid-template-columns: 25px 1fr;
+      color: #59635f;
+      font-size: .78rem;
+      line-height: 1.45;
+      text-decoration: none;
+    }
+
+    .toc a::before {
+      color: var(--coral);
+      content: "0" counter(toc);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .toc a:hover {
+      color: var(--ink);
+    }
+
+    .abstract {
+      margin-bottom: 76px;
+      padding: clamp(26px, 5vw, 46px);
+      background: var(--forest);
+      color: #f5f3ec;
+      border-radius: var(--radius);
+      box-shadow: 0 18px 45px rgba(23, 60, 53, .18);
+    }
+
+    .abstract .label {
+      display: block;
+      margin-bottom: 14px;
+      color: #9fd1bd;
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    .abstract h2 {
+      margin: 0 0 18px;
+      color: white;
+      font-size: clamp(1.8rem, 4vw, 2.55rem);
+      line-height: 1.2;
+    }
+
+    .abstract p {
+      margin: 0;
+      color: rgba(255, 255, 255, .82);
+      font-size: 1.04rem;
+    }
+
+    .one-line {
+      margin: 0 0 74px;
+      padding: 22px 0 22px 28px;
+      border-left: 5px solid var(--coral);
+      font-family: Georgia, "Noto Serif KR", serif;
+      font-size: clamp(1.32rem, 3vw, 1.78rem);
+      font-weight: 600;
+      line-height: 1.55;
+    }
+
+    .section {
+      padding: 80px 0 10px;
+      border-top: 1px solid var(--line);
+      scroll-margin-top: 30px;
+    }
+
+    .section-heading {
+      margin-bottom: 34px;
+    }
+
+    .section-number {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--coral);
+      font-size: .74rem;
+      font-weight: 800;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(2.25rem, 5.5vw, 4.15rem);
+      font-weight: 600;
+      line-height: 1.08;
+    }
+
+    h3 {
+      margin: 52px 0 16px;
+      font-size: clamp(1.55rem, 3.4vw, 2.15rem);
+      font-weight: 600;
+      line-height: 1.25;
+    }
+
+    p {
+      margin: 0 0 1.25em;
+    }
+
+    .lede {
+      margin-bottom: 42px;
+      color: #3f4b47;
+      font-family: Georgia, "Noto Serif KR", serif;
+      font-size: 1.18rem;
+      line-height: 1.72;
+    }
+
+    .dropcap::first-letter {
+      float: left;
+      margin: .12em .12em 0 0;
+      color: var(--forest);
+      font-family: Georgia, serif;
+      font-size: 4.7rem;
+      font-weight: 600;
+      line-height: .72;
+    }
+
+    .key-findings {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin: 36px 0 76px;
+    }
+
+    .finding {
+      min-height: 210px;
+      padding: 25px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 253, 248, .66);
+    }
+
+    .finding-num {
+      color: var(--coral);
+      font-family: Georgia, serif;
+      font-size: 1.5rem;
+      font-style: italic;
+    }
+
+    .finding h3 {
+      margin: 22px 0 10px;
+      font-family: inherit;
+      font-size: 1.03rem;
+      font-weight: 800;
+      letter-spacing: -.015em;
+    }
+
+    .finding p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.68;
+    }
+
+    .concept-map {
+      margin: 42px 0 72px;
+      padding: 30px;
+      border-radius: var(--radius);
+      background: #e5ece7;
+    }
+
+    .concept-map figcaption {
+      margin-bottom: 22px;
+      color: var(--forest);
+      font-size: .76rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .flow-step {
+      position: relative;
+      padding: 20px 17px;
+      color: white;
+      background: var(--forest);
+      border-radius: 14px;
+    }
+
+    .flow-step:not(:last-child)::after {
+      position: absolute;
+      top: 50%;
+      right: -18px;
+      color: var(--forest);
+      content: "→";
+      font-size: 1.2rem;
+      transform: translateY(-50%);
+    }
+
+    .flow-step small {
+      display: block;
+      margin-bottom: 7px;
+      color: #a9cdbf;
+      font-size: .66rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .flow-step strong {
+      display: block;
+      font-size: .88rem;
+      line-height: 1.45;
+    }
+
+    figure {
+      margin: 40px 0;
+    }
+
+    .evidence-frame {
+      overflow: hidden;
+      border: 1px solid rgba(23, 32, 30, .12);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: 0 12px 36px rgba(35, 42, 39, .08);
+    }
+
+    .evidence-frame img {
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      background: #18201e;
+    }
+
+    .evidence-frame figcaption {
+      padding: 16px 20px 18px;
+      color: var(--muted);
+      font-size: .78rem;
+      line-height: 1.55;
+    }
+
+    .timecode {
+      display: inline-block;
+      margin-right: .55rem;
+      color: var(--coral);
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .evidence-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin: 38px 0;
+    }
+
+    .evidence-grid figure {
+      margin: 0;
+    }
+
+    .pullquote {
+      margin: 58px -70px;
+      padding: 44px 60px;
+      color: var(--forest);
+      border-top: 1px solid var(--mint);
+      border-bottom: 1px solid var(--mint);
+      font-family: Georgia, "Noto Serif KR", serif;
+      font-size: clamp(1.55rem, 4vw, 2.45rem);
+      font-weight: 600;
+      line-height: 1.42;
+      text-align: center;
+    }
+
+    .pullquote cite {
+      display: block;
+      margin-top: 20px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: .75rem;
+      font-style: normal;
+      font-weight: 400;
+      letter-spacing: .08em;
+    }
+
+    .table-wrap {
+      margin: 38px 0 50px;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 253, 248, .72);
+    }
+
+    table {
+      width: 100%;
+      min-width: 650px;
+      border-collapse: collapse;
+      font-size: .86rem;
+      line-height: 1.62;
+    }
+
+    th,
+    td {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--forest);
+      background: var(--forest-soft);
+      font-size: .72rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .metric-card {
+      display: grid;
+      grid-template-columns: 170px 1fr;
+      gap: 28px;
+      align-items: center;
+      margin: 42px 0;
+      padding: 30px;
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: 0 14px 40px rgba(37, 45, 41, .09);
+    }
+
+    .metric-big {
+      color: var(--coral);
+      font-family: Georgia, serif;
+      font-size: 4rem;
+      font-weight: 600;
+      line-height: 1;
+      text-align: center;
+    }
+
+    .metric-big small {
+      display: block;
+      margin-top: 9px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: .72rem;
+      font-weight: 400;
+      line-height: 1.4;
+    }
+
+    .metric-card p {
+      margin: 0;
+      color: #46514d;
+      font-size: .93rem;
+    }
+
+    .bar-chart {
+      display: grid;
+      gap: 16px;
+      margin: 30px 0;
+      padding: 28px;
+      border-radius: 18px;
+      background: #fdfbf5;
+      border: 1px solid var(--line);
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 110px 1fr 48px;
+      gap: 14px;
+      align-items: center;
+      font-size: .78rem;
+      font-weight: 700;
+    }
+
+    .bar-track {
+      height: 13px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e3dfd6;
+    }
+
+    .bar {
+      height: 100%;
+      border-radius: inherit;
+      background: var(--mint);
+    }
+
+    .bar.specialist {
+      width: 41%;
+      background: #a9aea9;
+    }
+
+    .bar.generalist {
+      width: 63%;
+      background: var(--coral);
+    }
+
+    .equation {
+      margin: 30px 0;
+      padding: 22px 24px;
+      overflow-x: auto;
+      color: #eaf2ef;
+      border-radius: 14px;
+      background: #1d302c;
+      font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+      font-size: .86rem;
+      line-height: 1.75;
+      white-space: nowrap;
+    }
+
+    .callout {
+      margin: 44px 0;
+      padding: 28px 30px;
+      border: 1px solid #c8d8d1;
+      border-left: 5px solid var(--mint);
+      border-radius: 16px;
+      background: #edf4f0;
+    }
+
+    .callout-title {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--forest);
+      font-size: .77rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .callout p:last-child {
+      margin-bottom: 0;
+    }
+
+    .failure-curve {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      margin: 35px 0;
+      align-items: end;
+      height: 230px;
+      padding: 24px 24px 42px;
+      border-radius: 18px;
+      background:
+        repeating-linear-gradient(
+          to top,
+          transparent 0,
+          transparent 44px,
+          rgba(23, 32, 30, .08) 45px
+        ),
+        var(--surface);
+      border: 1px solid var(--line);
+    }
+
+    .phase {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: end;
+      min-width: 0;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .phase::after {
+      position: absolute;
+      top: calc(100% + 9px);
+      color: var(--muted);
+      font-size: .66rem;
+      font-weight: 700;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .phase.offline {
+      height: 82%;
+      background: var(--mint);
+    }
+
+    .phase.offline::after {
+      content: "Offline 종료";
+    }
+
+    .phase.collapse {
+      height: 24%;
+      background: var(--coral);
+    }
+
+    .phase.collapse::after {
+      content: "Online 전환";
+    }
+
+    .phase.recover {
+      height: 65%;
+      background: var(--gold);
+    }
+
+    .phase.recover::after {
+      content: "재학습·회복";
+    }
+
+    .checklist {
+      display: grid;
+      gap: 14px;
+      margin: 30px 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .checklist li {
+      position: relative;
+      padding: 18px 20px 18px 52px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 253, 248, .66);
+    }
+
+    .checklist li::before {
+      position: absolute;
+      top: 18px;
+      left: 19px;
+      display: grid;
+      width: 22px;
+      height: 22px;
+      place-items: center;
+      color: white;
+      border-radius: 50%;
+      background: var(--forest);
+      content: "✓";
+      font-size: .72rem;
+      font-weight: 900;
+    }
+
+    .limitations {
+      display: grid;
+      gap: 1px;
+      margin: 38px 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--line);
+    }
+
+    .limitation {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 16px;
+      padding: 22px;
+      background: var(--surface);
+    }
+
+    .limitation-num {
+      color: var(--coral);
+      font-family: Georgia, serif;
+      font-size: 1.45rem;
+      font-style: italic;
+    }
+
+    .limitation p {
+      margin: 0;
+      color: #4c5753;
+      font-size: .91rem;
+    }
+
+    .share-block {
+      margin: 76px 0;
+      padding: clamp(30px, 6vw, 52px);
+      color: white;
+      border-radius: 24px;
+      background:
+        linear-gradient(135deg, rgba(216, 110, 82, .95), rgba(156, 69, 52, .98));
+      box-shadow: 0 20px 50px rgba(160, 72, 53, .2);
+    }
+
+    .share-block .label {
+      color: #ffe1d6;
+      font-size: .71rem;
+      font-weight: 800;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+
+    .share-block h2 {
+      margin: 10px 0 22px;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+    }
+
+    .share-copy {
+      margin: 0;
+      padding: 20px 22px;
+      color: rgba(255, 255, 255, .88);
+      border: 1px solid rgba(255, 255, 255, .24);
+      border-radius: 14px;
+      background: rgba(74, 22, 15, .14);
+      font-size: .95rem;
+      line-height: 1.72;
+    }
+
+    .source-notes {
+      margin-top: 80px;
+      padding: 56px 0 80px;
+      border-top: 1px solid var(--line);
+    }
+
+    .source-notes h2 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+    }
+
+    .source-card {
+      margin-top: 28px;
+      padding: 26px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 253, 248, .7);
+    }
+
+    .source-card dl {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 10px 20px;
+      margin: 0;
+      font-size: .86rem;
+    }
+
+    .source-card dt {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .source-card dd {
+      margin: 0;
+    }
+
+    .source-note {
+      margin-top: 20px;
+      color: var(--muted);
+      font-size: .78rem;
+      line-height: 1.65;
+    }
+
+    .closing {
+      width: min(calc(100% - 40px), var(--wide));
+      margin: 0 auto;
+      padding: 86px 0 96px;
+      border-top: 1px solid var(--line);
+      text-align: center;
+    }
+
+    .closing p {
+      max-width: 760px;
+      margin: 0 auto;
+      color: var(--forest);
+      font-family: Georgia, "Noto Serif KR", serif;
+      font-size: clamp(1.45rem, 3.8vw, 2.45rem);
+      font-weight: 600;
+      line-height: 1.48;
+    }
+
+    .closing small {
+      display: block;
+      margin-top: 28px;
+      color: var(--muted);
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    footer {
+      padding: 25px 20px 32px;
+      color: #aebdb7;
+      background: #142723;
+      font-size: .72rem;
+      text-align: center;
+    }
+
+    @media (max-width: 980px) {
+      .article-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .article-body {
+        max-width: none;
+      }
+
+      .toc {
+        position: static;
+        order: -1;
+        margin-bottom: 42px;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: rgba(255, 253, 248, .6);
+      }
+
+      .toc ol {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .flow {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .flow-step:nth-child(2)::after {
+        display: none;
+      }
+
+      .pullquote {
+        margin-right: 0;
+        margin-left: 0;
+      }
+    }
+
+    @media (max-width: 680px) {
+      body {
+        font-size: 16px;
+        word-break: normal;
+      }
+
+      .masthead,
+      .hero,
+      .article-shell,
+      .closing {
+        width: min(calc(100% - 28px), var(--wide));
+      }
+
+      .masthead {
+        padding: 16px 0;
+      }
+
+      .issue {
+        display: none;
+      }
+
+      .hero {
+        padding-top: 56px;
+      }
+
+      h1 {
+        font-size: clamp(2.8rem, 15vw, 4.4rem);
+      }
+
+      .hero-caption {
+        right: 16px;
+        bottom: 14px;
+        left: 16px;
+      }
+
+      .hero-caption > span {
+        display: none;
+      }
+
+      .key-findings,
+      .evidence-grid,
+      .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .flow-step:not(:last-child)::after {
+        top: auto;
+        right: 50%;
+        bottom: -22px;
+        display: block;
+        content: "↓";
+        transform: translateX(50%);
+      }
+
+      .metric-card {
+        grid-template-columns: 1fr;
+      }
+
+      .toc ol {
+        grid-template-columns: 1fr;
+      }
+
+      .pullquote {
+        padding: 34px 12px;
+      }
+
+      .bar-row {
+        grid-template-columns: 86px 1fr 38px;
+      }
+
+      .source-card dl {
+        grid-template-columns: 1fr;
+        gap: 2px;
+      }
+
+      .source-card dd {
+        margin-bottom: 10px;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+        color: black;
+      }
+
+      .top-rule,
+      .toc,
+      .watch-link,
+      .share-block {
+        display: none;
+      }
+
+      .hero,
+      .article-shell,
+      .closing {
+        width: 100%;
+      }
+
+      .article-layout {
+        display: block;
+      }
+
+      .evidence-frame,
+      .abstract,
+      .metric-card {
+        box-shadow: none;
+      }
+
+      figure,
+      table,
+      .callout {
+        break-inside: avoid;
+      }
+
+      a {
+        color: inherit;
+      }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Diffusion in RL and robotics: how expressive policies changed how we use continuous actions">
+<meta property="og:description" content="Diffusion in RL and robotics: how expressive policies changed how we use continuous actions 영상 정보 발표자 : Sergey Levine (UC Berkeley) 채널 : Simons Institute for the Theory of Computing 게시일 : 2026 08 08 길이 : 48분 25초 행사 : Diffusion Generative Mo">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/1hf8gbt/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/1hf8gbt/assets/agi3xltgyau-ts-00-01-08.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Diffusion in RL and robotics: how expressive policies changed how we use continuous actions">
+<meta name="twitter:description" content="Diffusion in RL and robotics: how expressive policies changed how we use continuous actions 영상 정보 발표자 : Sergey Levine (UC Berkeley) 채널 : Simons Institute for the Theory of Computing 게시일 : 2026 08 08 길이 : 48분 25초 행사 : Diffusion Generative Mo">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/1hf8gbt/assets/agi3xltgyau-ts-00-01-08.jpg">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-diffusion-in-rl-and-robotics-how-expressive-policies-changed-continuous-actions-%EC%9A%94%EC%95%BD/">
+</head>
+<body>
+  <a class="skip-link" href="#article">본문으로 이동</a>
+  <div class="top-rule" aria-hidden="true"></div>
+
+  <header class="masthead">
+    <a class="brand" href="#top">Research Field Notes</a>
+    <span class="issue">Robotics · RL · Diffusion</span>
+  </header>
+
+  <main id="top">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Research Report · 14 August 2026</p>
+        <h1>Diffusion in <em>RL</em> and Robotics</h1>
+        <p class="hero-deck">
+          표현력 있는 정책은 연속 행동을 어떻게 바꿨는가. 다봉형 행동 분포에서
+          action chunk, 로봇 파운데이션 모델, offline-to-online RL과 현장 배치까지
+          하나의 논리로 읽는다.
+        </p>
+        <ul class="hero-meta" aria-label="문서 정보">
+          <li><strong>발표</strong> Sergey Levine</li>
+          <li><strong>행사</strong> Diffusion Generative Modeling</li>
+          <li><strong>길이</strong> 48분 25초</li>
+          <li><strong>근거</strong> 영어 수동 자막·발표 슬라이드</li>
+        </ul>
+      </div>
+
+      <figure class="hero-figure">
+        <img src="assets/agi3xltgyau-ts-00-01-08.jpg" alt="여러 카메라 관측을 이용해 옷을 접는 로봇과 π0 정책 구조">
+        <figcaption class="hero-caption">
+          <span>π0는 VLM 표현과 연속 행동 생성기를 결합해 짧은 행동 궤적을 한 번에 예측한다.</span>
+          <a class="watch-link" target="_blank" rel="noopener noreferrer">원본 강연 보기</a>
+        </figcaption>
+      </figure>
+    </header>
+
+    <div class="article-shell">
+      <div class="article-layout">
+        <article class="article-body" id="article">
+          <section class="abstract" aria-labelledby="abstract-title">
+            <span class="label">Abstract</span>
+            <h2 id="abstract-title">생성 모델이 아니라, 정책 클래스의 문제</h2>
+            <p>
+              이 강연에서 diffusion과 flow의 핵심 가치는 복잡한 행동을 그럴듯하게
+              생성하는 능력보다 더 구조적이다. 이들은 서로 다른 여러 정답을 평균으로
+              뭉개지 않고 보존하고, 긴 action chunk에 시간적 일관성을 부여하며, 강화학습
+              정책이 오프라인 데이터의 지지집합 가까이에 머물도록 돕는다. 그 결과
+              모방학습, VLA, offline-to-online RL, 실세계 로봇 후학습이 같은 표현력의
+              문제로 연결된다.
+            </p>
+          </section>
+
+          <p class="one-line">
+            Diffusion 정책은 행동을 더 화려하게 만드는 기술이 아니라,
+            <strong>유효한 행동의 공간을 보존하면서 그 안에서 개선할 수 있게 만드는 좌표계</strong>다.
+          </p>
+
+          <section aria-labelledby="findings-title">
+            <span class="section-number">Executive summary</span>
+            <h2 id="findings-title">핵심 발견</h2>
+
+            <div class="key-findings">
+              <article class="finding">
+                <span class="finding-num">01</span>
+                <h3>다봉형 행동을 평균내지 않는다</h3>
+                <p>서로 다른 유효 경로를 하나의 Gaussian 평균으로 합쳐 위험한 중간 행동을 만드는 문제를 피한다.</p>
+              </article>
+              <article class="finding">
+                <span class="finding-num">02</span>
+                <h3>Action chunk가 시간 구조를 담는다</h3>
+                <p>여러 step을 예측하고 일부를 실제 실행함으로써 긴 동작의 일관성과 안정성을 정책 표현에 넣는다.</p>
+              </article>
+              <article class="finding">
+                <span class="finding-num">03</span>
+                <h3>VLM에 ‘운동피질’을 붙인다</h3>
+                <p>언어·시각 표현은 거대한 백본이 담당하고, diffusion·flow 모듈은 고차원 연속 제어를 전담한다.</p>
+              </article>
+              <article class="finding">
+                <span class="finding-num">04</span>
+                <h3>Offline-to-online 전환을 완화한다</h3>
+                <p>표현력 있는 정책 제약과 noise steering이 데이터 밖 행동으로의 급격한 이동을 억제한다.</p>
+              </article>
+              <article class="finding">
+                <span class="finding-num">05</span>
+                <h3>학습 경로 분리가 필요하다</h3>
+                <p>Diffusion gradient가 VLM 표현을 훼손할 수 있어 stop-gradient와 보조 행동 손실이 사용된다.</p>
+              </article>
+              <article class="finding">
+                <span class="finding-num">06</span>
+                <h3>최종 지표는 운영 처리량이다</h3>
+                <p>실제 배치에서는 성공률뿐 아니라 복구, 연속 운용 시간, 시간당 완료 작업 수가 중요하다.</p>
+              </article>
+            </div>
+          </section>
+
+          <figure class="concept-map" aria-labelledby="pipeline-caption">
+            <figcaption id="pipeline-caption">로봇 후학습의 수렴하는 파이프라인</figcaption>
+            <div class="flow">
+              <div class="flow-step">
+                <small>Stage 01</small>
+                <strong>대규모 VLM·로봇 데이터 사전학습</strong>
+              </div>
+              <div class="flow-step">
+                <small>Stage 02</small>
+                <strong>Diffusion action chunk 모방학습</strong>
+              </div>
+              <div class="flow-step">
+                <small>Stage 03</small>
+                <strong>지지집합을 보존하는 RL</strong>
+              </div>
+              <div class="flow-step">
+                <small>Stage 04</small>
+                <strong>현장 online 개선과 재통합</strong>
+              </div>
+            </div>
+          </figure>
+
+          <section class="section" id="expressive-policy">
+            <header class="section-heading">
+              <span class="section-number">01 · Policy expressiveness</span>
+              <h2>평균 행동은 때로 충돌이다</h2>
+            </header>
+
+            <p class="lede dropcap">
+              연속 제어의 오래된 기본값은 상태에서 평균과 공분산을 출력하는 Gaussian
+              정책이었다. 계산하기 쉽고 강화학습 알고리즘에 넣기 편하지만, 실제 행동
+              데이터가 가진 여러 개의 정답을 표현하기에는 지나치게 단순하다.
+            </p>
+
+            <figure class="evidence-frame">
+              <img src="assets/agi3xltgyau-ts-00-02-30.jpg" alt="관측에서 50 step 길이의 행동 시퀀스를 출력하는 정책 구조">
+              <figcaption><span class="timecode">00:02:30</span>π0의 출력은 단일 제어값이 아니라 약 1초에 해당하는 50 step 관절 목표 시퀀스다.</figcaption>
+            </figure>
+
+            <p>
+              나무를 왼쪽이나 오른쪽으로 피하는 두 경로가 모두 데이터에 있다고 하자.
+              단일 Gaussian은 두 모드 사이의 평균, 곧 나무를 향하는 경로에 높은 확률을
+              줄 수 있다. 통계적으로 매끄러운 평균이 제어에서는 실제로 존재하지 않는
+              위험한 행동이 되는 셈이다.
+            </p>
+
+            <figure class="evidence-frame">
+              <img src="assets/agi3xltgyau-ts-00-04-20.jpg" alt="장애물 양옆의 유효 경로와 중앙의 위험한 평균 경로를 보여주는 드론 예시">
+              <figcaption><span class="timecode">00:04:20</span>다봉형 데이터의 모드 평균은 유효한 두 경로가 아니라 장애물과 충돌하는 세 번째 경로를 만든다.</figcaption>
+            </figure>
+
+            <blockquote class="pullquote">
+              “정책 제약이 실패한 것이 아니라, 제약을 지키면서 모든 모드를 표현할 정책 클래스가 부족했다.”
+              <cite>강연의 offline RL 논지를 재구성한 요약</cite>
+            </blockquote>
+
+            <h3>궤적 전체에서 조건부 action chunk로</h3>
+
+            <p>
+              초기 Diffuser는 시간축과 자유도축을 가진 궤적 행렬 전체에 unconditional
+              diffusion을 적용했다. 첫 상태는 inpainting으로 고정하고, 보상과 제약은
+              guidance로 주입했다. 이후 Diffusion Policy는 관측에 조건화된 행동 시퀀스만
+              생성하는 더 직접적인 구조로 정리했다.
+            </p>
+
+            <div class="evidence-grid">
+              <figure class="evidence-frame">
+                <img src="assets/agi3xltgyau-ts-00-07-30.jpg" alt="궤적 전체를 2차원 행렬로 생성하는 Diffuser 구조">
+                <figcaption><span class="timecode">00:07:30</span>Diffuser: 상태·행동 궤적 전체를 생성하고 시작 상태와 제약을 사후 주입한다.</figcaption>
+              </figure>
+              <figure class="evidence-frame">
+                <img src="assets/agi3xltgyau-ts-00-08-45.jpg" alt="관측에 조건화된 행동 시퀀스를 생성하는 Diffusion Policy 구조">
+                <figcaption><span class="timecode">00:08:45</span>Diffusion Policy: 관측과 denoising 상태를 받아 조건부 action chunk를 생성한다.</figcaption>
+              </figure>
+            </div>
+
+            <figure class="evidence-frame">
+              <img src="assets/agi3xltgyau-ts-00-10-05.jpg" alt="관측 인코더와 DiT 행동 생성기를 결합한 현대 로봇 정책 구조">
+              <figcaption><span class="timecode">00:10:05</span>현대 구현은 DiT 계열 블록이 관측 표현을 attention으로 참조하는 형태를 공유한다.</figcaption>
+            </figure>
+
+            <p>
+              여기서 action chunk는 계산 편의를 위한 출력 묶음이 아니다. 발표의 π0
+              예시는 50 step을 예측하고 그중 25 step을 open loop로 실행한 뒤 다시
+              계획한다. 첫 step만 실행하면 성능 이득이 사라진다는 관찰은, 여러 step의
+              결합 분포 자체가 모방학습의 중요한 표현 단위임을 시사한다.
+            </p>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>정책 클래스</th>
+                    <th>장점</th>
+                    <th>주요 한계</th>
+                    <th>로봇 제어에서의 의미</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>단일 Gaussian</td>
+                    <td>단순하고 학습·샘플링이 빠름</td>
+                    <td>다봉형 행동을 평균내거나 한 모드만 선택</td>
+                    <td>위험한 중간 행동과 데이터 손실 가능</td>
+                  </tr>
+                  <tr>
+                    <td>Mixture</td>
+                    <td>여러 모드를 명시적으로 표현</td>
+                    <td>모드 수와 고차원 상관구조 설계가 어려움</td>
+                    <td>제한된 복잡도의 행동에는 실용적</td>
+                  </tr>
+                  <tr>
+                    <td>Autoregressive</td>
+                    <td>복잡한 조건부 분포 표현</td>
+                    <td>순차 생성 비용과 오차 전파</td>
+                    <td>토큰화 방식에 따라 연속 제어 해상도 제약</td>
+                  </tr>
+                  <tr>
+                    <td>Diffusion / Flow</td>
+                    <td>고차원·다봉형 action chunk를 유연하게 표현</td>
+                    <td>학습과 반복 추론 비용이 큼</td>
+                    <td>모드 보존, 정책 제약, latent steering에 적합</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="section" id="vla">
+            <header class="section-heading">
+              <span class="section-number">02 · Foundation models</span>
+              <h2>VLM에 신경 운동피질을 붙이다</h2>
+            </header>
+
+            <p class="lede">
+              로봇 파운데이션 모델의 기본 레시피는 웹 규모의 이미지·언어 사전학습,
+              여러 과제와 여러 로봇의 데이터, 그리고 연속 제어 fine-tuning의 결합이다.
+              중요한 질문은 범용 모델이 각 현장에 맞춘 전문 모델보다 실제로 더 잘할 수
+              있는가였다.
+            </p>
+
+            <figure class="evidence-frame">
+              <img src="assets/agi3xltgyau-ts-00-12-25.jpg" alt="웹 이미지 언어 사전학습과 다과제 로봇 데이터를 결합하는 파운데이션 모델 구조">
+              <figcaption><span class="timecode">00:12:25</span>웹 규모의 표현과 로봇 행동 데이터를 결합해 과제 간 전이를 얻는 기본 레시피.</figcaption>
+            </figure>
+
+            <div class="metric-card">
+              <div class="metric-big">63%<small>RT-2-X generalist</small></div>
+              <p>
+                RT-X는 34개 연구실과 22종 로봇의 데이터를 모았고, 7개 연구실 평가에서
+                specialist 평균 41%보다 높은 63%를 기록했다. 서로 다른 과제의 이질적
+                지표를 평균한 수치라는 한계는 있지만, 통합 학습이 각 현장에서도 강한
+                전이를 만들 수 있다는 초기 증거였다.
+              </p>
+            </div>
+
+            <div class="bar-chart" role="img" aria-label="Specialist 평균 41퍼센트와 RT-2-X generalist 63퍼센트를 비교한 막대그래프">
+              <div class="bar-row">
+                <span>Specialist</span>
+                <div class="bar-track"><div class="bar specialist"></div></div>
+                <span>41%</span>
+              </div>
+              <div class="bar-row">
+                <span>Generalist</span>
+                <div class="bar-track"><div class="bar generalist"></div></div>
+                <span>63%</span>
+              </div>
+            </div>
+
+            <figure class="evidence-frame">
+              <img src="assets/agi3xltgyau-ts-00-14-35.jpg" alt="Specialist 41퍼센트와 RT-2-X generalist 63퍼센트를 비교한 발표 슬라이드">
+              <figcaption><span class="timecode">00:14:35</span>통합 모델의 방향성은 강하지만, 단일한 공통 benchmark 결과로 해석해서는 안 된다.</figcaption>
+            </figure>
+
+            <h3>1세대의 토큰에서 2세대의 연속 행동으로</h3>
+
+            <p>
+              RT-2 계열의 1세대 VLA는 로봇 명령을 질문으로, 행동 숫자열을 답으로 바꿔
+              다음 토큰 예측에 넣었다. ASCII 숫자열 같은 거친 표현으로도 일반화는
+              개선됐지만, 고차원·고주파 연속 제어에는 한계가 뚜렷했다.
+            </p>
+
+            <div class="evidence-grid">
+              <figure class="evidence-frame">
+                <img src="assets/agi3xltgyau-ts-00-17-15.jpg" alt="행동을 텍스트 숫자 토큰으로 출력하는 1세대 VLA">
+                <figcaption><span class="timecode">00:17:15</span>1세대 VLA는 행동을 언어 모델의 답변처럼 토큰화했다.</figcaption>
+              </figure>
+              <figure class="evidence-frame">
+                <img src="assets/agi3xltgyau-ts-00-18-20.jpg" alt="토큰 정책과 diffusion flow 행동 모듈을 비교한 2세대 VLA 구조">
+                <figcaption><span class="timecode">00:18:20</span>2세대 VLA는 고차원 action chunk를 담당하는 별도 ‘neural motor cortex’를 둔다.</figcaption>
+              </figure>
+            </div>
+
+            <p>
+              π0의 mixture-of-transformers 또는 별도 diffusion head는 VLM 표현을
+              참조하면서 양팔, 베이스, 손목 등 많은 자유도의 행동을 함께 생성한다.
+              덕분에 세탁물을 꺼내 이동하고 옷을 접는 긴 과제나, 작은 실수 뒤 다시
+              안정화하는 행동이 가능해졌다.
+            </p>
+
+            <div class="evidence-grid">
+              <figure class="evidence-frame">
+                <img src="assets/agi3xltgyau-ts-00-19-25.jpg" alt="π0 로봇이 세탁물을 이동하고 옷을 접는 긴 작업 시연">
+                <figcaption><span class="timecode">00:19:25</span>π0 flow-matching VLA가 베이스와 양팔을 end-to-end로 제어하는 장시간 작업.</figcaption>
+              </figure>
+              <figure class="evidence-frame">
+                <img src="assets/agi3xltgyau-ts-00-20-35.jpg" alt="복합 지시를 수행하고 오류에서 회복하는 π0.7 시연">
+                <figcaption><span class="timecode">00:20:35</span>π0.7은 행동 속도와 의도적 실수까지 포함한 복합 지시를 따르고 오류에서 회복한다.</figcaption>
+              </figure>
+            </div>
+
+            <h3>Knowledge insulation: 손실 경로를 분리한다</h3>
+
+            <p>
+              표현력이 공짜로 주어지는 것은 아니다. 발표에 따르면 순수 end-to-end
+              diffusion은 discrete action 학습보다 5~10배 느렸고, action expert의
+              고분산 gradient가 VLM 백본의 언어 추종 능력을 훼손하는 현상도 나타났다.
+            </p>
+
+            <figure class="evidence-frame">
+              <img src="assets/agi3xltgyau-ts-00-24-25.jpg" alt="Action expert와 VLM 사이의 stop-gradient 및 discrete action loss를 보여주는 knowledge insulation 슬라이드">
+              <figcaption><span class="timecode">00:24:25</span>Diffusion gradient는 차단하고 discretized action loss로 백본을 계속 적응시킨다.</figcaption>
+            </figure>
+
+            <div class="callout">
+              <span class="callout-title">구조적 해석</span>
+              <p>
+                Knowledge insulation은 백본을 완전히 동결하는 방법이 아니다.
+                <strong>어떤 손실이 어느 표현을 바꿀 수 있는지 분리</strong>한다.
+                쉬운 과제에서는 빠른 discrete 학습의 이점을, 어려운 과제에서는
+                diffusion 정책의 최종 성능을 가져가며 end-to-end diffusion 대비 약
+                5배의 학습 속도 향상이 보고됐다.
+              </p>
+            </div>
+          </section>
+
+          <section class="section" id="offline-online">
+            <header class="section-heading">
+              <span class="section-number">03 · Offline-to-online RL</span>
+              <h2>좋은 사전학습이 전환 직후 무너지는 이유</h2>
+            </header>
+
+            <p class="lede">
+              실제 로봇을 처음부터 무작위로 움직이며 학습시키는 것은 비싸고 위험하다.
+              현실적인 경로는 기존 로그에서 최대한 좋은 정책을 만든 다음, 현장 상호작용으로
+              조금씩 개선하는 것이다. 문제는 두 단계 사이의 분포 이동이다.
+            </p>
+
+            <div class="evidence-grid">
+              <figure class="evidence-frame">
+                <img src="assets/agi3xltgyau-ts-00-28-10.jpg" alt="Online RL과 offline RL의 데이터 흐름 비교">
+                <figcaption><span class="timecode">00:28:10</span>성공 조건은 효과적인 offline pre-training과 성능을 잃지 않는 online fine-tuning이다.</figcaption>
+              </figure>
+              <figure class="evidence-frame">
+                <img src="assets/agi3xltgyau-ts-00-29-00.jpg" alt="여러 오프라인 궤적에서 좋은 행동을 선택하는 offline RL 직관">
+                <figcaption><span class="timecode">00:29:00</span>Offline RL은 평균 모방이 아니라 데이터 안의 좋은 부분을 상황별로 추출하는 일이다.</figcaption>
+              </figure>
+            </div>
+
+            <h3>Q 함수는 자신의 약점을 공격하는 정책을 만든다</h3>
+
+            <div class="equation" aria-label="Q 함수와 정책 최적화 관계">
+              Q(s, a) ≈ r(s, a) + γ maxₐ′ Q(s′, a′)<br>
+              π(s) = arg maxₐ Q(s, a)
+            </div>
+
+            <p>
+              Q 함수는 특정 상태에서 행동한 뒤 얻을 누적 보상을 평가한다. 그러나
+              오프라인 데이터 밖의 행동에서는 추정 오차가 커진다. 정책은 바로 그 Q를
+              최대화하기 때문에 Q가 우연히 과대평가한 out-of-distribution 행동을
+              적극적으로 찾는다. 학습된 가치함수를 겨냥한 adversarial example이
+              정책 자체에서 만들어지는 셈이다.
+            </p>
+
+            <div class="evidence-grid">
+              <figure class="evidence-frame">
+                <img src="assets/agi3xltgyau-ts-00-30-30.jpg" alt="Q 함수와 Bellman 최적성 방정식을 설명하는 슬라이드">
+                <figcaption><span class="timecode">00:30:30</span>Bellman 최적성만으로는 데이터 정책과 새 정책 사이의 분포 차이가 해결되지 않는다.</figcaption>
+              </figure>
+              <figure class="evidence-frame">
+                <img src="assets/agi3xltgyau-ts-00-32-30.jpg" alt="Q 함수가 과대평가한 데이터 밖 행동을 정책이 선택하는 문제">
+                <figcaption><span class="timecode">00:32:30</span>정책은 추정 오차가 큰 영역에서 Q의 약점을 찾아내고 확대한다.</figcaption>
+              </figure>
+            </div>
+
+            <p>
+              Pessimism 계열 offline RL은 미지 행동의 가치를 낮춰 이 문제를 막는다.
+              하지만 online 단계가 시작되면 처음 방문한 영역은 오프라인 학습에서
+              의도적으로 저평가된 곳이다. 새 경험과 기존 가치 추정 사이의 차이가 큰
+              gradient를 만들고 정책 성능을 급격히 흔든다.
+            </p>
+
+            <div class="failure-curve" role="img" aria-label="오프라인 단계 끝의 높은 성능이 온라인 전환 직후 급락하고 이후 회복하는 개념도">
+              <div class="phase offline"></div>
+              <div class="phase collapse"></div>
+              <div class="phase recover"></div>
+            </div>
+
+            <figure class="evidence-frame">
+              <img src="assets/agi3xltgyau-ts-00-35-30.jpg" alt="Offline phase 종료 후 online phase 초기에 보상이 급락하는 학습 곡선">
+              <figcaption><span class="timecode">00:35:30</span>사전학습 정책의 보상이 online 전환 직후 무너졌다가 천천히 회복하는 전형적 패턴.</figcaption>
+            </figure>
+
+            <h3>강력하지만 씁쓸한 기준선</h3>
+
+            <p>
+              RLPD는 정교한 offline pre-training 없이 online RL을 바로 시작하되 매
+              batch의 절반을 offline 데이터로 채운다. 오랫동안 복잡한
+              offline-to-online 방법보다 강했다는 사실은 역설적이다. 사전학습의 이점을
+              포기하더라도 전환 붕괴를 피하는 편이 나았다는 뜻이기 때문이다.
+            </p>
+
+            <figure class="evidence-frame">
+              <img src="assets/agi3xltgyau-ts-00-36-35.jpg" alt="Offline 데이터를 절반씩 섞어 online RL을 수행하는 RLPD 기준선">
+              <figcaption><span class="timecode">00:36:35</span>RLPD는 사전학습을 충분히 활용하지 않지만 전환 충격을 피하는 강한 기준선이었다.</figcaption>
+            </figure>
+
+            <h3>표현력 있는 정책 제약의 귀환</h3>
+
+            <p>
+              새 정책을 데이터 정책 가까이에 두는 제약은 자연스러운 해결책처럼 보인다.
+              과거에는 단순 Gaussian이 데이터의 여러 모드를 동시에 표현할 수 없어
+              평균화하거나 일부 모드를 버려야 했다. Diffusion은 데이터의 복잡한
+              지지집합을 유지한 상태에서 가치가 높은 영역으로 이동할 여지를 준다.
+            </p>
+
+            <figure class="evidence-frame">
+              <img src="assets/agi3xltgyau-ts-00-38-45.jpg" alt="단순 Gaussian 정책 제약과 표현력 있는 diffusion 정책 제약의 차이">
+              <figcaption><span class="timecode">00:38:45</span>핵심 병목은 제약 자체가 아니라 제약을 만족시킬 정책 클래스의 표현력이었다.</figcaption>
+            </figure>
+          </section>
+
+          <section class="section" id="steering">
+            <header class="section-heading">
+              <span class="section-number">04 · Steering and guidance</span>
+              <h2>행동이 아니라 noise를 제어한다</h2>
+            </header>
+
+            <p class="lede">
+              Diffusion steering은 강화학습 문제를 다른 좌표계로 옮긴다. 모방학습으로
+              얻은 생성 사상은 고정하고, RL actor는 어떤 noise를 입력할지 학습한다.
+              정상적인 noise가 데이터 분포 안의 합리적 행동으로 변환되도록 사전학습돼
+              있으므로 행동 공간에서 직접 탐색하는 것보다 분포 이동을 통제하기 쉽다.
+            </p>
+
+            <div class="equation" aria-label="Diffusion steering의 정책 관계">
+              고정된 생성 정책: a = fθ(s, w), &nbsp; w ∼ N(0, I)<br>
+              RL actor의 역할: 상태 s에서 가치가 높은 noise w를 선택
+            </div>
+
+            <figure class="evidence-frame">
+              <img src="assets/agi3xltgyau-ts-00-41-40.jpg" alt="상태에서 noise를 선택하고 고정된 diffusion policy가 행동으로 변환하는 diffusion steering 구조">
+              <figcaption><span class="timecode">00:41:40</span>표준 Soft Actor-Critic을 행동이 아닌 noise 공간에서 수행한다.</figcaption>
+            </figure>
+
+            <p>
+              발표에서는 실제 로봇이 약 50 trial에 과제를 익혔고, 장기 퍼즐과 미로
+              offline benchmark에서도 경쟁력 있는 결과를 보였다고 설명한다. 이 접근은
+              offline과 online에 서로 다른 알고리즘을 붙이기보다 동일한 RL 메커니즘을
+              사용하면서 생성 모델이 행동의 유효 범위를 관리하게 한다.
+            </p>
+
+            <figure class="evidence-frame">
+              <img src="assets/agi3xltgyau-ts-00-42-20.jpg" alt="좋은 데이터 정책과 전체 데이터 정책을 guidance로 결합하는 CFGRL 슬라이드">
+              <figcaption><span class="timecode">00:42:20</span>Guidance는 생성 품질 조정뿐 아니라 가치가 높은 행동을 추출하는 정책 개선 연산자로 볼 수 있다.</figcaption>
+            </figure>
+
+            <div class="callout">
+              <span class="callout-title">Test-time compute</span>
+              <p>
+                여러 행동을 샘플링한 뒤 Q 값이 가장 높은 행동을 실행하는 best-of-N도
+                steering이나 guidance와 결합할 수 있다. 발표자는 이를 언어 모델의
+                reasoning과 동일시하기보다, 추론 시 더 많은 계산으로 더 나은 후보를
+                선택하는 <strong>test-time compute의 유사물</strong>로 설명한다.
+              </p>
+            </div>
+          </section>
+
+          <section class="section" id="deployment">
+            <header class="section-heading">
+              <span class="section-number">05 · VLA + RL deployment</span>
+              <h2>연구실 밖에서 측정해야 할 것</h2>
+            </header>
+
+            <p class="lede">
+              최종 목표는 VLA와 RL을 하나의 현장 시스템으로 결합하는 것이다. π*0.6은
+              VLA에 가치함수를 연결하고 행동의 value를 prompt 조건으로 사용한다.
+              추론 시 높은 value를 조건으로 더 좋은 행동을 생성하며, online 경험으로
+              계속 개선한다.
+            </p>
+
+            <figure class="evidence-frame">
+              <img src="assets/agi3xltgyau-ts-00-43-15.jpg" alt="여러 실제 로봇 과제에서 VLA와 강화학습을 결합하는 π*0.6 프로그램">
+              <figcaption><span class="timecode">00:43:15</span>가치 조건부 행동 생성과 online 경험 개선을 한 시스템 안에 결합한다.</figcaption>
+            </figure>
+
+            <div class="evidence-grid">
+              <figure class="evidence-frame">
+                <img src="assets/agi3xltgyau-ts-00-43-45.jpg" alt="사무실 커피 제조와 초콜릿 공장 상자 조립을 수행하는 로봇">
+                <figcaption><span class="timecode">00:43:45</span>커피 로봇은 13시간 운용됐고, 초콜릿 공장에서는 상자 조립과 스티커 부착을 수행했다.</figcaption>
+              </figure>
+              <figure class="evidence-frame">
+                <img src="assets/agi3xltgyau-ts-00-44-30.jpg" alt="Offline 정책과 online RL 이후의 시간당 성공 작업 수 비교">
+                <figcaption><span class="timecode">00:44:30</span>Online RL은 여러 과제에서 시간당 성공 작업 수, 즉 운영 throughput을 높였다.</figcaption>
+              </figure>
+            </div>
+
+            <figure class="evidence-frame">
+              <img src="assets/agi3xltgyau-ts-00-45-00.jpg" alt="여러 과제별 specialist 정책을 하나의 generalist 정책으로 통합하는 시연">
+              <figcaption><span class="timecode">00:45:00</span>과제별 RL 데이터와 advantage conditioning으로 여러 specialist를 다시 하나의 generalist로 통합한다.</figcaption>
+            </figure>
+
+            <p>
+              이 결과에서 중요한 지표는 일회성 성공률만이 아니다. 실패 뒤 작업 상태를
+              복구하는가, 사람이 개입하지 않고 얼마나 오래 운용되는가, 시간당 몇 개의
+              작업을 완료하는가가 실제 배치의 성패를 결정한다.
+            </p>
+
+            <ul class="checklist" aria-label="실배치 평가 체크리스트">
+              <li><strong>복구 능력:</strong> 작은 실수나 교란 뒤 정상 작업 흐름으로 돌아오는가.</li>
+              <li><strong>연속 운용:</strong> 성공률이 아니라 개입 없이 유지되는 시간을 측정하는가.</li>
+              <li><strong>처리량:</strong> 시간당 성공 작업 수가 실제 생산 가치로 이어지는가.</li>
+              <li><strong>전환 안정성:</strong> Online 학습 초기에도 기존 성능과 안전을 유지하는가.</li>
+              <li><strong>재통합:</strong> 개별 현장의 RL 경험을 범용 정책에 다시 흡수할 수 있는가.</li>
+            </ul>
+          </section>
+
+          <section class="section" id="implications">
+            <header class="section-heading">
+              <span class="section-number">06 · Implications</span>
+              <h2>무엇이 달라지는가</h2>
+            </header>
+
+            <h3>1. Diffusion의 가치를 표현력으로 재정의한다</h3>
+            <p>
+              이 기술의 의미를 이미지 생성의 유행이 로봇으로 확장된 사례로만 보면
+              중요한 연결을 놓친다. 같은 표현력이 모방학습의 모드 보존, VLA의 민첩한
+              action chunk, offline RL의 정책 제약을 동시에 가능하게 한다.
+            </p>
+
+            <h3>2. 생성 사상은 보존하고 방향만 조절한다</h3>
+            <p>
+              Diffusion 모델 전체를 RL로 크게 바꾸는 대신 latent 또는 noise 선택,
+              guidance, value conditioning으로 방향을 조절하면 사전학습된 행동
+              지지집합을 더 잘 보존할 수 있다. 데이터 효율성과 안정성을 함께 노리는
+              설계 원칙이다.
+            </p>
+
+            <h3>3. 로봇 후학습은 선형 파이프라인이 된다</h3>
+            <p>
+              실용적인 구조는
+              <strong>대규모 imitation/VLA pre-training → 지지집합을 보존하는 RL →
+              현장 online 개선 → 범용 모델로 재통합</strong>으로 정리된다. 초기 정책을
+              버리고 새로 배우는 방식보다 장비와 데이터의 기존 투자를 유지한다.
+            </p>
+
+            <h3>4. 비교 실험의 기준도 바뀌어야 한다</h3>
+            <p>
+              Gaussian, mixture, autoregressive, diffusion과 flow 정책을 비교할 때는
+              backbone과 action chunk 길이를 통제해야 한다. 성공률뿐 아니라 모드 보존,
+              offline-to-online 안정성, 추론 지연, 학습 FLOP와 운영 처리량을 함께
+              측정해야 표현력의 실제 비용과 이익을 판단할 수 있다.
+            </p>
+          </section>
+
+          <section class="section" id="limits">
+            <header class="section-heading">
+              <span class="section-number">07 · Limits and open questions</span>
+              <h2>아직 설명되지 않은 것들</h2>
+            </header>
+
+            <div class="limitations">
+              <div class="limitation">
+                <span class="limitation-num">01</span>
+                <p>강연은 여러 경험적 사례를 연결하지만 diffusion이 일관되게 유리한 이유에 대한 통일 이론을 제시하지 않는다.</p>
+              </div>
+              <div class="limitation">
+                <span class="limitation-num">02</span>
+                <p>RT-X의 41% 대 63%는 연구실마다 다른 과제와 metric을 평균한 값이다. 엄밀한 단일 benchmark 비교가 아니다.</p>
+              </div>
+              <div class="limitation">
+                <span class="limitation-num">03</span>
+                <p>Action chunk와 diffusion도 장기 error accumulation을 제거하지 않는다. 제어 분야의 예상보다 덜 심각했을 뿐이다.</p>
+              </div>
+              <div class="limitation">
+                <span class="limitation-num">04</span>
+                <p>Diffusion steering은 기본적으로 imitation policy가 학습한 행동 지지집합에 묶인다. 안전한 범위 밖 탐색은 열린 문제다.</p>
+              </div>
+              <div class="limitation">
+                <span class="limitation-num">05</span>
+                <p>Knowledge insulation은 실용적이지만 목적함수의 높은 분산과 공동학습 문제를 근본적으로 해결하는 우아한 해법은 아니다.</p>
+              </div>
+              <div class="limitation">
+                <span class="limitation-num">06</span>
+                <p>실배치 사례에는 안전 제약, 리셋 비용, 보상 설계와 장기 유지보수에 관한 정량 정보가 충분하지 않다.</p>
+              </div>
+            </div>
+
+            <div class="callout">
+              <span class="callout-title">연구 관점의 핵심 질문</span>
+              <p>
+                Diffusion 정책의 이점은 생성 품질보다
+                <strong>데이터 지지집합을 보존하는 제어 가능한 좌표계</strong>를
+                제공한다는 데 있을 수 있다. 동일한 action chunk 길이와 backbone 아래
+                Gaussian, mixture, autoregressive, diffusion/flow 정책을 놓고 모드
+                보존, 전환 안정성, 학습 FLOP를 함께 측정할 필요가 있다.
+              </p>
+            </div>
+          </section>
+
+          <section class="share-block" aria-labelledby="share-title">
+            <span class="label">Share framing</span>
+            <h2 id="share-title">공유용 요약</h2>
+            <blockquote class="share-copy">
+              Diffusion 정책의 진짜 가치는 복잡한 행동을 생성하는 데서 끝나지 않는다.
+              여러 유효 행동을 평균으로 뭉개지 않고 보존하고, 긴 action chunk를
+              일관되게 만들며, RL이 오프라인 데이터의 지지집합 가까이에서 개선되도록
+              돕는다. 모방학습·VLA·offline-to-online RL을 연결하는 공통 열쇠는
+              ‘생성 품질’보다 정책 클래스의 표현력이다.
+            </blockquote>
+          </section>
+
+          <section class="source-notes" id="sources">
+            <span class="section-number">Source notes</span>
+            <h2>출처와 해석 범위</h2>
+
+            <div class="source-card">
+              <dl>
+                <dt>발표자</dt>
+                <dd>Sergey Levine, UC Berkeley</dd>
+                <dt>강연</dt>
+                <dd>Diffusion in RL and robotics: how expressive policies changed how we use continuous actions</dd>
+                <dt>채널</dt>
+                <dd>Simons Institute for the Theory of Computing</dd>
+                <dt>행사</dt>
+                <dd>Diffusion Generative Modeling: Progress and Next Steps</dd>
+                <dt>게시일</dt>
+                <dd><time datetime="2026-08-08">2026년 8월 8일</time></dd>
+                <dt>재생 시간</dt>
+                <dd>48분 25초</dd>
+                <dt>원문</dt>
+                <dd><a target="_blank" rel="noopener noreferrer">YouTube 강연 페이지</a></dd>
+                <dt>요약 근거</dt>
+                <dd>영어 수동 자막과 영상 슬라이드</dd>
+              </dl>
+              <p class="source-note">
+                본 문서는 강연 내용을 주제별로 재배열한 해설형 연구 노트다. 수치와
+                시스템 설명은 발표자가 제시한 슬라이드와 자막에 근거하며, 논문별
+                세부 실험 조건을 독립적으로 재검증한 체계적 문헌 리뷰는 아니다.
+                이미지의 timecode는 해당 논점이 등장하는 영상 위치를 뜻한다.
+              </p>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>주요 주장</th>
+                    <th>영상 근거</th>
+                    <th>해석 시 주의점</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Action chunk는 여러 step을 실제 실행할 때 효과가 있다.</td>
+                    <td>00:10:05</td>
+                    <td>Chunk 길이와 재계획 간격은 시스템별로 달라질 수 있다.</td>
+                  </tr>
+                  <tr>
+                    <td>RT-2-X generalist 63%, specialist 평균 41%.</td>
+                    <td>00:14:35</td>
+                    <td>이질적 과제와 metric을 평균한 비교다.</td>
+                  </tr>
+                  <tr>
+                    <td>End-to-end diffusion 학습은 5~10배 느릴 수 있다.</td>
+                    <td>00:24:25</td>
+                    <td>모델·구현·과제 구성에 의존하는 경험적 결과다.</td>
+                  </tr>
+                  <tr>
+                    <td>Knowledge insulation은 약 5배 학습 속도 향상을 보였다.</td>
+                    <td>00:24:25</td>
+                    <td>속도와 최종 성능의 비교 조건을 함께 확인해야 한다.</td>
+                  </tr>
+                  <tr>
+                    <td>Diffusion steering으로 실제 로봇이 약 50 trial에 학습했다.</td>
+                    <td>00:41:40</td>
+                    <td>안전 제약과 리셋 비용의 상세 수치는 강연에서 제한적이다.</td>
+                  </tr>
+                  <tr>
+                    <td>커피 로봇이 사무실에서 13시간 운용됐다.</td>
+                    <td>00:43:45</td>
+                    <td>장기 신뢰성 전체를 대표하는 통계는 아니다.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </article>
+
+        <nav class="toc" aria-label="목차">
+          <p class="toc-title">In this report</p>
+          <ol>
+            <li><a href="#expressive-policy">정책 표현력</a></li>
+            <li><a href="#vla">VLA와 운동피질</a></li>
+            <li><a href="#offline-online">Offline-to-online RL</a></li>
+            <li><a href="#steering">Noise steering</a></li>
+            <li><a href="#deployment">실세계 배치</a></li>
+            <li><a href="#implications">시사점</a></li>
+            <li><a href="#limits">한계와 열린 문제</a></li>
+            <li><a href="#sources">출처 노트</a></li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+
+    <section class="closing">
+      <p>
+        로봇 정책의 다음 도약은 더 큰 모델만으로 오지 않는다.<br>
+        어떤 행동 공간을 보존하고, 그 안에서 어떻게 안전하게 개선할지를 설계하는 데서 온다.
+      </p>
+      <small>End of report · August 2026</small>
+    </section>
+  </main>
+
+  <footer>
+    독립 연구 노트 · 강연의 자막과 슬라이드를 바탕으로 편집·재구성
+  </footer>
+</body>
+</html>

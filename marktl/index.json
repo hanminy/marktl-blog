@@ -1,7 +1,25 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T07:22:11.952Z",
+  "updatedAt": "2026-08-14T07:35:10.508Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-diffusion-in-rl-and-robotics-how-expressive-policies-changed-continuous-actions-%EC%9A%94%EC%95%BD/",
+      "excerpt": "Diffusion in RL and robotics: how expressive policies changed how we use continuous actions 영상 정보 발표자 : Sergey Levine (UC Berkeley) 채널 : Simons Institute for the Theory of Computing 게시일 : 2026 08 08 길이 : 48분 25초 행사 : Diffusion Generative Mo",
+      "shortId": "1hf8gbt",
+      "slug": "yt-diffusion-in-rl-and-robotics-how-expressive-policies-changed-continuous-actions-요약",
+      "sourcePath": "clippings/yt_Diffusion_in_RL_and_robotics_how_expressive_policies_changed_continuous_actions_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료",
+        "로보틱스",
+        "강화학습",
+        "diffusion-policy"
+      ],
+      "title": "Diffusion in RL and robotics: how expressive policies changed how we use continuous actions",
+      "updatedAt": "2026-08-14T07:35:10.508Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/1hf8gbt/"
+    },
     {
       "slug": "한민확인-2021-real-time-motion-planning-of-a-hydraulic-excavator-using-trajectory-optimization-and-model-predictive-control-서울대-요약-apex구현대조",
       "shortId": "zurwkh",
