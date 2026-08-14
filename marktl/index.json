@@ -1,7 +1,24 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-14T07:35:10.508Z",
+  "updatedAt": "2026-08-14T07:39:16.342Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-wams-and-vlas-for-robot-learning-cosmos-labs-%EC%9A%94%EC%95%BD/",
+      "excerpt": "WAMs and VLAs for Robot Learning Cosmos Labs 영상 정보 채널 : NVIDIA Developer 게시일 : 2026 08 14 길이 : 01:03:05 링크 : https://www.youtube.com/watch?v=LagVL0KyGgo 자막 상태 : 수동·자동 음성 자막 없음(실시간 채팅만 제공) <div style=\"position: relative; width: 100%; padding",
+      "shortId": "x1vg12",
+      "slug": "yt-wams-and-vlas-for-robot-learning-cosmos-labs-요약",
+      "sourcePath": "clippings/yt_WAMs and VLAs for Robot Learning - Cosmos Labs_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료",
+        "로봇학습",
+        "PhysicalAI"
+      ],
+      "title": "WAMs and VLAs for Robot Learning | Cosmos Labs",
+      "updatedAt": "2026-08-14T07:39:16.342Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/x1vg12/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-diffusion-in-rl-and-robotics-how-expressive-policies-changed-continuous-actions-%EC%9A%94%EC%95%BD/",
