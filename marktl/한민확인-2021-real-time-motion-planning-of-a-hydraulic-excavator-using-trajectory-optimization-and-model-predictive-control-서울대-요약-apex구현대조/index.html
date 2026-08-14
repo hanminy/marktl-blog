@@ -1,0 +1,1973 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  
+  
+  
+  <title>Real-Time Motion Planning of a Hydraulic Excavator using Trajectory Optimization and MPC</title>
+  <style>
+    :root {
+      --paper: #f7f4ee;
+      --surface: #fffdf9;
+      --surface-strong: #ffffff;
+      --ink: #17211e;
+      --muted: #65716c;
+      --line: #d9ded9;
+      --accent: #176b5b;
+      --accent-soft: #e6f2ee;
+      --navy: #243d4b;
+      --blue-soft: #eaf3f8;
+      --amber: #9a6517;
+      --amber-soft: #fff4d9;
+      --purple: #63548d;
+      --purple-soft: #f1edfa;
+      --code: #172521;
+      --shadow: 0 16px 40px rgba(30, 48, 42, .08);
+      --radius: 18px;
+      --content: 900px;
+      --sidebar: 264px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 28px;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 4%, rgba(23, 107, 91, .08), transparent 28rem),
+        linear-gradient(180deg, #f3f0e9 0, var(--paper) 28rem);
+      font-family:
+        Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic",
+        system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.78;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration-thickness: 1px;
+      text-underline-offset: .18em;
+    }
+
+    a:hover { color: #0d5145; }
+
+    img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    code, pre, .equation {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    .page-shell {
+      width: min(1400px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .hero {
+      position: relative;
+      margin: 26px auto 24px;
+      padding: clamp(28px, 5vw, 64px);
+      overflow: hidden;
+      color: #f7fffc;
+      background:
+        linear-gradient(135deg, rgba(14, 51, 46, .98), rgba(26, 82, 73, .95)),
+        var(--navy);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero::after {
+      position: absolute;
+      right: -110px;
+      bottom: -160px;
+      width: 430px;
+      height: 430px;
+      content: "";
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 50%;
+      box-shadow:
+        0 0 0 44px rgba(255,255,255,.025),
+        0 0 0 90px rgba(255,255,255,.02);
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: #a9dccf;
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      position: relative;
+      z-index: 1;
+      max-width: 1050px;
+      margin: 0;
+      font-family: Georgia, "Times New Roman", "Noto Serif KR", serif;
+      font-size: clamp(2rem, 4.9vw, 4.6rem);
+      line-height: 1.08;
+      letter-spacing: -.045em;
+    }
+
+    .hero-subtitle {
+      position: relative;
+      z-index: 1;
+      max-width: 850px;
+      margin: 24px 0 0;
+      color: #d7e9e3;
+      font-size: clamp(1rem, 1.8vw, 1.2rem);
+    }
+
+    .metadata {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 34px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .metadata li {
+      min-width: 0;
+      padding: 14px 16px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 12px;
+    }
+
+    .metadata .label {
+      display: block;
+      margin-bottom: 4px;
+      color: #9fc9bf;
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .metadata .value {
+      display: block;
+      color: #fff;
+      font-size: .9rem;
+      line-height: 1.5;
+    }
+
+    .tag-row {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 22px;
+    }
+
+    .tag {
+      padding: 5px 10px;
+      color: #d6eee8;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 999px;
+      font-size: .76rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: var(--sidebar) minmax(0, var(--content));
+      justify-content: center;
+      gap: 30px;
+      align-items: start;
+      padding-bottom: 72px;
+    }
+
+    .toc {
+      position: sticky;
+      top: 20px;
+      max-height: calc(100vh - 40px);
+      padding: 20px;
+      overflow: auto;
+      background: rgba(255,253,249,.88);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 24px rgba(30,48,42,.05);
+      backdrop-filter: blur(12px);
+    }
+
+    .toc h2 {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: .75rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .toc ol {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .toc li { margin: 2px 0; }
+
+    .toc a {
+      display: block;
+      padding: 7px 9px;
+      color: #394640;
+      border-radius: 8px;
+      font-size: .83rem;
+      line-height: 1.35;
+      text-decoration: none;
+    }
+
+    .toc a:hover {
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .toc .sub a {
+      padding-left: 22px;
+      color: var(--muted);
+      font-size: .77rem;
+    }
+
+    main {
+      min-width: 0;
+      padding: clamp(24px, 4vw, 48px);
+      background: var(--surface);
+      border: 1px solid rgba(217,222,217,.9);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    main > :first-child { margin-top: 0; }
+
+    section {
+      padding-top: 12px;
+    }
+
+    section + section {
+      margin-top: 54px;
+      padding-top: 46px;
+      border-top: 1px solid var(--line);
+    }
+
+    h2, h3, h4 {
+      color: #173d36;
+      line-height: 1.3;
+      letter-spacing: -.025em;
+      text-wrap: balance;
+    }
+
+    h2 {
+      margin: 0 0 24px;
+      font-family: Georgia, "Noto Serif KR", serif;
+      font-size: clamp(1.65rem, 3vw, 2.25rem);
+    }
+
+    h3 {
+      margin: 38px 0 15px;
+      font-size: clamp(1.22rem, 2vw, 1.55rem);
+    }
+
+    h4 {
+      margin: 30px 0 12px;
+      font-size: 1.08rem;
+    }
+
+    p { margin: 12px 0; }
+
+    ul, ol {
+      margin: 12px 0;
+      padding-left: 1.45rem;
+    }
+
+    li + li { margin-top: 6px; }
+
+    strong { color: #183b34; }
+
+    .lead {
+      margin: 0;
+      padding: 24px 26px;
+      color: #213c36;
+      background: linear-gradient(135deg, var(--accent-soft), #f4faf7);
+      border: 1px solid #cde3db;
+      border-left: 5px solid var(--accent);
+      border-radius: 14px;
+      font-size: 1.06rem;
+      line-height: 1.9;
+    }
+
+    .callout {
+      margin: 24px 0;
+      padding: 20px 22px;
+      background: var(--surface-strong);
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--accent);
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(30,48,42,.045);
+    }
+
+    .callout.note {
+      background: var(--blue-soft);
+      border-color: #c9dde8;
+      border-left-color: #397c9e;
+    }
+
+    .callout.tip {
+      background: var(--amber-soft);
+      border-color: #efdcae;
+      border-left-color: var(--amber);
+    }
+
+    .callout.example {
+      background: #f8f6fc;
+      border-color: #ded7ef;
+      border-left-color: var(--purple);
+    }
+
+    .callout.abstract {
+      background: #eef7f3;
+      border-color: #cfe3da;
+      border-left-color: #427b69;
+    }
+
+    .callout.info {
+      background: #eef6fb;
+      border-color: #cfdfeb;
+      border-left-color: #467b9b;
+    }
+
+    .callout-title {
+      margin: 0 0 9px;
+      color: #163c35;
+      font-weight: 850;
+      line-height: 1.45;
+    }
+
+    .callout > :last-child { margin-bottom: 0; }
+
+    .mini-dictionary {
+      display: grid;
+      grid-template-columns: minmax(140px, 210px) 1fr;
+      gap: 0;
+      margin: 14px 0 0;
+    }
+
+    .mini-dictionary dt,
+    .mini-dictionary dd {
+      margin: 0;
+      padding: 10px 0;
+      border-top: 1px solid rgba(154,101,23,.16);
+    }
+
+    .mini-dictionary dt {
+      padding-right: 18px;
+      color: #6f4710;
+      font-weight: 800;
+    }
+
+    .mini-dictionary dd { color: #493c2a; }
+
+    .figure {
+      margin: 28px auto;
+      padding: 12px;
+      background: #f1f2ef;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+    }
+
+    .figure img {
+      width: auto;
+      max-height: 720px;
+      margin: 0 auto;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .figure.wide img { width: 100%; }
+
+    figcaption {
+      padding: 12px 8px 4px;
+      color: var(--muted);
+      font-size: .84rem;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .table-wrap {
+      width: 100%;
+      margin: 18px 0 26px;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 590px;
+      border-collapse: collapse;
+      background: #fff;
+      font-size: .88rem;
+      line-height: 1.58;
+    }
+
+    th, td {
+      padding: 11px 13px;
+      vertical-align: top;
+      border-right: 1px solid #e7eae7;
+      border-bottom: 1px solid #e7eae7;
+      text-align: left;
+    }
+
+    th:last-child, td:last-child { border-right: 0; }
+    tbody tr:last-child td { border-bottom: 0; }
+
+    th {
+      color: #1c443c;
+      background: #edf3f0;
+      font-weight: 800;
+    }
+
+    tbody tr:nth-child(even) td { background: #fbfcfb; }
+
+    .equation {
+      margin: 18px 0;
+      padding: 18px 20px;
+      overflow-x: auto;
+      color: #123a32;
+      background: #f1f6f3;
+      border: 1px solid #d5e3dd;
+      border-radius: 12px;
+      font-size: clamp(.78rem, 1.8vw, .96rem);
+      line-height: 1.72;
+      white-space: pre-wrap;
+      word-break: normal;
+    }
+
+    pre {
+      margin: 16px 0;
+      padding: 18px 20px;
+      overflow-x: auto;
+      color: #dcebe5;
+      background: var(--code);
+      border-radius: 12px;
+      font-size: .82rem;
+      line-height: 1.65;
+      white-space: pre;
+    }
+
+    :not(pre) > code {
+      padding: .14em .42em;
+      color: #23443d;
+      background: #e9efec;
+      border-radius: 5px;
+      font-size: .88em;
+    }
+
+    blockquote {
+      margin: 14px 0;
+      padding-left: 18px;
+      color: #53625c;
+      border-left: 3px solid #bdc9c3;
+    }
+
+    .diagram {
+      margin: 24px 0;
+      padding: 20px;
+      background: #f5f7f5;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+    }
+
+    .flow {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .flow.vertical {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .flow-node {
+      display: grid;
+      min-width: 135px;
+      max-width: 220px;
+      padding: 13px 15px;
+      place-items: center;
+      color: #173e36;
+      background: #fff;
+      border: 1px solid #cdd9d4;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(30,48,42,.04);
+      font-size: .82rem;
+      font-weight: 750;
+      line-height: 1.42;
+      text-align: center;
+    }
+
+    .flow-node.blue { background: #e8f4fd; }
+    .flow-node.red { background: #fde8e8; }
+    .flow-node.green { background: #e8fde8; }
+    .flow-node.linear { background: #dcf4e4; }
+    .flow-node.nonlinear { background: #f9dddd; }
+    .flow-node.output { background: #ddecf7; }
+
+    .arrow {
+      display: grid;
+      min-width: 34px;
+      place-items: center;
+      color: var(--accent);
+      font-size: 1.35rem;
+      font-weight: 900;
+    }
+
+    .vertical .arrow { transform: rotate(90deg); }
+
+    .flow-label {
+      display: block;
+      color: var(--muted);
+      font-size: .7rem;
+      font-weight: 600;
+    }
+
+    .phase-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .phase-card {
+      position: relative;
+      padding: 18px;
+      border-radius: 12px;
+    }
+
+    .phase-card:nth-child(1) { background: #e8f4fd; }
+    .phase-card:nth-child(2) { background: #fde8e8; }
+    .phase-card:nth-child(3) { background: #e8fde8; }
+
+    .phase-card strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .source-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 20px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .source-list li {
+      margin: 0;
+      padding: 12px 14px;
+      color: #41504a;
+      background: #f1f4f2;
+      border-radius: 10px;
+      font-size: .84rem;
+    }
+
+    .wikilink {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .status {
+      white-space: nowrap;
+      font-weight: 800;
+    }
+
+    .summary-list {
+      padding: 22px 24px 22px 46px;
+      background: linear-gradient(135deg, #eaf5f1, #f8fbfa);
+      border: 1px solid #cfe3da;
+      border-radius: 14px;
+    }
+
+    .back-top {
+      display: inline-block;
+      margin-top: 28px;
+      font-size: .82rem;
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    footer {
+      width: min(900px, calc(100% - 32px));
+      margin: -42px auto 44px;
+      color: var(--muted);
+      font-size: .78rem;
+      text-align: center;
+    }
+
+    @media (max-width: 1080px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: relative;
+        top: auto;
+        max-height: none;
+      }
+
+      .toc ol {
+        columns: 2;
+        column-gap: 24px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      body {
+        font-size: 15px;
+        word-break: normal;
+      }
+
+      .page-shell {
+        width: min(100% - 18px, 1400px);
+      }
+
+      .hero {
+        margin-top: 9px;
+        border-radius: 18px;
+      }
+
+      .metadata {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      main {
+        padding: 24px 17px;
+        border-radius: 18px;
+      }
+
+      .toc ol { columns: 1; }
+
+      .mini-dictionary {
+        grid-template-columns: 1fr;
+      }
+
+      .mini-dictionary dt {
+        padding-bottom: 1px;
+      }
+
+      .mini-dictionary dd {
+        padding-top: 2px;
+        border-top: 0;
+      }
+
+      .source-list,
+      .phase-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .flow {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .arrow { transform: rotate(90deg); }
+
+      .flow-node {
+        width: min(100%, 300px);
+        max-width: none;
+      }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .page-shell { width: 100%; }
+      .hero, main, .toc { box-shadow: none; }
+      .hero { break-after: page; }
+      .layout { display: block; }
+      .toc {
+        position: static;
+        margin-bottom: 24px;
+      }
+      .toc ol { columns: 2; }
+      main { border: 0; }
+      section, .callout, figure, table { break-inside: avoid; }
+      a { color: inherit; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Real-Time Motion Planning of a Hydraulic Excavator using Trajectory Optimization and MPC">
+<meta property="og:description" content="[!note] 🔧 이 문서에 대해 (20260814 생성) 원본 요약 노트의 논문 요약부를 그대로 복사하고 (심화 탐구 기록 제외), 각 장·절 끝에 [!example] 🔧 APEX 구현 대조 콜아웃으로 실제 코드 반영 현황을 달았다. 코드 발췌는 APEX/claude 저장소 실물( branch claude/r1, 2">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/zurwkh/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/zurwkh/assets/figure2.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Real-Time Motion Planning of a Hydraulic Excavator using Trajectory Optimization and MPC">
+<meta name="twitter:description" content="[!note] 🔧 이 문서에 대해 (20260814 생성) 원본 요약 노트의 논문 요약부를 그대로 복사하고 (심화 탐구 기록 제외), 각 장·절 끝에 [!example] 🔧 APEX 구현 대조 콜아웃으로 실제 코드 반영 현황을 달았다. 코드 발췌는 APEX/claude 저장소 실물( branch claude/r1, 2">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/zurwkh/assets/figure2.png">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/s/zurwkh/">
+</head>
+<body id="top">
+  <div class="page-shell">
+    <header class="hero">
+      <p class="eyebrow">Paper Note · Hydraulic Excavator · MPC</p>
+      <h1>Real-Time Motion Planning of a Hydraulic Excavator using Trajectory Optimization and MPC</h1>
+      <p class="hero-subtitle">
+        전역 궤적 최적화와 외란 추정 기반 모델 예측 제어를 통합한 유압 굴착기 실시간 모션 플래닝 연구 및 APEX 구현 대조 기록
+      </p>
+
+      <ul class="metadata" aria-label="문서 메타데이터">
+        <li>
+          <span class="label">Authors</span>
+          <span class="value">Dongjae Lee · Inkyu Jang · Jeonghyun Byun · Hoseong Seo · H. Jin Kim</span>
+        </li>
+        <li>
+          <span class="label">Affiliation</span>
+          <span class="value">Seoul National University (SNU), Department of Aerospace Engineering &amp; ASRI</span>
+        </li>
+        <li>
+          <span class="label">Publication</span>
+          <span class="value">IEEE · arXiv:2107.02366v2 · 2021</span>
+        </li>
+        <li>
+          <span class="label">Created</span>
+          <span class="value">2026-03-11</span>
+        </li>
+      </ul>
+
+      <div class="tag-row" aria-label="태그">
+        <span class="tag">논문요약</span>
+        <span class="tag">굴착기</span>
+        <span class="tag">trajectory_optimization</span>
+        <span class="tag">MPC</span>
+        <span class="tag">motion_planning</span>
+        <span class="tag">real_time</span>
+        <span class="tag">hydraulic_excavator</span>
+        <span class="tag">disturbance_estimation</span>
+      </div>
+    </header>
+
+    <div class="layout">
+      <nav class="toc" aria-label="문서 목차">
+        <h2>Contents</h2>
+        <ol>
+          <li><a href="#document-note">문서 안내</a></li>
+          <li><a href="#one-line-summary">한줄 요약</a></li>
+          <li><a href="#background">1. 연구 배경</a></li>
+          <li class="sub"><a href="#problem-definition">1.1 문제 정의</a></li>
+          <li class="sub"><a href="#prior-work">1.2 기존 연구 분류</a></li>
+          <li class="sub"><a href="#contributions">1.3 연구 기여</a></li>
+          <li><a href="#system-methodology">2. 시스템 및 방법론</a></li>
+          <li class="sub"><a href="#architecture">2.1 전체 시스템 아키텍처</a></li>
+          <li class="sub"><a href="#excavator-platform">2.2 굴착기 구성</a></li>
+          <li><a href="#core-technology">3. 핵심 기술</a></li>
+          <li class="sub"><a href="#kinematics">3.1 운동학</a></li>
+          <li class="sub"><a href="#dynamics">3.2 동역학</a></li>
+          <li class="sub"><a href="#global-planning">3.3 Global Planning</a></li>
+          <li class="sub"><a href="#local-planning">3.4 Local Planning</a></li>
+          <li><a href="#experiments">4. 실험 결과</a></li>
+          <li class="sub"><a href="#simulation-environment">4.1 시뮬레이션 환경</a></li>
+          <li class="sub"><a href="#scenario-1">4.2 Shallow Excavation</a></li>
+          <li class="sub"><a href="#scenario-2">4.3 Deep Excavation</a></li>
+          <li class="sub"><a href="#scenario-comparison">4.4 두 시나리오 비교</a></li>
+          <li><a href="#limitations">5. 한계 및 향후 연구</a></li>
+          <li><a href="#closing-summary">한마디로 정리</a></li>
+        </ol>
+      </nav>
+
+      <main>
+        <section id="document-note" aria-labelledby="document-note-heading">
+          <h2 id="document-note-heading">문서 안내</h2>
+
+          <aside class="callout note">
+            <p class="callout-title">🔧 이 문서에 대해 (2026-08-14 생성)</p>
+            <p>
+              원본 요약 노트의 <strong>논문 요약부를 그대로 복사</strong>하고 (심화 탐구 기록 제외),
+              각 장·절 끝에 <code>[!example] 🔧 APEX 구현 대조</code> 콜아웃으로
+              <strong>실제 코드 반영 현황</strong>을 달았다. 코드 발췌는
+              <code>APEX/claude</code> 저장소 실물(branch <code>claude/r1</code>,
+              2026-08-14) 기준.
+            </p>
+            <p>
+              근거 문서: <code>docs/experiments/mpc_paper_mapping.md</code>(게이트 결과·정직성 기록),
+              <code>docs/experiments/mpc_robustness_report.md</code>.
+              원본: <span class="wikilink">(한민확인)2021 Real-time motion planning of a hydraulic excavator using trajectory optimization and model predictive control - 서울대_요약 — 원본 요약 노트</span>
+            </p>
+          </aside>
+
+          <aside class="callout tip">
+            <p class="callout-title">📖 용어 미니 사전 (주석에 나오는 말들)</p>
+            <dl class="mini-dictionary">
+              <dt>전역 계획 / 국소 제어</dt>
+              <dd>전역 = 굴착 한 번 전체의 궤적을 미리 계산(수 초). 국소 = 실행 중 1초에 20번씩 다음 순간의 움직임을 결정</dd>
+
+              <dt>MPC</dt>
+              <dd>앞으로 조금 뒤까지 내다보며 “한계를 안 넘는 최선의 움직임”을 매번 다시 계산하는 제어 방식</dd>
+
+              <dt>FL (피드백 선형화)</dt>
+              <dd>팔 무게·중력·흙 저항을 미리 계산해 상쇄해 주는 기법. 여기서 계산되는 힘 = “보정 힘(FL 토크)”</dd>
+
+              <dt>최적화 솔버</dt>
+              <dd>IPOPT/CasADi, DDP. “조건을 지키며 점수를 최대화하는 답”을 찾아 주는 수치 라이브러리. 논문은 DDP, 우리는 IPOPT 사용</dd>
+
+              <dt>PD 제어 / 백업 제어</dt>
+              <dd>오차에 비례해 미는 가장 단순한 제어. 최적화가 실패한 순간에만 임시로 대신 씀</dd>
+
+              <dt>d̂ (흙 저항 추정값)</dt>
+              <dd>관측기가 실시간 추정한 “흙이 버킷을 미는 힘”</dd>
+
+              <dt>raw_u (원시 힘 값)</dt>
+              <dd>안전 한계로 잘라내기 전의, 계산된 그대로의 필요 힘 — 한계 초과 판정은 이 값으로 해야 정직함</dd>
+
+              <dt>p95</dt>
+              <dd>100번 중 95번은 이 값 이하라는 뜻 (최악값에 가까운 대표치)</dd>
+
+              <dt>미보정 (UNCALIBRATED)</dt>
+              <dd>실측으로 맞추지 않은 임시 수치 — 이 수치에 기반한 판정은 “판정 불가”로 기록</dd>
+
+              <dt>pass</dt>
+              <dd>굴착 한 번(진입→긁기→들기→쏟기)의 단위. 3-pass = 같은 자리를 세 번 점점 깊게 팜</dd>
+
+              <dt>vendored</dt>
+              <dd>다른 저장소(<code>~/dev/excavator</code>)에서 복사해 온 코드 — 원본과 항상 동일하게 유지</dd>
+            </dl>
+          </aside>
+
+          <aside class="callout info">
+            <p class="callout-title">관련 영상</p>
+            <p>📺 <a>YouTube — Real-time Motion Planning of a Hydraulic Excavator</a></p>
+          </aside>
+
+          <ul class="source-list" aria-label="원문 자료">
+            <li><span class="wikilink">2021 Real-time motion planning of a hydraulic excavator using trajectory optimization and model predictive control - 서울대 — 원문 MD</span></li>
+            <li><span class="wikilink">2021 Real-time motion planning of a hydraulic excavator using trajectory optimization and model predictive control - 서울대.pdf — 원본 PDF</span></li>
+          </ul>
+        </section>
+
+        <section id="one-line-summary" aria-labelledby="one-line-summary-heading">
+          <h2 id="one-line-summary-heading">한줄 요약</h2>
+          <p class="lead">
+            유압 굴착기의 실시간 궤적 계획을 위해 <strong>global planner (trajectory optimization)</strong>와
+            <strong>local planner (MPC + disturbance estimation)</strong>를 통합한 프레임워크를 제안하며,
+            force/torque, power, cylinder displacement, flow rate 등 물리적 제약조건을 모두 만족하면서
+            30 Hz 이상의 실시간 궤적 재계획이 가능함을 시뮬레이션으로 검증하였다.
+          </p>
+        </section>
+
+        <section id="background" aria-labelledby="background-heading">
+          <h2 id="background-heading">1. 연구 배경</h2>
+
+          <h3 id="problem-definition">1.1 문제 정의</h3>
+          <ul>
+            <li>유압 굴착기(hydraulic excavator)의 굴착 작업 자동화에는 다양한 <strong>operational constraints</strong> (굴착량, 버킷 자세 등)와 <strong>physical constraints</strong> (force/torque 한계, 펌프 유량 한계, 파워 한계 등)를 동시에 만족하는 궤적 계획이 필요</li>
+            <li>기존 trajectory optimization 방법은 전체 궤적을 한 번에 offline으로 최적화하므로, 운영 중 발생하는 <strong>외란(disturbance)</strong> — 토양-버킷 상호작용, 유압 실린더 마찰 — 에 취약</li>
+            <li>외란으로 인해 최적성 저하는 물론 <strong>제약조건 위반(constraint violation)</strong>까지 발생 가능</li>
+          </ul>
+
+          <h3 id="prior-work">1.2 기존 연구 분류</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>분류</th>
+                  <th>대표 연구</th>
+                  <th>특징</th>
+                  <th>한계</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Trajectory optimization</strong></td>
+                  <td>[6,7,9]</td>
+                  <td>비용함수+제약조건+시스템 동역학 기반 전체 궤적 최적화</td>
+                  <td>Offline 계산, 외란 미대응, 단순 커널 파라미터화</td>
+                </tr>
+                <tr>
+                  <td><strong>Receding horizon / MPC</strong></td>
+                  <td>[12,13]</td>
+                  <td>이동 수평선 방식 궤적 최적화</td>
+                  <td>[12] 단일 입력 decoupled 동역학만 고려, [13] 연산시간 부족 (~3.3 Hz)</td>
+                </tr>
+                <tr>
+                  <td><strong>Non-optimization 기반</strong></td>
+                  <td>[1,14-16]</td>
+                  <td>DMP, reachability map, 계층적 제어</td>
+                  <td>제약조건 명시적 고려 불가, feasibility 보장 어려움</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 id="contributions">1.3 연구 기여 (Contributions)</h3>
+          <ol>
+            <li><strong>Global + Local planner 통합</strong>: operational constraints와 physical constraints를 모두 고려</li>
+            <li><strong>축소 차원 global trajectory optimization</strong>: 수 초 이내 계산 가능한 문제 정식화</li>
+            <li><strong>실시간 제약 궤적 생성</strong>: 외란 추정 기반 disturbance-aware 실시간 궤적 계획</li>
+          </ol>
+        </section>
+
+        <section id="system-methodology" aria-labelledby="system-methodology-heading">
+          <h2 id="system-methodology-heading">2. 시스템 및 방법론</h2>
+
+          <h3 id="architecture">2.1 전체 시스템 아키텍처</h3>
+
+          <figure class="figure">
+            <img src="assets/figure2.png" alt="알고리즘 전체 흐름도">
+            <figcaption>
+              Fig. 2: 알고리즘 전체 흐름도. Global planner가 환경 모델 기반으로 전역 궤적
+              <strong>x<sub>r</sub></strong>을 생성하고, Local planner (MPC + 외란 추정)가 이를 실시간 추종하며,
+              Motion Controller가 제어 입력 <strong>u</strong>를 PLANT에 인가한다. 점선은 피드백 신호를 나타냄.
+            </figcaption>
+          </figure>
+
+          <div class="diagram" role="img" aria-label="환경 모델에서 굴착기 플랜트까지 이어지는 계획 및 제어 흐름">
+            <div class="flow">
+              <div class="flow-node">환경 모델<span class="flow-label">지면 형상</span></div>
+              <div class="arrow">→</div>
+              <div class="flow-node">Global Planner<span class="flow-label">Trajectory Optimization</span></div>
+              <div class="arrow">→</div>
+              <div class="flow-node blue">Local Planner<span class="flow-label">Disturbance Estimation + MPC</span></div>
+              <div class="arrow">→</div>
+              <div class="flow-node">Motion Controller<span class="flow-label">FB Linearization PID</span></div>
+              <div class="arrow">→</div>
+              <div class="flow-node output">PLANT<span class="flow-label">굴착기 동역학 · 상태 피드백 x</span></div>
+            </div>
+          </div>
+
+          <aside class="callout example">
+            <p class="callout-title">🔧 APEX 구현 대조 — 전체 체인</p>
+            <p><strong>우리 시스템의 흐름</strong> (논문 Fig. 2와 같은 역할 순서):</p>
+            <pre>지형 스캔 (LiDAR 2대 → 5Hz 높이 지도)
+  → 지면 모양을 간단한 수식으로 요약 (apex_grid_surface_fit)
+  → [전역 계획] 굴착 궤적 최적화 (apex_mpc_paper_planner, 수 초에 1회)
+  → 관절 각도 시간표(JSON) 생성
+  → [국소 제어] 1초에 20번, 제약을 지키는 최선의 움직임 계산
+      (apex_local_mpc_node: 제약 최적화 + 흙 저항 추정 + 힘 보정 계산)
+  → 속도 명령으로 변환 (SpeedCommandPlantAdapter)
+  → 시뮬레이터(AGX) 모터 구동</pre>
+
+            <p><strong>논문과 다른 점 2가지 (미리 알고 보시면 좋은 것)</strong>:</p>
+            <ol>
+              <li>논문은 계산한 <strong>힘(토크)을 그대로 장비에 인가</strong>합니다. 우리 시뮬레이터 모터는 <strong>속도 명령만</strong> 받기 때문에, 힘 계산은 “한계를 넘는지 판정”하는 데 쓰고 실제 명령은 속도로 보냅니다. (힘으로 직접 미는 유압 시뮬은 후속 과제)</li>
+              <li>논문은 달리는 중에도 계속 앞 구간을 다시 계획합니다. 우리는 <strong>한 번 파낸 뒤(pass 단위)</strong> 지형을 다시 스캔해 다음 계획을 세웁니다.</li>
+            </ol>
+            <p>전체 항목별 판정표는 <code>APEX/claude/docs/experiments/mpc_paper_mapping.md</code> 참조 (2026-08-14 독립 리뷰 통과).</p>
+          </aside>
+
+          <h3 id="excavator-platform">2.2 굴착기 구성 (Hyundai HX300L)</h3>
+
+          <figure class="figure">
+            <img src="assets/figure1.png" alt="Hyundai HX300L 굴착기 구성">
+            <figcaption>
+              Fig. 1: Hyundai HX300L 굴착기 구성. 4개의 회전 강체로 구성:
+              (1) Cabin, (2) Boom, (3) Arm, (4) Bucket. 관절 각도
+              <strong>q<sub>θ</sub></strong>와 실린더 변위 <strong>q<sub>L</sub></strong>로 configuration 정의 가능.
+            </figcaption>
+          </figure>
+
+          <aside class="callout example">
+            <p class="callout-title">🔧 APEX 구현 대조 — 플랫폼</p>
+            <ul>
+              <li>논문은 30톤급 현대 HX300L, 우리는 <strong>8.5톤급 E85</strong> (AGX 물리 시뮬레이터).</li>
+              <li>같은 4개 부위 구성입니다: 몸통 회전(cabin) / 붐 / 암 / 버킷. 링크 길이·기준 자세·관절 한계 수치는 <code>apex_e85_params.py</code> 파일 하나에 모아 두고 모든 코드가 이 파일만 참조합니다 (수치가 두 곳에서 어긋나는 사고 방지).</li>
+              <li><strong>체급 차이의 의미</strong>: 8.5톤 장비가 팔을 4.4m 뻗으면 내리누를 수 있는 힘이 ~20kN뿐이라, 한 번에 깊이 팔 수 없습니다. 우리가 한 pass에 25~44cm씩 <strong>여러 번 나눠 파는 것</strong>은 결함이 아니라 체급에 맞는 정상 동작입니다.</li>
+            </ul>
+          </aside>
+        </section>
+
+        <section id="core-technology" aria-labelledby="core-technology-heading">
+          <h2 id="core-technology-heading">3. 핵심 기술</h2>
+
+          <h3 id="kinematics">3.1 운동학 (Kinematics)</h3>
+          <p>Configuration을 관절 각도 또는 실린더 변위로 표현:</p>
+
+          <div class="equation" role="math">\mathbf{q}_\theta = [\psi_U \; \theta_B \; \theta_A \; \theta_K]^\top \in \mathbb{R}^4,
+\quad
+\mathbf{q}_L = [\psi_U \; L_B \; L_A \; L_K]^\top \in \mathbb{R}^4</div>
+
+          <p>두 표현 사이의 비선형 전단사(bijective) 매핑:</p>
+
+          <div class="equation" role="math">\mathbf{q}_\theta = g_L(\mathbf{q}_L),
+\quad \mathbf{q}_L = g_\theta(\mathbf{q}_\theta),
+\quad \dot{\mathbf{q}}_\theta = J_L(\mathbf{q}_L)\dot{\mathbf{q}}_L,
+\quad \dot{\mathbf{q}}_L = J_\theta(\mathbf{q}_\theta)\dot{\mathbf{q}}_\theta
+\tag{1}</div>
+
+          <p>버킷 팁 자세 (bucket tip pose):</p>
+
+          <div class="equation" role="math">\mathbf{E} = [E_x(\mathbf{L}) \; E_z(\mathbf{L}) \; \theta(\mathbf{L})]^\top \in \mathbb{R}^3</div>
+
+          <p>
+            여기서 <strong>L = [L<sub>B</sub> L<sub>A</sub> L<sub>K</sub>]<sup>⊤</sup></strong>,
+            <strong>θ = θ<sub>B</sub> + θ<sub>A</sub> + θ<sub>K</sub></strong>.
+          </p>
+
+          <aside class="callout example">
+            <p class="callout-title">🔧 APEX 구현 대조 — 식(1) — 각도↔실린더 변환을 실측 표로</p>
+            <p>
+              <strong>대응</strong>: 식(1)의 “관절 각도 ↔ 실린더 길이” 변환입니다. 우리는 시뮬레이터에서 팔을 전 구간 움직여 보며
+              <strong>실측한 대응표(조견표)</strong>를 만들어 씁니다 (<code>e85_theta_agx_calibration.json</code>).
+            </p>
+            <p>
+              핵심 발견 (2026-08-13): 버킷은 링크 4개가 사다리꼴로 얽힌 구조라
+              <strong>각도와 실린더 길이가 비례 관계가 아닙니다</strong>
+              (열리는 쪽과 오므리는 쪽의 기울기가 2배 차이). 처음엔 1차식(비례+상수)으로 근사했다가
+              오차가 커서 폐기하고, 40칸 실측 표에서 값을 찾아 쓰는 방식으로 바꿨습니다:
+            </p>
+
+            <pre><code># apex_e85_params.py — 버킷 각도 → 실린더 좌표 (실측 40칸 표에서 보간)
+def bucket_agx_from_urdf(u_k, calibration):
+    lk = calibration["bucket"].get("lookup_table")
+    if lk and lk.get("map") == "piecewise_linear" and lk.get("monotone"):
+        return np.interp(u_k, lk["urdf"], lk["agx"])   # 표에서 찾아 보간</code></pre>
+
+            <ul>
+              <li>표 방식의 오차: 평균 0.0005 라디안 (1차식은 최대 0.1 — 200배 차이). 왕복 변환 오차 0</li>
+              <li>버킷 이빨 끝 위치 계산(FK)은 시뮬레이터가 알려주는 실제 이빨 위치와 대조해 검증</li>
+              <li><strong>판정 🟢 충실</strong> — 논문의 “비선형 일대일 매핑”을 실측으로 구현</li>
+            </ul>
+          </aside>
+
+          <h3 id="dynamics">3.2 동역학 (Dynamics)</h3>
+          <p><strong>관절 각도 기반 동역학</strong> (Euler-Lagrange):</p>
+
+          <div class="equation" role="math">\dot{\mathbf{x}}_\theta =
+\begin{bmatrix}
+\dot{\mathbf{q}}_\theta \\
+\ddot{\mathbf{q}}_\theta
+\end{bmatrix}
+=
+\begin{bmatrix}
+\dot{\mathbf{q}}_\theta \\
+M_\theta^{-1}(-\mathbf{h}_\theta + J_\theta^\top \mathbf{u} + \boldsymbol{\Delta})
+\end{bmatrix}
+=: f_\theta(\mathbf{x}_\theta, \mathbf{u}, \boldsymbol{\Delta})
+\tag{2}</div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>기호</th>
+                  <th>의미</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>x<sub>θ</sub> = [q<sub>θ</sub><sup>⊤</sup> q̇<sub>θ</sub><sup>⊤</sup>]<sup>⊤</sup> ∈ ℝ<sup>8</sup></strong></td>
+                  <td>시스템 상태</td>
+                </tr>
+                <tr>
+                  <td><strong>u = [T<sub>U</sub> F<sub>B</sub> F<sub>A</sub> F<sub>K</sub>]<sup>⊤</sup> ∈ ℝ<sup>4</sup></strong></td>
+                  <td>제어 입력 (swing torque + 유압 실린더 force)</td>
+                </tr>
+                <tr>
+                  <td><strong>M<sub>θ</sub>(q<sub>θ</sub>) ∈ ℝ<sup>4×4</sup></strong></td>
+                  <td>질량 행렬</td>
+                </tr>
+                <tr>
+                  <td><strong>h<sub>θ</sub>(q<sub>θ</sub>, q̇<sub>θ</sub>) ∈ ℝ<sup>4</sup></strong></td>
+                  <td>Coriolis-원심력 + 중력 합성항</td>
+                </tr>
+                <tr>
+                  <td><strong>Δ ∈ ℝ<sup>4</sup></strong></td>
+                  <td>총괄 외란 (lumped disturbance)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <aside class="callout abstract">
+            <p class="callout-title">수식 상세 전개</p>
+            <p>
+              <strong>M<sub>θ</sub></strong>와 <strong>h<sub>θ</sub></strong>의 원소별 전개,
+              변수 색깔 구분(측정/CAD/미지), FL과의 연결은 별도 노트 참조:
+              <span class="wikilink">02_research/필드로봇/굴착기 동역학 M과 h 수식 해부 — 굴착기 동역학 M과 h 수식 해부</span>
+            </p>
+          </aside>
+
+          <p><strong>실린더 변위 기반 동역학</strong> (local planning에서 사용):</p>
+
+          <div class="equation" role="math">\dot{\mathbf{x}}_L =
+\begin{bmatrix}
+\dot{\mathbf{q}}_L \\
+\ddot{\mathbf{q}}_L
+\end{bmatrix}
+=
+\begin{bmatrix}
+\dot{\mathbf{q}}_L \\
+M_L^{-1}(-\mathbf{h}_L + \mathbf{u} + \boldsymbol{\Delta}_L)
+\end{bmatrix}
+=: f_L(\mathbf{x}_L, \mathbf{u}, \boldsymbol{\Delta}_L)
+\tag{3}</div>
+
+          <p>
+            여기서
+            <strong>M<sub>L</sub>(q<sub>L</sub>) = J<sub>L</sub><sup>⊤</sup> M̃<sub>L</sub> J<sub>L</sub></strong>,
+            <strong>h<sub>L</sub> = J<sub>L</sub><sup>⊤</sup>(M̃<sub>L</sub> J̇<sub>L</sub> q̇<sub>L</sub> + h̃<sub>L</sub>)</strong>,
+            <strong>Δ<sub>L</sub> = J<sub>L</sub><sup>⊤</sup>Δ</strong>.
+          </p>
+
+          <aside class="callout example">
+            <p class="callout-title">🔧 APEX 구현 대조 — 식(2)(3) — 무게·관성 모델: 구조는 가동, 수치는 미보정</p>
+            <p>
+              <strong>대응</strong>: 식(2)의 M(팔이 얼마나 무거운가)과 h(중력·회전 관성 힘)를 계산하는 코드가
+              <code>dynamics.py</code>에 있고, 실제로 <strong>3군데서 사용 중</strong>입니다:
+            </p>
+            <ol>
+              <li>국소 제어 최적화의 “지금 자세에서 중력이 이만큼 당긴다” 항</li>
+              <li>“이 움직임에 힘이 얼마나 드는가” 계산 (한계 초과 판정용)</li>
+              <li>흙 저항 추정기의 “저항이 없다면 이렇게 움직였을 것” 예측</li>
+            </ol>
+            <p>
+              <strong>숨기지 않는 한계</strong>: 이 모델의 <strong>수치(무게·관성·힘 한계)는 실측 보정을 하지 않은 임시값</strong>입니다.
+              시뮬레이터가 알려주는 실제 실린더 힘과 모델 예측을 비교하면 상관이 약합니다
+              (상관계수 0.07~0.43 수준; 암 축은 부호가 반대로 나와 지렛대 방향 해석 오류 후보로 기록).
+              그래서 “힘 한계 몇 % 사용” 같은 판정은 <strong>판정 불가</strong>로 못박고,
+              합격 판정은 굴착 결과(깊이·부피)로 합니다.
+            </p>
+            <p><strong>판정 🟡 부분</strong> — 구조는 연결·가동, 수치 보정은 유압 시뮬 과제와 함께 후속</p>
+          </aside>
+
+          <h3 id="global-planning">3.3 Global Planning</h3>
+          <p>굴착 작업은 3개 phase로 구성:</p>
+
+          <figure class="figure">
+            <img src="assets/figure3.png" alt="단일 굴착 작업의 세 단계">
+            <figcaption>
+              Fig. 3: 단일 굴착 작업의 3개 phase. Phase 1: 초기 위치에서 지표면 진입점으로 이동.
+              Phase 2: 버킷이 토양을 관통(굴착). Phase 3: 굴착된 토양을 목표 위치(트럭 등)로 운반.
+            </figcaption>
+          </figure>
+
+          <div class="diagram" aria-label="굴착 작업의 세 단계">
+            <div class="phase-grid">
+              <div class="phase-card">
+                <strong>Phase 1</strong>
+                초기 위치 → 지표면 진입<br>
+                <small>Bernstein 파라미터화</small>
+              </div>
+              <div class="phase-card">
+                <strong>Phase 2</strong>
+                토양 굴착<br>
+                <small>Waypoint 최적화</small>
+              </div>
+              <div class="phase-card">
+                <strong>Phase 3</strong>
+                토양 운반<br>
+                <small>Bernstein 파라미터화</small>
+              </div>
+            </div>
+          </div>
+
+          <h4 id="phase-2">Phase 2: 굴착 궤적 최적화</h4>
+          <p>
+            <strong>n<sub>2</sub> + 1</strong>개 waypoint
+            <strong>L<sub>0</sub>, L<sub>1</sub>, ⋯, L<sub>n₂</sub></strong>로 이산화하고,
+            비용함수를 다음과 같이 정의:
+          </p>
+
+          <div class="equation" role="math">J_{\text{Phase2}}
+= w_d \sum_{k=1}^{n_2} \|\mathbf{L}_k - \mathbf{L}_{k-1}\|_W^2
+- w_v V
+\tag{4}</div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>항</th>
+                  <th>의미</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>w<sub>d</sub> Σ ‖L<sub>k</sub> − L<sub>k−1</sub>‖<sub>W</sub><sup>2</sup></strong></td>
+                  <td>유압 실린더 이동 거리 최소화 (에너지 비용)</td>
+                </tr>
+                <tr>
+                  <td><strong>w<sub>v</sub>V</strong></td>
+                  <td>굴착 체적 최대화</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>지표면과 목표 형상은 다항식으로 모델링:</p>
+
+          <div class="equation" role="math">z_{\text{surf}}
+= a_0^{\text{surf}} + a_1^{\text{surf}}x + \cdots
++ a_{n_{\text{surf}}}^{\text{surf}} x^{n_{\text{surf}}}
+\tag{5}</div>
+
+          <div class="equation" role="math">z_{\text{target}}
+= a_0^{\text{target}} + a_1^{\text{target}}x + \cdots
++ a_{n_{\text{target}}}^{\text{target}} x^{n_{\text{target}}}</div>
+
+          <p>굴착 체적 (swept volume, 사다리꼴 적분):</p>
+
+          <div class="equation" role="math">V_{\text{swept}}
+= \int_{x_{n_2}}^{x_0} z_{\text{surf}}(x)\,dx
+- \frac{z_0 + 2z_1 + \cdots + 2z_{n_2-1} + z_{n_2}}{2n_2}
+\cdot (x_0 - x_{n_2})
+\tag{6}</div>
+
+          <div class="equation" role="math">V = \min\{V_{\text{swept}},\; V_{\text{cap}}(\theta(\mathbf{L}_{n_2}))\}</div>
+
+          <figure class="figure">
+            <img src="assets/figure5.png" alt="Phase 2 버킷 궤적 제약조건">
+            <figcaption>
+              Fig. 5: (좌) Phase 2에서의 버킷 궤적 제약조건. 실선은 현재 지표면, 점선은 목표 형상.
+              (우) 버킷 형상이 버킷 팁 궤적을 관통하지 않아야 함 (삼각형 충돌 박스).
+              버킷 회전 각도 θ와 여유 각도 α 표시.
+            </figcaption>
+          </figure>
+
+          <p><strong>Phase 2 제약조건 요약:</strong></p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>제약조건</th>
+                  <th>설명</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>위치 제약</td>
+                  <td>버킷 팁이 관심 영역 내, 목표 표면 위, 지표면 아래에 위치</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>단조 증가 θ</td>
+                  <td>버킷 회전각이 단조 증가해야 함 (에너지 효율)</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>양의 여유 각도 α &gt; 0</td>
+                  <td>버킷 팁 외 부분이 지면을 밀지 않도록</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>버킷 몸체 위치</td>
+                  <td>버킷 전체가 팁 경로 위에 위치</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>θ &lt; π</td>
+                  <td>토양 흘림 방지 (Fig. 4 참조)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <figure class="figure">
+            <img src="assets/figure4.png" alt="버킷 용량과 회전 각도의 관계">
+            <figcaption>
+              Fig. 4: 버킷 용량 V<sub>cap</sub>과 회전 각도 θ의 관계.
+              θ ≥ π이면 손목 방향으로 토양이 흘러 장비 고장 위험.
+            </figcaption>
+          </figure>
+
+          <aside class="callout example">
+            <p class="callout-title">🔧 APEX 구현 대조 — 식(4)(5)(6) — 굴착 경로 최적화 + 버킷 각도까지 함께 최적화 (확장)</p>
+            <p>
+              <strong>대응</strong>: <code>global_planner.py::_solve_phase2_with_theta</code> —
+              식(4)처럼 “실린더 이동은 적게, 퍼내는 흙은 많이”를 최적화 솔버(IPOPT)로 풉니다.
+            </p>
+            <p>
+              <strong>우리가 논문보다 확장한 부분</strong>: 논문은 경로점만 최적화하고 버킷 각도는 따라오는 값인데,
+              우리는 <strong>버킷 각도 자체를 최적화 변수로 승격</strong>했습니다.
+              “날이 진행 방향을 앞서야만 흙이 담긴다”는 포획 효율을 목적함수에 넣으니,
+              운전자들이 하는 “벌린 채 끌다가 마지막에 오므리기”가 규칙을 하드코딩하지 않아도
+              <strong>최적화 결과로 저절로</strong> 나옵니다:
+            </p>
+
+            <pre><code># 날판 각도 − 진행방향 각도 = phi. phi가 앞서야 흙을 "번다"
+phi = 0.5 * (th[index] + th[index + 1]) - tangent
+constraints.append(phi)      # 날 먼저 조건: 등판으로 흙 밀기 금지
+lbg.append(theta_opts["rake_min"])</code></pre>
+
+            <ul>
+              <li><strong>식(5) 지면 수식화</strong>: 스캔한 높이 지도에서 지면을 다항식으로 자동 요약 (<code>apex_grid_surface_fit.py</code>). 검증: 지형에 8° 경사를 심어 놓으니 7.32°로 읽어냄. 논문의 “지면 모양을 미리 안다고 가정” 한계를 실측 스캔으로 일부 해소</li>
+              <li><strong>식(6) 퍼낸 부피</strong>: 논문과 같은 사다리꼴 적분. 단 “버킷에 담길 수 있는 최대량” 항은 미구현 — 시뮬레이터 실측 부피로 사후 확인 (🟡)</li>
+              <li><strong>판정 🟢 충실 + 확장</strong></li>
+            </ul>
+          </aside>
+
+          <h4 id="phases-1-3">Phases 1 &amp; 3: Bernstein 다항식 파라미터화</h4>
+          <p>Bernstein 다항식:</p>
+
+          <div class="equation" role="math">p(s) = \sum_{k=0}^{n} \beta_k \binom{n}{k} s^k (1-s)^{n-k},
+\quad s \in [0,1]
+\tag{7}</div>
+
+          <p>Phases 1, 3의 최적화 문제:</p>
+
+          <div class="equation" role="math">\min_{\beta_k, T}
+\int_0^T \frac{1}{2} \mathbf{u}^\top W_u \mathbf{u}\, dt
+\tag{8}</div>
+
+          <div class="equation" role="math">\text{s.t.}\quad
+\mathbf{q}_L^l \leq \beta_k \leq \mathbf{q}_L^u,
+\quad
+\dot{\mathbf{q}}_L^l
+\leq \frac{n \cdot (\beta_{k+1} - \beta_k)}{T}
+\leq \dot{\mathbf{q}}_L^u</div>
+
+          <p>Phase 3 추가 제약 (토양 흘림 방지):</p>
+
+          <div class="equation" role="math">\theta_0 \leq \theta(\beta_k) \leq \pi
+\tag{9}</div>
+
+          <aside class="callout example">
+            <p class="callout-title">🔧 APEX 구현 대조 — 식(7)(8)(9) — 진입·인양 경로: 모양은 충실, 시간 배분은 단순화</p>
+            <p>
+              <strong>대응</strong>: 식(7)의 Bernstein 곡선(제어점 몇 개로 부드러운 곡선을 만드는 방법)은
+              <code>_bernstein</code> 함수에 그대로 있습니다:
+            </p>
+
+            <pre><code>def _bernstein(control_points, samples):
+    for i in range(degree + 1):
+        coeff = comb(degree, i) * (t**i) * ((1.0 - t)**(degree - i))
+        curve += coeff[:, None] * points[i]</code></pre>
+
+            <p>
+              <strong>단순화한 부분 (🟡)</strong>: 논문은 식(8)로 “힘이 가장 적게 드는 시간 배분”까지 최적화하지만,
+              우리는 곡선 모양은 고정하고 <strong>속도 상한(구간별 팁 속도 0.5/0.25/0.5 m/s)에 맞춰 시간만 재배분</strong>합니다.
+            </p>
+            <p>
+              <strong>식(9) 흘림 방지 (🟢, 방식만 다름)</strong>: 논문은 부등식 제약,
+              우리는 들어올리는 동안 오므림 각도를 직접 유지시키고 + 운반 높이를 강제 조건으로 겁니다.
+            </p>
+            <p>
+              <strong>운전자(사용자) 관찰로 고친 것 2건</strong>:
+              ① 내려갈 때 버킷을 <strong>활짝 벌린 자세</strong>로
+              (오므린 채 내려가면 등판이 먼저 땅에 닿는 비정상 동작)
+              ② 쏟을 때 각도 1.30rad를 명령해도 실제로는 8%밖에 안 열리던 결함
+              (위 3.1의 비비례 관계 탓) →
+              <strong>실측 가동범위의 92%를 직접 목표</strong>로 바꾸고 2초간 유지.
+            </p>
+          </aside>
+
+          <h3 id="local-planning">3.4 Local Planning (MPC)</h3>
+
+          <h4 id="physical-constraints">물리적 제약조건</h4>
+
+          <div class="equation" role="math">\mathbf{u}^l \leq \mathbf{u} \leq \mathbf{u}^u
+\tag{10a}</div>
+
+          <div class="equation" role="math">p = \mathbf{u}^\top \dot{\mathbf{q}}_L \leq p^u
+\tag{10b}</div>
+
+          <div class="equation" role="math">\mathbf{L}^l \leq \mathbf{L} \leq \mathbf{L}^u
+\tag{10c}</div>
+
+          <div class="equation" role="math">f_i =
+A_i(\operatorname{sgn}(\dot{\mathbf{q}}_L))^\top
+\dot{\mathbf{q}}_L^{\text{abs}}
+\leq f_i^u,
+\quad i = 1,2
+\tag{10d}</div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>제약</th>
+                  <th>물리적 의미</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>(10a) Force/torque limit</td>
+                  <td>각 액추에이터의 힘/토크 상하한</td>
+                </tr>
+                <tr>
+                  <td>(10b) Power limit</td>
+                  <td>유압 펌프의 총 파워 상한 (모든 액추에이터가 동일 파워원 공유)</td>
+                </tr>
+                <tr>
+                  <td>(10c) Cylinder displacement</td>
+                  <td>실린더 변위의 물리적 상하한</td>
+                </tr>
+                <tr>
+                  <td>(10d) Pump flow rate</td>
+                  <td>2개 유압 펌프의 유량 제한</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <aside class="callout example">
+            <p class="callout-title">🔧 APEX 구현 대조 — 식(10a-d) — 4가지 한계 조건이 코드에 1:1로</p>
+            <p>
+              <strong>대응</strong>: 국소 제어가 매번 푸는 최적화 문제에 논문의 4가지 한계가 그대로 들어 있습니다
+              (<code>local_mpc.py</code>):
+            </p>
+
+            <pre><code>approx_u  = inertia*v + damping*qd + h0    # (10a) 이 움직임에 필요한 힘 ≤ 한계의 90%
+power     = approx_u * qd                   # (10b) 파워(힘×속도) ≤ 한계
+q_L       = neutral + scale*q              # (10c) 실린더가 물리적 이동 범위 안
+pump_flow = Σ|q̇_L|                         # (10d) 유량(실린더 속도 합) ≤ 펌프 용량</code></pre>
+
+            <p>
+              <strong>논문과 다른 점</strong>: (10b) 파워를 논문은 전체 합으로 한 번에, 우리는 축마다 따로 제한.
+              (10d) 유량도 논문은 펌프 2대에 나눠 배분, 우리는 한 덩어리로 합산 (🟡 단순화).
+            </p>
+            <p>
+              <strong>판정의 정직성</strong>: 한계 초과 여부는 <strong>잘라내기 전의 원래 힘 값</strong>으로 판정합니다
+              (먼저 잘라놓고 “한계 안 넘었네”라고 하면 눈속임이므로).
+            </p>
+            <p>
+              <strong>“이 조건들이 진짜 일하는가” 검증</strong>: 제약을 끄고 단순 추종만 시켜보면
+              858번 중 645~657번 한계 초과 발생 — 즉 제약이 76% 구간에서 실제로 개입하고 있었습니다.
+              단, 제약을 켜도 “필요 힘이 한계를 넘는다”는 경고 표시는 ~24% 남는데,
+              이는 위 3.2의 미보정 힘 한계 수치 탓입니다 (기록된 한계).
+            </p>
+          </aside>
+
+          <h4 id="disturbance-estimation">외란 추정 (Disturbance Estimation)</h4>
+          <p>모멘텀 기반 외란 추정 (momentum-based disturbance estimation):</p>
+
+          <div class="equation" role="math">\hat{\boldsymbol{\Delta}}
+= K_E \left(
+\mathbf{p} - \mathbf{p}(0)
+- \int_0^t
+\left(
+J_\theta^\top \mathbf{u}
++ C_\theta^\top \dot{\mathbf{q}}_\theta
+- G_\theta
++ \hat{\boldsymbol{\Delta}}
+\right)d\tau
+\right),
+\quad
+\mathbf{p} = M_\theta \dot{\mathbf{q}}_\theta
+\tag{11}</div>
+
+          <p>
+            <strong>Ṁ<sub>θ</sub> = C<sub>θ</sub> + C<sub>θ</sub><sup>⊤</sup></strong> 성질을 활용하면,
+            실제 외란 <strong>Δ</strong>의 <strong>저역통과 필터(low-pass filter)</strong>로 작동:
+          </p>
+
+          <div class="equation" role="math">\dot{\hat{\boldsymbol{\Delta}}}
+= K_E(\boldsymbol{\Delta} - \hat{\boldsymbol{\Delta}})</div>
+
+          <p>
+            실린더 변위 기반 추정값:
+            <strong>Δ̂<sub>L</sub> = J<sub>L</sub><sup>⊤</sup>Δ̂ =
+            [Δ̂<sub>U</sub> Δ̂<sub>B</sub> Δ̂<sub>A</sub> Δ̂<sub>K</sub>]<sup>⊤</sup></strong>
+          </p>
+
+          <aside class="callout example">
+            <p class="callout-title">🔧 APEX 구현 대조 — 식(11) — 흙 저항 실시간 추정: 구현 + 효과 입증</p>
+            <p>
+              <strong>대응</strong>: <code>disturbance.py</code> —
+              “모델대로면 이렇게 움직였어야 하는데 실제는 이만큼 못 움직였다 → 그 차이가 흙의 저항”이라는
+              논문 식(11)의 아이디어를, 잡음을 걸러내는 필터와 함께 구현:
+            </p>
+
+            <pre><code>predicted = 모델이 예측한 가속도(저항 0 가정)
+residual_torque = M @ (실측 가속도 - predicted)   # = 흙 저항 추정
+estimate = 0.8*직전_추정 + 0.2*residual_torque    # 저역통과(잡음 제거)</code></pre>
+
+            <ul>
+              <li><strong>효과 입증 (핵심 성과)</strong>: 이 추정기를 끄면 같은 궤적인데 <strong>7.2cm 얕게 파고 흙은 45% 덜 담깁니다</strong> (3회 반복 중앙값, 서로 다른 3가지 측정이 일치). 즉 흙을 뚫고 들어가는 능력이 이 부품에서 나옵니다.</li>
+              <li><strong>주의할 점 (정직 기록)</strong>: ① 우리 모터는 속도 명령형이라, 추정값에는 흙 저항 외에 “모터 반응 지연”도 섞입니다. ② 추정값이 안전 상한(힘 한계의 80%)에 거의 항상 붙어 있어, 흙이 4배 단단해져도 추정값 숫자는 안 변합니다 — 미보정 힘 수치 탓이며 개선 항목 (🟡).</li>
+            </ul>
+          </aside>
+
+          <h4 id="mpc-formulation">MPC 문제 정식화</h4>
+          <p>원래 비선형 MPC:</p>
+
+          <div class="equation" role="math">\min_{\mathbf{u}_k}
+\|\mathbf{x}_N - \mathbf{x}_{r,N}\|_P^2
++ \sum_{k=0}^{N-1}
+\left(
+\|\mathbf{x}_k - \mathbf{x}_{r,k}\|_Q^2
++ \|\mathbf{u}_k\|_R^2
+\right)
+\tag{12}</div>
+
+          <div class="equation" role="math">\text{s.t.}\quad
+\mathbf{x}_{k+1}
+= f_d(\mathbf{x}_k,\mathbf{u}_k,\hat{\boldsymbol{\Delta}}_k),
+\quad
+c_{k,i}(\mathbf{x}_k,\mathbf{u}_k) \geq 0</div>
+
+          <h4 id="feedback-linearization">Feedback Linearization 기반 단순화</h4>
+          <p>가상 입력 <strong>v ∈ ℝ<sup>4</sup></strong>와 피드백 선형화 제어 법칙 도입:</p>
+
+          <div class="equation" role="math">\mathbf{u}
+= \operatorname{FL}(\mathbf{x},\mathbf{v})
+:= \mathbf{h}_L + M_L\mathbf{v}
+- \hat{\boldsymbol{\Delta}}_L</div>
+
+          <p>이를 통해 비선형 동역학을 <strong>선형 동역학으로 변환</strong>:</p>
+
+          <div class="equation" role="math">\dot{\mathbf{x}} = A_c\mathbf{x} + B_c\mathbf{v},
+\quad
+A_c =
+\begin{bmatrix}
+0_{4\times4} &amp; I_4 \\
+0_{4\times4} &amp; 0_{4\times4}
+\end{bmatrix},
+\quad
+B_c =
+\begin{bmatrix}
+0_{4\times4} \\
+I_4
+\end{bmatrix}
+\tag{13}</div>
+
+          <p>최종 MPC 문제 (선형화된 동역학 기반):</p>
+
+          <div class="equation" role="math">\min_{\mathbf{v}_k}
+\|\mathbf{x}_N - \mathbf{x}_{r,N}\|_{\tilde{P}}^2
++ \sum_{k=0}^{N-1}
+\left(
+\|\mathbf{x}_k - \mathbf{x}_{r,k}\|_{\tilde{Q}}^2
++ \|\mathbf{v}_k\|_{\tilde{R}}^2
+\right)
+\tag{14}</div>
+
+          <div class="equation" role="math">\text{s.t.}\quad
+\mathbf{x}_{k+1}
+= A_d\mathbf{x}_k + B_d\mathbf{v}_k,
+\quad
+c_{k,i}
+\left(
+\mathbf{x}_k,
+\operatorname{FL}(\mathbf{x}_k,\mathbf{v}_k)
+\right)
+\geq 0</div>
+
+          <div class="diagram" role="img" aria-label="피드백 선형화 기반 MPC 문제 단순화 과정">
+            <div class="flow">
+              <div class="flow-node nonlinear">
+                비선형 동역학 (3)
+                <span class="flow-label">f<sub>L</sub>(x<sub>L</sub>, u, Δ<sub>L</sub>)</span>
+              </div>
+              <div class="arrow">→</div>
+              <div class="flow-node linear">
+                선형 동역학 (13)
+                <span class="flow-label">Feedback Linearization<br>u = h<sub>L</sub> + M<sub>L</sub>v − Δ̂<sub>L</sub></span>
+              </div>
+              <div class="arrow">→</div>
+              <div class="flow-node">
+                이산 선형 동역학
+                <span class="flow-label">x<sub>k+1</sub> = A<sub>d</sub>x<sub>k</sub> + B<sub>d</sub>v<sub>k</sub></span>
+              </div>
+              <div class="arrow">→</div>
+              <div class="flow-node output">
+                MPC 문제 (14)
+                <span class="flow-label">선형 동역학 · 물리 제약 유지 · DDP + Augmented Lagrangian</span>
+              </div>
+            </div>
+            <p>
+              외란 추정 (11): 모멘텀 기반 · 저역통과 필터 특성 → MPC 문제에 입력
+            </p>
+          </div>
+
+          <aside class="callout example">
+            <p class="callout-title">🔧 APEX 구현 대조 — 식(12)(13)(14) — 제어 계산 구조: 대응 + 속도모터용 적응</p>
+            <blockquote>
+              <p>
+                용어: <strong>FL(feedback linearization, 피드백 선형화)</strong> =
+                “팔 무게·중력·흙 저항을 미리 계산해 상쇄하는 힘을 더해주면,
+                복잡한 기계가 단순한 수식처럼 움직인다”는 제어 기법.
+                이때 계산되는 힘을 이 문서에서 “보정 힘(FL 토크)”이라 부릅니다.
+              </p>
+            </blockquote>
+
+            <p>
+              <strong>식(12)→(14) 최적화</strong>: 논문은 앞으로 1초간의 입력 열 전체를 고급 솔버(DDP)로 풀고,
+              우리는 <strong>“지금 이 순간의 가속도 하나”만</strong> 정하는 단순화 버전을 범용 솔버(IPOPT)로 풉니다 (🟡):
+            </p>
+
+            <pre><code># 목표와의 거리(위치·속도)를 줄이는 가속도 v를, 위 4가지 한계 안에서 선택
+objective += 120*(위치오차²) + 18*(속도오차²)</code></pre>
+
+            <p><strong>식(14) 보정 힘</strong>: 논문 수식 u = h + M·v − Δ̂ 그대로 구현 (+마찰 항):</p>
+
+            <pre><code>raw_u = M@가속도 + 중력항 + 마찰*속도 - 흙저항추정</code></pre>
+
+            <p>
+              <strong>우리 플랜트 적응 (중요한 차이)</strong>: 이 보정 힘은 속도 모터에 직접 넣을 수 없으므로,
+              <strong>속도 명령을 그만큼 더 세게 미는 방식</strong>으로 같은 효과를 냅니다:
+              <code>목표속도 = 현재속도 + (v − M⁻¹·흙저항추정)·dt</code>.
+            </p>
+            <p>
+              <strong>꺼보기 검증의 정직한 결과</strong>: 흙 저항 부분을 끄면 성능이 크게 나빠지지만(위 식(11) 주석),
+              <strong>중력·관성 보정 부분만 끄면 결과가 안 변했습니다</strong>
+              (우리 굴착이 힘 한계에 안 걸릴 만큼 온화해서 이 보정이 개입할 기회가 없음).
+              “이 부품의 단독 효과는 이 조건에서 증명 안 됨”으로 기록.
+            </p>
+            <p>
+              <strong>계산 속도</strong>: 우리 단순화 덕에 100번 중 95번이 7ms 이내
+              (논문 21.7~30.2ms). 단 가끔 23~25ms 튀는 이봉 분포.
+            </p>
+            <blockquote>
+              <p>
+                <strong>덜컹거림과의 연결 (2026-08-14 사용자 관찰)</strong>:
+                “가속도 하나만 정해 유지”하는 우리 단순화는 가속도가 계단식으로 바뀌어
+                <strong>몸체가 꿀렁이는 구조적 원인 후보 1순위</strong>입니다.
+                논문처럼 입력 열을 부드럽게 최적화하면 완화 여지.
+                접촉 중 14~20% 스텝에서 백업 제어로 전환되며 명령이 살짝 튀는 것도 원인 후보.
+                → 다음 개선 작업으로 등록됨.
+              </p>
+            </blockquote>
+          </aside>
+        </section>
+
+        <section id="experiments" aria-labelledby="experiments-heading">
+          <h2 id="experiments-heading">4. 실험 결과</h2>
+
+          <h3 id="simulation-environment">4.1 시뮬레이션 환경</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>항목</th>
+                  <th>설정</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>플랫폼</strong></td>
+                  <td>Hyundai HX300L 모델 파라미터</td>
+                </tr>
+                <tr>
+                  <td><strong>구현</strong></td>
+                  <td>ROS + C++ (각 모듈 개별 노드)</td>
+                </tr>
+                <tr>
+                  <td><strong>외란 모델</strong></td>
+                  <td>Modified LuGre friction (실린더 마찰) + Modified FEE (토양-버킷 상호작용)</td>
+                </tr>
+                <tr>
+                  <td><strong>전역 최적화</strong></td>
+                  <td>ALGLIB (비선형 최적화 솔버)</td>
+                </tr>
+                <tr>
+                  <td><strong>MPC 솔버</strong></td>
+                  <td>DDP + Augmented Lagrangian [30]</td>
+                </tr>
+                <tr>
+                  <td><strong>MPC 파라미터</strong></td>
+                  <td>시간 수평선 1000 ms, 제어 이산화/적분 주기 20 ms</td>
+                </tr>
+                <tr>
+                  <td><strong>Bernstein 제어점</strong></td>
+                  <td>Phase 1, 3: 9개 / Phase 2: 20개 via point</td>
+                </tr>
+                <tr>
+                  <td><strong>하드웨어</strong></td>
+                  <td>Intel Core i7-9750 CPU @ 2.6 GHz</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 id="scenario-1">4.2 Scenario 1 — Shallow Excavation (얕은 굴착)</h3>
+
+          <figure class="figure wide">
+            <img src="assets/figure6.png" alt="얕은 굴착 및 깊은 굴착의 global planning 결과">
+            <figcaption>
+              Fig. 6: 두 시나리오의 global planning 결과. (a) Shallow excavation, (b) Deep excavation.
+              Ground(주황), Target(흰색), Global planner result(녹색), Traversed trajectory(빨강).
+            </figcaption>
+          </figure>
+
+          <figure class="figure wide">
+            <img src="assets/figure7.png" alt="Scenario 1 얕은 굴착 결과">
+            <figcaption>
+              Fig. 7: Scenario 1 - Shallow excavation 결과.
+              (a) 전역 궤적 추종, (b) 정규화된 제어 입력,
+              (c) 정규화된 파워 및 펌프 유량, (d) 정규화된 추정 외란.
+              빨간 점선은 물리적 한계를 나타냄.
+            </figcaption>
+          </figure>
+
+          <p><strong>주요 결과:</strong></p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>지표</th>
+                  <th>값</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Global trajectory 계산 시간</td>
+                  <td><strong>2.1초</strong></td>
+                </tr>
+                <tr>
+                  <td>Local planning 평균 계산 시간</td>
+                  <td><strong>21.7 ms (약 46 Hz)</strong></td>
+                </tr>
+                <tr>
+                  <td>물리적 제약조건 만족</td>
+                  <td>모든 제약조건 충족</td>
+                </tr>
+                <tr>
+                  <td>외란 추정</td>
+                  <td>버킷 실린더에서 마찰 모델 명확히 관측, 붐/암에서는 토양 상호작용 외란이 더 큼</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <ul>
+            <li>목표 형상(target shape)을 관통하지 않도록 넓은 영역에서 궤적 생성</li>
+            <li><strong>Tip-grading-like motion</strong> 발생</li>
+            <li>Global planning이 의도적으로 물리적 한계를 초과하더라도, local planning에서 제약조건 만족</li>
+          </ul>
+
+          <h3 id="scenario-2">4.3 Scenario 2 — Deep Excavation (깊은 굴착)</h3>
+
+          <figure class="figure wide">
+            <img src="assets/figure8.png" alt="Scenario 2 깊은 굴착 결과">
+            <figcaption>
+              Fig. 8: Scenario 2 - Deep excavation 결과.
+              (a) 전역 궤적 추종, (b) 정규화된 제어 입력,
+              (c) 정규화된 파워 및 펌프 유량, (d) 정규화된 추정 외란.
+            </figcaption>
+          </figure>
+
+          <p><strong>주요 결과:</strong></p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>지표</th>
+                  <th>값</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Global trajectory 계산 시간</td>
+                  <td><strong>1.6초</strong></td>
+                </tr>
+                <tr>
+                  <td>Local planning 평균 계산 시간</td>
+                  <td><strong>30.2 ms (약 33 Hz)</strong></td>
+                </tr>
+                <tr>
+                  <td>물리적 제약조건 만족</td>
+                  <td>모든 제약조건 충족</td>
+                </tr>
+                <tr>
+                  <td>외란 크기</td>
+                  <td>Scenario 1보다 큰 외란 (버킷이 토양에 더 깊이 침투)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <ul>
+            <li>목표 형상이 깊으면 Phase 2에서 <strong>삼각형 형태의 궤적</strong> 생성하여 굴착 체적 최대화</li>
+            <li>반복 굴착을 통해 깊은 목표 형상에 점진적으로 도달하는 전략 (target-shape-aware excavation-volume-maximizing strategy)</li>
+            <li>더 큰 외란에도 불구하고 global reference 잘 추종 및 모든 물리적 제약조건 충족</li>
+          </ul>
+
+          <h3 id="scenario-comparison">4.4 두 시나리오 비교</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>항목</th>
+                  <th>Shallow Excavation</th>
+                  <th>Deep Excavation</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>궤적 형태</td>
+                  <td>넓은 영역 tip-grading</td>
+                  <td>삼각형 체적 최대화</td>
+                </tr>
+                <tr>
+                  <td>목표 도달</td>
+                  <td>단일 pass</td>
+                  <td>반복 필요</td>
+                </tr>
+                <tr>
+                  <td>Global 계산</td>
+                  <td>2.1 s</td>
+                  <td>1.6 s</td>
+                </tr>
+                <tr>
+                  <td>Local 계산</td>
+                  <td>21.7 ms (46 Hz)</td>
+                  <td>30.2 ms (33 Hz)</td>
+                </tr>
+                <tr>
+                  <td>외란 크기</td>
+                  <td>상대적 소</td>
+                  <td>상대적 대</td>
+                </tr>
+                <tr>
+                  <td>제약 만족</td>
+                  <td>O</td>
+                  <td>O</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <aside class="callout example">
+            <p class="callout-title">🔧 APEX 구현 대조 — §4 실험 — 논문 수치 vs 우리 실측</p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>항목</th>
+                    <th>논문 (30t, 자체 시뮬)</th>
+                    <th>APEX (8.5t, AGX 시뮬)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>전역 계획 계산</td>
+                    <td>1.6~2.1초</td>
+                    <td>~0.4초 + 지면 요약 (pass마다)</td>
+                  </tr>
+                  <tr>
+                    <td>국소 제어 계산</td>
+                    <td>평균 21.7~30.2ms</td>
+                    <td><strong>95%가 7ms 이내</strong> (가끔 23~25ms)</td>
+                  </tr>
+                  <tr>
+                    <td>한계 조건 만족</td>
+                    <td>전부 충족</td>
+                    <td>명령 포화 0, 사전 등록 기준 내 (단 “필요 힘 경고” ~24%는 미보정 수치 탓)</td>
+                  </tr>
+                  <tr>
+                    <td>깊은 굴착 전략</td>
+                    <td>여러 pass 반복 점진 도달</td>
+                    <td><strong>동일 전략</strong>: 3-pass로 -0.27→-0.30→-0.44m</td>
+                  </tr>
+                  <tr>
+                    <td>지면 정보</td>
+                    <td>미리 안다고 가정</td>
+                    <td><strong>LiDAR 실측 스캔</strong> (경사 8°→7.32° 읽음)</td>
+                  </tr>
+                  <tr>
+                    <td>조건 다양성</td>
+                    <td>얕은/깊은 2가지</td>
+                    <td><strong>5가지</strong> (단단한 흙/모래/경사/둔덕/조합) + 라이브 재현</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>굴착량은 기존 자동굴착(scripted) 대비 84% — 한계 조건을 지키는 대가로 기록.</p>
+          </aside>
+        </section>
+
+        <section id="limitations" aria-labelledby="limitations-heading">
+          <h2 id="limitations-heading">5. 한계 및 향후 연구</h2>
+
+          <ul>
+            <li><strong>시뮬레이션만 검증</strong>: 실제 굴착기에서의 실험 검증이 수행되지 않음</li>
+            <li><strong>환경 사전 지식 가정</strong>: 지면 형상(ground shape)을 사전에 알고 있다고 가정 (LiDAR, 카메라 등으로 취득 가능하나 불확실성 미고려)</li>
+            <li><strong>토양 모델의 단순화</strong>: Modified FEE 기반 토양-버킷 상호작용 모델은 시뮬레이션용이며, 실제 토양 조건의 다양성 미반영</li>
+            <li><strong>단일 굴착 작업만 고려</strong>: 연속적인 반복 굴착, 트럭 적재 등 상위 수준 태스크 플래닝 미포함</li>
+            <li><strong>향후 연구</strong>: 실제 굴착기에서의 알고리즘 검증 (논문 결론에서 명시)</li>
+          </ul>
+
+          <aside class="callout example">
+            <p class="callout-title">🔧 APEX 구현 대조 — 한계 대조 — 논문의 한계를 우리가 얼마나 해소했나</p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>논문의 한계</th>
+                    <th>우리 상태</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>시뮬레이션만 검증</td>
+                    <td><strong>같음</strong> (실차 이식은 별도 로드맵)</td>
+                  </tr>
+                  <tr>
+                    <td>지면 모양을 미리 안다고 가정</td>
+                    <td><strong>해소</strong> — LiDAR 스캔→자동 수식화 (경사·둔덕 실측 검증)</td>
+                  </tr>
+                  <tr>
+                    <td>흙 모델 단순화</td>
+                    <td><strong>부분 해소</strong> — 입자 물리(AGX) + 물성 3종 바꿔 검증 (단 3개 수치만 변경)</td>
+                  </tr>
+                  <tr>
+                    <td>한 번의 굴착만 다룸</td>
+                    <td><strong>부분 해소</strong> — 3-pass 연속 + 회전 덤프 (그 위의 작업 계획은 미포함)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              <strong>우리에게만 있는 한계 (논문에는 없는 것)</strong>:
+              ① 무게·관성·힘 한계 수치 미보정
+              ② 힘으로 미는 모터 없음(속도 모터 — 보정 힘은 속도로 환산 적용)
+              ③ 중력·관성 보정 부품의 단독 효과 미증명
+              ④ pass 단위 재계획
+              ⑤ <strong>덜컹거림(저크)</strong> — 다음 개선 작업.
+            </p>
+          </aside>
+        </section>
+
+        <section id="closing-summary" aria-labelledby="closing-summary-heading">
+          <h2 id="closing-summary-heading">한마디로 정리</h2>
+
+          <ul class="summary-list">
+            <li>Global + Local planner 통합 프레임워크로 유압 굴착기의 <strong>실시간 궤적 계획</strong> 구현</li>
+            <li>Force/torque, power, cylinder displacement, flow rate 등 <strong>4가지 물리적 제약조건 동시 충족</strong> 달성</li>
+            <li>Feedback linearization으로 비선형 MPC를 선형화하여 <strong>30 Hz 이상 실시간 연산</strong> 달성</li>
+            <li>모멘텀 기반 외란 추정으로 마찰 및 토양 상호작용 <strong>disturbance-aware planning</strong> 구현</li>
+            <li>Shallow/deep excavation 두 시나리오에서 <strong>제약 만족 + 전역 궤적 추종</strong> 검증 완료</li>
+            <li>실제 굴착기 실험 <strong>미수행</strong> — 시뮬레이션만 검증</li>
+          </ul>
+
+          <aside class="callout example">
+            <p class="callout-title">🔧 APEX 구현 대조 — 종합 — 검토 가이드</p>
+            <p><strong>절별 판정 한눈에</strong>:</p>
+            <ul>
+              <li><span class="status">🟢 충실:</span> 운동학(실측 표) · 굴착 최적화(각도까지 확장) · 흘림 방지 · 지면 자동 수식화</li>
+              <li><span class="status">🟡 부분/단순화:</span> 무게·관성 모델(수치 미보정) · 진입/인양 시간배분 · 파워/유량 배분 방식 · “가속도 하나” 단순화 · 보정 힘(속도 환산 적용) · 흙 저항 추정(상한 포화)</li>
+              <li><span class="status">🔴 다름/없음:</span> 솔버 종류(DDP↔IPOPT) · 회전(스윙) 계획 방식 · 힘으로 미는 모터 채널</li>
+            </ul>
+            <p>
+              <strong>읽는 법</strong>: 절마다 “논문 대비 이 정도면 충분한가”를 판정해 주시면,
+              미흡 판정 절이 그대로 다음 작업 목록이 됩니다.
+              수치 근거·검증 이력이 궁금한 절은 <code>mpc_paper_mapping.md</code>의 게이트 표에 상세가 있습니다.
+            </p>
+          </aside>
+
+          <a class="back-top" href="#top">↑ 문서 맨 위로</a>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    Real-Time Motion Planning of a Hydraulic Excavator using Trajectory Optimization and Model Predictive Control · Faithful editorial rendering
+  </footer>
+</body>
+</html>
