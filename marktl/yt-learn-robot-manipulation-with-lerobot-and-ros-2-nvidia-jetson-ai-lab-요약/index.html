@@ -5,42 +5,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
   
-
-  <title>로봇에게 보고, 이해하고, 움직이는 법을 가르치는 스택 — LeRobot·GR00T·ROS 2 분석</title>
-  
-  
-  
-
   
   
   
   
   
-
   
   
   
   
-
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>로봇이 보고, 배우고, 움직이기까지 | LeRobot·GR00T·ROS 2 연구 리포트</title>
   <style>
     :root {
-      --ink: #16201d;
-      --ink-soft: #4c5b56;
-      --paper: #f7f4ed;
-      --paper-deep: #eee9dd;
-      --surface: #fffdf8;
-      --forest: #17352f;
-      --forest-2: #245c4d;
-      --mint: #dcebe2;
-      --lime: #c7ea78;
-      --amber: #f3bc68;
-      --amber-soft: #fff1d7;
-      --line: #d9d5ca;
-      --line-dark: #9aaba4;
-      --shadow: 0 24px 70px rgba(23, 53, 47, 0.12);
-      --radius: 24px;
+      --ink: #18211d;
+      --ink-soft: #4d5b54;
+      --muted: #6e7a73;
+      --paper: #fbfaf6;
+      --paper-deep: #f0eee6;
+      --surface: #ffffff;
+      --line: #dcded7;
+      --line-strong: #bdc4bb;
+      --green: #1f6b4f;
+      --green-dark: #164737;
+      --green-pale: #e8f2ec;
+      --lime: #b8de62;
+      --amber: #d88b32;
+      --amber-pale: #fff1dc;
+      --blue: #2c6076;
+      --blue-pale: #e5f0f4;
+      --danger: #9f4539;
+      --shadow: 0 20px 60px rgba(23, 37, 29, 0.09);
+      --shadow-soft: 0 8px 28px rgba(23, 37, 29, 0.07);
+      --radius: 22px;
+      --radius-sm: 13px;
       --content: 760px;
-      --wide: 1160px;
+      --wide: 1180px;
+      --sans: "Pretendard Variable", Pretendard, SUIT, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+      --serif: "Noto Serif KR", "KoPub Batang", "Nanum Myeongjo", Georgia, serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
     }
 
     * {
@@ -56,13 +66,11 @@
       margin: 0;
       color: var(--ink);
       background:
-        radial-gradient(circle at 8% 1%, rgba(199, 234, 120, 0.18), transparent 27rem),
-        linear-gradient(180deg, #fbfaf5 0, var(--paper) 36rem);
-      font-family:
-        "Pretendard", "SUIT", "Noto Sans KR", "Apple SD Gothic Neo",
-        "Malgun Gothic", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        radial-gradient(circle at 8% 2%, rgba(184, 222, 98, 0.17), transparent 22rem),
+        linear-gradient(180deg, #f7f7f0 0, var(--paper) 36rem);
+      font-family: var(--sans);
       font-size: 17px;
-      line-height: 1.78;
+      line-height: 1.82;
       word-break: keep-all;
       overflow-wrap: break-word;
     }
@@ -70,250 +78,244 @@
     img {
       display: block;
       max-width: 100%;
+      height: auto;
     }
 
     a {
-      color: var(--forest-2);
+      color: var(--green);
+      text-underline-offset: 0.18em;
       text-decoration-thickness: 1px;
-      text-underline-offset: 0.2em;
     }
 
     a:hover,
     a:focus-visible {
-      color: #0e7960;
+      color: var(--green-dark);
+      text-decoration-thickness: 2px;
     }
 
     :focus-visible {
-      outline: 3px solid var(--amber);
+      outline: 3px solid rgba(31, 107, 79, 0.35);
       outline-offset: 4px;
       border-radius: 4px;
     }
 
     .skip-link {
       position: absolute;
-      top: 0;
-      left: -9999px;
+      top: -5rem;
+      left: 1rem;
       z-index: 100;
-      padding: 0.8rem 1rem;
-      color: white;
-      background: var(--forest);
+      padding: 0.7rem 1rem;
+      color: #fff;
+      background: var(--green-dark);
+      border-radius: 0 0 8px 8px;
     }
 
     .skip-link:focus {
-      left: 1rem;
-      top: 1rem;
+      top: 0;
     }
 
-    .site-bar {
-      border-bottom: 1px solid rgba(23, 53, 47, 0.12);
-      background: rgba(251, 250, 245, 0.94);
-    }
-
-    .site-bar-inner {
-      width: min(calc(100% - 40px), var(--wide));
-      min-height: 64px;
+    .masthead {
+      width: min(calc(100% - 32px), var(--wide));
       margin: 0 auto;
+      padding: 24px 0 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 1rem;
+      gap: 20px;
+      border-bottom: 1px solid rgba(24, 33, 29, 0.12);
     }
 
     .brand {
-      color: var(--forest);
-      font-size: 0.83rem;
-      font-weight: 850;
-      letter-spacing: 0.14em;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      color: var(--ink);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.13em;
+      text-decoration: none;
       text-transform: uppercase;
     }
 
-    .site-bar nav {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      gap: 0.35rem 1rem;
-      font-size: 0.82rem;
+    .brand-mark {
+      display: grid;
+      width: 31px;
+      height: 31px;
+      place-items: center;
+      color: #fff;
+      background: var(--green-dark);
+      border-radius: 50% 50% 50% 12%;
+      font-size: 0.8rem;
+      letter-spacing: 0;
     }
 
-    .site-bar nav a {
-      color: var(--ink-soft);
-      text-decoration: none;
+    .masthead-label {
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
     .hero {
-      width: min(calc(100% - 40px), var(--wide));
+      width: min(calc(100% - 32px), var(--wide));
       margin: 0 auto;
-      padding: clamp(4rem, 9vw, 8rem) 0 3.2rem;
+      padding: clamp(58px, 8vw, 118px) 0 58px;
     }
 
-    .hero-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1.14fr) minmax(280px, 0.62fr);
-      align-items: end;
-      gap: clamp(2rem, 6vw, 5.5rem);
-    }
-
-    .eyebrow,
-    .section-label {
-      margin: 0 0 1rem;
-      color: var(--forest-2);
-      font-size: 0.76rem;
-      font-weight: 850;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-    }
-
-    h1,
-    h2,
-    h3,
-    .pullquote {
-      font-family:
-        "Noto Serif KR", "KoPub Batang", "AppleMyungjo", "Batang",
-        Georgia, serif;
-      letter-spacing: -0.045em;
-    }
-
-    h1 {
-      max-width: 900px;
-      margin: 0;
-      color: var(--forest);
-      font-size: clamp(2.7rem, 6.5vw, 6.1rem);
-      font-weight: 760;
-      line-height: 1.04;
-    }
-
-    .hero-accent {
-      position: relative;
-      white-space: nowrap;
-    }
-
-    .hero-accent::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0.04em;
-      z-index: -1;
-      height: 0.21em;
-      border-radius: 999px;
-      background: var(--lime);
-      transform: rotate(-1.2deg);
-    }
-
-    .dek {
-      max-width: 660px;
-      margin: 2rem 0 0;
-      color: #33443e;
-      font-size: clamp(1.12rem, 2vw, 1.42rem);
-      line-height: 1.65;
-    }
-
-    .hero-side {
-      padding: 1.5rem 0 0;
-      border-top: 2px solid var(--forest);
-    }
-
-    .hero-side strong {
-      display: block;
-      margin-bottom: 0.65rem;
-      color: var(--forest);
-      font-size: 0.78rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    .hero-side p {
-      margin: 0;
-      color: var(--ink-soft);
-      font-size: 0.96rem;
-    }
-
-    .meta-row {
+    .kicker,
+    .section-kicker {
       display: flex;
-      flex-wrap: wrap;
-      gap: 0.6rem;
-      margin-top: 2rem;
-    }
-
-    .pill {
-      padding: 0.42rem 0.78rem;
-      border: 1px solid rgba(23, 53, 47, 0.18);
-      border-radius: 999px;
-      color: var(--forest);
-      background: rgba(255, 253, 248, 0.74);
-      font-size: 0.76rem;
-      font-weight: 750;
-    }
-
-    .hero-figure {
-      width: min(calc(100% - 40px), var(--wide));
-      margin: 0 auto;
-    }
-
-    .hero-figure figure {
-      margin: 0;
-      overflow: hidden;
-      border-radius: clamp(18px, 3vw, 34px);
-      background: var(--forest);
-      box-shadow: var(--shadow);
-    }
-
-    .hero-figure img {
-      width: 100%;
-      aspect-ratio: 16 / 7.5;
-      object-fit: cover;
-      image-rendering: auto;
-    }
-
-    .hero-figure figcaption {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 1rem;
-      padding: 1rem 1.3rem;
-      color: #deebe5;
-      background: var(--forest);
-      font-size: 0.82rem;
-    }
-
-    .timestamp {
-      color: var(--lime);
-      font-weight: 850;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: 0.04em;
-    }
-
-    .article-shell {
-      width: min(calc(100% - 40px), var(--wide));
-      margin: 0 auto;
-      padding: 5rem 0 8rem;
-    }
-
-    .lead-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.45fr);
-      gap: clamp(2rem, 7vw, 6rem);
-      align-items: start;
-    }
-
-    .toc {
-      position: sticky;
-      top: 1.25rem;
-      padding: 1.4rem;
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      background: rgba(255, 253, 248, 0.82);
-    }
-
-    .toc h2 {
-      margin: 0 0 1rem;
-      font-family: inherit;
-      font-size: 0.75rem;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 18px;
+      color: var(--green);
+      font-size: 0.78rem;
       font-weight: 850;
       letter-spacing: 0.12em;
       text-transform: uppercase;
     }
 
+    .kicker::before,
+    .section-kicker::before {
+      width: 34px;
+      height: 2px;
+      background: currentColor;
+      content: "";
+    }
+
+    h1 {
+      max-width: 980px;
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(2.75rem, 6.5vw, 6.35rem);
+      font-weight: 800;
+      letter-spacing: -0.055em;
+      line-height: 1.07;
+    }
+
+    .title-accent {
+      color: var(--green);
+    }
+
+    .deck {
+      max-width: 830px;
+      margin: 30px 0 0;
+      color: #3d4b44;
+      font-family: var(--serif);
+      font-size: clamp(1.15rem, 2.2vw, 1.52rem);
+      line-height: 1.72;
+    }
+
+    .byline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      align-items: center;
+      margin-top: 34px;
+      color: var(--muted);
+      font-size: 0.87rem;
+    }
+
+    .byline strong {
+      color: var(--ink);
+    }
+
+    .byline span + span::before {
+      margin-right: 20px;
+      color: var(--line-strong);
+      content: "•";
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 26px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .tag-list li {
+      padding: 5px 12px;
+      color: var(--green-dark);
+      background: var(--green-pale);
+      border: 1px solid rgba(31, 107, 79, 0.15);
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 750;
+    }
+
+    .hero-figure {
+      position: relative;
+      width: min(calc(100% - 32px), 1320px);
+      margin: 0 auto;
+    }
+
+    .hero-figure img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      border-radius: clamp(16px, 3vw, 32px);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-figure figcaption {
+      width: min(92%, 840px);
+      margin: 15px auto 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .hero-badge {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 7px 11px;
+      color: #fff;
+      background: rgba(16, 28, 22, 0.86);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .page-shell {
+      display: grid;
+      grid-template-columns: 210px minmax(0, var(--content));
+      gap: clamp(44px, 7vw, 94px);
+      width: min(calc(100% - 32px), 1070px);
+      margin: 76px auto 0;
+      align-items: start;
+    }
+
+    .toc {
+      position: sticky;
+      top: 24px;
+      padding: 18px 0;
+      color: var(--muted);
+      border-top: 2px solid var(--ink);
+      border-bottom: 1px solid var(--line);
+      font-size: 0.76rem;
+      line-height: 1.55;
+    }
+
+    .toc-title {
+      margin: 0 0 12px;
+      color: var(--ink);
+      font-size: 0.72rem;
+      font-weight: 850;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
     .toc ol {
+      display: grid;
+      gap: 10px;
       margin: 0;
       padding: 0;
       list-style: none;
@@ -321,863 +323,902 @@
     }
 
     .toc li {
-      position: relative;
-      padding: 0.65rem 0 0.65rem 2.25rem;
-      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 5px;
       counter-increment: toc;
     }
 
     .toc li::before {
-      content: "0" counter(toc);
-      position: absolute;
-      left: 0;
-      top: 0.7rem;
-      color: var(--forest-2);
-      font-size: 0.69rem;
-      font-weight: 850;
-      letter-spacing: 0.05em;
+      color: var(--green);
+      font-weight: 800;
+      content: counter(toc, decimal-leading-zero);
     }
 
     .toc a {
-      color: var(--ink);
-      font-size: 0.88rem;
-      font-weight: 680;
+      color: inherit;
       text-decoration: none;
     }
 
-    .prose {
-      max-width: var(--content);
+    .toc a:hover,
+    .toc a:focus-visible {
+      color: var(--green);
+    }
+
+    main {
+      min-width: 0;
+    }
+
+    section {
+      scroll-margin-top: 24px;
     }
 
     .abstract {
-      margin-bottom: 2.5rem;
+      padding: clamp(26px, 4vw, 42px);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-top: 5px solid var(--green);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-soft);
     }
 
     .abstract h2 {
-      margin: 0 0 1.1rem;
-      color: var(--forest);
-      font-size: clamp(2rem, 4vw, 3rem);
-      line-height: 1.16;
+      margin-top: 0;
     }
 
-    .abstract p {
-      margin: 0;
-      color: #263631;
+    .abstract p:last-child {
+      margin-bottom: 0;
+    }
+
+    h2 {
+      margin: 0 0 25px;
+      font-family: var(--serif);
+      font-size: clamp(2rem, 4.7vw, 3.25rem);
+      letter-spacing: -0.04em;
+      line-height: 1.23;
+    }
+
+    h3 {
+      margin: 48px 0 18px;
+      font-family: var(--serif);
+      font-size: clamp(1.35rem, 2.8vw, 1.82rem);
+      letter-spacing: -0.026em;
+      line-height: 1.4;
+    }
+
+    h4 {
+      margin: 30px 0 10px;
+      font-size: 1.05rem;
+      line-height: 1.45;
+    }
+
+    p {
+      margin: 0 0 1.35em;
+    }
+
+    .lead {
+      color: #314038;
       font-size: 1.08rem;
+      line-height: 1.85;
     }
 
-    .scope-note {
-      position: relative;
-      margin: 2.5rem 0 0;
-      padding: 1.4rem 1.5rem 1.4rem 3.5rem;
-      border: 1px solid #e4c68f;
-      border-radius: 18px;
-      background: var(--amber-soft);
-      color: #5a4421;
-      font-size: 0.91rem;
+    .report-section {
+      margin-top: 100px;
     }
 
-    .scope-note::before {
-      content: "!";
-      position: absolute;
-      top: 1.3rem;
-      left: 1.3rem;
-      width: 1.45rem;
-      height: 1.45rem;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-      color: white;
-      background: #a8651a;
+    .section-intro {
+      max-width: 690px;
+      margin-bottom: 34px;
+      color: var(--ink-soft);
+      font-size: 1.03rem;
+    }
+
+    .note {
+      margin: 32px 0;
+      padding: 22px 24px 22px 26px;
+      background: var(--amber-pale);
+      border-left: 4px solid var(--amber);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      color: #59452d;
       font-size: 0.9rem;
-      font-weight: 900;
     }
 
-    .scope-note strong {
-      color: #6d4210;
+    .note strong {
+      display: block;
+      margin-bottom: 5px;
+      color: #35291c;
     }
 
-    .findings {
-      margin: 5rem 0;
-      padding: clamp(1.5rem, 4vw, 3rem);
-      border-radius: var(--radius);
-      color: white;
-      background:
-        linear-gradient(135deg, rgba(199, 234, 120, 0.12), transparent 42%),
-        var(--forest);
-      box-shadow: var(--shadow);
-    }
-
-    .findings .section-label {
-      color: var(--lime);
-    }
-
-    .findings h2 {
-      max-width: 680px;
-      margin: 0;
-      font-size: clamp(2rem, 4.3vw, 3.4rem);
-      line-height: 1.12;
-    }
-
-    .finding-grid {
+    .key-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 1px;
-      margin-top: 2.5rem;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.13);
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.15);
+      gap: 14px;
+      margin-top: 28px;
     }
 
-    .finding {
-      min-height: 180px;
-      padding: 1.4rem;
-      background: rgba(12, 39, 33, 0.8);
+    .key-card {
+      min-height: 190px;
+      padding: 25px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 4px 18px rgba(23, 37, 29, 0.04);
     }
 
-    .finding .number {
-      color: var(--lime);
-      font-size: 0.75rem;
-      font-weight: 900;
-      letter-spacing: 0.1em;
+    .key-number {
+      display: block;
+      margin-bottom: 25px;
+      color: var(--green);
+      font-family: var(--serif);
+      font-size: 1.9rem;
+      font-weight: 800;
+      line-height: 1;
     }
 
-    .finding h3 {
-      margin: 0.75rem 0 0.55rem;
-      font-family: inherit;
-      font-size: 1.05rem;
-      letter-spacing: -0.025em;
+    .key-card h3 {
+      margin: 0 0 9px;
+      font-family: var(--sans);
+      font-size: 1rem;
+      letter-spacing: -0.02em;
     }
 
-    .finding p {
+    .key-card p {
       margin: 0;
-      color: #cddbd5;
-      font-size: 0.86rem;
-      line-height: 1.65;
-    }
-
-    .section {
-      margin: 7rem 0;
-      scroll-margin-top: 2rem;
-    }
-
-    .section-head {
-      max-width: var(--content);
-      margin: 0 auto 3rem;
-    }
-
-    .section-head h2 {
-      margin: 0;
-      color: var(--forest);
-      font-size: clamp(2.15rem, 4.7vw, 4rem);
-      line-height: 1.12;
-    }
-
-    .section-head .intro {
-      margin: 1.25rem 0 0;
       color: var(--ink-soft);
-      font-size: 1.08rem;
-    }
-
-    .section-head .chapter-no {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.6rem;
-      margin-bottom: 1.15rem;
-      color: var(--forest-2);
-      font-size: 0.73rem;
-      font-weight: 900;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-    }
-
-    .section-head .chapter-no::before {
-      content: "";
-      width: 38px;
-      height: 2px;
-      background: var(--lime);
+      font-size: 0.85rem;
+      line-height: 1.7;
     }
 
     .pullquote {
-      max-width: 980px;
-      margin: 5rem auto;
-      padding: 1rem 0 1rem clamp(1.5rem, 5vw, 4rem);
-      border-left: 6px solid var(--lime);
-      color: var(--forest);
-      font-size: clamp(1.7rem, 4.2vw, 3.45rem);
-      font-weight: 720;
-      line-height: 1.25;
-    }
-
-    .pullquote small {
-      display: block;
-      margin-top: 1rem;
-      color: var(--ink-soft);
-      font-family: inherit;
-      font-size: 0.78rem;
-      font-weight: 650;
-      letter-spacing: 0.02em;
-    }
-
-    .workflow {
-      display: grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-      margin: 3rem 0 4rem;
-      overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--surface);
-      box-shadow: 0 18px 45px rgba(23, 53, 47, 0.07);
-    }
-
-    .workflow-step {
       position: relative;
-      min-height: 170px;
-      padding: 1.25rem 1rem;
-      border-right: 1px solid var(--line);
+      margin: 70px -34px;
+      padding: 42px 48px 40px;
+      color: #fff;
+      background: var(--green-dark);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      font-family: var(--serif);
+      font-size: clamp(1.35rem, 3vw, 2.08rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.55;
     }
 
-    .workflow-step:last-child {
-      border-right: 0;
+    .pullquote::before {
+      position: absolute;
+      top: 18px;
+      left: 25px;
+      color: var(--lime);
+      font-family: Georgia, serif;
+      font-size: 4.2rem;
+      line-height: 1;
+      content: "“";
+      opacity: 0.72;
     }
 
-    .workflow-step::after {
-      content: "→";
+    .pullquote p {
+      position: relative;
+      margin: 0;
+    }
+
+    .pullquote cite {
+      display: block;
+      margin-top: 18px;
+      color: #c5d8cd;
+      font-family: var(--sans);
+      font-size: 0.74rem;
+      font-style: normal;
+      font-weight: 650;
+      letter-spacing: 0.03em;
+    }
+
+    .pipeline {
+      margin: 35px 0 45px;
+      padding: 28px;
+      background: #17221d;
+      border-radius: var(--radius);
+      color: #fff;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .pipeline-title {
+      margin: 0 0 20px;
+      color: #d9e5dd;
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
+    .pipeline-flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 9px;
+      align-items: stretch;
+    }
+
+    .pipeline-step {
+      position: relative;
+      display: flex;
+      min-height: 104px;
+      padding: 15px 13px;
+      align-items: flex-end;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 11px;
+      font-size: 0.77rem;
+      font-weight: 750;
+      line-height: 1.45;
+    }
+
+    .pipeline-step::before {
+      position: absolute;
+      top: 12px;
+      left: 13px;
+      color: var(--lime);
+      font-family: var(--mono);
+      font-size: 0.67rem;
+      content: attr(data-step);
+    }
+
+    .pipeline-step:not(:last-child)::after {
       position: absolute;
       top: 50%;
-      right: -0.48rem;
+      right: -11px;
       z-index: 2;
-      width: 1rem;
-      color: var(--forest-2);
-      background: var(--surface);
-      text-align: center;
+      color: var(--lime);
+      font-size: 1rem;
+      content: "›";
       transform: translateY(-50%);
     }
 
-    .workflow-step:last-child::after {
-      display: none;
+    .feedback-label {
+      margin: 14px 0 0;
+      color: #b7c8be;
+      font-size: 0.72rem;
+      text-align: center;
     }
 
-    .workflow-step b {
-      display: block;
-      color: var(--forest-2);
-      font-size: 0.69rem;
-      letter-spacing: 0.08em;
+    .feedback-label strong {
+      color: var(--lime);
     }
 
-    .workflow-step strong {
-      display: block;
-      margin-top: 0.75rem;
-      color: var(--forest);
-      font-size: 0.95rem;
+    .evidence-figure {
+      margin: 34px 0 48px;
     }
 
-    .workflow-step span {
+    .evidence-figure img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      background: #e6e9e4;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-soft);
+    }
+
+    figcaption {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.79rem;
+      line-height: 1.65;
+    }
+
+    .timecode {
+      display: inline-block;
+      margin-right: 7px;
+      padding: 2px 7px;
+      color: var(--green-dark);
+      background: var(--green-pale);
+      border-radius: 5px;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .evidence-gallery {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin: 32px 0 48px;
+    }
+
+    .evidence-gallery figure {
+      margin: 0;
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 5px 20px rgba(23, 37, 29, 0.05);
+    }
+
+    .evidence-gallery img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      background: #e6e9e4;
+    }
+
+    .evidence-gallery figcaption {
+      min-height: 112px;
+      margin: 0;
+      padding: 15px 17px 17px;
+    }
+
+    .evidence-gallery strong {
       display: block;
-      margin-top: 0.45rem;
+      margin: 7px 0 3px;
+      color: var(--ink);
+      font-size: 0.86rem;
+      line-height: 1.5;
+    }
+
+    .evidence-gallery span {
       color: var(--ink-soft);
       font-size: 0.76rem;
       line-height: 1.55;
     }
 
-    .evidence-grid {
-      display: grid;
-      grid-template-columns: repeat(12, minmax(0, 1fr));
-      gap: 1.2rem;
-    }
-
-    .evidence-card {
-      grid-column: span 4;
-      margin: 0;
-      overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: var(--surface);
-      box-shadow: 0 10px 30px rgba(23, 53, 47, 0.055);
-    }
-
-    .evidence-card.wide {
-      grid-column: span 6;
-    }
-
-    .evidence-card img {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      object-fit: cover;
-      background: #d8d8d8;
-    }
-
-    .evidence-card figcaption {
-      padding: 1rem 1rem 1.15rem;
-    }
-
-    .evidence-card .caption-title {
-      display: block;
-      margin-top: 0.3rem;
-      color: var(--ink);
-      font-size: 0.92rem;
-      font-weight: 800;
-      line-height: 1.45;
-    }
-
-    .evidence-card .caption-body {
-      display: block;
-      margin-top: 0.4rem;
-      color: var(--ink-soft);
-      font-size: 0.77rem;
-      line-height: 1.55;
-    }
-
-    .article-copy {
-      max-width: var(--content);
-      margin: 3.5rem auto;
-    }
-
-    .article-copy h3 {
-      margin: 2.8rem 0 0.9rem;
-      color: var(--forest);
-      font-size: clamp(1.5rem, 3vw, 2.05rem);
-      line-height: 1.3;
-    }
-
-    .article-copy p {
-      margin: 0 0 1.15rem;
-    }
-
-    .article-copy strong {
-      color: var(--forest);
-    }
-
-    .architecture {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
-      align-items: stretch;
-      gap: 0.65rem;
-      margin: 3rem 0 4rem;
-    }
-
-    .architecture-node {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      min-height: 160px;
-      padding: 1.2rem;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: var(--surface);
-      text-align: center;
-    }
-
-    .architecture-node:nth-of-type(1) {
-      border-color: #bfd48d;
-      background: #f2f8e2;
-    }
-
-    .architecture-node:nth-of-type(4) {
-      color: white;
-      border-color: var(--forest);
-      background: var(--forest);
-    }
-
-    .architecture-node b {
-      color: var(--forest-2);
-      font-size: 0.69rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .architecture-node:nth-of-type(4) b {
-      color: var(--lime);
-    }
-
-    .architecture-node strong {
-      margin-top: 0.45rem;
-      font-size: 1rem;
-    }
-
-    .architecture-node span {
-      margin-top: 0.35rem;
-      color: var(--ink-soft);
-      font-size: 0.74rem;
-      line-height: 1.45;
-    }
-
-    .architecture-node:nth-of-type(4) span {
-      color: #d3e0db;
-    }
-
-    .connector {
-      display: grid;
-      place-items: center;
-      color: var(--forest-2);
-      font-size: 1.4rem;
-      font-weight: 900;
-    }
-
     .table-wrap {
-      margin: 3.5rem 0;
+      margin: 32px 0 46px;
       overflow-x: auto;
       border: 1px solid var(--line);
-      border-radius: 20px;
-      background: var(--surface);
-      box-shadow: 0 12px 38px rgba(23, 53, 47, 0.055);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 5px 20px rgba(23, 37, 29, 0.04);
     }
 
     table {
       width: 100%;
-      min-width: 760px;
+      min-width: 650px;
       border-collapse: collapse;
-      font-size: 0.88rem;
+      background: var(--surface);
+      font-size: 0.82rem;
+      line-height: 1.62;
     }
 
     th,
     td {
-      padding: 1rem 1.1rem;
+      padding: 15px 17px;
       border-bottom: 1px solid var(--line);
       vertical-align: top;
       text-align: left;
     }
 
     th {
-      color: white;
-      background: var(--forest);
+      color: var(--green-dark);
+      background: var(--green-pale);
       font-size: 0.74rem;
-      letter-spacing: 0.05em;
-    }
-
-    td:first-child {
-      color: var(--forest);
-      font-weight: 820;
+      font-weight: 850;
+      letter-spacing: 0.02em;
     }
 
     tr:last-child td {
       border-bottom: 0;
     }
 
-    tbody tr:nth-child(even) {
-      background: #f6f5ef;
+    td:first-child {
+      color: var(--ink);
+      font-weight: 750;
+      white-space: nowrap;
     }
 
-    .timeline {
-      max-width: 900px;
-      margin: 3rem auto;
-      padding: 0;
-      list-style: none;
+    .architecture {
+      margin: 38px 0 50px;
+      padding: 29px;
+      background: linear-gradient(145deg, #edf3ef, #f9faf6);
+      border: 1px solid #ced9d1;
+      border-radius: var(--radius);
     }
 
-    .timeline li {
-      display: grid;
-      grid-template-columns: 130px 1fr;
-      gap: 1.6rem;
-      padding: 1.4rem 0;
-      border-top: 1px solid var(--line);
-    }
-
-    .timeline time {
-      color: var(--forest-2);
-      font-size: 0.78rem;
-      font-weight: 900;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: 0.04em;
-    }
-
-    .timeline strong {
-      display: block;
-      color: var(--forest);
-    }
-
-    .timeline p {
-      margin: 0.35rem 0 0;
-      color: var(--ink-soft);
-      font-size: 0.9rem;
-    }
-
-    .implications {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 1.2rem;
-      margin: 3rem 0;
-    }
-
-    .implication {
-      padding: 1.5rem;
-      border-top: 4px solid var(--lime);
-      border-radius: 0 0 18px 18px;
-      background: var(--surface);
-      box-shadow: 0 14px 38px rgba(23, 53, 47, 0.065);
-    }
-
-    .implication b {
-      display: block;
-      color: var(--forest-2);
-      font-size: 0.72rem;
-      letter-spacing: 0.1em;
+    .architecture h3 {
+      margin: 0 0 8px;
+      font-family: var(--sans);
+      font-size: 0.87rem;
+      font-weight: 850;
+      letter-spacing: 0.07em;
       text-transform: uppercase;
     }
 
-    .implication h3 {
-      margin: 0.65rem 0;
-      font-family: inherit;
-      font-size: 1.02rem;
-      letter-spacing: -0.025em;
+    .architecture-subtitle {
+      margin: 0 0 22px;
+      color: var(--muted);
+      font-size: 0.76rem;
     }
 
-    .implication p {
+    .architecture-flow {
+      display: grid;
+      grid-template-columns: 1fr 36px 1fr 36px 1fr;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .arch-node {
+      min-height: 105px;
+      padding: 17px;
+      background: var(--surface);
+      border: 1px solid var(--line-strong);
+      border-radius: 11px;
+      box-shadow: 0 4px 14px rgba(23, 37, 29, 0.05);
+    }
+
+    .arch-node.accent {
+      color: #fff;
+      background: var(--green-dark);
+      border-color: var(--green-dark);
+    }
+
+    .arch-node.blue {
+      background: var(--blue-pale);
+      border-color: #bed3dc;
+    }
+
+    .arch-node strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.86rem;
+    }
+
+    .arch-node small {
+      display: block;
+      color: var(--muted);
+      font-size: 0.71rem;
+      line-height: 1.55;
+    }
+
+    .arch-node.accent small {
+      color: #c5d9cd;
+    }
+
+    .arch-arrow {
+      color: var(--green);
+      font-size: 1.6rem;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .architecture-feedback {
+      margin: 17px 0 0;
+      padding-top: 15px;
+      color: var(--ink-soft);
+      border-top: 1px dashed var(--line-strong);
+      font-size: 0.73rem;
+      text-align: center;
+    }
+
+    .timeline {
+      position: relative;
+      margin: 35px 0 46px;
+      padding-left: 28px;
+    }
+
+    .timeline::before {
+      position: absolute;
+      top: 8px;
+      bottom: 8px;
+      left: 6px;
+      width: 2px;
+      background: var(--line-strong);
+      content: "";
+    }
+
+    .timeline-item {
+      position: relative;
+      display: grid;
+      grid-template-columns: 105px 1fr;
+      gap: 15px;
+      padding: 0 0 26px;
+    }
+
+    .timeline-item:last-child {
+      padding-bottom: 0;
+    }
+
+    .timeline-item::before {
+      position: absolute;
+      top: 7px;
+      left: -27px;
+      width: 10px;
+      height: 10px;
+      background: var(--green);
+      border: 4px solid var(--paper);
+      border-radius: 50%;
+      content: "";
+    }
+
+    .timeline-time {
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .timeline-copy strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 0.88rem;
+    }
+
+    .timeline-copy p {
       margin: 0;
       color: var(--ink-soft);
-      font-size: 0.85rem;
+      font-size: 0.8rem;
+      line-height: 1.65;
+    }
+
+    .implication-list {
+      display: grid;
+      gap: 13px;
+      margin: 30px 0 46px;
+      padding: 0;
+      list-style: none;
+      counter-reset: implication;
+    }
+
+    .implication-list li {
+      position: relative;
+      padding: 23px 24px 23px 70px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      counter-increment: implication;
+    }
+
+    .implication-list li::before {
+      position: absolute;
+      top: 22px;
+      left: 23px;
+      display: grid;
+      width: 30px;
+      height: 30px;
+      place-items: center;
+      color: #fff;
+      background: var(--green);
+      border-radius: 50%;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      font-weight: 800;
+      content: counter(implication, decimal-leading-zero);
+    }
+
+    .implication-list strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.93rem;
+    }
+
+    .implication-list p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 0.82rem;
       line-height: 1.65;
     }
 
     .checklist {
-      max-width: var(--content);
-      margin: 3rem auto;
+      margin: 34px 0 45px;
+      padding: 27px;
+      background: #f1f5f2;
+      border: 1px solid #d2dcd5;
+      border-radius: var(--radius);
+    }
+
+    .checklist h3 {
+      margin: 0 0 18px;
+      font-family: var(--sans);
+      font-size: 0.96rem;
+    }
+
+    .checklist ul {
+      display: grid;
+      gap: 11px;
+      margin: 0;
       padding: 0;
       list-style: none;
     }
 
     .checklist li {
       position: relative;
-      margin: 0.65rem 0;
-      padding: 0.9rem 1rem 0.9rem 3rem;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: rgba(255, 253, 248, 0.7);
-      font-size: 0.92rem;
+      padding-left: 28px;
+      color: #3e4d45;
+      font-size: 0.83rem;
+      line-height: 1.6;
     }
 
     .checklist li::before {
-      content: "✓";
       position: absolute;
-      top: 0.86rem;
-      left: 1rem;
-      width: 1.3rem;
-      height: 1.3rem;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-      color: var(--forest);
-      background: var(--lime);
-      font-size: 0.75rem;
-      font-weight: 900;
+      top: 0.28em;
+      left: 0;
+      width: 15px;
+      height: 15px;
+      background: var(--surface);
+      border: 2px solid var(--green);
+      border-radius: 4px;
+      content: "";
     }
 
     .limitations {
+      padding: 28px;
+      background: #f9f0ed;
+      border: 1px solid #ead2cb;
+      border-radius: var(--radius);
+    }
+
+    .limitations h3 {
+      margin-top: 0;
+      color: var(--danger);
+    }
+
+    .limitations ul {
+      margin-bottom: 0;
+      padding-left: 1.25rem;
+    }
+
+    .limitations li + li {
+      margin-top: 10px;
+    }
+
+    .source-list {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.2rem;
-      margin-top: 2.5rem;
+      gap: 13px;
+      margin: 28px 0 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: sources;
     }
 
-    .limitation {
-      padding: 1.4rem;
-      border: 1px solid #e4c68f;
-      border-radius: 18px;
-      background: var(--amber-soft);
+    .source-list li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 12px;
+      padding: 17px 0;
+      border-bottom: 1px solid var(--line);
+      counter-increment: sources;
     }
 
-    .limitation strong {
+    .source-list li::before {
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: 0.73rem;
+      font-weight: 800;
+      content: "[" counter(sources) "]";
+    }
+
+    .source-list a {
+      font-weight: 750;
+    }
+
+    .source-list small {
       display: block;
-      color: #71470e;
-      font-size: 0.86rem;
+      margin-top: 3px;
+      color: var(--muted);
+      line-height: 1.55;
     }
 
-    .limitation p {
-      margin: 0.6rem 0 0;
-      color: #655234;
-      font-size: 0.85rem;
-      line-height: 1.65;
-    }
-
-    .ending {
-      margin-top: 7rem;
-      overflow: hidden;
-      border-radius: 30px;
-      color: white;
+    .share-card {
+      margin: 72px 0 0;
+      padding: clamp(28px, 5vw, 46px);
+      color: #fff;
       background:
-        radial-gradient(circle at 85% 20%, rgba(199, 234, 120, 0.22), transparent 22rem),
-        var(--forest);
+        radial-gradient(circle at 90% 10%, rgba(184, 222, 98, 0.2), transparent 18rem),
+        var(--green-dark);
+      border-radius: var(--radius);
       box-shadow: var(--shadow);
     }
 
-    .ending-inner {
-      max-width: 860px;
-      padding: clamp(2rem, 6vw, 5rem);
+    .share-card h2 {
+      margin-bottom: 14px;
+      font-size: clamp(1.75rem, 4vw, 2.65rem);
     }
 
-    .ending .section-label {
-      color: var(--lime);
+    .share-card > p {
+      max-width: 620px;
+      color: #c9d9cf;
     }
 
-    .ending h2 {
-      margin: 0;
-      font-size: clamp(2rem, 4.8vw, 4rem);
-      line-height: 1.15;
+    .share-copy {
+      margin: 24px 0 0;
+      padding: 19px 21px;
+      white-space: pre-wrap;
+      color: #f7fff9;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 11px;
+      font-family: var(--sans);
+      font-size: 0.83rem;
+      line-height: 1.7;
     }
 
-    .ending p {
-      max-width: 680px;
-      margin: 1.4rem 0 0;
-      color: #d5e1dc;
-      font-size: 1.02rem;
+    .ending {
+      margin-top: 80px;
+      padding-top: 42px;
+      border-top: 1px solid var(--line-strong);
     }
 
-    .ending .closing-line {
-      margin-top: 2rem;
-      color: white;
-      font-size: 1.15rem;
-      font-weight: 780;
+    .ending p:first-of-type {
+      color: var(--ink);
+      font-family: var(--serif);
+      font-size: 1.23rem;
+      font-weight: 700;
+      line-height: 1.8;
     }
 
-    .share-block {
-      display: grid;
-      grid-template-columns: 0.62fr 1.38fr;
-      gap: 1.5rem;
-      margin: 5rem 0;
-      padding: clamp(1.4rem, 4vw, 2.5rem);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      background: var(--surface);
-    }
-
-    .share-block h2 {
-      margin: 0;
-      color: var(--forest);
-      font-size: 1.55rem;
-    }
-
-    .share-block p {
-      margin: 0.6rem 0 0;
-      color: var(--ink-soft);
-      font-size: 0.87rem;
-    }
-
-    .copy-ready {
-      padding: 1.2rem 1.3rem;
-      border-left: 4px solid var(--lime);
-      border-radius: 0 14px 14px 0;
-      background: #f1f4e9;
-      color: #263b34;
-      font-size: 0.92rem;
-      line-height: 1.65;
-      user-select: all;
-    }
-
-    .source-notes {
-      max-width: 900px;
-      margin: 0 auto;
-      padding-top: 3rem;
-      border-top: 1px solid var(--line-dark);
-    }
-
-    .source-notes h2 {
-      margin: 0 0 1.2rem;
-      color: var(--forest);
-      font-size: 1.7rem;
-    }
-
-    .source-notes ol {
-      margin: 0;
-      padding-left: 1.35rem;
-    }
-
-    .source-notes li {
-      margin: 0.75rem 0;
-      padding-left: 0.35rem;
-      color: var(--ink-soft);
-      font-size: 0.88rem;
-    }
-
-    .source-notes .method {
-      margin-top: 2rem;
-      padding: 1.25rem;
-      border-radius: 16px;
-      background: var(--paper-deep);
-      color: var(--ink-soft);
+    .watch-link {
+      display: inline-flex;
+      margin-top: 10px;
+      padding: 12px 17px;
+      align-items: center;
+      gap: 8px;
+      color: #fff;
+      background: var(--green);
+      border-radius: 999px;
       font-size: 0.82rem;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .watch-link::after {
+      content: "↗";
     }
 
     footer {
-      padding: 2.5rem 20px 3.5rem;
+      width: min(calc(100% - 32px), var(--wide));
+      margin: 100px auto 0;
+      padding: 28px 0 45px;
+      color: var(--muted);
       border-top: 1px solid var(--line);
-      color: var(--ink-soft);
-      text-align: center;
-      font-size: 0.78rem;
+      font-size: 0.73rem;
+      line-height: 1.65;
     }
 
-    @media (max-width: 960px) {
-      .hero-grid,
-      .lead-grid {
-        grid-template-columns: 1fr;
-      }
+    footer strong {
+      color: var(--ink);
+    }
 
-      .hero-side {
-        max-width: 680px;
+    @media (max-width: 900px) {
+      .page-shell {
+        display: block;
       }
 
       .toc {
         position: static;
+        margin-bottom: 54px;
       }
 
       .toc ol {
-        display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        column-gap: 1rem;
       }
 
-      .prose {
-        max-width: none;
-      }
-
-      .workflow {
-        grid-template-columns: repeat(3, 1fr);
-      }
-
-      .workflow-step:nth-child(3) {
-        border-right: 0;
-      }
-
-      .workflow-step:nth-child(-n+3) {
-        border-bottom: 1px solid var(--line);
-      }
-
-      .workflow-step:nth-child(3)::after {
-        display: none;
-      }
-
-      .architecture {
-        grid-template-columns: 1fr;
-      }
-
-      .connector {
-        transform: rotate(90deg);
-      }
-
-      .implications {
-        grid-template-columns: 1fr;
+      .pullquote {
+        margin-right: 0;
+        margin-left: 0;
       }
     }
 
     @media (max-width: 700px) {
       body {
         font-size: 16px;
-        line-height: 1.72;
+        line-height: 1.76;
       }
 
-      .site-bar-inner {
-        align-items: flex-start;
-        flex-direction: column;
-        padding: 0.85rem 0;
-      }
-
-      .site-bar nav {
-        justify-content: flex-start;
-      }
-
-      .hero {
-        padding-top: 3.4rem;
-      }
-
-      h1 {
-        font-size: clamp(2.55rem, 13vw, 4rem);
-      }
-
-      .hero-accent {
-        white-space: normal;
-      }
-
-      .hero-figure img {
-        aspect-ratio: 16 / 10;
-      }
-
-      .hero-figure figcaption {
-        grid-template-columns: 1fr;
-        gap: 0.25rem;
-      }
-
-      .article-shell {
-        padding-top: 3rem;
-      }
-
-      .toc ol,
-      .finding-grid,
-      .limitations,
-      .share-block {
-        grid-template-columns: 1fr;
-      }
-
-      .workflow {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .workflow-step,
-      .workflow-step:nth-child(3) {
-        border-right: 1px solid var(--line);
-        border-bottom: 1px solid var(--line);
-      }
-
-      .workflow-step:nth-child(even) {
-        border-right: 0;
-      }
-
-      .workflow-step:nth-child(5),
-      .workflow-step:nth-child(6) {
-        border-bottom: 0;
-      }
-
-      .workflow-step:nth-child(3)::after {
-        display: block;
-      }
-
-      .workflow-step:nth-child(even)::after {
+      .masthead-label {
         display: none;
       }
 
-      .evidence-card,
-      .evidence-card.wide {
-        grid-column: span 12;
+      .hero {
+        padding-top: 52px;
       }
 
-      .timeline li {
+      h1 {
+        letter-spacing: -0.045em;
+      }
+
+      .byline {
+        display: grid;
+        gap: 4px;
+      }
+
+      .byline span + span::before {
+        display: none;
+      }
+
+      .hero-badge {
+        top: 10px;
+        left: 10px;
+      }
+
+      .key-grid,
+      .evidence-gallery {
         grid-template-columns: 1fr;
-        gap: 0.35rem;
+      }
+
+      .evidence-gallery figcaption {
+        min-height: 0;
+      }
+
+      .pipeline-flow {
+        grid-template-columns: 1fr;
+      }
+
+      .pipeline-step {
+        min-height: 74px;
+      }
+
+      .pipeline-step:not(:last-child)::after {
+        top: auto;
+        right: 50%;
+        bottom: -15px;
+        transform: translateX(50%) rotate(90deg);
+      }
+
+      .architecture-flow {
+        grid-template-columns: 1fr;
+      }
+
+      .arch-node {
+        min-height: auto;
+      }
+
+      .arch-arrow {
+        transform: rotate(90deg);
+      }
+
+      .timeline-item {
+        grid-template-columns: 1fr;
+        gap: 4px;
       }
 
       .pullquote {
-        margin: 4rem 0;
+        padding: 39px 27px 31px;
+      }
+
+      .toc ol {
+        grid-template-columns: 1fr;
+      }
+
+      .report-section {
+        margin-top: 78px;
+      }
+
+      .implication-list li {
+        padding: 65px 21px 22px;
       }
     }
 
     @media print {
       body {
-        background: white;
-        color: black;
+        background: #fff;
+        color: #000;
         font-size: 11pt;
       }
 
-      .site-bar,
+      .masthead,
       .toc,
-      .share-block {
+      .share-card,
+      .watch-link {
         display: none;
       }
 
       .hero,
+      .page-shell,
       .hero-figure,
-      .article-shell {
+      footer {
         width: 100%;
       }
 
-      .section,
-      .ending {
-        margin: 2.5rem 0;
+      .page-shell {
+        display: block;
+        margin-top: 40px;
       }
 
-      .evidence-card,
-      .finding,
-      .implication,
-      .ending,
-      .table-wrap {
+      .report-section {
+        margin-top: 55px;
+      }
+
+      .evidence-figure,
+      .evidence-gallery figure,
+      .key-card,
+      .architecture,
+      .pipeline {
         break-inside: avoid;
         box-shadow: none;
       }
@@ -1191,602 +1232,157 @@
 <meta property="og:title" content="Learn Robot Manipulation with LeRobot and ROS 2 | NVIDIA Jetson AI Lab">
 <meta property="og:description" content="Learn Robot Manipulation with LeRobot and ROS 2 NVIDIA Jetson AI Lab 영상 정보 채널 : NVIDIA Developer 게시일 : 2026 08 11 길이 : 47:30 링크 : https://www.youtube.com/watch?v=BHEsQZYGZ4o 공식 세션 안내 : Make It Think: NVIDIA Jetson AI Lab Livestream Series &lt;">
 <meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/4yeh3e/">
-<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/4yeh3e/assets/bhesqzygz4o-ts-00-03-19.jpg">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/4yeh3e/assets/bhesqzygz4o-ts-00-03-35.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Learn Robot Manipulation with LeRobot and ROS 2 | NVIDIA Jetson AI Lab">
 <meta name="twitter:description" content="Learn Robot Manipulation with LeRobot and ROS 2 NVIDIA Jetson AI Lab 영상 정보 채널 : NVIDIA Developer 게시일 : 2026 08 11 길이 : 47:30 링크 : https://www.youtube.com/watch?v=BHEsQZYGZ4o 공식 세션 안내 : Make It Think: NVIDIA Jetson AI Lab Livestream Series &lt;">
-<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/4yeh3e/assets/bhesqzygz4o-ts-00-03-19.jpg">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/4yeh3e/assets/bhesqzygz4o-ts-00-03-35.jpg">
 <link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-learn-robot-manipulation-with-lerobot-and-ros-2-nvidia-jetson-ai-lab-%EC%9A%94%EC%95%BD/">
 </head>
-
 <body>
-  <a class="skip-link" href="#article">본문으로 건너뛰기</a>
+  <a class="skip-link" href="#main-content">본문으로 이동</a>
 
-  <header class="site-bar">
-    <div class="site-bar-inner">
-      <div class="brand">Physical AI Research Brief</div>
-      <nav aria-label="문서 바로가기">
-        <a href="#abstract">초록</a>
-        <a href="#findings">핵심 발견</a>
-        <a href="#learning-loop">학습 루프</a>
-        <a href="#agentic-robotics">에이전트 로보틱스</a>
-        <a href="#implications">시사점</a>
-        <a href="#sources">출처</a>
-      </nav>
+  <header>
+    <div class="masthead">
+      <a class="brand" href="#top" aria-label="Research Notes 처음으로">
+        <span class="brand-mark">R</span>
+        <span>Research Notes</span>
+      </a>
+      <span class="masthead-label">Physical AI · Field Report</span>
     </div>
+
+    <div class="hero" id="top">
+      <p class="kicker">NVIDIA Jetson AI Lab 세션 분석</p>
+      <h1>로봇이 보고,<br>배우고, <span class="title-accent">움직이기까지</span></h1>
+      <p class="deck">
+        LeRobot과 Isaac GR00T N1.7의 데이터·정책 워크플로부터 Jetson Thor의 엣지 추론,
+        ROS 2와 AgenticROS가 만드는 인지·행동 폐루프까지—Physical AI를 실제 로봇으로
+        옮기는 전체 파이프라인을 장면 근거와 함께 해부한다.
+      </p>
+
+      <div class="byline" aria-label="문서 정보">
+        <span><strong>Research Report</strong></span>
+        <span>2026년 8월 14일</span>
+        <span>약 14분 읽기</span>
+        <span>영상 47분 30초 분석</span>
+      </div>
+
+      <ul class="tag-list" aria-label="주제 태그">
+        <li>LeRobot</li>
+        <li>Isaac GR00T</li>
+        <li>ROS 2</li>
+        <li>AgenticROS</li>
+        <li>NVIDIA Jetson</li>
+        <li>Robotics</li>
+      </ul>
+    </div>
+
+    <figure class="hero-figure">
+      <span class="hero-badge">SESSION EVIDENCE · 00:03:45</span>
+      <img src="assets/bhesqzygz4o-ts-00-03-45.jpg" width="1920" height="1080" alt="Jetson Thor와 SO-101 로봇팔을 이용한 LeRobot 및 GR00T N1.7 통합 데모 슬라이드" fetchpriority="high">
+      <figcaption>
+        세션의 핵심 구성: LeRobot은 데이터와 실험 흐름을, GR00T는 VLA 정책을,
+        Jetson Thor는 엣지 추론을, SO-101은 물리적 행동 실행을 담당한다.
+      </figcaption>
+    </figure>
   </header>
 
-  <main id="article">
-    <header class="hero">
-      <div class="hero-grid">
-        <div>
-          <p class="eyebrow">NVIDIA Jetson AI Lab · Research Report</p>
-          <h1>로봇에게 <span class="hero-accent">보고, 이해하고, 움직이는 법</span>을 가르치는 스택</h1>
-          <p class="dek">
-            LeRobot과 Isaac GR00T N1.7이 데이터를 정책으로 바꾸고,
-            Jetson Thor·ROS 2·AgenticROS가 그 정책을 실제 센서와 행동에 연결하는 방식을
-            공개 세션의 30개 장면을 통해 분석했다.
-          </p>
-          <div class="meta-row" aria-label="문서 메타데이터">
-            <span class="pill">리서치 리포트</span>
-            <span class="pill">2026.08.14</span>
-            <span class="pill">읽기 약 14분</span>
-            <span class="pill">LeRobot</span>
-            <span class="pill">ROS 2</span>
-            <span class="pill">Physical AI</span>
-          </div>
-        </div>
+  <div class="page-shell">
+    <aside class="toc" aria-label="목차">
+      <p class="toc-title">이 글에서 다루는 것</p>
+      <ol>
+        <li><a href="#abstract">초록</a></li>
+        <li><a href="#findings">핵심 발견</a></li>
+        <li><a href="#stack">전체 스택</a></li>
+        <li><a href="#learning">학습 파이프라인</a></li>
+        <li><a href="#agentic">AgenticROS</a></li>
+        <li><a href="#evidence">장면별 근거</a></li>
+        <li><a href="#implications">시사점</a></li>
+        <li><a href="#sources">출처와 한계</a></li>
+      </ol>
+    </aside>
 
-        <aside class="hero-side" aria-label="한 줄 결론">
-          <strong>한 줄 결론</strong>
-          <p>
-            Physical AI의 핵심은 거대한 모델 하나가 아니라,
-            데이터 수집부터 안전한 실제 행동까지 끊김 없이 이어지는 운영 가능한 폐루프다.
-          </p>
-        </aside>
-      </div>
-    </header>
+    <main id="main-content">
+      <section class="abstract" id="abstract">
+        <p class="section-kicker">Abstract</p>
+        <h2>모델보다 중요한 것은 연결 구조다</h2>
+        <p class="lead">
+          이 세션은 로봇 파운데이션 모델을 소개하는 데서 멈추지 않는다. 시뮬레이션과
+          텔레오퍼레이션으로 데이터를 수집하고, LeRobot에서 데이터셋과 정책 실험을 관리하며,
+          Isaac GR00T N1.7을 특정 작업에 맞게 파인튜닝한 뒤 Jetson Thor와 실제 로봇에서
+          실행하는 종단간 흐름을 보여준다.
+        </p>
+        <p>
+          후반부 AgenticROS 데모는 여기에 자연어 에이전트 계층을 더한다. RealSense가 환경을
+          관측하고, 에이전트가 목표를 도구 호출로 분해하며, ROS 2가 센서·제어 노드와 실제
+          이동 로봇을 연결한다. 두 데모가 함께 드러내는 결론은 명확하다. Physical AI의
+          성패는 단일 모델의 점수보다 <strong>데이터, embodiment, 제어 계약, 안전, 지연,
+          관찰성을 얼마나 일관된 시스템으로 묶는가</strong>에 달려 있다.
+        </p>
+      </section>
 
-    <div class="hero-figure">
-      <figure>
-        <img
-          src="assets/bhesqzygz4o-ts-00-03-39.jpg"
-          alt="Jetson Thor와 SO-101 로봇팔에서 실행되는 LeRobot 및 GR00T N1.7 통합 데모 소개 화면"
-          width="1280"
-          height="720">
-        <figcaption>
-          <span class="timestamp">00:03:39</span>
-          <span>세션이 제시한 핵심 구성: LeRobot × Isaac GR00T N1.7 × NVIDIA Jetson Thor × SO-101.</span>
-        </figcaption>
-      </figure>
-    </div>
+      <aside class="note" aria-label="자료 범위">
+        <strong>자료 범위와 판독 원칙</strong>
+        이 보고서는 YouTube 한국어 자동 자막, 영상 설명, NVIDIA 공식 세션 안내와 1080p
+        원본 영상에서 추출한 장면을 근거로 작성했다. 자동 자막의 고유명사·기술 용어 오인식
+        가능성을 고려해 직접 인용은 피했으며, 화면과 자막이 함께 뒷받침하는 내용만 확정적으로
+        서술했다. 프레임에서 판독하기 어려운 그래프 수치와 명령어는 추정하지 않았다.
+      </aside>
 
-    <div class="article-shell">
-      <div class="lead-grid">
-        <aside class="toc" aria-label="목차">
-          <h2>이 글의 흐름</h2>
-          <ol>
-            <li><a href="#abstract">초록과 자료 범위</a></li>
-            <li><a href="#findings">핵심 발견</a></li>
-            <li><a href="#learning-loop">종단간 학습 루프</a></li>
-            <li><a href="#deployment">정책에서 실제 행동으로</a></li>
-            <li><a href="#agentic-robotics">에이전트·ROS·센서</a></li>
-            <li><a href="#evidence-map">기술 계층과 근거</a></li>
-            <li><a href="#implications">시사점과 한계</a></li>
-            <li><a href="#sources">출처와 방법</a></li>
-          </ol>
-        </aside>
+      <section class="report-section" id="findings">
+        <p class="section-kicker">Key Findings</p>
+        <h2>이 영상에서 건질 여섯 가지</h2>
+        <p class="section-intro">
+          세션은 서로 다른 두 데모를 통해 같은 메시지를 반복한다. 로봇 지능은 모델 파일
+          하나가 아니라 관측에서 행동까지 이어지는 운영 가능한 시스템이다.
+        </p>
 
-        <div class="prose">
-          <section class="abstract" id="abstract">
-            <p class="section-label">Abstract</p>
-            <h2>모델보다 중요한 것은 연결이다</h2>
-            <p>
-              이 세션은 로봇 조작을 하나의 모델 시연으로 설명하지 않는다.
-              텔레오퍼레이션과 시뮬레이션에서 데이터를 만들고, LeRobot으로 실험 흐름을 관리하며,
-              Isaac GR00T N1.7 같은 시각·언어·행동 정책을 특정 작업에 맞춘 뒤,
-              Jetson에서 추론하고 SO-101이 행동하도록 연결한다. 후반부에는 범위를 넓혀
-              자연어 목표를 ROS 도구 호출로 분해하는 AgenticROS와 RealSense 기반 인지 루프를 보여준다.
-            </p>
-          </section>
-
-          <aside class="scope-note">
-            <strong>자료 범위.</strong>
-            YouTube 메타데이터에는 한국어·영어 자동 자막이 표시되지만 자막 파일 요청은
-            HTTP 429 및 IP 차단으로 실패했다. 이 글은 영상 설명, NVIDIA의 공식 세션 안내,
-            약 10초 간격의 공개 스토리보드 288프레임을 근거로 작성했다.
-            발표자의 발언을 직접 인용하지 않으며, 화면에서 판독하기 어려운 수치·코드·명령어는 확정하지 않는다.
-          </aside>
-        </div>
-      </div>
-
-      <section class="findings" id="findings">
-        <p class="section-label">Key Findings</p>
-        <h2>이 세션에서 읽어야 할 여섯 가지</h2>
-
-        <div class="finding-grid">
-          <article class="finding">
-            <span class="number">01</span>
-            <h3>학습은 선형 절차가 아니라 반복 루프다</h3>
-            <p>수집, 학습, 실제 평가, 실패 분석, 재수집이 반복되며 각 단계의 품질이 다음 단계를 제한한다.</p>
+        <div class="key-grid">
+          <article class="key-card">
+            <span class="key-number">01</span>
+            <h3>학습은 반복 가능한 루프다</h3>
+            <p>로봇 설정, 시범 수집, 데이터셋 구성, 학습, 실제 평가가 한 번의 직선 과정이 아니라 반복 루프를 이룬다.</p>
           </article>
-
-          <article class="finding">
-            <span class="number">02</span>
-            <h3>LeRobot과 GR00T는 서로 다른 층을 맡는다</h3>
-            <p>LeRobot은 데이터·실험 워크플로를, GR00T는 시각과 언어에서 행동을 생성하는 정책 계층을 담당한다.</p>
+          <article class="key-card">
+            <span class="key-number">02</span>
+            <h3>LeRobot과 GR00T의 역할은 다르다</h3>
+            <p>LeRobot은 데이터·실험 워크플로를 제공하고, GR00T N1.7은 시각과 언어에서 행동을 생성하는 VLA 정책 계층을 맡는다.</p>
           </article>
-
-          <article class="finding">
-            <span class="number">03</span>
-            <h3>엣지 추론은 지연뿐 아니라 운영 경계를 바꾼다</h3>
-            <p>로봇 가까이에서 추론하면 네트워크 의존성을 줄이고 센서 입력과 행동 출력의 시간 일관성을 높일 수 있다.</p>
+          <article class="key-card">
+            <span class="key-number">03</span>
+            <h3>Jetson은 로봇 가까이에서 추론한다</h3>
+            <p>엣지 실행은 제어 지연과 네트워크 의존성을 줄이고, 센서와 정책 런타임을 실제 장비에 가깝게 배치한다.</p>
           </article>
-
-          <article class="finding">
-            <span class="number">04</span>
-            <h3>ROS 2는 모델과 하드웨어 사이의 계약이다</h3>
-            <p>노드, 토픽, 서비스와 액션이 센서·정책·제어기를 분리하면서도 함께 작동하게 만든다.</p>
+          <article class="key-card">
+            <span class="key-number">04</span>
+            <h3>ROS 2는 연결과 운영의 계층이다</h3>
+            <p>모델 출력, 카메라 관측, 로봇 명령을 노드·토픽·서비스·액션의 명시적 인터페이스로 연결한다.</p>
           </article>
-
-          <article class="finding">
-            <span class="number">05</span>
-            <h3>에이전트는 모터를 직접 움직이지 않는다</h3>
-            <p>자연어 목표는 도구 선택, 인수 구성, 실행 결과 확인과 같은 중간 단계를 거쳐 로봇 행동으로 변환된다.</p>
+          <article class="key-card">
+            <span class="key-number">05</span>
+            <h3>에이전트는 검증된 도구를 조합해야 한다</h3>
+            <p>자연어 임무는 센서 읽기, 이동, 정지, 조건 판단 같은 제한된 스킬과 추적 가능한 도구 호출로 변환된다.</p>
           </article>
-
-          <article class="finding">
-            <span class="number">06</span>
+          <article class="key-card">
+            <span class="key-number">06</span>
             <h3>안전과 관찰성은 부가 기능이 아니다</h3>
-            <p>작업 공간 제한, 비상 정지, 로그, 실행 이력과 실패 추적이 모델 정확도만큼 시스템 성능을 결정한다.</p>
+            <p>속도·작업 공간 제한, 비상 정지, 좌표계, 실행 로그와 실패 추적이 모델 정확도만큼 중요한 시스템 요건이다.</p>
           </article>
         </div>
       </section>
 
       <blockquote class="pullquote">
-        “Physical AI의 성능은 모델 체크포인트가 아니라,
-        데이터에서 실제 행동까지 이어지는 전체 루프의 가장 약한 연결부에서 결정된다.”
-        <small>공개 화면과 세션 구조를 바탕으로 한 본 보고서의 종합 해석</small>
+        <p>Physical AI의 병목은 ‘더 큰 모델’ 하나가 아니라, 데이터에서 관절 명령까지 이어지는 모든 경계를 신뢰할 수 있게 만드는 일이다.</p>
+        <cite>세션의 두 데모를 관통하는 시스템 관점의 결론</cite>
       </blockquote>
 
-      <section class="section" id="learning-loop">
-        <header class="section-head">
-          <span class="chapter-no">Chapter 01</span>
-          <h2>데이터가 행동이 되는 종단간 학습 루프</h2>
-          <p class="intro">
-            세션 전반부는 로봇 설정, 시범 수집, 데이터셋 구성, 정책 학습,
-            실제 평가와 재학습을 하나의 연결된 워크플로로 제시한다.
-          </p>
-        </header>
-
-        <div class="workflow" role="img" aria-label="로봇 설정에서 실제 평가와 재수집까지 이어지는 여섯 단계 학습 흐름">
-          <div class="workflow-step">
-            <b>STEP 01</b>
-            <strong>로봇 정의</strong>
-            <span>관절, 그리퍼, 카메라와 행동 공간을 명시한다.</span>
-          </div>
-          <div class="workflow-step">
-            <b>STEP 02</b>
-            <strong>시범 수집</strong>
-            <span>텔레오퍼레이션 또는 시뮬레이션으로 궤적을 만든다.</span>
-          </div>
-          <div class="workflow-step">
-            <b>STEP 03</b>
-            <strong>데이터셋</strong>
-            <span>관측·상태·행동·지시를 시간축에 맞춰 저장한다.</span>
-          </div>
-          <div class="workflow-step">
-            <b>STEP 04</b>
-            <strong>정책 학습</strong>
-            <span>ACT 또는 VLA 계열 정책을 특정 작업에 맞춘다.</span>
-          </div>
-          <div class="workflow-step">
-            <b>STEP 05</b>
-            <strong>실기 평가</strong>
-            <span>완료율, 실패 유형과 반복 안정성을 관찰한다.</span>
-          </div>
-          <div class="workflow-step">
-            <b>STEP 06</b>
-            <strong>재수집</strong>
-            <span>실패 조건을 보강해 다음 학습 루프로 되돌린다.</span>
-          </div>
-        </div>
-
-        <div class="article-copy">
-          <h3>첫 번째 원칙은 안전이다</h3>
-          <p>
-            로봇 조작에서 모델 출력은 곧 물리적 힘과 이동이다.
-            화면에 크게 등장한 <strong>“Safety is Important!”</strong> 슬라이드는
-            충돌 회피, 사람과 장비 사이의 거리, 작업 공간 제한과 비상 정지가
-            학습 성능보다 먼저 설계되어야 함을 환기한다.
-          </p>
-
-          <h3>시뮬레이션과 텔레오퍼레이션은 경쟁 관계가 아니다</h3>
-          <p>
-            시뮬레이션은 위험한 초기 탐색과 반복 가능한 조건 생성에 유리하다.
-            반면 사람이 수행한 텔레오퍼레이션 시범은 실제 마찰, 카메라 노이즈,
-            그리퍼 접근 각도처럼 시뮬레이션이 놓치기 쉬운 조건을 담는다.
-            두 경로는 서로를 대체하기보다 데이터의 범위와 현실성을 보완한다.
-          </p>
-
-          <h3>데이터 다양성이 곧 정책의 경계다</h3>
-          <p>
-            작업 모자이크로 구성된 데이터셋 장면은 단순한 데이터 양보다
-            물체, 배경, 조명, 시점, 시작 상태와 조작 방식의 다양성이 중요함을 보여준다.
-            배포 환경이 수집 환경에서 멀어질수록 정책은 더 쉽게 실패한다.
-          </p>
-        </div>
-
-        <div class="evidence-grid" aria-label="로봇 학습 워크플로 관련 장면">
-          <figure class="evidence-card wide">
-            <img src="assets/bhesqzygz4o-ts-00-03-19.jpg" alt="세 명의 공동 발표자를 소개하는 Meet the Guest Speakers 슬라이드" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:03:19</span>
-              <span class="caption-title">여러 층을 잇는 공동 세션</span>
-              <span class="caption-body">로봇 학습, 오픈소스 생태계, 센서와 ROS 연동을 서로 다른 관점에서 연결한다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card wide">
-            <img src="assets/bhesqzygz4o-ts-00-03-29.jpg" alt="Safety is Important 제목과 소형 로봇팔 작업대 사진" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:03:29</span>
-              <span class="caption-title">물리적 안전이 선행 조건</span>
-              <span class="caption-body">모델 성능과 별개로 충돌, 작업 공간, 비상 정지와 사람의 거리를 먼저 관리해야 한다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card">
-            <img src="assets/bhesqzygz4o-ts-00-04-39.jpg" alt="SO-101 로봇팔이 초록색 물체에 그리퍼를 접근시키는 모습" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:04:39</span>
-              <span class="caption-title">정책의 종착점은 실제 행동</span>
-              <span class="caption-body">모델 출력이 관절과 그리퍼의 연속 동작으로 변환된다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card">
-            <img src="assets/bhesqzygz4o-ts-00-04-49.jpg" alt="Isaac GR00T N1.7 VLA 소개 슬라이드" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:04:49</span>
-              <span class="caption-title">시각·언어·행동 정책</span>
-              <span class="caption-body">GR00T는 관측과 언어 지시를 로봇 행동으로 연결하는 정책 계층으로 소개된다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card">
-            <img src="assets/bhesqzygz4o-ts-00-06-19.jpg" alt="LeRobot 0.6.1과 GR00T N1.7 통합 설명 슬라이드" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:06:19</span>
-              <span class="caption-title">프로젝트 사이의 인터페이스</span>
-              <span class="caption-body">공통 데이터 형식과 상태·행동 계약이 통합의 핵심이다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card wide">
-            <img src="assets/bhesqzygz4o-ts-00-07-28.jpg" alt="설정 코드와 여러 시뮬레이션 환경을 보여주는 데이터 수집 슬라이드" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:07:28</span>
-              <span class="caption-title">시뮬레이션에서 초기 데이터 확보</span>
-              <span class="caption-body">작업 조건과 궤적을 안전하고 반복 가능하게 생성해 초기 구축 비용을 낮춘다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card wide">
-            <img src="assets/bhesqzygz4o-ts-00-10-28.jpg" alt="학습 곡선과 작업 실행 화면이 배치된 GR00T N1.7 파인튜닝 슬라이드" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:10:28</span>
-              <span class="caption-title">파인튜닝은 평가와 함께 완성된다</span>
-              <span class="caption-body">범용 정책을 특정 로봇과 작업에 맞추고 실제 환경에서 반복 검증한다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card">
-            <img src="assets/bhesqzygz4o-ts-00-14-57.jpg" alt="로봇, 데이터, 모델, 평가와 배포를 여섯 단계 아이콘으로 표현한 LeRobot 워크플로 슬라이드" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:14:57</span>
-              <span class="caption-title">LeRobot의 종단간 흐름</span>
-              <span class="caption-body">단일 알고리즘보다 설정부터 배포까지 재현 가능한 도구 흐름에 초점을 둔다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card">
-            <img src="assets/bhesqzygz4o-ts-00-15-07.jpg" alt="SO-101 로봇팔과 LeKiwi 이동형 플랫폼을 비교하는 Robots 슬라이드" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:15:07</span>
-              <span class="caption-title">Embodiment를 데이터에 반영</span>
-              <span class="caption-body">고정형 팔과 이동형 플랫폼은 서로 다른 관측·상태·행동 공간을 가진다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card">
-            <img src="assets/bhesqzygz4o-ts-00-15-57.jpg" alt="사람의 조작을 로봇팔이 따라 하는 텔레오퍼레이션 화면" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:15:57</span>
-              <span class="caption-title">사람의 시범을 학습 데이터로</span>
-              <span class="caption-body">관측과 행동을 시간 정렬해 행동 복제 또는 VLA 파인튜닝의 출발점으로 삼는다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card wide">
-            <img src="assets/bhesqzygz4o-ts-00-16-07.jpg" alt="다양한 로봇과 작업 장면을 모자이크로 배치한 Datasets 슬라이드" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:16:07</span>
-              <span class="caption-title">일반화는 데이터 다양성에서 시작한다</span>
-              <span class="caption-body">물체, 배경, 시점과 조작 방식의 범위가 정책이 대응할 수 있는 세계의 범위를 정한다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card wide">
-            <img src="assets/bhesqzygz4o-ts-00-16-17.jpg" alt="관측 인코더와 Transformer 인코더 디코더를 연결한 ACT 계열 모델 구조도" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:16:17</span>
-              <span class="caption-title">연속 행동을 묶어 예측하는 정책</span>
-              <span class="caption-body">Action chunking은 추론 지연과 제어 안정성 사이의 균형을 다루는 접근이다.</span>
-            </figcaption>
-          </figure>
-        </div>
-      </section>
-
-      <section class="section" id="deployment">
-        <header class="section-head">
-          <span class="chapter-no">Chapter 02</span>
-          <h2>학습 손실에서 실제 성공으로</h2>
-          <p class="intro">
-            정책이 학습되었다는 사실과 로봇이 작업을 안정적으로 완료한다는 사실은 다르다.
-            배포 단계에서는 카메라, 지연, 장치 연결과 운영 로그가 성능의 일부가 된다.
-          </p>
-        </header>
-
-        <div class="article-copy">
-          <h3>실제 환경 평가는 별도의 측정 문제다</h3>
-          <p>
-            학습 곡선이 내려가도 물체를 놓치거나, 그리퍼가 잘못된 각도로 접근하거나,
-            첫 시도 이후 시작 상태가 변하면 작업은 실패할 수 있다.
-            따라서 최종 평가는 <strong>작업 완료 여부, 실패 유형, 반복 실행의 안정성</strong>을
-            실제 장면에서 관찰해야 한다.
-          </p>
-
-          <h3>재현 가능한 설치와 로그가 데모를 개발 시스템으로 바꾼다</h3>
-          <p>
-            설치 명령, 장치 연결, 설정 파일, 실행 프로세스와 로그를 재현 가능하게 정리해야
-            다른 장비와 개발자가 동일한 경로를 반복할 수 있다.
-            터미널 작업이 긴 비중을 차지하는 것은 로봇 개발에서 운영 문제가
-            모델 추론만큼 현실적인 업무임을 보여준다.
-          </p>
-        </div>
-
-        <div class="evidence-grid" aria-label="정책 실행과 배포 관련 장면">
-          <figure class="evidence-card">
-            <img src="assets/bhesqzygz4o-ts-00-17-06.jpg" alt="타이머가 표시된 영상에서 로봇팔이 상자와 물체 주변을 조작하는 장면" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:17:06</span>
-              <span class="caption-title">실제 정책 실행 관찰</span>
-              <span class="caption-body">손실 값이 아닌 작업 완료와 실패 패턴을 물리적 환경에서 확인한다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card">
-            <img src="assets/bhesqzygz4o-ts-00-17-46.jpg" alt="설치 및 실행 명령 블록이 제시된 How to get started 슬라이드" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:17:46</span>
-              <span class="caption-title">실행 가능한 진입점</span>
-              <span class="caption-body">환경, 연결, 설정과 명령을 정리해야 연구 데모가 반복 가능한 워크플로가 된다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card">
-            <img src="assets/bhesqzygz4o-ts-00-19-46.jpg" alt="여러 줄의 명령과 출력이 누적된 전체 화면 터미널" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:19:46</span>
-              <span class="caption-title">운영 작업도 시스템의 일부</span>
-              <span class="caption-body">장치 탐색, 프로세스 실행, 로그 확인과 연결 오류 진단이 실제 데모를 지탱한다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card wide">
-            <img src="assets/bhesqzygz4o-ts-00-22-05.jpg" alt="흰색 SO-101 계열 로봇팔과 상자 및 작업 물체가 놓인 실제 작업대" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:22:05</span>
-              <span class="caption-title">배포 조건은 데이터 조건과 맞아야 한다</span>
-              <span class="caption-body">카메라 위치, 조명, 물체 배치와 그리퍼 접근 각도가 정책 성능에 직접 영향을 준다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card wide">
-            <img src="assets/bhesqzygz4o-ts-00-36-52.jpg" alt="실행 항목과 상태 및 지표 패널을 보여주는 NVIDIA 계열 대시보드" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:36:52</span>
-              <span class="caption-title">단발 데모를 넘어 실행 이력을 남긴다</span>
-              <span class="caption-body">성공·실패 상태와 구성 정보를 보존해야 시스템을 비교하고 개선할 수 있다.</span>
-            </figcaption>
-          </figure>
-        </div>
-      </section>
-
-      <section class="section" id="agentic-robotics">
-        <header class="section-head">
-          <span class="chapter-no">Chapter 03</span>
-          <h2>자연어 목표를 로봇 행동으로 번역하는 계층</h2>
-          <p class="intro">
-            후반부 AgenticROS 데모는 로봇 정책보다 한 단계 위에서 작동한다.
-            에이전트가 목표를 해석하고 ROS 도구를 선택하며,
-            센서 결과를 다시 확인하는 폐루프를 구성한다.
-          </p>
-        </header>
-
-        <div class="architecture" role="img" aria-label="자연어 목표가 에이전트, AgenticROS와 ROS 2, 센서 및 로봇으로 전달되고 다시 관측으로 돌아오는 구조">
-          <div class="architecture-node">
-            <b>Intent</b>
-            <strong>자연어 목표</strong>
-            <span>해야 할 일을 사람의 언어로 표현</span>
-          </div>
-          <div class="connector" aria-hidden="true">→</div>
-          <div class="architecture-node">
-            <b>Planning</b>
-            <strong>AI 에이전트</strong>
-            <span>목표 해석, 도구 선택, 단계 구성</span>
-          </div>
-          <div class="connector" aria-hidden="true">→</div>
-          <div class="architecture-node">
-            <b>Bridge</b>
-            <strong>AgenticROS · ROS 2</strong>
-            <span>도구 등록, 노드·토픽·서비스 연결</span>
-          </div>
-          <div class="connector" aria-hidden="true">↔</div>
-          <div class="architecture-node">
-            <b>World</b>
-            <strong>센서 · 로봇</strong>
-            <span>환경 관측, 이동과 조작, 결과 반환</span>
-          </div>
-        </div>
-
-        <div class="article-copy">
-          <h3>자연어는 제어 신호가 아니라 임무 표현이다</h3>
-          <p>
-            사용자의 요청이 곧바로 모터 명령이 되는 것은 아니다.
-            에이전트는 목표를 해석하고, 등록된 ROS 도구 중 적합한 기능을 고르며,
-            인수를 구성하고 실행 결과를 확인한다.
-            이 중간 계층이 있어야 자연어의 모호함과 하드웨어 제어의 엄격함을 분리할 수 있다.
-          </p>
-
-          <h3>센서 피드가 있어야 폐루프가 된다</h3>
-          <p>
-            로봇은 움직인 뒤 다시 보아야 한다. RealSense와 같은 카메라가 RGB 또는 깊이 관측을 제공하면
-            에이전트는 객체 탐색, 거리 판단과 장면 확인을 수행할 수 있다.
-            그러나 카메라 장착 위치, 시야, 깊이 정렬과 로봇 좌표계가 안정적으로 정의되지 않으면
-            높은 수준의 에이전트도 잘못된 세계를 보게 된다.
-          </p>
-
-          <h3>신뢰성은 답변 문장이 아니라 도구 기록에서 나온다</h3>
-          <p>
-            실제 로봇을 움직이는 시스템에서는 에이전트가 그럴듯한 설명을 생성했는지보다
-            <strong>어떤 도구를 어떤 인수로 호출했고, 무엇을 반환받았으며,
-            어떤 안전 제약이 적용되었는지</strong>가 중요하다.
-            도구 로그와 실행 이력은 실패 원인 분석과 승인 체계의 기반이 된다.
-          </p>
-        </div>
-
-        <div class="evidence-grid" aria-label="AgenticROS, ROS 2, RealSense 관련 장면">
-          <figure class="evidence-card wide">
-            <img src="assets/bhesqzygz4o-ts-00-28-04.jpg" alt="어두운 배경의 AgenticROS 랜딩 화면과 프로젝트 로고" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:28:04</span>
-              <span class="caption-title">정책에서 에이전트 계층으로</span>
-              <span class="caption-body">후반부는 AI 에이전트가 ROS 도구와 센서를 호출해 임무를 구성하는 구조로 이동한다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card wide">
-            <img src="assets/bhesqzygz4o-ts-00-29-04.jpg" alt="AI 에이전트, AgenticROS, ROS, 센서와 로봇을 연결한 전체 아키텍처 다이어그램" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:29:04</span>
-              <span class="caption-title">AI 에이전트 + ROS + RealSense</span>
-              <span class="caption-body">에이전트는 목표와 도구 선택을, ROS는 제어 연결을, 센서는 환경 관측을 담당한다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card">
-            <img src="assets/bhesqzygz4o-ts-00-32-23.jpg" alt="발표자가 RealSense 계열 카메라가 장착된 소형 로봇을 조정하는 모습" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:32:23</span>
-              <span class="caption-title">로봇의 눈을 정렬하는 일</span>
-              <span class="caption-body">장착 위치, 시야, 깊이와 좌표계 관계가 인지 결과의 신뢰도를 좌우한다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card">
-            <img src="assets/bhesqzygz4o-ts-00-33-13.jpg" alt="AgenticROS ASCII 로고와 연속된 실행 로그가 표시된 터미널" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:33:13</span>
-              <span class="caption-title">런타임 연결 상태</span>
-              <span class="caption-body">어댑터, ROS 연결과 센서·행동 도구 등록 상태를 로그에서 확인한다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card">
-            <img src="assets/bhesqzygz4o-ts-00-33-33.jpg" alt="사용자 명령과 에이전트 응답 및 도구 실행 단계가 표시된 대화형 UI" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:33:33</span>
-              <span class="caption-title">명령은 여러 실행 단계로 분해된다</span>
-              <span class="caption-body">목표 해석, ROS 도구 선택과 결과 확인이 대화 흐름 안에서 드러난다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card wide">
-            <img src="assets/bhesqzygz4o-ts-00-33-43.jpg" alt="실시간 카메라 영상과 제어 버튼이 함께 보이는 웹 인터페이스" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:33:43</span>
-              <span class="caption-title">보고, 행동하고, 다시 보는 폐루프</span>
-              <span class="caption-body">센서 피드와 제어 도구를 같은 운영 화면에서 확인하면 실패를 추적하기 쉬워진다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card wide">
-            <img src="assets/bhesqzygz4o-ts-00-34-43.jpg" alt="대화형 UI에 긴 도구 실행 출력 또는 코드 블록이 펼쳐진 화면" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:34:43</span>
-              <span class="caption-title">도구 실행의 추적성</span>
-              <span class="caption-body">호출한 도구, 인수와 반환값을 남기는 기록이 로봇 에이전트의 감사 가능성을 만든다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card">
-            <img src="assets/bhesqzygz4o-ts-00-38-42.jpg" alt="라인 추종 로봇 관련 자연어 지시와 실행 출력이 표시된 화면" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:38:42</span>
-              <span class="caption-title">상위 임무를 하위 행동으로</span>
-              <span class="caption-body">자연어 임무는 센서 읽기, 이동, 조건 판단과 중지 규칙으로 분해되어야 한다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card">
-            <img src="assets/bhesqzygz4o-ts-00-38-52.jpg" alt="전면 카메라와 센서를 장착한 소형 바퀴형 로봇" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:38:52</span>
-              <span class="caption-title">작은 플랫폼에서 시작하는 실험</span>
-              <span class="caption-body">소형 이동 로봇도 인지·계획·행동 루프를 검증하는 충분한 연구 플랫폼이 된다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card">
-            <img src="assets/bhesqzygz4o-ts-00-40-02.jpg" alt="발표자가 소형 로봇 전면의 센서 또는 카메라를 직접 조정하는 모습" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:40:02</span>
-              <span class="caption-title">기계적 장착도 소프트웨어 성능이다</span>
-              <span class="caption-body">센서 높이, 각도, 진동, 케이블과 시야 가림이 인식과 제어 안정성에 영향을 준다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card wide">
-            <img src="assets/bhesqzygz4o-ts-00-42-31.jpg" alt="발표자가 RealSense 관련 카메라 또는 센서 구성품을 가까이 들어 보이는 모습" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:42:31</span>
-              <span class="caption-title">RGB·깊이 관측을 ROS 도구로</span>
-              <span class="caption-body">센서 관측이 토픽과 도구로 노출되면 객체 탐색과 거리 판단 같은 물리적 기능을 사용할 수 있다.</span>
-            </figcaption>
-          </figure>
-
-          <figure class="evidence-card wide">
-            <img src="assets/bhesqzygz4o-ts-00-47-00.jpg" alt="세 개의 QR 코드와 후속 리소스를 안내하는 Next Steps 슬라이드" loading="lazy" width="1280" height="720">
-            <figcaption>
-              <span class="timestamp">00:47:00</span>
-              <span class="caption-title">데모 이후의 학습 경로</span>
-              <span class="caption-body">세션은 완결된 제품보다 문서, 커뮤니티와 후속 실습으로 이어지는 입문 지도를 제공한다.</span>
-            </figcaption>
-          </figure>
-        </div>
-      </section>
-
-      <section class="section" id="evidence-map">
-        <header class="section-head">
-          <span class="chapter-no">Evidence Map</span>
-          <h2>화면에서 확인된 기술 계층</h2>
-          <p class="intro">
-            각 구성요소를 독립된 제품 목록이 아니라,
-            관측에서 행동까지 이어지는 시스템의 책임 단위로 정리하면 다음과 같다.
-          </p>
-        </header>
+      <section class="report-section" id="stack">
+        <p class="section-kicker">System View</p>
+        <h2>하나의 로봇 지능, 여덟 개의 계층</h2>
+        <p class="section-intro">
+          화면에서 확인되는 요소를 기능별로 분리하면 각 기술의 역할과 교체 가능한 경계가
+          선명해진다. 이 구분은 특정 제품 목록보다 실제 구현에 더 유용하다.
+        </p>
 
         <div class="table-wrap">
           <table>
@@ -1794,8 +1390,8 @@
               <tr>
                 <th scope="col">계층</th>
                 <th scope="col">화면에서 확인된 요소</th>
-                <th scope="col">주요 기능</th>
-                <th scope="col">핵심 실패 지점</th>
+                <th scope="col">시스템 역할</th>
+                <th scope="col">핵심 운영 질문</th>
               </tr>
             </thead>
             <tbody>
@@ -1803,233 +1399,553 @@
                 <td>로봇 하드웨어</td>
                 <td>SO-101, LeKiwi, 소형 이동 로봇</td>
                 <td>관절·그리퍼·바퀴를 통한 행동 실행</td>
-                <td>충돌, 기구 오차, 작업 범위 이탈</td>
+                <td>행동 공간과 안전 한계가 명시됐는가?</td>
               </tr>
               <tr>
                 <td>센서</td>
-                <td>카메라, RealSense 계열 장치</td>
-                <td>RGB·깊이 기반 환경 관측</td>
-                <td>가림, 좌표계 불일치, 장착 흔들림</td>
+                <td>RGB 카메라, RealSense 계열 깊이 장치</td>
+                <td>환경과 로봇 상태의 관측 제공</td>
+                <td>시야, 깊이 정렬, 좌표계가 안정적인가?</td>
               </tr>
               <tr>
                 <td>데이터</td>
                 <td>텔레오퍼레이션, 시뮬레이션, 작업 모자이크</td>
-                <td>관측·상태·행동·지시의 학습 자료 구성</td>
-                <td>시간 불일치, 조건 편향, 다양성 부족</td>
+                <td>관측·상태·행동·지시의 시간 정렬</td>
+                <td>배포 조건과 데이터 분포가 일치하는가?</td>
               </tr>
               <tr>
                 <td>정책</td>
                 <td>ACT 구조, Isaac GR00T N1.7 VLA</td>
-                <td>관측과 언어 조건에서 연속 행동 예측</td>
-                <td>분포 이동, 누적 오차, 불안정한 제어</td>
+                <td>시각·언어 조건에서 연속 행동 예측</td>
+                <td>지연과 제어 안정성의 균형은 어떤가?</td>
               </tr>
               <tr>
                 <td>워크플로</td>
                 <td>LeRobot 0.6.1</td>
-                <td>수집, 학습, 평가와 배포 연결</td>
-                <td>설정 불일치, 재현성 부족</td>
+                <td>수집, 학습, 평가, 배포의 재현 가능한 연결</td>
+                <td>실험 설정과 데이터 버전이 추적되는가?</td>
               </tr>
               <tr>
                 <td>엣지 컴퓨팅</td>
                 <td>NVIDIA Jetson Thor</td>
-                <td>로봇 가까이에서 정책 추론과 런타임 실행</td>
-                <td>지연, 자원 압박, 열·전력 제약</td>
+                <td>로봇 가까이에서 정책과 런타임 실행</td>
+                <td>최악 조건의 추론 지연을 감당하는가?</td>
               </tr>
               <tr>
                 <td>미들웨어</td>
                 <td>ROS 2</td>
-                <td>노드, 토픽, 서비스·액션을 통한 연결</td>
-                <td>통신 상태, 메시지 계약, 좌표 변환</td>
+                <td>센서·모델·제어를 노드와 인터페이스로 연결</td>
+                <td>시간 제한과 실패 상태가 계약에 포함됐는가?</td>
               </tr>
               <tr>
                 <td>에이전트</td>
-                <td>AgenticROS 대화 UI와 도구 로그</td>
-                <td>자연어 목표를 도구 호출과 임무 단계로 변환</td>
-                <td>잘못된 도구 선택, 권한, 추적성 부족</td>
+                <td>AgenticROS UI, 스킬, 도구 실행 로그</td>
+                <td>자연어 목표를 제한된 로봇 도구 호출로 변환</td>
+                <td>권한, 중지 규칙, 감사 로그가 있는가?</td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <ol class="timeline" aria-label="영상 전개">
-          <li>
-            <time>00:00–00:14</time>
-            <div>
-              <strong>통합 스택과 학습 기반</strong>
-              <p>안전, Jetson Thor·SO-101 통합, GR00T N1.7 VLA, 시뮬레이션 수집과 파인튜닝.</p>
+        <div class="architecture" role="img" aria-label="자연어 목표에서 실제 로봇 행동과 센서 피드백까지 이어지는 구조">
+          <h3>Agent-to-Action Architecture</h3>
+          <p class="architecture-subtitle">자연어 목표가 실행 가능한 행동이 되고, 관측이 다시 판단으로 돌아오는 폐루프</p>
+          <div class="architecture-flow">
+            <div class="arch-node accent">
+              <strong>목표·에이전트</strong>
+              <small>자연어 임무 해석<br>도구·스킬 선택<br>중지 조건 설정</small>
             </div>
-          </li>
-          <li>
-            <time>00:14–00:23</time>
-            <div>
+            <div class="arch-arrow" aria-hidden="true">→</div>
+            <div class="arch-node blue">
+              <strong>AgenticROS + ROS 2</strong>
+              <small>도구 어댑터<br>노드·토픽·서비스<br>실행 결과와 오류</small>
+            </div>
+            <div class="arch-arrow" aria-hidden="true">→</div>
+            <div class="arch-node">
+              <strong>센서·정책·로봇</strong>
+              <small>RealSense 관측<br>VLA 또는 제어 정책<br>관절·그리퍼·바퀴</small>
+            </div>
+          </div>
+          <p class="architecture-feedback">
+            <strong>피드백 경로:</strong> 카메라·상태·실행 결과 → ROS 2 → 에이전트의 다음 판단
+          </p>
+        </div>
+
+        <div class="evidence-gallery">
+          <figure>
+            <img src="assets/bhesqzygz4o-ts-00-03-35.jpg" width="1920" height="1080" loading="lazy" alt="Safety is Important 제목과 소형 로봇팔이 표시된 안전 슬라이드">
+            <figcaption>
+              <a class="timecode">00:03:35</a>
+              <strong>안전이 아키텍처보다 먼저다</strong>
+              <span>실제 로봇 작업에서는 충돌, 작업 공간, 비상 정지와 사람·장비 사이의 거리를 먼저 관리해야 한다.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="assets/bhesqzygz4o-ts-00-04-05.jpg" width="1920" height="1080" loading="lazy" alt="SO-101 로봇팔의 그리퍼가 초록색 물체에 접근하는 모습">
+            <figcaption>
+              <a class="timecode">00:04:05</a>
+              <strong>출력의 종착지는 물리적 행동이다</strong>
+              <span>모델 출력은 텍스트나 분류가 아니라 관절과 그리퍼의 시간 연속적인 움직임으로 변환되어야 한다.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="assets/bhesqzygz4o-ts-00-04-45.jpg" width="1920" height="1080" loading="lazy" alt="Isaac GR00T N1.7 VLA의 성능 그래프와 모델 흐름도가 포함된 슬라이드">
+            <figcaption>
+              <a class="timecode">00:04:45</a>
+              <strong>GR00T N1.7은 VLA 정책 계층</strong>
+              <span>시각 관측과 언어 지시를 로봇 행동으로 연결한다. 화면에서 판독하기 어려운 성능 수치는 기록하지 않았다.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="assets/bhesqzygz4o-ts-00-06-15.jpg" width="1920" height="1080" loading="lazy" alt="LeRobot 0.6.1과 GR00T N1.7 통합을 설명하는 슬라이드">
+            <figcaption>
+              <a class="timecode">00:06:15</a>
+              <strong>통합의 핵심은 인터페이스</strong>
+              <span>공통 데이터 형식, 로봇 상태·행동 표현, 학습과 배포의 경계를 맞춰야 서로 다른 프로젝트가 연결된다.</span>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="report-section" id="learning">
+        <p class="section-kicker">Evidence I</p>
+        <h2>시범에서 정책까지: LeRobot 학습 루프</h2>
+        <p class="section-intro">
+          전반부는 데이터가 만들어지고 실제 행동으로 되돌아가는 과정을 순서대로 보여준다.
+          여기서 LeRobot의 가치는 특정 알고리즘 하나보다 전체 실험 흐름을 재현 가능한
+          도구 체계로 묶는 데 있다.
+        </p>
+
+        <div class="pipeline" role="img" aria-label="로봇 설정, 데이터 수집, 데이터셋 구성, 정책 학습, 실제 평가로 이어지는 파이프라인">
+          <p class="pipeline-title">End-to-End Physical AI Loop</p>
+          <div class="pipeline-flow">
+            <div class="pipeline-step" data-step="01">로봇·센서 설정</div>
+            <div class="pipeline-step" data-step="02">시뮬레이션·시범 수집</div>
+            <div class="pipeline-step" data-step="03">데이터셋 구성</div>
+            <div class="pipeline-step" data-step="04">학습·파인튜닝</div>
+            <div class="pipeline-step" data-step="05">실제 평가·배포</div>
+          </div>
+          <p class="feedback-label">실패 사례와 새 조건을 다시 수집하는 <strong>반복 루프</strong></p>
+        </div>
+
+        <h3>1. 시뮬레이션은 초기 시행착오의 비용을 낮춘다</h3>
+        <p>
+          실제 장비만으로 데이터를 모으면 충돌 위험, 하드웨어 마모, 작업자 시간과 환경
+          재설정 비용이 빠르게 커진다. 시뮬레이션은 작업 조건과 궤적을 반복 생성해 초기
+          데이터 구축의 안전성과 재현성을 높인다. 다만 최종 성능은 실제 환경의 조명,
+          마찰, 카메라 시점과 제어 지연을 얼마나 반영하는지에 달려 있다.
+        </p>
+
+        <figure class="evidence-figure">
+          <img src="assets/bhesqzygz4o-ts-00-07-25.jpg" width="1920" height="1080" loading="lazy" alt="코드와 여러 시뮬레이션 환경이 함께 보이는 Collecting Data in Simulation 슬라이드">
+          <figcaption>
+            <a class="timecode">00:07:25</a>
+            설정·코드와 여러 시뮬레이션 장면이 병렬로 제시된다. 실제 로봇에 적용하기 전
+            작업 조건과 데이터 생성 절차를 반복 검증하는 단계로 읽을 수 있다.
+          </figcaption>
+        </figure>
+
+        <h3>2. 파인튜닝은 데이터·지표·실환경 평가의 삼각형이다</h3>
+        <p>
+          범용 사전학습 정책을 특정 로봇과 작업에 맞추려면 수집 데이터만 투입해서는 부족하다.
+          학습 곡선으로 최적화 상태를 확인하고, 실제 장비에서 실패 유형을 분류한 뒤,
+          부족한 조건을 다시 데이터에 반영해야 한다. 화면은 이 세 요소가 하나의 실험 단위로
+          다뤄져야 함을 보여준다.
+        </p>
+
+        <figure class="evidence-figure">
+          <img src="assets/bhesqzygz4o-ts-00-10-25.jpg" width="1920" height="1080" loading="lazy" alt="학습 곡선과 로봇 작업 화면이 나란히 있는 GR00T N1.7 파인튜닝 슬라이드">
+          <figcaption>
+            <a class="timecode">00:10:25</a>
+            학습 곡선과 작업 실행 화면이 함께 등장한다. 훈련 지표와 실제 성공 여부를
+            분리하지 않고 같은 반복 루프 안에서 평가해야 한다는 점이 중요하다.
+          </figcaption>
+        </figure>
+
+        <h3>3. 데이터셋은 양보다 조건의 다양성이 중요하다</h3>
+        <p>
+          텔레오퍼레이션 시범은 관측과 행동이 시간 정렬된 데이터가 된다. 하지만 같은 배경,
+          같은 물체 배치, 같은 카메라 각도만 반복하면 정책은 좁은 조건에 과적합되기 쉽다.
+          물체, 배경, 시점, 조작 방식과 실패 회복 상황을 설계적으로 포함해야 실제 배포에서
+          일반화를 기대할 수 있다.
+        </p>
+
+        <div class="evidence-gallery">
+          <figure>
+            <img src="assets/bhesqzygz4o-ts-00-15-05.jpg" width="1920" height="1080" loading="lazy" alt="LeRobot End-to-end Physical AI Workflow의 여섯 단계 아이콘">
+            <figcaption>
+              <a class="timecode">00:15:05</a>
+              <strong>종단간 워크플로</strong>
+              <span>로봇, 데이터, 모델, 학습·평가·배포를 하나의 연속된 도구 흐름으로 제시한다.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="assets/bhesqzygz4o-ts-00-15-25.jpg" width="1920" height="1080" loading="lazy" alt="SO-101, LeKiwi, Reachy 2와 Unitree 계열 등 여러 로봇 이미지">
+            <figcaption>
+              <a class="timecode">00:15:25</a>
+              <strong>다양한 embodiment</strong>
+              <span>고정형 팔과 이동형 플랫폼은 관측·상태·행동 공간이 다르므로 로봇별 설정이 데이터 계약에 반영돼야 한다.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="assets/bhesqzygz4o-ts-00-16-05.jpg" width="1920" height="1080" loading="lazy" alt="사람의 조작을 로봇팔이 따라 하는 텔레오퍼레이션 장면">
+            <figcaption>
+              <a class="timecode">00:16:05</a>
+              <strong>텔레오퍼레이션 시범</strong>
+              <span>사람이 수행한 조작이 관측과 행동의 시간 정렬된 학습 자료가 된다.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="assets/bhesqzygz4o-ts-00-16-10.jpg" width="1920" height="1080" loading="lazy" alt="여러 로봇과 작업 장면을 모자이크로 보여주는 Datasets 슬라이드">
+            <figcaption>
+              <a class="timecode">00:16:10</a>
+              <strong>작업 다양성</strong>
+              <span>로봇 정책의 일반화는 데이터 양뿐 아니라 물체·배경·시점·조작 방식의 분포에 좌우된다.</span>
+            </figcaption>
+          </figure>
+        </div>
+
+        <h3>4. 정책 구조는 제어 주기와 함께 봐야 한다</h3>
+        <p>
+          ACT 계열 구조는 연속 행동을 묶어 예측하는 action chunking으로 제어의 시간 구조를
+          다룬다. 이는 단일 프레임마다 명령을 새로 생성하는 방식과 달리 추론 지연, 동작의
+          부드러움, 오류가 지속되는 시간 사이의 균형을 요구한다. 정책 구조를 선택할 때는
+          벤치마크 점수뿐 아니라 로봇의 제어 주기와 최악 조건의 지연을 함께 측정해야 한다.
+        </p>
+
+        <div class="evidence-gallery">
+          <figure>
+            <img src="assets/bhesqzygz4o-ts-00-16-15.jpg" width="1920" height="1080" loading="lazy" alt="관측 인코더와 Transformer 인코더 및 디코더가 연결된 ACT 모델 구조">
+            <figcaption>
+              <a class="timecode">00:16:15</a>
+              <strong>ACT 계열 모델</strong>
+              <span>관측 인코더와 Transformer 구조를 통해 연속 행동 묶음을 예측하는 정책 구성이 제시된다.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="assets/bhesqzygz4o-ts-00-17-25.jpg" width="1920" height="1080" loading="lazy" alt="양팔 로봇이 천을 다루는 장면">
+            <figcaption>
+              <a class="timecode">00:17:25</a>
+              <strong>양팔 협응으로의 확장</strong>
+              <span>동일한 학습 도구가 단일 로봇팔을 넘어 더 복잡한 다중 팔 조작 문제로 확장될 가능성을 보여준다.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="assets/bhesqzygz4o-ts-00-17-45.jpg" width="1920" height="1080" loading="lazy" alt="터미널 형식의 설치 및 실행 명령을 보여주는 How to get started 슬라이드">
+            <figcaption>
+              <a class="timecode">00:17:45</a>
+              <strong>재현 가능한 진입점</strong>
+              <span>환경 설치, 장치 연결, 설정 파일과 실행 명령이 정리돼야 연구 데모가 반복 가능한 개발 흐름으로 바뀐다.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="assets/bhesqzygz4o-ts-00-22-35.jpg" width="1920" height="1080" loading="lazy" alt="흰색 SO-101 계열 로봇팔과 상자 및 작업 물체가 놓인 실제 작업대">
+            <figcaption>
+              <a class="timecode">00:22:35</a>
+              <strong>실제 작업대 평가</strong>
+              <span>카메라 위치, 조명, 접근 각도와 물체 배치가 정책 성능에 직접 개입한다. 수집 조건과 배포 조건의 일치가 핵심이다.</span>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="report-section" id="agentic">
+        <p class="section-kicker">Evidence II</p>
+        <h2>자연어에서 로봇 행동까지: AgenticROS 폐루프</h2>
+        <p class="section-intro">
+          후반부는 학습 정책 자체보다 로봇을 운영하는 에이전트 계층에 초점을 맞춘다.
+          에이전트는 목표를 해석하고, AgenticROS는 이를 로봇 도구로 연결하며, ROS 2와
+          RealSense는 각각 제어 인터페이스와 환경 관측을 제공한다.
+        </p>
+
+        <figure class="evidence-figure">
+          <img src="assets/bhesqzygz4o-ts-00-29-15.jpg" width="1920" height="1080" loading="lazy" alt="AI 에이전트, AgenticROS, ROS, 센서와 로봇을 연결한 전체 아키텍처 다이어그램">
+          <figcaption>
+            <a class="timecode">00:29:15</a>
+            에이전트, AgenticROS, ROS, RealSense와 로봇을 잇는 전체 구조. 상위 목표와
+            실제 제어 사이에 명시적 어댑터와 로봇 미들웨어가 존재한다.
+          </figcaption>
+        </figure>
+
+        <h3>1. 센서는 에이전트의 ‘눈’이기 전에 좌표계의 일부다</h3>
+        <p>
+          카메라 스트림을 에이전트에 노출하는 것만으로 안정적인 인지가 완성되지는 않는다.
+          카메라의 장착 위치와 시야, RGB·깊이 정렬, 로봇 기준 좌표계와의 변환이 일관돼야
+          “앞에 있는 물체”라는 언어 표현이 실제 이동과 조작 명령으로 이어질 수 있다.
+          전원, 배선, 고정과 열 관리 역시 같은 시스템 문제다.
+        </p>
+
+        <div class="evidence-gallery">
+          <figure>
+            <img src="assets/bhesqzygz4o-ts-00-32-25.jpg" width="1920" height="1080" loading="lazy" alt="RealSense 깊이 카메라와 Jetson 기반 컴퓨팅을 장착한 소형 이동 로봇">
+            <figcaption>
+              <a class="timecode">00:32:25</a>
+              <strong>RealSense와 이동 플랫폼</strong>
+              <span>깊이 카메라가 이동 로봇 전면에 배치된다. 센서 장착 위치와 시야가 인지 가능한 공간을 결정한다.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="assets/bhesqzygz4o-ts-00-32-35.jpg" width="1920" height="1080" loading="lazy" alt="Jetson 보드, 배터리, 케이블과 RealSense 장착 구조의 클로즈업">
+            <figcaption>
+              <a class="timecode">00:32:35</a>
+              <strong>하드웨어 통합의 현실</strong>
+              <span>전원 용량, 배선, 센서 고정과 열 관리는 모델이나 미들웨어 밖에 있지만 시스템 안정성을 좌우한다.</span>
+            </figcaption>
+          </figure>
+        </div>
+
+        <h3>2. 운영 화면은 결과보다 과정이 보여야 한다</h3>
+        <p>
+          로봇 에이전트의 신뢰성은 최종 응답 문장보다 어떤 도구를 선택했고, 어떤 인자를
+          전달했으며, 무엇을 관측하고 반환받았는지 추적할 수 있는가에 달려 있다. 터미널 로그,
+          카메라 피드, 제어 인터페이스와 대화 기록은 서로 다른 장식이 아니라 같은 실행을
+          관찰하는 복수의 창이다.
+        </p>
+
+        <div class="evidence-gallery">
+          <figure>
+            <img src="assets/bhesqzygz4o-ts-00-33-15.jpg" width="1920" height="1080" loading="lazy" alt="AgenticROS ASCII 로고와 연속 실행 로그가 표시된 터미널">
+            <figcaption>
+              <a class="timecode">00:33:15</a>
+              <strong>런타임 연결 로그</strong>
+              <span>어댑터, ROS 연결, 센서와 행동 도구의 등록 상태를 확인하는 핵심 관찰 지점이다.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="assets/bhesqzygz4o-ts-00-33-45.jpg" width="1920" height="1080" loading="lazy" alt="실시간 카메라 피드와 여러 제어 버튼이 함께 표시된 웹 인터페이스">
+            <figcaption>
+              <a class="timecode">00:33:45</a>
+              <strong>관측과 제어를 한 화면에</strong>
+              <span>센서 피드와 제어 도구를 같은 운영 화면에서 확인하면 판단·행동·결과의 실패 지점을 추적하기 쉽다.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="assets/bhesqzygz4o-ts-00-35-15.jpg" width="1920" height="1080" loading="lazy" alt="카메라 관측 요청과 장면을 설명하는 에이전트 응답이 표시된 대화형 UI">
+            <figcaption>
+              <a class="timecode">00:35:15</a>
+              <strong>관측을 언어로 해석</strong>
+              <span>카메라가 단순 스트림을 넘어 에이전트의 후속 판단에 사용할 수 있는 의미 표현으로 변환된다.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="assets/bhesqzygz4o-ts-00-36-25.jpg" width="1920" height="1080" loading="lazy" alt="로봇 요청, 도구 선택 과정과 실행 결과가 표시된 에이전트 화면">
+            <figcaption>
+              <a class="timecode">00:36:25</a>
+              <strong>도구 호출의 추적성</strong>
+              <span>요청, 선택된 도구와 실행 결과를 한 흐름으로 기록해 로봇 행동의 원인을 사후 검토할 수 있다.</span>
+            </figcaption>
+          </figure>
+        </div>
+
+        <h3>3. 자연어 임무는 제한된 스킬로 내려와야 한다</h3>
+        <p>
+          “주변을 살펴봐”, “큐브를 집어”, “나를 따라와” 같은 자연어 목표는 그대로 모터에
+          전달되지 않는다. 센서 읽기, 대상 선택, 이동 명령, 반복 조건과 중지 규칙으로
+          분해되어야 한다. 검증된 절차를 스킬로 패키징하면 에이전트는 낮은 수준의 제어를
+          매번 새로 생성하지 않고 안전 범위 안에서 임무를 조합할 수 있다.
+        </p>
+
+        <div class="evidence-gallery">
+          <figure>
+            <img src="assets/bhesqzygz4o-ts-00-36-55.jpg" width="1920" height="1080" loading="lazy" alt="Surroundings Scan, Pick Cube, Follow Me, Start SLAM과 Navigate To 스킬 카드">
+            <figcaption>
+              <a class="timecode">00:36:55</a>
+              <strong>재사용 가능한 로봇 스킬</strong>
+              <span>센서 읽기와 제어 절차를 검증 가능한 단위로 패키징해 상위 임무에서 재사용한다.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="assets/bhesqzygz4o-ts-00-38-45.jpg" width="1920" height="1080" loading="lazy" alt="follow me 스킬 설명과 stop follow me 중지 지시가 표시된 터미널">
+            <figcaption>
+              <a class="timecode">00:38:45</a>
+              <strong>임무와 중지 조건</strong>
+              <span>사람 추적은 대상 탐지, 이동, 조건 재평가와 명시적 중지 지시로 분해된다.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="assets/bhesqzygz4o-ts-00-39-15.jpg" width="1920" height="1080" loading="lazy" alt="보라색 빛의 전면 센서를 장착한 소형 바퀴형 로봇">
+            <figcaption>
+              <a class="timecode">00:39:15</a>
+              <strong>작은 플랫폼에서의 폐루프 실험</strong>
+              <span>복잡한 산업용 장비가 아니어도 소형 이동 로봇에서 인지·계획·행동 루프를 검증할 수 있다.</span>
+            </figcaption>
+          </figure>
+          <figure>
+            <img src="assets/bhesqzygz4o-ts-00-47-25.jpg" width="1920" height="1080" loading="lazy" alt="세 개의 QR 코드와 후속 리소스를 보여주는 Next Steps 슬라이드">
+            <figcaption>
+              <a class="timecode">00:47:25</a>
+              <strong>다음 단계</strong>
+              <span>세션은 완결된 제품 설명보다 각 프로젝트의 문서, 커뮤니티와 후속 실습으로 이어지는 입문 경로를 제공한다.</span>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="report-section" id="evidence">
+        <p class="section-kicker">Session Map</p>
+        <h2>47분의 전개를 한눈에 보기</h2>
+        <p class="section-intro">
+          영상은 전반부의 로봇 학습 파이프라인과 후반부의 에이전트 운영 데모로 나뉜다.
+          중간 패널을 경계로 “정책을 어떻게 학습하는가”에서 “학습된 지능과 도구를 어떻게
+          실제 로봇에 연결하는가”로 질문이 이동한다.
+        </p>
+
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-time">00:00–00:14</div>
+            <div class="timeline-copy">
+              <strong>통합 스택과 학습 준비</strong>
+              <p>안전, Jetson Thor·SO-101 통합, GR00T N1.7 VLA, 시뮬레이션 데이터 수집과 파인튜닝.</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">00:14–00:23</div>
+            <div class="timeline-copy">
               <strong>LeRobot 종단간 워크플로</strong>
-              <p>로봇, 텔레오퍼레이션, 데이터셋, 모델, 설치와 실제 실행 데모.</p>
+              <p>지원 로봇, 텔레오퍼레이션, 데이터셋, ACT 계열 모델, 설치와 실제 작업대 데모.</p>
             </div>
-          </li>
-          <li>
-            <time>00:23–00:28</time>
-            <div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">00:23–00:28</div>
+            <div class="timeline-copy">
               <strong>패널과 전환</strong>
-              <p>질의응답을 거쳐 조작 정책 중심의 전반부에서 오픈소스 에이전트 데모로 이동.</p>
+              <p>질의응답을 거쳐 학습 중심의 전반부에서 오픈소스 에이전트 데모로 이동.</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">00:28–00:47</div>
+            <div class="timeline-copy">
+              <strong>AgenticROS·ROS 2·RealSense</strong>
+              <p>이동 로봇 하드웨어, 센서 피드, 에이전트 해석, 도구 호출, 재사용 스킬과 자연어 임무 실행.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="report-section" id="implications">
+        <p class="section-kicker">Implications</p>
+        <h2>연구팀과 개발팀이 가져갈 것</h2>
+
+        <ol class="implication-list">
+          <li>
+            <strong>데이터 계약을 먼저 설계하라</strong>
+            <p>관측, 로봇 상태, 행동, 언어 지시와 시간 정보의 형식이 명확해야 정책이나 로봇을 교체해도 전체 파이프라인이 유지된다.</p>
+          </li>
+          <li>
+            <strong>embodiment를 설정 파일 이상으로 다뤄라</strong>
+            <p>관절 범위, 그리퍼 방향, 센서 좌표계와 제어 주기는 모델 입력·출력의 의미를 결정한다. 잘못된 정의는 데이터 전체를 오염시킨다.</p>
+          </li>
+          <li>
+            <strong>평균 지연이 아니라 최악 조건을 측정하라</strong>
+            <p>엣지 추론의 목적은 단순한 오프라인 처리 속도가 아니다. 제어 주기 안에서 예측 가능하게 응답하고 안전 정지가 항상 우선돼야 한다.</p>
+          </li>
+          <li>
+            <strong>에이전트에게 무제한 제어권을 주지 마라</strong>
+            <p>자연어 목표는 권한이 제한된 스킬로 변환하고, 속도·공간·시간 제한과 승인·중지 규칙을 실행 계층에서 강제해야 한다.</p>
+          </li>
+          <li>
+            <strong>성공률과 함께 실패 경로를 저장하라</strong>
+            <p>센서 프���임, 선택된 도구, 인자, ROS 상태, 정책 출력과 실제 결과를 같은 실행 식별자로 묶어야 재현과 개선이 가능하다.</p>
+          </li>
+        </ol>
+
+        <div class="checklist">
+          <h3>실제 프로토타입을 위한 최소 점검표</h3>
+          <ul>
+            <li>비상 정지와 속도·작업 공간 제한이 에이전트보다 낮은 계층에서 강제되는가?</li>
+            <li>카메라 시야, 깊이 정렬과 로봇 좌표 변환이 반복 측정으로 검증됐는가?</li>
+            <li>수집 환경과 배포 환경의 조명·배경·물체 분포 차이를 기록했는가?</li>
+            <li>관측·행동 타임스탬프와 제어 지연을 하나의 로그에서 추적할 수 있는가?</li>
+            <li>각 스킬에 시작 조건, 성공 조건, 시간 제한과 안전한 중지 동작이 있는가?</li>
+            <li>실패 사례가 다음 수집·학습 주기로 되돌아가는 데이터 운영 절차가 있는가?</li>
+          </ul>
+        </div>
+
+        <blockquote class="pullquote">
+          <p>자연어 인터페이스는 안전 제약을 대체하지 않는다. 좋은 에이전트는 무엇이든 할 수 있는 에이전트가 아니라, 허용된 행동을 투명하게 조합하는 에이전트다.</p>
+          <cite>AgenticROS 데모가 보여주는 운영 원칙</cite>
+        </blockquote>
+      </section>
+
+      <section class="report-section" id="sources">
+        <p class="section-kicker">Sources &amp; Limitations</p>
+        <h2>근거, 출처, 그리고 해석의 경계</h2>
+
+        <div class="limitations">
+          <h3>자료의 한계</h3>
+          <ul>
+            <li>한국어 자동 자막에는 고유명사와 기술 용어의 오인식 가능성이 있다. 따라서 자막의 문장을 직접 인용하지 않았다.</li>
+            <li>정확한 명령어와 수치는 1080p 화면에서 판독 가능한 범위만 기록했으며, 흐릿한 그래프 값은 추정하지 않았다.</li>
+            <li>추출 장면은 회의 UI와 참가자 패널을 제외하고 본문 화면을 중심으로 구성했다.</li>
+            <li>단일 정지 화면은 시스템 구성과 실행 맥락의 근거가 될 수 있지만, 동작의 전체 성공률이나 반복 안정성까지 입증하지는 않는다.</li>
+            <li>“엣지 추론이 지연과 네트워크 의존성을 줄인다”와 같은 문장은 일반적인 시스템적 함의를 설명한 것이며, 영상이 정량 비교 결과를 제공했다는 뜻은 아니다.</li>
+          </ul>
+        </div>
+
+        <h3>참고 근거</h3>
+        <ol class="source-list">
+          <li>
+            <div>
+              <a>Learn Robot Manipulation with LeRobot and ROS 2</a>
+              <small>NVIDIA Developer · 게시일 2026-08-11 · 47분 30초. 본 보고서의 주요 영상·장면 근거.</small>
             </div>
           </li>
           <li>
-            <time>00:28–00:47</time>
             <div>
-              <strong>AgenticROS와 센서 기반 폐루프</strong>
-              <p>ROS 2, RealSense와 이동 로봇을 연결해 명령, 관측, 도구 실행과 운영 화면을 시연.</p>
+              <a>Make It Think: NVIDIA Jetson AI Lab Livestream Series</a>
+              <small>NVIDIA Developer Forums의 공식 세션 안내.</small>
+            </div>
+          </li>
+          <li>
+            <div>
+              <a>Robotics AI Developer Kits for Students &amp; Educators</a>
+              <small>NVIDIA Jetson 로보틱스 개발 키트 관련 공식 자료.</small>
+            </div>
+          </li>
+          <li>
+            <div>
+              <a>AgenticROS — Open Robotics Discourse</a>
+              <small>AgenticROS의 ROS 연결과 에이전트 활용 맥락을 설명하는 커뮤니티 자료.</small>
             </div>
           </li>
         </ol>
       </section>
 
-      <section class="section" id="implications">
-        <header class="section-head">
-          <span class="chapter-no">Implications</span>
-          <h2>연구와 개발에 남는 의미</h2>
-          <p class="intro">
-            세션이 보여준 구성은 특정 로봇 데모를 넘어,
-            Physical AI 시스템을 설계할 때 무엇을 독립시키고 무엇을 함께 검증해야 하는지 알려준다.
-          </p>
-        </header>
-
-        <div class="implications">
-          <article class="implication">
-            <b>Research</b>
-            <h3>모델 크기보다 일관된 실험 계약</h3>
-            <p>
-              데이터 품질, embodiment 정의, 상태·행동 표현, 센서 좌표계와 배포 지연을
-              동일한 기준으로 관리해야 모델 비교가 의미를 가진다.
-            </p>
-          </article>
-
-          <article class="implication">
-            <b>Engineering</b>
-            <h3>계층을 분리하되 경계를 명시한다</h3>
-            <p>
-              LeRobot, GR00T, ROS 2와 AgenticROS를 역할별로 분리하면 정책·로봇·센서를
-              독립적으로 교체할 수 있다. 전제는 입력과 출력 계약이 명확하다는 것이다.
-            </p>
-          </article>
-
-          <article class="implication">
-            <b>Operations</b>
-            <h3>자연어가 안전 제약을 대체하지 않는다</h3>
-            <p>
-              승인, 속도와 작업 공간 제한, 비상 정지, 권한 범위와 도구 호출 로그는
-              에이전트 인터페이스 아래에서 강제되어야 한다.
-            </p>
-          </article>
-        </div>
-
-        <div class="article-copy">
-          <h3>직접 실험한다면 무엇부터 확인할까</h3>
-          <p>
-            완성된 대형 VLA를 먼저 선택하기보다 작은 작업과 측정 가능한 성공 조건을 정의하는 편이 낫다.
-            로봇이 실패했을 때 데이터, 인지, 정책, 제어 중 어느 계층에서 문제가 시작되었는지
-            구분할 수 있어야 다음 실험이 빨라진다.
-          </p>
-        </div>
-
-        <ul class="checklist" aria-label="실험 시작 체크리스트">
-          <li><strong>작업 정의:</strong> 성공과 실패를 카메라 또는 상태값으로 판정할 수 있는가?</li>
-          <li><strong>안전 경계:</strong> 속도, 힘, 관절 범위, 작업 공간과 비상 정지가 강제되는가?</li>
-          <li><strong>데이터 계약:</strong> 관측, 로봇 상태, 행동과 언어 지시가 같은 시간축에 기록되는가?</li>
-          <li><strong>배포 일치:</strong> 학습 때의 카메라 위치와 물체 조건이 실제 실행 환경과 맞는가?</li>
-          <li><strong>관찰성:</strong> 센서 입력, 정책 출력, ROS 호출과 실패 원인을 다시 추적할 수 있는가?</li>
-        </ul>
-
-        <div class="limitations">
-          <article class="limitation">
-            <strong>자막 부재</strong>
-            <p>
-              자동 자막 엔드포인트가 HTTP 429 및 IP 차단으로 응답해 발표자의 상세 논증,
-              질의응답, 정확한 명령어와 수치는 분석 범위에서 제외했다.
-            </p>
-          </article>
-
-          <article class="limitation">
-            <strong>스토리보드 해상도</strong>
-            <p>
-              장면은 약 10초 간격의 320×180 공개 스토리보드에서 추출했다.
-              흐릿한 수치와 코드를 확대 해석하거나 단일 프레임으로 동작 성공 여부를 단정하지 않았다.
-            </p>
-          </article>
-        </div>
+      <section class="share-card" aria-labelledby="share-title">
+        <p class="section-kicker">Share Framing</p>
+        <h2 id="share-title">이 글을 한 문단으로 공유한다면</h2>
+        <p>
+          아래 문구는 뉴스레터, 소셜 게시물 또는 팀 채널에 그대로 옮겨 쓸 수 있도록
+          핵심 주장과 기술 스택을 한 문단으로 정리한 것이다.
+        </p>
+        <pre class="share-copy">로봇이 보고, 배우고, 움직이기까지 필요한 것은 모델 하나가 아니다. LeRobot의 데이터·학습 워크플로, GR00T N1.7의 VLA 정책, Jetson의 엣지 추론, ROS 2의 연결 계층과 AgenticROS의 도구 호출이 하나의 폐루프로 작동해야 한다. NVIDIA Jetson AI Lab 세션을 장면별로 분석해 Physical AI의 실제 구현 포인트와 안전·관찰성 요구사항을 정리했다. #LeRobot #ROS2 #PhysicalAI #Robotics</pre>
       </section>
 
       <section class="ending">
-        <div class="ending-inner">
-          <p class="section-label">Reader’s Ending</p>
-          <h2>로봇 지능은 모델 안에만 있지 않다</h2>
-          <p>
-            좋은 정책도 잘못 장착된 카메라, 어긋난 좌표계, 불완전한 데이터,
-            추적할 수 없는 도구 호출 위에서는 신뢰할 수 없다.
-            반대로 작은 로봇과 제한된 모델도 명확한 인터페이스, 안전 경계,
-            반복 가능한 평가 루프를 갖추면 유용한 Physical AI 연구 플랫폼이 된다.
-          </p>
-          <p class="closing-line">
-            다음 실험의 출발점은 “어떤 모델을 쓸까?”보다
-            “관측에서 행동까지 무엇을 측정하고 다시 설명할 수 있는가?”에 가깝다.
-          </p>
-        </div>
-      </section>
-
-      <aside class="share-block" aria-label="공유용 문구">
-        <div>
-          <p class="section-label">Share Framing</p>
-          <h2>공유용 요약</h2>
-          <p>아래 문장은 선택해 그대로 복사할 수 있다.</p>
-        </div>
-        <div class="copy-ready">
-          LeRobot·GR00T·Jetson·ROS 2가 로봇 데이터에서 실제 행동까지 어떻게 연결되는지,
-          NVIDIA Jetson AI Lab 세션의 30개 공개 장면으로 분석했습니다.
-          결론은 명확합니다. Physical AI의 핵심은 모델 하나가 아니라
-          안전·센서·데이터·정책·제어·로그가 이어지는 완전한 폐루프입니다.
-          #PhysicalAI #LeRobot #ROS2 #Robotics
-        </div>
-      </aside>
-
-      <section class="source-notes" id="sources">
-        <p class="section-label">Source Notes</p>
-        <h2>참고 근거</h2>
-        <ol>
-          <li>
-            <a rel="noopener noreferrer">
-              NVIDIA Developer — Learn Robot Manipulation with LeRobot and ROS 2
-            </a>
-            · 게시일 2026-08-11 · 재생 시간 47:30
-          </li>
-          <li>
-            <a rel="noopener noreferrer">
-              NVIDIA Developer Forums — Make It Think: NVIDIA Jetson AI Lab Livestream Series
-            </a>
-          </li>
-          <li>
-            <a rel="noopener noreferrer">
-              NVIDIA Jetson — Robotics AI Developer Kits for Students &amp; Educators
-            </a>
-          </li>
-          <li>
-            <a rel="noopener noreferrer">
-              Open Robotics Discourse — AgenticROS
-            </a>
-          </li>
-        </ol>
-
-        <p class="method">
-          <strong>분석 방법:</strong>
-          영상 메타데이터와 공식 안내를 먼저 확인한 뒤 공개 스토리보드의 시간순 장면을
-          로봇 학습, 데이터, 정책, 배포, ROS 연결, 에이전트와 센서의 여섯 주제로 분류했다.
-          화면에 직접 보이는 요소와 그에 대한 해석을 구분했으며,
-          판독할 수 없는 세부 수치·명령어·발표자의 표현은 재구성하지 않았다.
+        <p class="section-kicker">Closing Note</p>
+        <h2>로봇 지능은 결국 시스템의 품질이다</h2>
+        <p>
+          이 세션에서 가장 흥미로운 지점은 새로운 모델 이름이나 인상적인 데모 동작만이 아니다.
+          데이터 수집과 학습, 엣지 추론, 센서 좌표계, ROS 인터페이스, 도구 호출과 안전 규칙이
+          하나의 운영 가능한 구조로 모일 때 비로소 모델의 능력이 물리 세계에서 의미를 갖는다는
+          사실이다.
         </p>
+        <p>
+          다음 실험을 시작한다면 더 큰 모델을 찾기 전에 먼저 한 가지 작업을 고르고,
+          성공·실패 조건을 정의하고, 관측에서 행동까지의 로그를 연결하는 것이 좋다.
+          작고 측정 가능한 폐루프가 구축되면 로봇, 센서와 정책을 바꾸더라도 학습 가능한
+          시스템은 남는다.
+        </p>
+        <a class="watch-link">원본 세션 보기</a>
       </section>
-    </div>
-  </main>
+    </main>
+  </div>
 
   <footer>
-    <p>Research report · Source video by NVIDIA Developer · Prepared 2026-08-14</p>
+    <strong>Research Notes · Physical AI Field Report</strong><br>
+    원본 세션: NVIDIA Developer, “Learn Robot Manipulation with LeRobot and ROS 2 |
+    NVIDIA Jetson AI Lab.” 장면 이미지는 제공된 로컬 영상 추출 자산을 사용했다.
+    본문은 연구·교육 목적의 분석이며 제품 성능에 대한 독립적인 정량 검증을 의미하지 않는다.
   </footer>
 </body>
 </html>
