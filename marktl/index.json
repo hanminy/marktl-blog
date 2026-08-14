@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-12T02:47:35.099Z",
+  "updatedAt": "2026-08-14T06:29:17.135Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-learn-robot-manipulation-with-lerobot-and-ros-2-nvidia-jetson-ai-lab-%EC%9A%94%EC%95%BD/",
+      "excerpt": "Learn Robot Manipulation with LeRobot and ROS 2 NVIDIA Jetson AI Lab 영상 정보 채널 : NVIDIA Developer 게시일 : 2026 08 11 길이 : 47:30 링크 : https://www.youtube.com/watch?v=BHEsQZYGZ4o 공식 세션 안내 : Make It Think: NVIDIA Jetson AI Lab Livestream Series <",
+      "shortId": "4yeh3e",
+      "slug": "yt-learn-robot-manipulation-with-lerobot-and-ros-2-nvidia-jetson-ai-lab-요약",
+      "sourcePath": "clippings/yt_Learn Robot Manipulation with LeRobot and ROS 2 NVIDIA Jetson AI Lab_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료",
+        "robotics",
+        "LeRobot",
+        "ROS2",
+        "NVIDIA"
+      ],
+      "title": "Learn Robot Manipulation with LeRobot and ROS 2 | NVIDIA Jetson AI Lab",
+      "updatedAt": "2026-08-14T06:29:17.135Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/4yeh3e/"
+    },
     {
       "slug": "강화학습-기초-로봇vla-논문-읽기용",
       "shortId": "nmcjy8",
