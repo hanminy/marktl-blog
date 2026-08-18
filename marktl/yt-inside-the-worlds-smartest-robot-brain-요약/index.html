@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>세상에서 가장 똑똑한 로봇 두뇌의 내부 — VLA와 π₀ 완전 해부 | 연구 리포트</title>
+
+
+
+
+
+
+<style>
+:root{
+  --bg:#faf7f2;
+  --surface:#ffffff;
+  --ink:#221f1c;
+  --body:#3a352f;
+  --muted:#6f675d;
+  --accent:#b12a63;
+  --accent-soft:#f7e3ec;
+  --line:#e6dfd4;
+  --gemma:#3f6fae;
+  --gemma-soft:#e8eff8;
+  --expert:#c08a1f;
+  --expert-soft:#faf0da;
+  --warn:#c98a2b;
+  --warn-soft:#faf3e3;
+  --pos:#177245;
+  --neg:#b3362b;
+  --code-bg:#241f2b;
+  --code-ink:#e9e2f2;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#16131a;
+    --surface:#1f1b26;
+    --ink:#ede8e2;
+    --body:#cfc8c0;
+    --muted:#9d958b;
+    --accent:#e0619a;
+    --accent-soft:#3a2231;
+    --line:#332e3d;
+    --gemma:#7aa3d9;
+    --gemma-soft:#22293a;
+    --expert:#d9a94f;
+    --expert-soft:#33291a;
+    --warn:#d9a94f;
+    --warn-soft:#2e2618;
+    --pos:#5cb98a;
+    --neg:#e08578;
+    --code-bg:#100d15;
+    --code-ink:#d9d2e6;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--body);
+  font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Segoe UI","Malgun Gothic",sans-serif;
+  font-size:1.02rem;
+  line-height:1.85;
+  word-break:keep-all;
+  overflow-wrap:break-word;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.pullquote,.sec-num{
+  font-family:"Noto Serif KR","Source Serif Pro",Georgia,"Times New Roman",serif;
+  color:var(--ink);
+}
+a{color:var(--accent)}
+img{max-width:100%}
+.wrap{max-width:740px;margin:0 auto;padding:0 22px}
+.wide{max-width:980px;margin-left:auto;margin-right:auto}
+
+/* ---------- hero ---------- */
+.hero{padding:72px 0 0}
+.kicker{
+  display:inline-block;letter-spacing:.22em;font-size:.75rem;font-weight:800;
+  color:var(--accent);text-transform:uppercase;
+  border-bottom:2px solid var(--accent);padding-bottom:6px;
+}
+h1{font-size:clamp(1.95rem,4.6vw,3.05rem);line-height:1.32;font-weight:800;margin:26px 0 6px}
+.subtitle{font-size:.98rem;color:var(--muted);letter-spacing:.02em;margin:0 0 26px;font-style:italic}
+.lede{
+  font-size:1.16rem;line-height:1.9;color:var(--body);
+  border-left:3px solid var(--accent);padding-left:20px;margin:30px 0;
+}
+.meta-row{
+  display:flex;flex-wrap:wrap;gap:8px 24px;align-items:center;
+  font-size:.88rem;color:var(--muted);margin:26px 0 14px;
+}
+.meta-row b{color:var(--ink);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 40px}
+.chip{
+  font-size:.78rem;font-weight:600;color:var(--accent);
+  background:var(--accent-soft);border-radius:999px;padding:4px 13px;
+}
+
+/* ---------- video card ---------- */
+.video-card{position:relative;display:block;border-radius:18px;overflow:hidden;box-shadow:0 12px 36px rgba(0,0,0,.16)}
+.video-card img{width:100%;display:block}
+.video-card .veil{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.62) 100%);
+}
+.play-btn{
+  width:74px;height:74px;border-radius:50%;background:rgba(255,255,255,.94);
+  position:relative;box-shadow:0 6px 22px rgba(0,0,0,.35);
+}
+.play-btn::after{
+  content:"";position:absolute;left:29px;top:22px;
+  border-left:24px solid #b3362b;border-top:15px solid transparent;border-bottom:15px solid transparent;
+}
+.vc-label{
+  position:absolute;left:0;right:0;bottom:0;padding:16px 22px;
+  color:#fff;font-size:.9rem;letter-spacing:.02em;
+}
+.vc-label b{font-size:1rem}
+
+/* ---------- toc ---------- */
+.toc{
+  background:var(--surface);border:1px solid var(--line);border-radius:16px;
+  padding:26px 30px;margin:56px 0;
+}
+.toc-title{font-size:.78rem;font-weight:800;letter-spacing:.18em;color:var(--muted);margin:0 0 14px}
+.toc ol{margin:0;padding:0 0 0 2px;columns:2;column-gap:36px;list-style:none;counter-reset:toc}
+.toc li{counter-increment:toc;margin:7px 0;break-inside:avoid;font-size:.94rem}
+.toc li::before{content:counter(toc,decimal-leading-zero);color:var(--accent);font-weight:700;margin-right:10px;font-variant-numeric:tabular-nums}
+.toc a{color:var(--ink);text-decoration:none}
+.toc a:hover{color:var(--accent);text-decoration:underline}
+@media (max-width:640px){.toc ol{columns:1}}
+
+/* ---------- sections ---------- */
+.sec-head{display:flex;align-items:baseline;gap:16px;margin:84px 0 10px}
+.sec-num{font-size:.92rem;font-weight:700;letter-spacing:.12em;color:var(--accent)}
+h2{font-size:clamp(1.5rem,3.2vw,2.05rem);line-height:1.4;margin:0;font-weight:800}
+.sec-sub{color:var(--muted);font-size:.95rem;margin:8px 0 26px}
+h3{font-size:1.16rem;line-height:1.55;margin:2.2em 0 .6em;font-weight:700}
+p{margin:1em 0}
+strong{color:var(--ink)}
+
+/* ---------- takeaway cards ---------- */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:16px;margin:30px 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px 22px 18px;position:relative}
+.card .idx{font-variant-numeric:tabular-nums;font-size:.78rem;font-weight:800;color:var(--accent);letter-spacing:.1em}
+.card h3{margin:.5em 0 .4em;font-size:1.04rem;font-family:inherit}
+.card p{margin:0;font-size:.92rem;line-height:1.75;color:var(--body)}
+
+/* ---------- timeline ---------- */
+.timeline{display:grid;grid-template-columns:repeat(4,1fr);margin:36px 0 10px}
+.tl-item{position:relative;padding:20px 16px 0 0;border-top:2px solid var(--line)}
+.tl-item::before{
+  content:"";position:absolute;top:-7px;left:0;width:12px;height:12px;border-radius:50%;
+  background:var(--accent);border:3px solid var(--bg);
+}
+.tl-date{font-size:.76rem;font-weight:700;letter-spacing:.08em;color:var(--accent)}
+.tl-name{font-weight:800;color:var(--ink);margin:2px 0 4px;font-size:1.02rem}
+.tl-desc{font-size:.85rem;line-height:1.65;color:var(--muted)}
+@media (max-width:640px){
+  .timeline{grid-template-columns:1fr}
+  .tl-item{border-top:none;border-left:2px solid var(--line);padding:0 0 26px 20px}
+  .tl-item::before{top:4px;left:-7px}
+}
+
+/* ---------- scenes ---------- */
+.scene{margin:52px 0}
+.scene img{width:100%;display:block;border-radius:14px;border:1px solid var(--line)}
+.scene-head{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.ts{
+  font-variant-numeric:tabular-nums;background:var(--accent-soft);color:var(--accent);
+  font-weight:800;font-size:.78rem;padding:5px 12px;border-radius:999px;text-decoration:none;
+  letter-spacing:.04em;white-space:nowrap;
+}
+.ts:hover{filter:brightness(.94)}
+.scene h3{margin:0;flex:1;min-width:200px}
+.scene .body{margin-top:14px;font-size:.98rem}
+
+/* ---------- pull quote ---------- */
+.pullquote{
+  margin:72px auto;max-width:600px;text-align:center;
+  font-size:clamp(1.3rem,2.8vw,1.6rem);line-height:1.65;font-weight:700;
+  padding:34px 10px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  position:relative;
+}
+.pullquote::before{
+  content:"“";display:block;font-size:3rem;line-height:.6;color:var(--accent);margin-bottom:14px;
+}
+.pullquote cite{display:block;margin-top:18px;font-size:.82rem;font-weight:400;font-style:normal;letter-spacing:.12em;color:var(--muted);font-family:inherit}
+
+/* ---------- callout ---------- */
+.callout{
+  border-left:3px solid var(--warn);background:var(--warn-soft);
+  padding:16px 20px;border-radius:0 12px 12px 0;font-size:.93rem;line-height:1.75;margin:20px 0;
+}
+.callout .ct{font-weight:800;color:var(--ink);letter-spacing:.04em;font-size:.8rem;display:block;margin-bottom:4px}
+
+/* ---------- tables ---------- */
+.tbl-wrap{overflow-x:auto;margin:28px 0;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+table{width:100%;border-collapse:collapse;font-size:.94rem;min-width:520px}
+th,td{padding:13px 18px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:transparent}
+tbody tr:last-child td{border-bottom:none}
+td.num,th.num{font-variant-numeric:tabular-nums}
+.pos{color:var(--pos);font-weight:700}
+.neg{color:var(--neg);font-weight:700}
+.tbl-note{font-size:.83rem;color:var(--muted);margin:-14px 0 28px}
+
+/* ---------- diagram ---------- */
+.diagram{margin:36px 0}
+.lane{border:2px solid;border-radius:18px;padding:24px;background:var(--surface)}
+.lane.gemma{border-color:var(--gemma)}
+.lane.expert{border-color:var(--expert)}
+.lane-title{font-size:.8rem;font-weight:800;letter-spacing:.14em;margin-bottom:16px}
+.lane.gemma .lane-title{color:var(--gemma)}
+.lane.expert .lane-title{color:var(--expert)}
+.dnode{
+  background:var(--bg);border:1px solid var(--line);border-radius:10px;
+  padding:10px 16px;font-size:.88rem;text-align:center;line-height:1.6;
+}
+.dnode b{color:var(--ink)}
+.dnode.hl-g{background:var(--gemma-soft);border-color:var(--gemma)}
+.dnode.hl-e{background:var(--expert-soft);border-color:var(--expert)}
+.darr{text-align:center;color:var(--muted);padding:3px 0;font-size:.92rem;line-height:1}
+.dsplit{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:0}
+.dsplit .col{display:flex;flex-direction:column}
+@media (max-width:560px){.dsplit{grid-template-columns:1fr}}
+.bridge{
+  text-align:center;margin:18px 0;color:var(--gemma);font-weight:800;font-size:.9rem;letter-spacing:.02em;line-height:1.6;
+}
+.bridge .big{font-size:1.5rem;display:block;line-height:1}
+
+/* ---------- checklist ---------- */
+.checklist{list-style:none;padding:0;margin:20px 0}
+.checklist li{padding-left:36px;position:relative;margin:12px 0;font-size:.96rem}
+.checklist li::before{
+  content:"✓";position:absolute;left:0;top:2px;width:24px;height:24px;border-radius:7px;
+  background:var(--accent-soft);color:var(--accent);font-weight:800;font-size:.85rem;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ---------- share / ending ---------- */
+.sharebox{
+  background:var(--surface);border:1.5px dashed var(--accent);border-radius:16px;
+  padding:24px 28px;margin:34px 0;
+}
+.sharebox .st{font-size:.78rem;font-weight:800;letter-spacing:.16em;color:var(--accent);margin-bottom:10px}
+.sharebox p{margin:.4em 0;font-size:.95rem;user-select:all}
+.sharebox .url{font-variant-numeric:tabular-nums;color:var(--muted);word-break:break-all}
+
+/* ---------- footer ---------- */
+footer{
+  margin-top:96px;border-top:1px solid var(--line);padding:40px 0 64px;
+  font-size:.86rem;color:var(--muted);
+}
+footer p{margin:.4em 0}
+.divider{height:1px;background:var(--line);margin:64px 0}
+</style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Inside the World&#39;s Smartest Robot Brain [VLA]">
+<meta property="og:description" content="Inside the World&#39;s Smartest Robot Brain [VLA] 영상 정보 채널 : Welch Labs 게시일 : 2026 04 04 길이 : 35:02 링크 : https://www.youtube.com/watch?v=2mrGMMmrVNE &lt;div style=&quot;position: relative; width: 100%; padding bottom: 56.25%; height: 0; overflow: hidde">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/1wmkvgh/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/1wmkvgh/assets/2mrgmmmrvne-ts-00-00-30.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Inside the World&#39;s Smartest Robot Brain [VLA]">
+<meta name="twitter:description" content="Inside the World&#39;s Smartest Robot Brain [VLA] 영상 정보 채널 : Welch Labs 게시일 : 2026 04 04 길이 : 35:02 링크 : https://www.youtube.com/watch?v=2mrGMMmrVNE &lt;div style=&quot;position: relative; width: 100%; padding bottom: 56.25%; height: 0; overflow: hidde">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/1wmkvgh/assets/2mrgmmmrvne-ts-00-00-30.jpg">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-inside-the-worlds-smartest-robot-brain-%EC%9A%94%EC%95%BD/">
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="kicker">Research Report · 영상 심층 분석</span>
+    <h1>세상에서 가장 똑똑한 로봇 두뇌의 내부<br>— VLA와 π₀ 완전 해부</h1>
+    <p class="subtitle">Inside the World's Smartest Robot Brain [VLA] · Welch Labs</p>
+    <p class="lede">
+      콜라 캔을 테일러 스위프트 사진 위에 어색하게 올려놓은 데모는 초라해 보였다.
+      그러나 그 순간, 인터넷 규모의 지식이 처음으로 로봇의 관절을 움직였다.
+      구글의 SayCan·RT-1·PaLM-E를 거쳐 RT-2에서 탄생한 Vision-Language-Action(VLA) 패러다임과,
+      이를 이어받은 Physical Intelligence의 π₀(Pi Zero) 아키텍처를 어텐션 행렬 수준까지 따라 내려간다.
+    </p>
+    <div class="meta-row">
+      <span>채널 <b>Welch Labs</b></span>
+      <span>게시 <b>2026-04-04</b></span>
+      <span>길이 <b>35:02</b></span>
+      <span>정리 <b>2026-08-18</b></span>
+    </div>
+    <div class="chips">
+      <span class="chip">#AI</span>
+      <span class="chip">#로봇</span>
+      <span class="chip">#VLA</span>
+      <span class="chip">#연구자료</span>
+      <span class="chip">#YouTube</span>
+    </div>
+  </div>
+
+  <div class="wrap wide">
+    <a class="video-card" rel="noopener">
+      <img src="assets/2mrgmmmrvne-ts-00-00-30.jpg" alt="구글 RT-2 데모 — 로봇 팔이 콜라 캔을 옮기고, 오른쪽 도식에 TPU 오프보드 추론 구조가 표시된 장면">
+      <span class="veil"><span class="play-btn"></span></span>
+      <span class="vc-label"><b>YouTube에서 원본 영상 보기</b><br>Welch Labs · Inside the World's Smartest Robot Brain [VLA] · 35:02</span>
+    </a>
+  </div>
+
+  <nav class="wrap">
+    <div class="toc">
+      <p class="toc-title">목차</p>
+      <ol>
+        <li><a href="#abstract">초록</a></li>
+        <li><a href="#findings">핵심 발견 여섯 가지</a></li>
+        <li><a href="#genealogy">계보 — 구글의 4단계 진화</a></li>
+        <li><a href="#pi0">π₀ — 더 작아진 두뇌, 더 정교해진 손</a></li>
+        <li><a href="#attention">어텐션 해부 — "pen"이 펜이 되는 순간</a></li>
+        <li><a href="#action-expert">Action Expert와 KV 캐시 인터페이스</a></li>
+        <li><a href="#debate">반론 — "VLA are doomed"</a></li>
+        <li><a href="#implications">시사점</a></li>
+        <li><a href="#sources">근거와 한계</a></li>
+      </ol>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ================= 01 ABSTRACT ================= -->
+  <section class="wrap" id="abstract">
+    <div class="sec-head"><span class="sec-num">01</span><h2>초록</h2></div>
+    <p>
+      이 리포트는 Welch Labs의 35분짜리 영상을 화면 프레임 단위로 검증하며 정리한 연구 노트다.
+      영상의 결론을 한 문장으로 압축하면 이렇다.
+      <strong>사전학습된 멀티모달 LLM(PaliGemma)과 플로우 매칭 기반 Action Expert를
+      어텐션의 키·값(KV) 캐시로 직접 결합함으로써, 인터넷 규모의 지식이 로봇 관절 궤적 생성에
+      바로 연결되었다.</strong>
+    </p>
+    <p>
+      이야기는 두 막으로 진행된다. 1막은 구글이 2022~2023년 사이에 밟은 네 단계 —
+      SayCan, RT-1, PaLM-E, RT-2 — 이며, 계획층과 제어층이라는 두 개의 분리된 모델이
+      하나의 Vision-Language-Action 모델로 융합되는 과정이다.
+      2막은 RT-2 핵심 인력이 구글을 떠나 세운 Physical Intelligence의 π₀로,
+      3.3B 파라미터라는 <em>더 작은</em> 모델이 세탁물 개기 같은 <em>더 정교한</em> 작업을
+      단일 GPU 위에서 73ms 만에 추론해내는 구조를 어텐션 행렬 수준에서 해부한다.
+    </p>
+  </section>
+
+  <!-- ================= 02 FINDINGS ================= -->
+  <section class="wrap wide" id="findings">
+    <div class="wrap">
+      <div class="sec-head"><span class="sec-num">02</span><h2>핵심 발견 여섯 가지</h2></div>
+      <p class="sec-sub">바쁜 독자를 위한 요약. 각 항목의 근거는 본문 해당 장에 있다.</p>
+    </div>
+    <div class="cards">
+      <div class="card"><span class="idx">TAKEAWAY 1</span>
+        <h3>RT-2의 의미는 성능이 아니라 일반화 경로였다</h3>
+        <p>콜라 캔 데모 자체는 초라했지만, 로봇 제어 학습 데이터에 존재하지 않았던 개념(테일러 스위프트)을 인터넷 사전학습에서 끌어와 행동으로 연결했다. RT-2 팀은 이 유형에 Vision-Language-Action(VLA)이라는 이름을 붙였다.</p>
+      </div>
+      <div class="card"><span class="idx">TAKEAWAY 2</span>
+        <h3>구글은 네 단계로 진화했다</h3>
+        <p>SayCan(2022.4)은 LLM 플래너 + 사전학습 스킬, RT-1(2022.12)은 13만+ 시연으로 제어층 강화, PaLM-E(2023.3)는 플래너에 시각 부여, RT-2(2023.7)는 두 층을 하나의 모델로 통합했다.</p>
+      </div>
+      <div class="card"><span class="idx">TAKEAWAY 3</span>
+        <h3>핵심 인력은 구글을 떠났다</h3>
+        <p>2023년 데모 이후 1년 안에 Karol Hausman 등 RT-2 핵심 인력이 Physical Intelligence를 창업했고, 2024년 10월 π₀를 공개했다.</p>
+      </div>
+      <div class="card"><span class="idx">TAKEAWAY 4</span>
+        <h3>더 작은 모델이 더 잘한다</h3>
+        <p>π₀는 3.3B 파라미터로 RT-2(5–55B)보다 작지만 세탁물 개기, 오렌지 껍질 벗기기, 처음 보는 주방 정리까지 수행한다. RTX 4090 한 장에서 73ms 온보드 추론이 가능하다.</p>
+      </div>
+      <div class="card"><span class="idx">TAKEAWAY 5</span>
+        <h3>결정적 차이는 인터페이스다</h3>
+        <p>SayCan은 모델 간 통신이 자연어였다. π₀는 어텐션 헤드의 키·값 행렬을 직접 넘긴다. 같은 아키텍처를 공유하기에 가능한 설계로, 두 모델이 "거의 하나처럼" 사고하면서도 모듈성을 유지한다.</p>
+      </div>
+      <div class="card"><span class="idx">TAKEAWAY 6</span>
+        <h3>아직은 데모다</h3>
+        <p>1995년 카네기멜런의 RALPH가 미 대륙을 98.2% 자율주행했지만 상용화는 한참 뒤였고, 오늘날의 자율주행은 전혀 다른 방식으로 작동한다. 영상은 같은 경계를 VLA에도 적용한다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 03 GENEALOGY ================= -->
+  <section class="wrap" id="genealogy">
+    <div class="sec-head"><span class="sec-num">03</span><h2>계보 — 구글의 4단계 진화</h2></div>
+    <p class="sec-sub">2022년 4월부터 2023년 7월까지, 15개월 만에 완성된 융합의 기록</p>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-date">2022.04</div>
+        <div class="tl-name">SayCan</div>
+        <div class="tl-desc">PaLM 540B가 계획을 세우고, 사전학습 스킬(BC-Z)이 실행. 계획층과 제어층이 완전히 분리.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">2022.12</div>
+        <div class="tl-name">RT-1</div>
+        <div class="tl-desc">13만+ 시연으로 학습한 트랜스포머가 제어층을 교체. 행동 메뉴가 크게 확장.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">2023.03</div>
+        <div class="tl-name">PaLM-E</div>
+        <div class="tl-desc">플래너가 비전+언어 멀티모달 모델로. 상황 변화를 보고 계획을 다시 세운다.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">2023.07</div>
+        <div class="tl-name">RT-2</div>
+        <div class="tl-desc">두 층이 하나의 모델로 융합. Vision-Language-Action(VLA)이라는 이름이 탄생.</div>
+      </div>
+    </div>
+
+    <div class="scene" id="t-00-00-30">
+      <div class="scene-head">
+        <a class="ts" rel="noopener">00:00:30</a>
+        <h3>RT-2의 콜라 캔 데모와 오프보드 TPU 추론</h3>
+      </div>
+      <img src="assets/2mrgmmmrvne-ts-00-00-30.jpg" alt="RT-2 데모 — 로봇 팔이 콜라 캔을 옮기고 TPU 클러스터와 이미지·제어 신호를 주고받는 도식">
+      <p class="body">
+        "Move coke can to Taylor Swift" 지시를 수행하는 구글 RT-2 데모(화면 표기 2배속).
+        화면 오른쪽 도식은 로봇이 온보드 카메라 이미지를 TPU 클러스터로 보내고(IMAGES)
+        제어 신호를 돌려받는(CONTROL) 구조를 보여준다. 모델이 너무 커서 로봇에서 직접
+        구동할 수 없었다는 전사 내용과 일치한다.
+      </p>
+    </div>
+
+    <div class="scene" id="t-00-01-56">
+      <div class="scene-head">
+        <a class="ts" rel="noopener">00:01:56</a>
+        <h3>SayCan — LLM을 플래너로 쓴 첫 결과</h3>
+      </div>
+      <img src="assets/2mrgmmmrvne-ts-00-01-56.jpg" alt="SayCan 도식 — PaLM 540B가 음료를 흘렸다는 요청을 4개 하위작업으로 분해하는 장면">
+      <p class="body">
+        2022년 4월 SayCan. 입력 "I spilled my drink, can you help?"를 PaLM 540B LLM이
+        4개 하위작업(스펀지 찾기 → 집기 → 흘린 곳으로 이동 → 내려놓기)으로 분해하고,
+        하단의 사전학습 스킬(BC-Z)이 실제 제어 신호를 출력한다.
+        계획층과 제어층이 완전히 분리된 구조다.
+      </p>
+    </div>
+
+    <div class="scene" id="t-00-03-10">
+      <div class="scene-head">
+        <a class="ts" rel="noopener">00:03:10</a>
+        <h3>RT-1으로 제어층 교체</h3>
+      </div>
+      <img src="assets/2mrgmmmrvne-ts-00-03-10.jpg" alt="타임라인에 RT-1이 추가된 도식 — 상단은 그대로 PaLM, 하단 제어층만 BC-Z에서 RT-1으로 교체">
+      <p class="body">
+        같은 타임라인에 2022년 12월 RT-1이 추가된다. 상단 LLM은 그대로 PaLM이고
+        하단 제어층만 BC-Z에서 RT-1으로 바뀐다. 전사에 따르면 RT-1은 13만 건 이상의
+        사람 시연 데이터와 더 큰 트랜스포머 구조로 훈련되어, 계획층이 고를 수 있는
+        "행동 메뉴"를 크게 넓혔다.
+      </p>
+    </div>
+
+    <div class="scene" id="t-00-05-25">
+      <div class="scene-head">
+        <a class="ts" rel="noopener">00:05:25</a>
+        <h3>PaLM-E — 눈을 가진 플래너</h3>
+      </div>
+      <img src="assets/2mrgmmmrvne-ts-00-05-25.jpg" alt="PaLM-E 데모 — 연구자가 과자 봉지를 서랍에 되돌려 놓아도 계획을 다시 세우는 장면">
+      <p class="body">
+        2023년 3월 PaLM-E. 텍스트 전용 PaLM 대신 비전+언어 멀티모달 모델이 플래너 자리에
+        들어간다. 상단 영상은 연구자가 과자 봉지를 서랍에 반복해서 되돌려 놓아도
+        PaLM-E가 상황 변화를 인지하고 계획을 다시 세우는 장면이다.
+      </p>
+    </div>
+
+    <div class="scene" id="t-00-06-06">
+      <div class="scene-head">
+        <a class="ts" rel="noopener">00:06:06</a>
+        <h3>PaLM-E와 RT-1의 구조적 동형성</h3>
+      </div>
+      <img src="assets/2mrgmmmrvne-ts-00-06-06.jpg" alt="PaLM-E와 RT-1을 나란히 놓은 도식 — 둘 다 Image Encoder를 거쳐 Transformer로 들어간다">
+      <p class="body">
+        두 모델을 나란히 놓은 도식. 양쪽 모두 카메라 이미지를 Image Encoder에 통과시킨 뒤
+        Transformer로 보낸다. 차이는 학습 목표뿐이다 — PaLM-E는 텍스트("Pick up the sponge")를,
+        RT-1은 제어 신호를 출력하도록 훈련되었다.
+      </p>
+    </div>
+
+    <div class="scene" id="t-00-07-08">
+      <div class="scene-head">
+        <a class="ts" rel="noopener">00:07:08</a>
+        <h3>"두 개의 모델이 정말 필요한가?"</h3>
+      </div>
+      <img src="assets/2mrgmmmrvne-ts-00-07-08.jpg" alt="PaLM-E 트랜스포머에서 곧바로 로봇 관절 위치 시계열이 출력되는 도식">
+      <p class="body">
+        같은 도식에서 PaLM-E 트랜스포머로부터 곧바로 로봇 관절 위치(Robot Joint Positions)
+        시계열이 뻗어 나온다. RT-1을 하나의 강력한 엔드투엔드 모델로 흡수할 수 있는가라는
+        질문을 시각적으로 제기하는 장면이다.
+      </p>
+    </div>
+
+    <div class="scene" id="t-00-08-07">
+      <div class="scene-head">
+        <a class="ts" rel="noopener">00:08:07</a>
+        <h3>RT-2 — 학습 데이터에 없던 개념으로의 일반화</h3>
+      </div>
+      <img src="assets/2mrgmmmrvne-ts-00-08-07.jpg" alt="RT-2가 테일러 스위프트라는 학습 데이터에 없던 개념을 로봇 제어에 연결하는 장면">
+      <p class="body">
+        2023년 7월 RT-2. 로봇 제어 학습 데이터에 테일러 스위프트가 있었을 리 없으므로,
+        이 과제를 풀려면 인터넷 규모 사전학습에서 얻은 추상 개념과 로봇 제어 에피소드를
+        연결해야만 한다. 영상이 이 "인상적이지 않은" 데모를 결정적 사건으로 보는 이유다.
+      </p>
+    </div>
+
+    <div class="scene" id="t-00-08-56">
+      <div class="scene-head">
+        <a class="ts" rel="noopener">00:08:56</a>
+        <h3>VLA 계보의 완성</h3>
+      </div>
+      <img src="assets/2mrgmmmrvne-ts-00-08-56.jpg" alt="SayCan부터 RT-2까지의 전체 타임라인 — RT-2에서 상하단이 하나의 분홍색 뇌로 합쳐진다">
+      <p class="body">
+        SayCan(2022.4) → RT-1(2022.12) → PaLM-E(2023.3) → RT-2(2023.7)의 전체 타임라인과
+        ChatGPT·GPT-4 출시 시점이 함께 표시된다. RT-2에서 처음으로 상·하단이 하나의
+        분홍색 뇌(Vision + Language + Action)로 합쳐지며 VLA라는 명칭이 붙는다.
+      </p>
+      <div class="callout">
+        <span class="ct">⚠ 표기 불일치</span>
+        이 프레임의 그래픽은 PaLM 파라미터를 "450B"로 적고 있으나, 같은 영상의 내레이션과
+        앞선 프레임은 540B로 말한다. 실제 PaLM은 540B다.
+      </div>
+    </div>
+
+    <blockquote class="pullquote">
+      데모는 초라했다. 그러나 학습 데이터에 없던 개념이<br>처음으로 로봇의 행동이 되었다.
+      <cite>— RT-2가 VLA라는 이름을 얻은 이유</cite>
+    </blockquote>
+  </section>
+
+  <!-- ================= 04 PI ZERO ================= -->
+  <section class="wrap" id="pi0">
+    <div class="sec-head"><span class="sec-num">04</span><h2>π₀ — 더 작아진 두뇌, 더 정교해진 손</h2></div>
+    <p class="sec-sub">RT-2 팀의 이탈, 그리고 2024년 10월 Physical Intelligence의 답안</p>
+
+    <p>
+      RT-2 데모 이후 1년 안에 Karol Hausman을 비롯한 핵심 인력이 구글을 떠나
+      Physical Intelligence를 세웠다. 이들이 내놓은 π₀는 역설적인 수치를 보여준다.
+      모델은 <strong>작아졌는데</strong> 할 수 있는 일은 <strong>훨씬 정교해졌다</strong>.
+    </p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>항목</th><th>RT-2 (2023.7, Google)</th><th>π₀ (2024.10, Physical Intelligence)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>파라미터</strong></td><td class="num">5–55B</td><td class="num">3.3B</td></tr>
+          <tr><td><strong>추론 하드웨어</strong></td><td>멀티-TPU 클러스터 (오프보드)</td><td>Nvidia RTX 4090 단일 GPU (온보드 가능)</td></tr>
+          <tr><td><strong>추론 시간</strong></td><td class="num">200–1000ms</td><td class="num">73ms</td></tr>
+          <tr><td><strong>과제 수준</strong></td><td>물체 집기·재배치 중심</td><td>세탁물 개기, 오렌지 껍질 벗기기, 처음 보는 주방 정리</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="tbl-note">수치 출처: 영상 00:11:00 화면에 직접 표시된 값.</p>
+
+    <div class="scene" id="t-00-11-00">
+      <div class="scene-head">
+        <a class="ts" rel="noopener">00:11:00</a>
+        <h3>RT-2 vs π₀ 사양 비교</h3>
+      </div>
+      <img src="assets/2mrgmmmrvne-ts-00-11-00.jpg" alt="RT-2와 π₀의 파라미터, 하드웨어, 추론 시간을 비교한 화면">
+      <p class="body">
+        화면에 직접 표시된 수치: RT-2는 5–55B 파라미터, 멀티-TPU 클러스터, 200–1000ms 추론.
+        π₀는 3.3B 파라미터, RTX 4090 단일 GPU, 73ms 추론.
+        성능이 올라갔는데 모델은 오히려 작아졌다는 것이 이 절의 핵심이다.
+      </p>
+    </div>
+
+    <div class="scene" id="t-00-11-37">
+      <div class="scene-head">
+        <a class="ts" rel="noopener">00:11:37</a>
+        <h3>π₀의 입출력 — 카메라 3대와 14개 관절</h3>
+      </div>
+      <img src="assets/2mrgmmmrvne-ts-00-11-37.jpg" alt="Aloha 양팔 플랫폼에서 Uncap the pen 프롬프트를 처리하는 π₀ — 카메라 3대 입력과 14개 관절 출력">
+      <p class="body">
+        Aloha 양팔 플랫폼에서 "Uncap the pen" 프롬프트를 처리하는 π₀.
+        입력은 오버헤드 1대 + 각 손목 1대씩 총 3개 시점이고, 출력은 14개 관절
+        (팔당 Waist·Shoulder·Elbow·Forearm·Wrist angle·Wrist rotate·Gripper)의
+        위치 시계열이다. 화면 범례에 14개 관절명이 모두 읽힌다.
+      </p>
+    </div>
+
+    <div class="scene" id="t-00-12-48">
+      <div class="scene-head">
+        <a class="ts" rel="noopener">00:12:48</a>
+        <h3>PaliGemma + Action Expert</h3>
+      </div>
+      <img src="assets/2mrgmmmrvne-ts-00-12-48.jpg" alt="π₀ 내부 확대도 — PaliGemma 점선 상자 안의 SigLIP 인코더와 Gemma 2B, 아래의 노란 Action Expert 상자">
+      <p class="body">
+        π₀ 내부 확대도. 점선 상자 PaliGemma 안에 SigLIP So400m 인코더들과 LLM(Gemma 2B)이
+        들어 있고, 그 아래 노란 상자가 Action Expert다. 상자 안 코드
+        <code>gemma_expert = GemmaForCausalLM()</code>이 그대로 보인다 — 전사에서
+        "코드베이스에서 Action Expert가 Gemma 모델로 인스턴스화된다"고 말한 부분의 화면 근거다.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= 05 ATTENTION ================= -->
+  <section class="wrap" id="attention">
+    <div class="sec-head"><span class="sec-num">05</span><h2>어텐션 해부 — "pen"이 펜이 되는 순간</h2></div>
+    <p class="sec-sub">단어 하나가 이미지 패치를 찾아내는 과정을 숫자로 확인한다</p>
+
+    <p>
+      π₀의 앞단은 이렇게 요약된다. 카메라 3대의 이미지가 각각 256개 패치로 쪼개져
+      SigLIP So400m 인코더를 거치면 768개의 임베딩 벡터(길이 2048)가 되고, 프롬프트
+      "Uncap the pen"의 4개 토큰이 더해져 총 772개 입력이 Gemma 2B로 들어간다.
+      Gemma 2B는 18개 트랜스포머 블록, 블록당 8개 어텐션 헤드로 구성된다.
+      이 구조가 그대로 뒤의 Action Expert와 공유된다는 점이 π₀ 설계의 복선이다.
+    </p>
+
+    <div class="scene" id="t-00-13-58">
+      <div class="scene-head">
+        <a class="ts" rel="noopener">00:13:58</a>
+        <h3>이미지 패치화 — 768 패치</h3>
+      </div>
+      <img src="assets/2mrgmmmrvne-ts-00-13-58.jpg" alt="3개 카메라 이미지가 격자로 쪼개져 SigLIP So400m 인코더로 들어가는 장면, 왼쪽에 768 PATCHES 라벨">
+      <p class="body">
+        3개 카메라 이미지가 각각 격자로 쪼개져 SigLIP So400m 인코더로 들어간다.
+        왼쪽 세로 라벨이 "768 PATCHES"이며, 하단 각주는 이 768개에 위아래 레터박스
+        (검은 여백) 패치가 포함되어 있다고 명시한다. 프롬프트는 "Uncap the pen".
+      </p>
+    </div>
+
+    <div class="scene" id="t-00-15-28">
+      <div class="scene-head">
+        <a class="ts" rel="noopener">00:15:28</a>
+        <h3>Gemma 2B의 내부 — 18블록 × 8헤드</h3>
+      </div>
+      <img src="assets/2mrgmmmrvne-ts-00-15-28.jpg" alt="Gemma 2B의 18개 트랜스포머 블록과 블록당 8개 어텐션 헤드 구조 도식">
+      <p class="body">
+        Gemma 2B가 18개 트랜스포머 블록으로 구성되고, 각 블록이 어텐션(h₀–h₇, 즉 8개 헤드)과
+        다층 퍼셉트론으로 이루어짐을 보여준다. 이 "18블록 × 8헤드" 구조가 뒤에서
+        Action Expert와 그대로 공유된다.
+      </p>
+    </div>
+
+    <div class="scene" id="t-00-17-52">
+      <div class="scene-head">
+        <a class="ts" rel="noopener">00:17:52</a>
+        <h3>Query·Key와 내적 값</h3>
+      </div>
+      <img src="assets/2mrgmmmrvne-ts-00-17-52.jpg" alt="W_Q와 W_K가 입력을 쿼리와 키로 변환하고, 펜 패치 두 행만 양수 내적 값을 갖는 화면">
+      <p class="body">
+        학습 가중치 W<sub>Q</sub>, W<sub>K</sub>(각 2048×256)가 입력을 QUERIES(772×256)와
+        KEYS(772×256)로 변환한다. 오른쪽 DOT PRODUCT 열에서 펜을 담은 두 주황색 행만
+        양수이고 나머지는 모두 음수다. "pen" 토큰의 쿼리가 펜 이미지 패치와 선택적으로
+        정렬된다는 정량적 증거다.
+      </p>
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>입력 행 (772개 중)</th><th class="num">"pen" 쿼리와의 내적</th><th>해석</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>펜을 담은 이미지 패치 ①</td><td class="num"><span class="pos">+36.30</span></td><td rowspan="2">단어 "pen"과 선택적으로 정렬</td></tr>
+          <tr><td>펜을 담은 이미지 패치 ②</td><td class="num"><span class="pos">+41.04</span></td></tr>
+          <tr><td>그 외 770개 행</td><td class="num"><span class="neg">−19 ~ −48</span></td><td>모두 음수 — 어텐션에서 배제</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="tbl-note">출처: 영상 00:17:52 화면의 DOT PRODUCT 열.</p>
+
+    <div class="scene" id="t-00-18-48">
+      <div class="scene-head">
+        <a class="ts" rel="noopener">00:18:48</a>
+        <h3>어텐션 히트맵으로 본 펜 추적</h3>
+      </div>
+      <img src="assets/2mrgmmmrvne-ts-00-18-48.jpg" alt="3개 카메라 이미지 위에 마젠타 히트맵이 겹쳐져 펜 위치에 어텐션이 집중된 장면">
+      <p class="body">
+        소프트맥스로 정규화한 어텐션 값을 3개 카메라 이미지 위에 마젠타 히트맵으로 겹쳤다.
+        세 시점 모두에서 밝은 마젠타가 펜(주황색 물체) 위치에 집중된다.
+        어텐션 헤드가 프롬프트의 단어 "pen"을 이미지 속 펜에 연결하고 있음을 보여준다.
+        프레임을 이어 붙여 재생하면 이 어텐션이 실제로 펜을 추적한다.
+      </p>
+    </div>
+
+    <div class="scene" id="t-00-19-22">
+      <div class="scene-head">
+        <a class="ts" rel="noopener">00:19:22</a>
+        <h3>772×772 어텐션 패턴 전체</h3>
+      </div>
+      <img src="assets/2mrgmmmrvne-ts-00-19-22.jpg" alt="772×772 어텐션 패턴 행렬과 W_V가 만든 VALUES 행렬, h6 헤드 표기가 보이는 화면">
+      <p class="body">
+        개별 쿼리가 아니라 772개 입력 전체가 서로를 조회한 결과인 772×772
+        ATTENTION PATTERN 행렬. 우하단에 W<sub>V</sub>(2048×256)가 만든 VALUES(772×256)가
+        함께 있고, 좌측에는 772개 임베딩 벡터(길이 2048)가 표시된다.
+        우측 하단 h₆ 표기는 6번 헤드를 보고 있음을 뜻한다.
+        소프트맥스 정규화 후 값 행렬과 곱하면 펜 패치의 표현이 "pen" 토큰 위치로
+        복사·합산된다 — 텍스트와 픽셀의 통합 표현이 형성되는 지점이다.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= 06 ACTION EXPERT ================= -->
+  <section class="wrap" id="action-expert">
+    <div class="sec-head"><span class="sec-num">06</span><h2>Action Expert와 KV 캐시 인터페이스</h2></div>
+    <p class="sec-sub">π₀ 설계의 심장 — 두 네트워크가 "거의 하나처럼" 사고하는 방법</p>
+
+    <p>
+      Action Expert는 Gemma와 동일한 아키텍처(18블록 × 8헤드)를 갖지만 무작위로 초기화되고,
+      추론 비용을 낮추기 위해 폭이 좁다(임베딩 1024차원 vs Gemma의 2048차원).
+      결과를 한 번에 출력하지 않고, 순수 노이즈로 시작한 14×50 행렬을 반복적으로 다듬어
+      최종 관절 궤적으로 만든다 — AI 이미지 생성의 확산·플로우 매칭과 같은 절차로,
+      π₀는 10회 반복한다.
+    </p>
+    <p>
+      이 방식이 잘 맞는 이유는 <strong>분포의 다봉성</strong>이다. 고양이 이미지를 만드는
+      방법이 여러 가지이듯, 14개 관절로 펜 뚜껑을 여는 방법도 여러 가지다.
+      단일 정답을 회귀하는 대신, 유효한 궤적 분포에서 하나를 뽑아낸다.
+    </p>
+
+    <div class="diagram wide">
+      <div class="lane gemma">
+        <div class="lane-title">PALIGEMMA — 보고 이해하는 쪽 (임베딩 2048차원)</div>
+        <div class="dsplit">
+          <div class="col">
+            <div class="dnode">카메라 3대<br><b>오버헤드 + 좌/우 손목</b></div>
+            <div class="darr">↓</div>
+            <div class="dnode">각 256 패치 × 3 = <b>768 패치</b><br>→ SigLIP So400m 인코더</div>
+          </div>
+          <div class="col">
+            <div class="dnode">프롬프트 <b>"Uncap the pen"</b></div>
+            <div class="darr">↓</div>
+            <div class="dnode"><b>4 토큰</b> → 임베딩 4개</div>
+          </div>
+        </div>
+        <div class="darr">↓</div>
+        <div class="dnode hl-g">합계 <b>772개 입력</b> → <b>Gemma 2B</b> (18블록 × 8헤드)</div>
+      </div>
+
+      <div class="bridge">
+        <span class="big">⇩</span>
+        18개 블록 각각의 K/V 캐시 772개 전달<br>
+        <span>이미지가 바뀌지 않는 동안 재사용 — 자연어가 아닌 어텐션 키·값이 인터페이스</span>
+      </div>
+
+      <div class="lane expert">
+        <div class="lane-title">ACTION EXPERT — 움직임을 만드는 쪽 (임베딩 1024차원)</div>
+        <div class="dsplit">
+          <div class="col">
+            <div class="dnode">관절 상태 14개 [S₀…S₁₃]<br>→ W<sub>S</sub>(14×1024) → <b>임베딩 1개</b></div>
+          </div>
+          <div class="col">
+            <div class="dnode">미래 50스텝 액션 (초기값: 랜덤 노이즈)<br>→ <b>임베딩 50개</b></div>
+          </div>
+        </div>
+        <div class="darr">↓</div>
+        <div class="dnode hl-e">합계 <b>51개 입력</b> → 18블록 × 8헤드<br>각 헤드의 키/값 = 자기 51개 + Gemma 772개 = <b>823개</b></div>
+        <div class="darr">↓</div>
+        <div class="dnode hl-e"><b>플로우 매칭 ×10회</b> 반복으로 노이즈를 다듬음</div>
+        <div class="darr">↓</div>
+        <div class="dnode"><b>14 관절 × 50 타임스텝</b> 궤적 출력</div>
+      </div>
+    </div>
+
+    <div class="scene" id="t-00-21-24">
+      <div class="scene-head">
+        <a class="ts" rel="noopener">00:21:24</a>
+        <h3>Action Expert의 첫 번째 입력 — 현재 상태</h3>
+      </div>
+      <img src="assets/2mrgmmmrvne-ts-00-21-24.jpg" alt="Aloha 양팔의 가동 관절을 빨간 화살표로 표시한 CURRENT POSITION (STATE) 패널">
+      <p class="body">
+        Aloha 양팔의 가동 관절을 빨간 화살표로 표시한 CURRENT POSITION (STATE) 패널이
+        Action Expert로 들어간다. 상단 수식 [S₀, S₁, …]이 관절 위치 벡터를 나타낸다.
+      </p>
+    </div>
+
+    <div class="scene" id="t-00-22-52">
+      <div class="scene-head">
+        <a class="ts" rel="noopener">00:22:52</a>
+        <h3>출력 형태 — 관절 × 타임스텝 행렬</h3>
+      </div>
+      <img src="assets/2mrgmmmrvne-ts-00-22-52.jpg" alt="세로축 JOINT, 가로축 TIMESTEP인 출력 행렬이 이미지처럼 시각화된 화면">
+      <p class="body">
+        Action Expert의 출력은 세로축 JOINT, 가로축 TIMESTEP인 행렬이며 이미지처럼
+        시각화된다. 각 행이 하나의 관절, 각 열이 하나의 미래 시점이다.
+        전사 기준 실제 크기는 14×50이다.
+      </p>
+    </div>
+
+    <div class="scene" id="t-00-24-08">
+      <div class="scene-head">
+        <a class="ts" rel="noopener">00:24:08</a>
+        <h3>상태 + 랜덤 액션 → 51개 임베딩</h3>
+      </div>
+      <img src="assets/2mrgmmmrvne-ts-00-24-08.jpg" alt="관절 상태 벡터가 W_S를 거쳐 임베딩이 되고 랜덤 액션 50개와 합쳐져 51개 임베딩이 되는 도식">
+      <p class="body">
+        관절 상태 벡터 [S₀,…,S₁₃]가 W<sub>S</sub>(14×1024)를 거쳐 임베딩 1개가 되고,
+        여기에 NEXT 50 POSITIONS (ACTIONS) — 아직 랜덤 노이즈 상태인 행렬 — 이 더해져
+        총 51개 임베딩 벡터(길이 1024)가 Action Expert 입력이 된다.
+        Gemma가 2048차원인 것과 달리 1024차원을 쓰는 점이 화면에 드러난다.
+      </p>
+    </div>
+
+    <div class="scene" id="t-00-26-52">
+      <div class="scene-head">
+        <a class="ts" rel="noopener">00:26:52</a>
+        <h3>823개 키 — 두 모델을 잇는 인터페이스</h3>
+      </div>
+      <img src="assets/2mrgmmmrvne-ts-00-26-52.jpg" alt="QUERIES는 51×256인데 ALL KEYS와 ALL VALUES는 823×256 — 51+772의 합임을 보여주는 화면">
+      <p class="body">
+        Action Expert의 QUERIES는 51×256이지만, ALL KEYS와 ALL VALUES는 823×256이다.
+        오른쪽 중괄호가 그 823이 자기 자신의 51개와 Gemma에서 가져온 772개의 합임을
+        명시한다. W<sub>Q</sub>·W<sub>K</sub>·W<sub>V</sub>가 모두 1024×256으로,
+        Gemma의 2048×256과 구분된다. <strong>π₀ 설계의 핵심이 한 장에 담긴 프레임이다.</strong>
+      </p>
+    </div>
+
+    <div class="scene" id="t-00-27-32">
+      <div class="scene-head">
+        <a class="ts" rel="noopener">00:27:32</a>
+        <h3>블록 단위로 공유되는 KV 캐시</h3>
+      </div>
+      <img src="assets/2mrgmmmrvne-ts-00-27-32.jpg" alt="파란 테두리 Gemma 블록들의 키/값이 아래 노란 테두리 Action Expert 블록으로 내려가는 도식">
+      <p class="body">
+        파란 테두리의 Gemma 2B 18개 블록에서 각 어텐션이 계산한 키/값(초록·주황·하늘색 줄)이
+        아래쪽 노란 테두리 Action Expert 블록으로 내려간다. 이미지가 바뀌지 않는 동안
+        이 캐시를 재사용하므로, 플로우 매칭을 10회 반복해도 PaliGemma를 다시 돌릴 필요가 없다 —
+        10회 반복이 곧 10배 비용이 되지 않는 이유다.
+      </p>
+    </div>
+
+    <blockquote class="pullquote">
+      SayCan은 자연어로 말을 건넸고,<br>π₀는 어텐션의 키·값을 직접 건넨다.
+      <cite>— 두 세대를 가르는 인터페이스의 차이</cite>
+    </blockquote>
+
+    <p>
+      π₀ 공개 이후 학습 방식과 모델은 개선되었지만, "긴밀 결합된 멀티모달 LLM +
+      플로우 매칭 Action Expert"라는 핵심 구조는 그대로 유지되고 있다.
+    </p>
+  </section>
+
+  <!-- ================= 07 DEBATE ================= -->
+  <section class="wrap" id="debate">
+    <div class="sec-head"><span class="sec-num">07</span><h2>반론 — "VLA are doomed"</h2></div>
+
+    <div class="scene" id="t-00-30-16">
+      <div class="scene-head">
+        <a class="ts" rel="noopener">00:30:16</a>
+        <h3>Yann LeCun의 반론</h3>
+      </div>
+      <img src="assets/2mrgmmmrvne-ts-00-30-16.jpg" alt="진행자와 Yann LeCun의 화상 인터뷰 장면">
+      <p class="body">
+        진행자와 Yann LeCun의 화상 인터뷰. JEPA 계열이 VLA를 앞지를 것으로 보느냐는 질문에
+        LeCun은 즉답한다.
+      </p>
+    </div>
+
+    <blockquote class="pullquote">
+      Oh, absolutely. VLA are doomed.
+      <cite>— Yann LeCun, 영상 인터뷰 중 (00:30:16)</cite>
+    </blockquote>
+
+    <p>
+      다만 영상에 담긴 것은 인터뷰 중의 짧은 단언이며, 그 근거는 이 영상에서 다뤄지지 않는다.
+      제작진은 JEPA 기반 월드 모델 접근을 다음 편에서 다루겠다고 예고했다.
+      노선 경쟁은 아직 열려 있다.
+    </p>
+  </section>
+
+  <!-- ================= 08 IMPLICATIONS ================= -->
+  <section class="wrap" id="implications">
+    <div class="sec-head"><span class="sec-num">08</span><h2>시사점</h2></div>
+
+    <h3>연구 관점 — 가치는 전이 경로에 있다</h3>
+    <p>
+      VLA의 가치는 제어 정확도가 아니라 <strong>사전학습 지식의 전이 경로</strong>에 있다.
+      로봇 데이터가 부족한 도메인에서는 "얼마나 많은 시연을 모으는가"보다
+      "어떤 백본에 무엇을 어떻게 붙이는가"가 성능을 좌우할 수 있다.
+    </p>
+
+    <h3>설계 관점 — 배울 것은 크기가 아니라 인터페이스다</h3>
+    <p>
+      π₀에서 배울 점은 모델 크기가 아니라 <strong>인터페이스 설계</strong>다.
+      두 네트워크의 아키텍처를 일치시켜 KV를 직접 공유하는 방식은, 텍스트 병목을 없애면서도
+      모듈성과 캐시 재사용이라는 실용적 이득을 동시에 얻는다.
+      이종 모듈을 결합할 때 참고할 만한 패턴이다.
+    </p>
+
+    <h3>역사 관점 — RALPH의 교훈</h3>
+    <p>
+      1995년 카네기멜런의 RALPH가 미 대륙을 98.2% 자율주행했지만, 자율주행차 상용화는
+      그로부터 한참 뒤였고 오늘날의 자율주행은 당시와 전혀 다른 방식으로 작동한다.
+      인상적인 데모와 실용화 사이의 간극, 그리고 최종 승자가 지금의 방식이 아닐 수 있다는
+      가능성 — 영상은 이 두 가지 경계를 VLA에도 똑같이 적용한다.
+    </p>
+  </section>
+
+  <!-- ================= 09 SOURCES ================= -->
+  <section class="wrap" id="sources">
+    <div class="sec-head"><span class="sec-num">09</span><h2>근거와 한계</h2></div>
+    <p class="sec-sub">이 리포트의 수치가 어디에서 왔는지 — 신뢰도 등급별 정리</p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>수치·사실</th><th>근거</th><th>신뢰도</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>파라미터(5–55B / 3.3B), 추론 시간(200–1000ms / 73ms)</td><td>화면 직접 확인 (00:11:00)</td><td><span class="pos">화면 검증</span></td></tr>
+          <tr><td>768 패치 (레터박스 포함)</td><td>화면 직접 확인 (00:13:58)</td><td><span class="pos">화면 검증</span></td></tr>
+          <tr><td>18블록 × 8헤드 구조</td><td>화면 직접 확인 (00:15:28)</td><td><span class="pos">화면 검증</span></td></tr>
+          <tr><td>행렬 차원(2048×256, 1024×256)과 내적 값(+36.30, +41.04), 823=51+772</td><td>화면 직접 확인 (00:17:52, 00:19:22, 00:26:52)</td><td><span class="pos">화면 검증</span></td></tr>
+          <tr><td>W<sub>S</sub> 14×1024</td><td>화면 직접 확인 (00:24:08)</td><td><span class="pos">화면 검증</span></td></tr>
+          <tr><td>14×50 액션 크기, 플로우 매칭 10회, 13만+ 시연, 772 = 768+4 분해</td><td>자동 생성 자막</td><td><span class="neg">자막 근거 — 원문 확인 권장</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>인용 전 확인 체크리스트</h3>
+    <ul class="checklist">
+      <li>이 영상에는 사람이 작성한 자막이 없다. <strong>자동 생성 자막 기반 수치는 인용 전 원 논문(π₀, RT-2)과 대조</strong>할 것.</li>
+      <li>인명 표기 주의 — 자막의 "Carol Hausman"은 실제로 <strong>Karol Hausman</strong>이다.</li>
+      <li>영상 자체 그래픽에도 오류가 있다 — 00:08:56 프레임의 PaLM "450B" 표기는 내레이션·타 프레임과 불일치하며, 실제 PaLM은 <strong>540B</strong>다.</li>
+      <li>영상의 30:26 이후는 포스터·서적 판매와 국제 배송 안내 등 채널 공지이므로 이 리포트의 요약 범위에서 제외했다.</li>
+    </ul>
+  </section>
+
+  <!-- ================= OUTRO ================= -->
+  <section class="wrap" id="outro">
+    <div class="divider"></div>
+    <h3>마치며</h3>
+    <p>
+      RT-2의 어색한 콜라 캔 데모에서 π₀의 세탁물 개기까지 걸린 시간은 15개월 남짓이다.
+      그 사이에 바뀐 것은 모델의 크기가 아니라 <strong>지식이 흐르는 통로</strong>였다 —
+      자연어라는 좁은 관에서, 어텐션의 키·값이라는 넓은 관으로.
+      LeCun의 단언처럼 VLA가 막다른 길일지, 아니면 자율주행의 역사처럼 전혀 다른 승자가
+      나타날지는 아직 알 수 없다. 확실한 것은 하나다. 로봇의 두뇌를 여는 열쇠가
+      이제 로봇 공학 바깥, 인터넷 규모의 사전학습에서 오고 있다는 사실이다.
+    </p>
+
+    <div class="sharebox">
+      <p class="st">공유용 소개 문구</p>
+      <p>🤖 콜라 캔 데모는 초라했지만 혁명이었다 — 구글 RT-2에서 Physical Intelligence π₀까지, 인터넷 지식이 로봇 관절 궤적이 되는 과정을 어텐션 행렬 수준에서 해부한 리포트. 3.3B 모델이 어떻게 세탁물을 개는가.</p>
+      <p class="url">원본 영상: https://www.youtube.com/watch?v=2mrGMMmrVNE</p>
+    </div>
+
+    <p>
+      더 깊이 보려면 <a rel="noopener">Welch Labs의 원본 영상(35:02)</a>을 추천한다.
+      각 장면의 타임스탬프 배지를 누르면 해당 시점으로 바로 이동한다.
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><strong>출처</strong> — Welch Labs, "Inside the World's Smartest Robot Brain [VLA]" (2026-04-04, 35:02) · <a rel="noopener">youtube.com/watch?v=2mrGMMmrVNE</a></p>
+    <p>본 문서는 영상 프레임과 자동 생성 자막을 교차 검증해 작성한 연구 노트이며, 스크린샷의 저작권은 원 채널에 있습니다.</p>
+    <p>정리 기준일 2026-08-18 · 태그: youtube · 연구자료 · AI · 로봇 · VLA</p>
+  </div>
+</footer>
+
+</body>
+</html>

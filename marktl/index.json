@@ -1,7 +1,25 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-18T05:06:27.848Z",
+  "updatedAt": "2026-08-18T14:48:43.773Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-inside-the-worlds-smartest-robot-brain-%EC%9A%94%EC%95%BD/",
+      "excerpt": "Inside the World's Smartest Robot Brain [VLA] 영상 정보 채널 : Welch Labs 게시일 : 2026 04 04 길이 : 35:02 링크 : https://www.youtube.com/watch?v=2mrGMMmrVNE <div style=\"position: relative; width: 100%; padding bottom: 56.25%; height: 0; overflow: hidde",
+      "shortId": "1wmkvgh",
+      "slug": "yt-inside-the-worlds-smartest-robot-brain-요약",
+      "sourcePath": "clippings/yt_Inside_the_Worlds_Smartest_Robot_Brain_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료",
+        "AI",
+        "로봇",
+        "VLA"
+      ],
+      "title": "Inside the World's Smartest Robot Brain [VLA]",
+      "updatedAt": "2026-08-18T14:48:43.773Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/1wmkvgh/"
+    },
     {
       "slug": "한민확인-2021-real-time-motion-planning-of-a-hydraulic-excavator-using-trajectory-optimization-and-model-predictive-control-서울대-요약-apex구현대조",
       "shortId": "zurwkh",
