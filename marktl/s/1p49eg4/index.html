@@ -1,0 +1,1524 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Newton은 로봇 시뮬레이션을 어떻게 다시 설계하는가 | SIGGRAPH 2026 분석</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      --paper: #f6f3ec;
+      --paper-deep: #ece7db;
+      --surface: #fffdf8;
+      --ink: #17211c;
+      --ink-soft: #4e5a53;
+      --muted: #748078;
+      --line: #d9d5ca;
+      --green: #245e48;
+      --green-deep: #123c2d;
+      --green-pale: #e3eee8;
+      --lime: #b7df63;
+      --amber: #b56d20;
+      --amber-pale: #f9ebd8;
+      --blue: #315c78;
+      --shadow: 0 20px 60px rgba(24, 38, 30, 0.09);
+      --radius: 24px;
+      --content: 760px;
+      --wide: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--paper);
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 85% 4%, rgba(183, 223, 99, 0.18), transparent 25rem),
+        linear-gradient(180deg, #f9f7f1 0, var(--paper) 42rem, #f3f0e8 100%);
+      font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+      font-size: 18px;
+      line-height: 1.82;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+
+    a {
+      color: var(--green);
+      text-decoration-color: rgba(36, 94, 72, 0.35);
+      text-underline-offset: 0.2em;
+    }
+
+    a:hover,
+    a:focus {
+      color: var(--green-deep);
+      text-decoration-color: currentColor;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .skip-link {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 100;
+      padding: 0.7rem 1rem;
+      color: #fff;
+      background: var(--green-deep);
+      border-radius: 999px;
+      transform: translateY(-160%);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .masthead {
+      width: min(calc(100% - 40px), var(--wide));
+      margin: 0 auto;
+      padding: 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      border-bottom: 1px solid rgba(23, 33, 28, 0.13);
+    }
+
+    .publication {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      color: var(--ink);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.13em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .publication-mark {
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      color: var(--green-deep);
+      background: var(--lime);
+      border-radius: 8px 8px 8px 2px;
+      font-family: Georgia, serif;
+      font-size: 0.95rem;
+    }
+
+    .source-link {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .source-link::after {
+      content: " ↗";
+    }
+
+    .hero {
+      width: min(calc(100% - 40px), var(--wide));
+      margin: 0 auto;
+      padding: clamp(58px, 9vw, 128px) 0 62px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+      align-items: end;
+      gap: clamp(40px, 7vw, 100px);
+    }
+
+    .eyebrow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 28px;
+    }
+
+    .eyebrow span {
+      padding: 5px 10px;
+      color: var(--green-deep);
+      background: var(--green-pale);
+      border: 1px solid rgba(36, 94, 72, 0.16);
+      border-radius: 999px;
+      font-size: 0.69rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      line-height: 1.5;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 900px;
+      margin: 0;
+      font-family: Georgia, "Noto Serif KR", "Batang", serif;
+      font-size: clamp(3rem, 7.2vw, 6.7rem);
+      font-weight: 700;
+      letter-spacing: -0.065em;
+      line-height: 0.98;
+    }
+
+    h1 .accent {
+      color: var(--green);
+    }
+
+    .dek {
+      max-width: 780px;
+      margin: 34px 0 0;
+      color: var(--ink-soft);
+      font-family: Georgia, "Noto Serif KR", "Batang", serif;
+      font-size: clamp(1.15rem, 2.2vw, 1.55rem);
+      line-height: 1.65;
+      letter-spacing: -0.025em;
+    }
+
+    .hero-side {
+      padding: 26px 0 4px 28px;
+      border-left: 3px solid var(--lime);
+    }
+
+    .hero-side-label {
+      margin: 0 0 8px;
+      color: var(--green);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .hero-side p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 0.94rem;
+      line-height: 1.75;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 24px;
+      margin-top: 38px;
+      padding-top: 22px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      font-size: 0.78rem;
+      font-weight: 650;
+    }
+
+    .meta-row strong {
+      color: var(--ink);
+    }
+
+    .hero-figure {
+      width: min(calc(100% - 40px), var(--wide));
+      margin: 0 auto;
+      overflow: hidden;
+      background: var(--green-deep);
+      border-radius: 32px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-figure img {
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+    }
+
+    .hero-caption {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 18px;
+      padding: 18px 24px 20px;
+      color: rgba(255, 255, 255, 0.76);
+      font-size: 0.75rem;
+      line-height: 1.55;
+    }
+
+    .hero-caption b {
+      color: var(--lime);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .report-shell {
+      width: min(calc(100% - 40px), var(--wide));
+      margin: 74px auto 0;
+      display: grid;
+      grid-template-columns: 240px minmax(0, var(--content));
+      justify-content: center;
+      gap: clamp(40px, 7vw, 100px);
+      align-items: start;
+    }
+
+    .toc {
+      position: sticky;
+      top: 24px;
+      padding-top: 12px;
+      font-size: 0.76rem;
+      line-height: 1.55;
+    }
+
+    .toc-title {
+      margin: 0 0 15px;
+      color: var(--ink);
+      font-size: 0.7rem;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .toc ol {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: toc;
+    }
+
+    .toc li {
+      counter-increment: toc;
+      border-top: 1px solid var(--line);
+    }
+
+    .toc a {
+      display: grid;
+      grid-template-columns: 24px 1fr;
+      gap: 8px;
+      padding: 11px 0;
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .toc a::before {
+      content: "0" counter(toc);
+      color: var(--green);
+      font-variant-numeric: tabular-nums;
+      font-weight: 800;
+    }
+
+    .toc a:hover,
+    .toc a:focus {
+      color: var(--ink);
+    }
+
+    main {
+      min-width: 0;
+    }
+
+    section {
+      scroll-margin-top: 28px;
+    }
+
+    .abstract {
+      padding: clamp(28px, 5vw, 48px);
+      background: var(--surface);
+      border: 1px solid rgba(23, 33, 28, 0.1);
+      border-radius: var(--radius);
+      box-shadow: 0 16px 45px rgba(32, 45, 37, 0.055);
+    }
+
+    .section-kicker {
+      margin: 0 0 10px;
+      color: var(--green);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 0 0 24px;
+      font-family: Georgia, "Noto Serif KR", "Batang", serif;
+      font-size: clamp(2rem, 4.5vw, 3.25rem);
+      letter-spacing: -0.045em;
+      line-height: 1.18;
+    }
+
+    h3 {
+      margin: 56px 0 15px;
+      color: var(--green-deep);
+      font-family: Georgia, "Noto Serif KR", "Batang", serif;
+      font-size: clamp(1.35rem, 3vw, 1.85rem);
+      letter-spacing: -0.035em;
+      line-height: 1.34;
+    }
+
+    p {
+      margin: 0 0 1.25em;
+    }
+
+    .abstract p:last-child {
+      margin-bottom: 0;
+    }
+
+    .lead {
+      color: var(--ink-soft);
+      font-family: Georgia, "Noto Serif KR", "Batang", serif;
+      font-size: 1.1rem;
+      line-height: 1.9;
+    }
+
+    .evidence-note {
+      margin-top: 22px;
+      padding: 16px 18px;
+      color: var(--ink-soft);
+      background: var(--green-pale);
+      border-left: 4px solid var(--green);
+      border-radius: 0 12px 12px 0;
+      font-size: 0.82rem;
+      line-height: 1.65;
+    }
+
+    .evidence-note strong {
+      color: var(--green-deep);
+    }
+
+    .findings {
+      margin: 32px 0 86px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .finding {
+      min-height: 188px;
+      padding: 24px;
+      background: var(--green-deep);
+      border-radius: 18px;
+      color: rgba(255, 255, 255, 0.82);
+    }
+
+    .finding:nth-child(2),
+    .finding:nth-child(3) {
+      background: var(--green);
+    }
+
+    .finding-number {
+      display: inline-grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      margin-bottom: 25px;
+      color: var(--green-deep);
+      background: var(--lime);
+      border-radius: 50%;
+      font-size: 0.72rem;
+      font-weight: 900;
+    }
+
+    .finding h3 {
+      margin: 0 0 8px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 1.02rem;
+      letter-spacing: -0.02em;
+    }
+
+    .finding p {
+      margin: 0;
+      font-size: 0.79rem;
+      line-height: 1.68;
+    }
+
+    .article-section {
+      margin: 0 0 104px;
+    }
+
+    .section-intro {
+      margin-bottom: 36px;
+      color: var(--ink-soft);
+      font-size: 1.02rem;
+    }
+
+    .figure {
+      width: min(100%, 940px);
+      margin: 38px 0 44px;
+      overflow: hidden;
+      background: #111713;
+      border-radius: 18px;
+      box-shadow: 0 15px 38px rgba(26, 38, 31, 0.12);
+    }
+
+    .figure img {
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+    }
+
+    figcaption {
+      padding: 14px 18px 16px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.73rem;
+      line-height: 1.58;
+    }
+
+    figcaption b {
+      color: var(--lime);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .figure-grid {
+      width: min(100%, 1040px);
+      margin: 38px 0 48px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .figure-grid .figure {
+      width: 100%;
+      margin: 0;
+    }
+
+    .figure-grid figcaption {
+      min-height: 74px;
+    }
+
+    .full-bleed {
+      width: min(var(--wide), calc(100vw - 40px));
+      margin-left: min(0px, calc((var(--content) - var(--wide)) / 2));
+    }
+
+    .pullquote {
+      width: min(1040px, calc(100vw - 40px));
+      margin: 76px 0 80px;
+      padding: clamp(34px, 6vw, 64px);
+      color: #f8fff9;
+      background:
+        linear-gradient(135deg, rgba(183, 223, 99, 0.13), transparent 55%),
+        var(--green-deep);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+    }
+
+    .pullquote::before {
+      content: "“";
+      display: block;
+      height: 46px;
+      color: var(--lime);
+      font-family: Georgia, serif;
+      font-size: 5rem;
+      line-height: 0.8;
+    }
+
+    .pullquote p {
+      max-width: 850px;
+      margin: 0;
+      font-family: Georgia, "Noto Serif KR", "Batang", serif;
+      font-size: clamp(1.45rem, 3.5vw, 2.45rem);
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      line-height: 1.48;
+    }
+
+    .pullquote cite {
+      display: block;
+      margin-top: 24px;
+      color: rgba(255, 255, 255, 0.58);
+      font-size: 0.72rem;
+      font-style: normal;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .diagram {
+      width: min(100%, 980px);
+      margin: 38px 0 46px;
+      padding: 28px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+    }
+
+    .diagram-title {
+      margin: 0 0 20px;
+      color: var(--ink-soft);
+      font-size: 0.76rem;
+      font-weight: 850;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      align-items: stretch;
+      gap: 8px;
+    }
+
+    .pipeline-step {
+      position: relative;
+      min-height: 112px;
+      padding: 16px 13px;
+      background: var(--green-pale);
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .pipeline-step:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      z-index: 2;
+      top: 42px;
+      right: -13px;
+      width: 18px;
+      color: var(--green);
+      font-weight: 900;
+    }
+
+    .pipeline-step small {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--green);
+      font-size: 0.61rem;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .pipeline-step b {
+      display: block;
+      font-size: 0.78rem;
+      line-height: 1.48;
+    }
+
+    .table-wrap {
+      width: min(100%, 1040px);
+      margin: 38px 0 50px;
+      overflow-x: auto;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 10px 28px rgba(31, 44, 36, 0.045);
+    }
+
+    table {
+      width: 100%;
+      min-width: 700px;
+      border-collapse: collapse;
+      font-size: 0.79rem;
+      line-height: 1.62;
+    }
+
+    th,
+    td {
+      padding: 17px 18px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: #fff;
+      background: var(--green-deep);
+      font-size: 0.7rem;
+      letter-spacing: 0.04em;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    td:first-child {
+      color: var(--green-deep);
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .metric-strip {
+      width: min(100%, 1040px);
+      margin: 36px 0 48px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .metric {
+      padding: 26px 20px;
+      background: var(--surface);
+      border-top: 5px solid var(--lime);
+      border-radius: 14px;
+      box-shadow: 0 8px 28px rgba(31, 44, 36, 0.06);
+    }
+
+    .metric strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--green);
+      font-family: Georgia, serif;
+      font-size: 2.25rem;
+      line-height: 1;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--ink-soft);
+      font-size: 0.73rem;
+      line-height: 1.55;
+    }
+
+    .caution {
+      margin: 34px 0 48px;
+      padding: 22px 24px;
+      color: #714614;
+      background: var(--amber-pale);
+      border: 1px solid rgba(181, 109, 32, 0.22);
+      border-radius: 15px;
+      font-size: 0.82rem;
+      line-height: 1.7;
+    }
+
+    .caution strong {
+      display: block;
+      margin-bottom: 5px;
+      color: #7b4812;
+      font-size: 0.74rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .checklist {
+      margin: 30px 0 46px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .checklist li {
+      position: relative;
+      margin-bottom: 12px;
+      padding: 18px 20px 18px 52px;
+      background: rgba(255, 253, 248, 0.78);
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      font-size: 0.89rem;
+      line-height: 1.66;
+    }
+
+    .checklist li::before {
+      content: "✓";
+      position: absolute;
+      top: 18px;
+      left: 19px;
+      display: grid;
+      width: 22px;
+      height: 22px;
+      place-items: center;
+      color: var(--green-deep);
+      background: var(--lime);
+      border-radius: 50%;
+      font-size: 0.7rem;
+      font-weight: 900;
+    }
+
+    .ending {
+      margin-bottom: 40px;
+      padding: clamp(32px, 6vw, 62px);
+      color: #fff;
+      background: var(--green-deep);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .ending .section-kicker {
+      color: var(--lime);
+    }
+
+    .ending h2 {
+      max-width: 660px;
+      color: #fff;
+    }
+
+    .ending p {
+      max-width: 680px;
+      color: rgba(255, 255, 255, 0.76);
+    }
+
+    .ending p:last-child {
+      margin-bottom: 0;
+    }
+
+    .share-copy {
+      margin: 28px 0 0;
+      padding: 19px 20px;
+      color: rgba(255, 255, 255, 0.88);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 13px;
+      font-size: 0.78rem;
+      line-height: 1.65;
+    }
+
+    .share-copy strong {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--lime);
+      font-size: 0.67rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .source-notes {
+      margin: 80px 0 0;
+      padding-top: 44px;
+      border-top: 1px solid var(--line);
+      color: var(--ink-soft);
+      font-size: 0.79rem;
+      line-height: 1.72;
+    }
+
+    .source-notes h2 {
+      color: var(--ink);
+      font-size: 1.8rem;
+    }
+
+    .source-notes ol {
+      padding-left: 1.3rem;
+    }
+
+    .source-notes li {
+      margin-bottom: 12px;
+      padding-left: 0.35rem;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 30px;
+    }
+
+    .tags span {
+      padding: 5px 10px;
+      color: var(--green);
+      background: var(--green-pale);
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 750;
+    }
+
+    footer {
+      width: min(calc(100% - 40px), var(--wide));
+      margin: 90px auto 0;
+      padding: 28px 0 42px;
+      display: flex;
+      justify-content: space-between;
+      gap: 30px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      font-size: 0.71rem;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-side {
+        max-width: 650px;
+      }
+
+      .report-shell {
+        display: block;
+      }
+
+      .toc {
+        position: static;
+        margin-bottom: 56px;
+        padding: 22px;
+        background: rgba(255, 253, 248, 0.7);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+      }
+
+      .toc ol {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 24px;
+      }
+
+      .full-bleed,
+      .pullquote {
+        width: 100%;
+        margin-left: 0;
+      }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        font-size: 16px;
+        line-height: 1.78;
+      }
+
+      .masthead,
+      .hero,
+      .hero-figure,
+      .report-shell,
+      footer {
+        width: min(calc(100% - 28px), var(--wide));
+      }
+
+      .source-link {
+        font-size: 0;
+      }
+
+      .source-link::after {
+        content: "원문 ↗";
+        font-size: 0.74rem;
+      }
+
+      h1 {
+        font-size: clamp(2.8rem, 15vw, 4.8rem);
+      }
+
+      .hero {
+        padding-top: 56px;
+      }
+
+      .hero-figure {
+        border-radius: 18px;
+      }
+
+      .hero-caption {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+
+      .toc ol,
+      .findings,
+      .figure-grid,
+      .metric-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .finding {
+        min-height: auto;
+      }
+
+      .figure-grid figcaption {
+        min-height: 0;
+      }
+
+      .pipeline {
+        grid-template-columns: 1fr;
+      }
+
+      .pipeline-step {
+        min-height: 0;
+        text-align: left;
+      }
+
+      .pipeline-step:not(:last-child)::after {
+        content: "↓";
+        top: auto;
+        right: 20px;
+        bottom: -16px;
+      }
+
+      .pullquote {
+        border-radius: 19px;
+      }
+
+      footer {
+        display: block;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        color: #000;
+      }
+
+      .masthead,
+      .toc,
+      .share-copy {
+        display: none;
+      }
+
+      .hero,
+      .hero-figure,
+      .report-shell,
+      footer {
+        width: 100%;
+      }
+
+      .report-shell {
+        display: block;
+      }
+
+      .figure,
+      .pullquote,
+      .abstract,
+      .ending {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+
+      a {
+        color: inherit;
+      }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Newton: Open-Source GPU Physics for Robot Simulation | Physical AI Day at SIGGRAPH 2026">
+<meta property="og:description" content="Newton: Open Source GPU Physics for Robot Simulation Physical AI Day at SIGGRAPH 2026 영상 정보 채널 : NVIDIA Omniverse 게시일 : 2026 08 12 길이 : 40:41 링크 : https://www.youtube.com/watch?v=ElIyRboR1A8 발표자 : Miles Macklin(NVIDIA), Louis Lian(Lightwhee">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/1p49eg4/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/1p49eg4/assets/eliyrbor1a8-ts-00-00-49.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Newton: Open-Source GPU Physics for Robot Simulation | Physical AI Day at SIGGRAPH 2026">
+<meta name="twitter:description" content="Newton: Open Source GPU Physics for Robot Simulation Physical AI Day at SIGGRAPH 2026 영상 정보 채널 : NVIDIA Omniverse 게시일 : 2026 08 12 길이 : 40:41 링크 : https://www.youtube.com/watch?v=ElIyRboR1A8 발표자 : Miles Macklin(NVIDIA), Louis Lian(Lightwhee">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/1p49eg4/assets/eliyrbor1a8-ts-00-00-49.jpg">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-newton-open-source-gpu-physics-for-robot-simulation-physical-ai-day-at-siggraph-2026-%EC%9A%94%EC%95%BD/">
+</head>
+<body>
+  <a class="skip-link" href="#article">본문으로 이동</a>
+
+  <header class="masthead">
+    <a class="publication" href="#article" aria-label="Physical AI Research">
+      <span class="publication-mark">N</span>
+      <span>Physical AI Research</span>
+    </a>
+    <a class="source-link">NVIDIA Omniverse 발표 보기</a>
+  </header>
+
+  <div class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">
+          <span>Research Report</span>
+          <span>SIGGRAPH 2026</span>
+          <span>Robot Simulation</span>
+        </div>
+        <h1>Newton은 로봇 시뮬레이션을 어떻게 <span class="accent">다시 설계</span>하는가</h1>
+        <p class="dek">강체와 변형체, 접촉과 센서, 자산 보정과 모델 평가를 하나의 GPU 우선 파이프라인으로 연결하려는 오픈소스 물리 엔진의 설계와 함의.</p>
+      </div>
+      <aside class="hero-side" aria-label="한줄 요약">
+        <p class="hero-side-label">In one sentence</p>
+        <p>Newton의 핵심은 단일 고성능 솔버가 아니라, 로봇 학습에 필요한 물리·자산·센서·평가 구성 요소를 교체 가능한 형태로 묶는 데 있다.</p>
+      </aside>
+    </div>
+
+    <div class="meta-row">
+      <span><strong>분석일</strong> 2026.08.18</span>
+      <span><strong>발표자</strong> Miles Macklin · Louis Lian</span>
+      <span><strong>영상</strong> 40분 41초</span>
+      <span><strong>읽는 시간</strong> 약 18분</span>
+    </div>
+  </div>
+
+  <figure class="hero-figure">
+    <img src="assets/eliyrbor1a8-ts-00-04-25.jpg" alt="NVIDIA, Google DeepMind, Disney Research, Lightwheel, Toyota Research Institute와 Linux Foundation이 표시된 Newton 프로젝트 소개 슬라이드">
+    <figcaption class="hero-caption">
+      <b>Opening frame</b>
+      <span>Newton은 NVIDIA를 비롯한 연구·산업 조직이 공동으로 개발하는 오픈소스 로봇 학습용 물리 엔진으로 소개됐다.</span>
+    </figcaption>
+  </figure>
+
+  <div class="report-shell">
+    <nav class="toc" aria-label="목차">
+      <p class="toc-title">Contents</p>
+      <ol>
+        <li><a href="#abstract">초록과 핵심 발견</a></li>
+        <li><a href="#problem">합성 물리가 필요한 이유</a></li>
+        <li><a href="#architecture">Newton의 설계 구조</a></li>
+        <li><a href="#multiphysics">강체를 넘어선 다물리</a></li>
+        <li><a href="#industry">산업 작업과 접촉</a></li>
+        <li><a href="#performance">성능과 센서 확장</a></li>
+        <li><a href="#calibration">자산 보정과 평가 폐루프</a></li>
+        <li><a href="#implications">시사점과 한계</a></li>
+      </ol>
+    </nav>
+
+    <main id="article">
+      <section id="abstract">
+        <div class="abstract">
+          <p class="section-kicker">Abstract</p>
+          <h2>로봇 학습을 위한 물리 엔진은 무엇이 달라야 하는가</h2>
+          <p class="lead">Newton은 오픈소스·GPU 우선·Python 우선이라는 세 가지 원칙 아래, 로봇 학습에 필요한 강체 동역학, 변형체, 접촉, 센서, 대규모 병렬 실행을 하나의 구성 가능한 기술 스택으로 묶으려는 프로젝트다.</p>
+          <p>발표의 주장은 명확하다. 인터넷 규모 데이터에는 접촉력과 마찰, 물체의 변형처럼 로봇 행동에 필요한 물리 정보가 부족하다. 실제 데이터를 무한정 수집할 수도 없다. 따라서 로봇 학습의 확장에는 물리적으로 타당한 합성 데이터와 이를 빠르게 생성할 시뮬레이션 기반이 필요하다.</p>
+          <p>Newton은 이를 위해 모델·상태·제어·접점·솔버를 분리하고, 강체와 MPM 입자, Cosserat rod, 얇은 쉘, 사면체 탄성체를 서로 다른 솔버로 처리한다. 더 나아가 자산 파라미터 식별, 원격조작 데이터 생성, 병렬 모델 평가까지 연결해 시뮬레이션을 학습과 평가의 폐루프로 확장하려 한다.</p>
+          <div class="evidence-note">
+            <strong>근거 범위</strong> 이 글은 발표 슬라이드에서 직접 확인되는 화면 정보, 한국어 자동 자막, 영상 설명을 종합했다. 고유명사는 화면 표기를 우선했으며, 성능 수치는 발표자가 제시한 자체 벤치마크로 구분해 해석했다.
+          </div>
+        </div>
+
+        <div class="findings" aria-label="핵심 발견">
+          <article class="finding">
+            <span class="finding-number">01</span>
+            <h3>구성 가능성이 핵심 경쟁력이다</h3>
+            <p>솔버·접촉·자산·센서를 분리해 문제에 맞는 수치 방법을 선택하고 교체할 수 있도록 설계했다.</p>
+          </article>
+          <article class="finding">
+            <span class="finding-number">02</span>
+            <h3>다물리는 선택이 아닌 전제다</h3>
+            <p>케이블, 호스, 봉투, 토사처럼 실제 산업 작업을 구성하는 자산은 강체만으로 표현되지 않는다.</p>
+          </article>
+          <article class="finding">
+            <span class="finding-number">03</span>
+            <h3>정확한 자산이 정확한 솔버만큼 중요하다</h3>
+            <p>재료와 액추에이터 파라미터를 실측 응답에 맞추지 않으면 sim-to-real 평가의 신뢰도도 낮아진다.</p>
+          </article>
+          <article class="finding">
+            <span class="finding-number">04</span>
+            <h3>시뮬레이션은 평가 시스템으로 확장된다</h3>
+            <p>데이터 생성, 학습, 병렬 평가, 실패 분석과 다음 데이터 결정이 하나의 반복 루프를 이룬다.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="article-section" id="problem">
+        <p class="section-kicker">01 · The Data Gap</p>
+        <h2>Physical AI에는 ‘물리가 담긴 데이터’가 필요하다</h2>
+        <p class="section-intro">Newton이 출발하는 지점은 물리 엔진 자체가 아니라 로봇 학습 데이터의 구조적 부족이다.</p>
+
+        <p>실제 로봇 데이터는 접촉과 힘, 마찰, 실패의 복잡성을 가장 잘 담는다. 그러나 장비와 공간, 안전 관리, 운영 인력이 필요하고 수집 속도도 제한적이다. 반면 인터넷 규모의 이미지와 영상은 풍부하지만, 물체에 얼마만큼의 힘이 가해졌는지 혹은 접촉면에서 어떤 마찰이 발생했는지는 거의 알려주지 않는다.</p>
+
+        <div class="figure-grid full-bleed">
+          <figure class="figure">
+            <img src="assets/eliyrbor1a8-ts-00-00-49.jpg" alt="실제 데이터, 합성 데이터, 인터넷 규모 데이터로 구성된 Physical AI 데이터 피라미드">
+            <figcaption><b>00:00:49</b> 실제 데이터와 인터넷 규모 데이터 사이를 물리적 합성 데이터가 연결한다.</figcaption>
+          </figure>
+          <figure class="figure">
+            <img src="assets/eliyrbor1a8-ts-00-02-05.jpg" alt="로봇 메커니즘, 실제 조작, 변형체, 대규모 병렬 환경을 보여주는 슬라이드">
+            <figcaption><b>00:02:05</b> 로봇 시뮬레이션에는 메커니즘·접촉·변형체·병렬성이 동시에 요구된다.</figcaption>
+          </figure>
+        </div>
+
+        <p>여기서 합성 데이터는 단순한 시각적 렌더링을 뜻하지 않는다. 로봇이 물체를 밀고, 잡고, 삽입하고, 구부릴 때 발생하는 상태 변화가 물리적으로 일관돼야 한다. 강화학습에서는 이 과정을 수천 개 환경에서 병렬 반복할 수 있어야 하며, 딥러닝 프레임워크와 텐서 데이터를 직접 교환할 수 있어야 한다.</p>
+
+        <aside class="pullquote full-bleed">
+          <p>로봇 학습용 물리의 목표는 장면이 그럴듯해 보이는 것이 아니라, 정책이 의존할 상호작용을 충분히 정확하고 반복 가능하게 만드는 것이다.</p>
+          <cite>발표의 문제의식을 종합한 해석</cite>
+        </aside>
+      </section>
+
+      <section class="article-section" id="architecture">
+        <p class="section-kicker">02 · Architecture</p>
+        <h2>엔진보다 먼저, 구성 요소의 경계를 설계하다</h2>
+        <p class="section-intro">Newton은 자산과 시간별 상태, 제어, 접점, 시간 적분기를 명시적으로 분리한다. 이 경계가 솔버 교체와 연구 확장의 기반이다.</p>
+
+        <figure class="figure full-bleed">
+          <img src="assets/eliyrbor1a8-ts-00-05-29.jpg" alt="pip install newton 명령과 Newton 예제 및 문서 링크가 표시된 슬라이드">
+          <figcaption><b>00:05:29</b> Python 패키지 설치와 독립형 예제를 진입점으로 제시한 Newton.</figcaption>
+        </figure>
+
+        <figure class="figure full-bleed">
+          <img src="assets/eliyrbor1a8-ts-00-06-16.jpg" alt="Newton의 Model, State, Control, Contacts, Solver 클래스와 실행 흐름">
+          <figcaption><b>00:06:16</b> Assets에서 Model·State·Control을 구성하고 Collision·Contacts를 거쳐 Solver가 상태를 진행한다.</figcaption>
+        </figure>
+
+        <div class="diagram full-bleed" aria-label="Newton 구성 요소 흐름도">
+          <p class="diagram-title">Newton simulation flow</p>
+          <div class="pipeline">
+            <div class="pipeline-step">
+              <small>Assets</small>
+              <b>로봇·환경·재료 정의</b>
+            </div>
+            <div class="pipeline-step">
+              <small>Runtime</small>
+              <b>Model·State·Control</b>
+            </div>
+            <div class="pipeline-step">
+              <small>Collision</small>
+              <b>접점 탐색과 생성</b>
+            </div>
+            <div class="pipeline-step">
+              <small>Solver</small>
+              <b>힘 계산과 시간 적분</b>
+            </div>
+            <div class="pipeline-step">
+              <small>Learning</small>
+              <b>센서·정책·평가 피드백</b>
+            </div>
+          </div>
+        </div>
+
+        <h3>두 좌표계와 플러그형 솔버</h3>
+        <p>축소 좌표는 관절 자유도만으로 로봇을 표현해 일반적인 직렬 메커니즘과 강화학습에 효율적이다. 최대 좌표는 각 링크를 독립 강체로 표현하고 제약으로 연결하기 때문에 폐루프나 복잡한 연결 구조에 유연하다. Newton의 상위 인터페이스는 문제에 따라 이 두 표현과 대응 솔버를 선택할 수 있도록 한다.</p>
+
+        <div class="figure-grid full-bleed">
+          <figure class="figure">
+            <img src="assets/eliyrbor1a8-ts-00-10-31.jpg" alt="Reduced coordinates와 Maximal coordinates 다물체 표현 비교">
+            <figcaption><b>00:10:31</b> 축소 좌표와 최대 좌표는 서로 다른 로봇 구조와 수치적 요구에 대응한다.</figcaption>
+          </figure>
+          <figure class="figure">
+            <img src="assets/eliyrbor1a8-ts-00-11-52.jpg" alt="해석 형상과 SDF 형상을 처리하는 충돌 및 접점 생성 파이프라인">
+            <figcaption><b>00:11:52</b> 접점 생성은 솔버와 분리되어 다른 수치 방법에도 연결될 수 있다.</figcaption>
+          </figure>
+        </div>
+
+        <h3>접점은 솔버의 상류 조건이다</h3>
+        <p>로봇 조작에서 접점의 위치와 방향, 깊이, 분포가 불안정하면 아무리 정교한 솔버라도 수렴성과 결과 품질을 확보하기 어렵다. Newton은 해석 형상과 SDF 기반 형상을 처리하는 접촉 파이프라인을 독립 구성 요소로 두고, 생성된 접점을 여러 솔버가 소비할 수 있도록 한다.</p>
+
+        <figure class="figure full-bleed">
+          <img src="assets/eliyrbor1a8-ts-00-12-56.jpg" alt="두 물체의 겹침에서 접촉 표면과 압력 분포를 구성하는 Hydroelastic Contact 도식">
+          <figcaption><b>00:12:56</b> Hydroelastic contact는 점 하나가 아니라 접촉 면적과 압력 분포를 모델링한다.</figcaption>
+        </figure>
+
+        <p>Hydroelastic contact는 물체의 겹침 영역에서 접촉 표면을 구성해 힘과 토크의 공간적 분포를 표현한다. 이는 비틀림 마찰, 넓은 면적의 파지, 촉각 센서 판독처럼 점 접촉 근사에 민감한 작업에서 특히 중요하다.</p>
+      </section>
+
+      <section class="article-section" id="multiphysics">
+        <p class="section-kicker">03 · Multiphysics</p>
+        <h2>강체 하나로는 산업 현장을 설명할 수 없다</h2>
+        <p class="section-intro">Newton은 모든 물질을 하나의 표현에 억지로 맞추기보다, 형상과 재료에 맞는 이산화 방식과 솔버를 선택한다.</p>
+
+        <figure class="figure full-bleed">
+          <img src="assets/eliyrbor1a8-ts-00-15-42.jpg" alt="입자, 막대, 얇은 쉘, 사면체로 구성된 다물리 표현">
+          <figcaption><b>00:15:42</b> 입자 0D, 막대 1D, 쉘 2D, 사면체 3D 표현을 물질 특성에 맞게 배치한다.</figcaption>
+        </figure>
+
+        <div class="table-wrap full-bleed">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">표현</th>
+                <th scope="col">발표에 제시된 방법</th>
+                <th scope="col">대표 대상</th>
+                <th scope="col">로봇 작업의 의미</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>입자 · 0D</td>
+                <td>MPM, 구성 법칙, 소성·점성 모델</td>
+                <td>눈, 토사, 입상재, 점성 물질</td>
+                <td>굴착·보행·현장 작업의 환경 반응 표현</td>
+              </tr>
+              <tr>
+                <td>막대 · 1D</td>
+                <td>Cosserat rod</td>
+                <td>케이블, 호스, 배선</td>
+                <td>굽힘·비틀림·소성 변형이 있는 조립과 정비</td>
+              </tr>
+              <tr>
+                <td>쉘 · 2D</td>
+                <td>VBD, 유한요소 쉘, 충돌 감지</td>
+                <td>천, 비닐, 종이봉투</td>
+                <td>포장재·의류·얇은 부품의 파지와 펼침</td>
+              </tr>
+              <tr>
+                <td>사면체 · 3D</td>
+                <td>VBD, Neo-Hookean 계열 재료</td>
+                <td>스펀지, 탄성 부품</td>
+                <td>압축·복원과 체적 변형을 포함한 조작</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>입상재와 케이블</h3>
+        <div class="figure-grid full-bleed">
+          <figure class="figure">
+            <img src="assets/eliyrbor1a8-ts-00-16-03.jpg" alt="눈 위를 걷는 캐릭터와 굴착 및 입상재를 시뮬레이션하는 MPM 예제">
+            <figcaption><b>00:16:03</b> MPM은 눈과 토사처럼 큰 변형을 보이는 재료를 입자 기반으로 처리한다.</figcaption>
+          </figure>
+          <figure class="figure">
+            <img src="assets/eliyrbor1a8-ts-00-17-30.jpg" alt="Cosserat rod의 굽힘과 비틀림 및 케이블 시뮬레이션">
+            <figcaption><b>00:17:30</b> Cosserat rod는 케이블의 굽힘·비틀림 강성과 소성 변형을 표현한다.</figcaption>
+          </figure>
+        </div>
+
+        <figure class="figure full-bleed">
+          <img src="assets/eliyrbor1a8-ts-00-18-23.jpg" alt="사람이 케이블을 던져 매듭을 만드는 장면과 Flying Knots 로봇 시뮬레이션 비교">
+          <figcaption><b>00:18:23</b> 빠른 동적 동작으로 케이블 매듭을 만드는 Flying Knots 재현 사례.</figcaption>
+        </figure>
+
+        <h3>얇은 포장재와 탄성 고체</h3>
+        <div class="figure-grid full-bleed">
+          <figure class="figure">
+            <img src="assets/eliyrbor1a8-ts-00-19-02.jpg" alt="천을 다루는 로봇과 Thin Shells 솔버 설명">
+            <figcaption><b>00:19:02</b> VBD와 유한요소 쉘 모델을 이용한 얇은 물체 시뮬레이션.</figcaption>
+          </figure>
+          <figure class="figure">
+            <img src="assets/eliyrbor1a8-ts-00-19-43.jpg" alt="로봇이 비닐봉투와 종이봉투를 조작하는 Meituan 협력 사례">
+            <figcaption><b>00:19:43</b> 얇은 쉘 연구를 실제 물류 포장재 조작으로 연결한 사례.</figcaption>
+          </figure>
+          <figure class="figure">
+            <img src="assets/eliyrbor1a8-ts-00-20-14.jpg" alt="휴머노이드가 부드러운 물체를 누르는 Elastic Solids 예제">
+            <figcaption><b>00:20:14</b> 사면체 메쉬와 탄성 재료 모델로 부드러운 고체의 체적 변형을 처리한다.</figcaption>
+          </figure>
+          <figure class="figure">
+            <img src="assets/eliyrbor1a8-ts-00-20-53.jpg" alt="USD Deformable Schemas 코드와 AOUSD 로고">
+            <figcaption><b>00:20:53</b> USD Deformable Schemas는 곡선·쉘·볼륨 자산의 교환 기반을 지향한다.</figcaption>
+          </figure>
+        </div>
+
+        <h3>다른 솔버를 하나의 작업 안에서 결합한다</h3>
+        <p>로봇은 강체지만 로봇이 다루는 대상은 케이블이나 토사일 수 있다. Newton의 coupling framework는 다물체 솔버와 변형체 솔버 사이에서 힘을 양방향 전달해, 각 대상에 적합한 수치 방법을 유지하면서 하나의 작업을 구성하려 한다.</p>
+
+        <figure class="figure full-bleed">
+          <img src="assets/eliyrbor1a8-ts-00-22-02.jpg" alt="다물체 솔버와 변형체 솔버를 coupler로 연결한 도식과 로봇팔 예제">
+          <figcaption><b>00:22:02</b> 강체 로봇과 변형체 사이의 힘을 양방향으로 연결하는 실험적 coupling framework.</figcaption>
+        </figure>
+      </section>
+
+      <section class="article-section" id="industry">
+        <p class="section-kicker">04 · Contact in Practice</p>
+        <h2>접촉 모델의 가치는 삽입과 파지에서 드러난다</h2>
+        <p class="section-intro">발표는 단순 데모보다 조립, 촉각 파지, 호스와 케이블 삽입처럼 접촉 품질에 민감한 작업을 전면에 배치한다.</p>
+
+        <div class="figure-grid full-bleed">
+          <figure class="figure">
+            <img src="assets/eliyrbor1a8-ts-00-13-52.jpg" alt="로봇의 GB300 트레이 부품 조립 시뮬레이션과 실제 장비 비교">
+            <figcaption><b>00:13:52</b> 버스바 배치 등 정밀 조립 정책의 sim-to-real 사례.</figcaption>
+          </figure>
+          <figure class="figure">
+            <img src="assets/eliyrbor1a8-ts-00-14-31.jpg" alt="Sharpa 손의 손가락 접촉 영역과 촉각 분포 및 조작 장면">
+            <figcaption><b>00:14:31</b> 손가락별 촉각 센서를 모사해 비전 없이 파지 정책을 학습한 사례.</figcaption>
+          </figure>
+        </div>
+
+        <p>Hydroelastic contact가 산출하는 압력 분포는 촉각 센서 신호로 직접 해석될 수 있다. 발표에서는 각 손가락의 240×240 taxel 판독값을 모사하고, 카메라 입력 없이 촉각 정보만으로 조작 정책을 학습한 사례를 소개한다.</p>
+
+        <div class="figure-grid full-bleed">
+          <figure class="figure">
+            <img src="assets/eliyrbor1a8-ts-00-27-26.jpg" alt="삼성 워터호스 조립 작업의 실제 영상과 Newton 시뮬레이션 비교">
+            <figcaption><b>00:27:26</b> 강체 로봇과 VBD 호스를 결합한 Waterhose Assembly 비교.</figcaption>
+          </figure>
+          <figure class="figure">
+            <img src="assets/eliyrbor1a8-ts-00-28-06.jpg" alt="산업용 케이블과 커넥터를 로봇이 삽입하는 시뮬레이션">
+            <figcaption><b>00:28:06</b> 커넥터는 강체, 케이블은 변형체로 모델링한 산업용 삽입 과제.</figcaption>
+          </figure>
+        </div>
+
+        <p>이 작업들의 공통점은 작은 모델링 오차가 성공과 실패를 가른다는 것이다. 커넥터의 형상, 케이블의 굽힘 강성, 삽입 순간의 접촉과 진동이 실제와 다르면 시뮬레이션 정책의 성공률은 현실 성능을 제대로 예측하지 못한다.</p>
+      </section>
+
+      <section class="article-section" id="performance">
+        <p class="section-kicker">05 · Scale</p>
+        <h2>GPU 병렬성은 더 많은 환경과 더 많은 관측을 겨냥한다</h2>
+        <p class="section-intro">Newton의 성능 주장은 단순한 초당 스텝 수를 넘어, 같은 GPU에서 실행할 환경 수와 센서 데이터 규모를 늘리는 데 초점이 맞춰져 있다.</p>
+
+        <figure class="figure full-bleed">
+          <img src="assets/eliyrbor1a8-ts-00-23-09.jpg" alt="Isaac Lab 작업별 유효 FPS 비교와 2배에서 3배 향상 문구">
+          <figcaption><b>00:23:09</b> Newton 기반 MuJoCo Warp 솔버의 Isaac Lab 유효 FPS 자체 벤치마크.</figcaption>
+        </figure>
+
+        <div class="metric-strip full-bleed" aria-label="발표 성능 수치">
+          <div class="metric">
+            <strong>2–3×</strong>
+            <span>Isaac Lab 환경 스텝 처리량 향상 주장</span>
+          </div>
+          <div class="metric">
+            <strong>3–4×</strong>
+            <span>강화학습 환경 메모리 사용량 절감 설명</span>
+          </div>
+          <div class="metric">
+            <strong>5–10×</strong>
+            <span>tiled camera 메모리 사용량 절감 주장</span>
+          </div>
+        </div>
+
+        <figure class="figure full-bleed">
+          <img src="assets/eliyrbor1a8-ts-00-24-15.jpg" alt="IMU, Contact, Tiled Camera 센서와 다중 뷰 렌더링 성능 비교">
+          <figcaption><b>00:24:15</b> 다수 환경의 지각 학습을 겨냥한 tiled camera와 Grouped BVH 기반 센서 처리.</figcaption>
+        </figure>
+
+        <p><code>newton.SensorTiledCamera</code>는 여러 환경의 카메라 관측을 한꺼번에 처리하는 방식으로 소개된다. 물리 시뮬레이션의 병렬성만 높여도 이미지 생성이 병목이 되면 비전 기반 정책의 학습 규모는 제한된다. 따라서 센서 시뮬레이션의 처리량과 메모리 구조도 물리 엔진의 실질적 성능에 포함된다.</p>
+
+        <div class="caution">
+          <strong>Benchmark caution</strong>
+          발표 수치는 특정 Isaac Lab 환경, GPU, 비교 구성과 구현 버전을 사용한 자체 결과다. 독립 재현 결과나 모든 로봇 과제에서의 보편적 우위를 의미하지 않는다. 비교 시에는 하드웨어, 시간 간격, 환경 수, 솔버 설정, 정확도 기준과 메모리 측정 방식을 함께 고정해야 한다.
+        </div>
+      </section>
+
+      <section class="article-section" id="calibration">
+        <p class="section-kicker">06 · Sim-to-Real Loop</p>
+        <h2>좋은 시뮬레이터만큼 중요한 것은 좋은 자산이다</h2>
+        <p class="section-intro">Lightwheel의 발표는 시뮬레이션 정확도를 솔버만의 문제로 보지 않는다. 재료와 로봇의 파라미터를 측정하고, 실제 응답에 맞게 보정하고, 독립 데이터로 검증하는 과정이 필요하다.</p>
+
+        <figure class="figure full-bleed">
+          <img src="assets/eliyrbor1a8-ts-00-29-10.jpg" alt="자산 생성부터 모델 학습, 병렬 평가와 피드백으로 이어지는 RoboFinals 파이프라인">
+          <figcaption><b>00:29:10</b> 자산·로봇 식별, 데이터 생성, 학습, 병렬 평가와 피드백이 순환하는 RoboFinals.</figcaption>
+        </figure>
+
+        <div class="diagram full-bleed" aria-label="시뮬레이션 평가 폐루프">
+          <p class="diagram-title">Closed-loop model development</p>
+          <div class="pipeline">
+            <div class="pipeline-step">
+              <small>Calibrate</small>
+              <b>자산·로봇 파라미터 식별</b>
+            </div>
+            <div class="pipeline-step">
+              <small>Generate</small>
+              <b>시연과 합성 관측 생성</b>
+            </div>
+            <div class="pipeline-step">
+              <small>Train</small>
+              <b>정책·기반 모델 학습</b>
+            </div>
+            <div class="pipeline-step">
+              <small>Evaluate</small>
+              <b>환경 변형 병렬 평가</b>
+            </div>
+            <div class="pipeline-step">
+              <small>Feedback</small>
+              <b>실패 기반 다음 데이터 결정</b>
+            </div>
+          </div>
+        </div>
+
+        <h3>물성 파라미터를 실제 응답에 맞춘다</h3>
+        <div class="figure-grid full-bleed">
+          <figure class="figure">
+            <img src="assets/eliyrbor1a8-ts-00-32-05.jpg" alt="실제 자산 측정 또는 CAD 입력에서 파라미터 최적화와 검증으로 이어지는 Assets Sim2Real 파이프라인">
+            <figcaption><b>00:32:05</b> 실측 또는 CAD 자산을 출발점으로 시뮬레이션 파라미터를 최적화한다.</figcaption>
+          </figure>
+          <figure class="figure">
+            <img src="assets/eliyrbor1a8-ts-00-33-38.jpg" alt="실제 케이블과 시뮬레이션 케이블의 초기 진동 및 감쇠 곡선 비교">
+            <figcaption><b>00:33:38</b> 빠른 초기 진동과 느린 감쇠를 함께 맞추는 케이블 보정 사례.</figcaption>
+          </figure>
+        </div>
+
+        <p>케이블처럼 여러 시간 스케일을 가진 자산은 보정이 어렵다. 초기에는 빠르게 진동하고 이후에는 천천히 감쇠한다. 한쪽 응답만 맞추면 다른 구간에서 오차가 커질 수 있다. 발표는 VBD 기반 시뮬레이션과 파라미터 최적화를 통해 두 응답을 함께 근사하는 사례를 제시한다.</p>
+
+        <figure class="figure full-bleed">
+          <img src="assets/eliyrbor1a8-ts-00-34-02.jpg" alt="실제 로봇과 시뮬레이션 로봇의 액추에이터 선택, 데이터 수집, 시스템 식별과 검증 절차">
+          <figcaption><b>00:34:02</b> 공개 USD·URDF 모델도 실물과 같다고 가정하지 않고 관절과 액추에이터를 식별한다.</figcaption>
+        </figure>
+
+        <h3>데이터 생성에서 병렬 평가까지</h3>
+        <div class="figure-grid full-bleed">
+          <figure class="figure">
+            <img src="assets/eliyrbor1a8-ts-00-35-35.jpg" alt="Franka 계열 로봇으로 케이블 조작 시연을 수집하는 시뮬레이션 원격조작 화면">
+            <figcaption><b>00:35:35</b> 시뮬레이션 원격조작으로 반복 가능한 작업 시연을 생성한다.</figcaption>
+          </figure>
+          <figure class="figure">
+            <img src="assets/eliyrbor1a8-ts-00-36-23.jpg" alt="PCB 조작 작업을 여러 카메라 시점으로 동시에 렌더링한 화면">
+            <figcaption><b>00:36:23</b> 같은 물리 상태를 여러 시점에서 렌더링해 비전 학습 데이터를 확장한다.</figcaption>
+          </figure>
+        </div>
+
+        <figure class="figure full-bleed">
+          <img src="assets/eliyrbor1a8-ts-00-36-58.jpg" alt="여러 로봇 정책 실행 화면과 성공률 및 진행 상태를 보여주는 RoboFinals 대시보드">
+          <figcaption><b>00:36:58</b> 여러 모델과 환경 변형을 병렬 평가하고 결과를 학습팀에 되돌리는 폐루프.</figcaption>
+        </figure>
+
+        <p>이 구조에서 시뮬레이터는 학습 데이터 생성기에 머물지 않는다. 서로 다른 모델을 동일한 조건과 환경 변형에서 실행하고, 실패 유형을 집계하며, 다음 학습 단계에 필요한 데이터를 결정하는 평가 인프라가 된다.</p>
+      </section>
+
+      <section class="article-section" id="implications">
+        <p class="section-kicker">07 · Implications</p>
+        <h2>Newton을 평가할 때 보아야 할 것</h2>
+        <p class="section-intro">프로젝트의 잠재력은 크지만, 발표에서 제시된 구조와 수치가 실제 연구·생산 환경의 신뢰성으로 이어지는지는 별도의 검증이 필요하다.</p>
+
+        <ul class="checklist">
+          <li><strong>강화학습:</strong> 환경 수와 메모리 효율 개선은 동일 하드웨어에서 더 많은 병렬 롤아웃과 도메인 랜덤화를 가능하게 할 수 있다.</li>
+          <li><strong>필드 로봇:</strong> 토사·눈·케이블·호스·탄성체를 함께 다루는 기능은 굴착, 정비, 현장 조작용 합성 데이터에 직접 연결된다.</li>
+          <li><strong>접촉 중심 조작:</strong> Hydroelastic contact와 촉각 모델은 비전만으로 판단하기 어려운 삽입, 미끄럼, 파지 안정성 연구에 유용하다.</li>
+          <li><strong>재현 가능한 수치 연구:</strong> Python 우선 API와 플러그형 솔버는 엔진 전체를 다시 작성하지 않고 접촉 모델과 수치 방법을 비교할 기반을 제공한다.</li>
+          <li><strong>평가 체계:</strong> 모델 성능 비교 전에 자산과 로봇의 보정 품질, 실패 조건, 환경 분포가 함께 정의돼야 한다.</li>
+        </ul>
+
+        <div class="table-wrap full-bleed">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">검증 질문</th>
+                <th scope="col">왜 중요한가</th>
+                <th scope="col">필요한 공개 정보</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>수치 안정성</td>
+                <td>강체·변형체 결합이 긴 학습 롤아웃에서도 발산하지 않아야 한다.</td>
+                <td>시간 간격, 반복 횟수, 실패율, 안정화 설정</td>
+              </tr>
+              <tr>
+                <td>결정론</td>
+                <td>병렬 GPU 실행의 편차는 실험 재현과 정책 비교에 영향을 준다.</td>
+                <td>동일 시드 반복 결과와 하드웨어별 편차</td>
+              </tr>
+              <tr>
+                <td>정확도 대비 속도</td>
+                <td>더 높은 FPS가 물리 오차 증가와 맞바뀌었는지 확인해야 한다.</td>
+                <td>오차 기준을 포함한 속도·메모리 동시 비교</td>
+              </tr>
+              <tr>
+                <td>Sim-to-real 유효성</td>
+                <td>시뮬레이션 성공률이 실제 성공률을 얼마나 예측하는지가 핵심이다.</td>
+                <td>독립 테스트 세트와 실제 장비 결과</td>
+              </tr>
+              <tr>
+                <td>자산 보정 비용</td>
+                <td>고정밀 자산을 만드는 비용이 확장성을 제한할 수 있다.</td>
+                <td>측정 장비, 수집 시간, 최적화 비용과 재사용 범위</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>특히 강체와 변형체의 coupling framework는 발표 시점에 실험적 기능으로 소개됐다. 대규모 강화학습에서의 장기 안정성, GPU 실행의 결정론, 미분 가능성, 복잡 접촉에서의 오차는 과제별로 확인해야 한다.</p>
+
+        <figure class="figure full-bleed">
+          <img src="assets/eliyrbor1a8-ts-00-38-06.jpg" alt="Newton의 오픈소스 물리 엔진, 플러그형 솔버, 재사용 기술 스택과 생산용 솔버를 정리한 결론 슬라이드">
+          <figcaption><b>00:38:06</b> 오픈소스, 가속된 연구개발, 재사용 기술 스택과 플러그형 구성 요소로 정리된 Newton의 핵심 메시지.</figcaption>
+        </figure>
+      </section>
+
+      <section class="ending">
+        <p class="section-kicker">Final Takeaway</p>
+        <h2>Newton의 진짜 실험은 ‘물리 엔진’보다 더 크다</h2>
+        <p>Newton이 제안하는 미래는 하나의 완벽한 솔버가 모든 로봇 문제를 해결하는 세계가 아니다. 서로 다른 물리 표현과 솔버, 접촉 생성기, 자산 스키마, 센서와 평가 도구가 공통 인터페이스 위에서 결합되는 세계다.</p>
+        <p>이 비전이 성공하려면 빠른 GPU 코드만으로는 부족하다. 실제 응답과 맞는 자산, 재현 가능한 벤치마크, 독립적인 정확도 검증, 실패를 다음 데이터로 전환하는 평가 루프가 함께 성숙해야 한다. Newton의 가장 중요한 기여는 바로 이 전체 문제를 하나의 오픈소스 연구 의제로 드러냈다는 데 있다.</p>
+        <div class="share-copy">
+          <strong>Share-ready summary</strong>
+          Newton은 강체와 변형체, 접촉과 센서, 자산 보정과 모델 평가를 하나의 GPU 우선 파이프라인으로 연결하려는 오픈소스 로봇 물리 엔진이다. 핵심은 단일 솔버의 속도보다 교체 가능한 구성 요소와 sim-to-real 폐루프에 있다.
+        </div>
+      </section>
+
+      <section class="source-notes" aria-labelledby="source-title">
+        <p class="section-kicker">Source Notes</p>
+        <h2 id="source-title">자료와 해석 기준</h2>
+        <ol>
+          <li><strong>주요 출처:</strong> NVIDIA Omniverse, “Newton: Open-Source GPU Physics for Robot Simulation | Physical AI Day at SIGGRAPH 2026,” 게시일 2026년 8월 12일, 길이 40분 41초. <a>원본 영상 보기</a>.</li>
+          <li><strong>발표자:</strong> Miles Macklin(NVIDIA), Louis Lian(Lightwheel).</li>
+          <li><strong>화면 근거:</strong> 이 글의 캡션과 슬라이드 설명은 제공된 영상 캡처에서 직접 확인되는 표기와 도식을 바탕으로 작성했다.</li>
+          <li><strong>발표 맥락:</strong> 기술의 목적과 사례 해석은 한국어 자동 자막과 영상 설명을 종합했다. 자동 자막의 고유명사 오류는 화면 표기를 우선해 보정했다.</li>
+          <li><strong>성능 수치:</strong> 2–3배 처리량, 3–4배 RL 메모리 절감, 5–10배 tiled camera 메모리 절감은 발표에서 제시된 자체 결과다. 독립 재현이나 보편적 성능 보장으로 해석해서는 안 된다.</li>
+          <li><strong>버전 주의:</strong> API, 지원 솔버와 실험 기능의 상태는 릴리스에 따라 달라질 수 있다. 실제 도입 전 공식 저장소와 문서에서 사용 버전을 기준으로 재확인해야 한다.</li>
+        </ol>
+
+        <div class="tags" aria-label="태그">
+          <span>#Newton</span>
+          <span>#PhysicalAI</span>
+          <span>#로봇시뮬레이션</span>
+          <span>#GPUPhysics</span>
+          <span>#SimToReal</span>
+          <span>#강화학습</span>
+          <span>#연구자료</span>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <span>Research report · Editorial edition · 2026</span>
+    <span>Source imagery: NVIDIA Omniverse presentation captures</span>
+  </footer>
+</body>
+</html>

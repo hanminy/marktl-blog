@@ -1,7 +1,25 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-18T01:30:44.259Z",
+  "updatedAt": "2026-08-18T01:36:39.729Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-newton-open-source-gpu-physics-for-robot-simulation-physical-ai-day-at-siggraph-2026-%EC%9A%94%EC%95%BD/",
+      "excerpt": "Newton: Open Source GPU Physics for Robot Simulation Physical AI Day at SIGGRAPH 2026 영상 정보 채널 : NVIDIA Omniverse 게시일 : 2026 08 12 길이 : 40:41 링크 : https://www.youtube.com/watch?v=ElIyRboR1A8 발표자 : Miles Macklin(NVIDIA), Louis Lian(Lightwhee",
+      "shortId": "1p49eg4",
+      "slug": "yt-newton-open-source-gpu-physics-for-robot-simulation-physical-ai-day-at-siggraph-2026-요약",
+      "sourcePath": "clippings/yt_Newton_Open-Source_GPU_Physics_for_Robot_Simulation_Physical_AI_Day_at_SIGGRAPH_2026_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료",
+        "로봇시뮬레이션",
+        "physical-ai",
+        "nvidia-newton"
+      ],
+      "title": "Newton: Open-Source GPU Physics for Robot Simulation | Physical AI Day at SIGGRAPH 2026",
+      "updatedAt": "2026-08-18T01:36:39.729Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/1p49eg4/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-the-next-era-of-earthmoving-%EC%9A%94%EC%95%BD/",
