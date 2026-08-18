@@ -1,0 +1,1389 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>굴착기는 어떻게 로봇이 되는가 — 건설 생산성을 바꾸는 자율 토공의 다음 시대</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      --paper: #f7f4ed;
+      --surface: #fffdf8;
+      --ink: #18211d;
+      --muted: #65706a;
+      --line: #d9ddd6;
+      --accent: #d76033;
+      --accent-dark: #9f3f1e;
+      --forest: #174d3b;
+      --forest-soft: #dcebe4;
+      --sand: #eee4d2;
+      --warning: #fff2cf;
+      --warning-line: #e3b64c;
+      --shadow: 0 18px 48px rgba(30, 45, 37, 0.09);
+      --radius: 22px;
+      --content: 760px;
+      --wide: 1120px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--paper);
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 86% 4%, rgba(215, 96, 51, 0.11), transparent 28rem),
+        radial-gradient(circle at 8% 18%, rgba(23, 77, 59, 0.09), transparent 32rem),
+        var(--paper);
+      font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+      font-size: 17px;
+      line-height: 1.82;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+
+    a {
+      color: var(--accent-dark);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.2em;
+    }
+
+    a:hover {
+      color: var(--accent);
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    .skip-link {
+      position: absolute;
+      top: -5rem;
+      left: 1rem;
+      z-index: 100;
+      padding: 0.65rem 1rem;
+      color: white;
+      background: var(--forest);
+      border-radius: 0 0 8px 8px;
+    }
+
+    .skip-link:focus {
+      top: 0;
+    }
+
+    .masthead {
+      position: relative;
+      min-height: 88vh;
+      display: grid;
+      align-items: end;
+      overflow: hidden;
+      color: white;
+      background: #102b22;
+    }
+
+    .masthead::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(9, 28, 22, 0.96) 0%, rgba(9, 28, 22, 0.81) 46%, rgba(9, 28, 22, 0.32) 78%, rgba(9, 28, 22, 0.45) 100%),
+        linear-gradient(0deg, rgba(9, 28, 22, 0.92) 0%, transparent 54%);
+    }
+
+    .masthead-media {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.88;
+    }
+
+    .masthead-inner {
+      position: relative;
+      z-index: 1;
+      width: min(var(--wide), calc(100% - 2.5rem));
+      margin: 0 auto;
+      padding: 6rem 0 5rem;
+    }
+
+    .eyebrow,
+    .section-kicker {
+      margin: 0 0 1rem;
+      color: #f6b390;
+      font-size: 0.76rem;
+      font-weight: 800;
+      line-height: 1.4;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .masthead h1 {
+      max-width: 900px;
+      margin: 0;
+      font-family: Georgia, "Noto Serif KR", "Batang", serif;
+      font-size: clamp(2.8rem, 7.4vw, 6.8rem);
+      font-weight: 700;
+      line-height: 0.99;
+      letter-spacing: -0.055em;
+      text-wrap: balance;
+    }
+
+    .dek {
+      max-width: 760px;
+      margin: 2rem 0 0;
+      color: rgba(255, 255, 255, 0.84);
+      font-size: clamp(1.08rem, 2vw, 1.38rem);
+      line-height: 1.65;
+    }
+
+    .byline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem 1.3rem;
+      margin-top: 2.2rem;
+      color: rgba(255, 255, 255, 0.69);
+      font-size: 0.86rem;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin-top: 1.4rem;
+    }
+
+    .tag {
+      padding: 0.34rem 0.7rem;
+      color: rgba(255, 255, 255, 0.84);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 999px;
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+    }
+
+    main {
+      padding-bottom: 6rem;
+    }
+
+    .article-grid {
+      display: grid;
+      grid-template-columns: minmax(0, var(--content)) minmax(220px, 280px);
+      gap: 5rem;
+      width: min(var(--wide), calc(100% - 2.5rem));
+      margin: 0 auto;
+    }
+
+    .article-body {
+      min-width: 0;
+    }
+
+    .sidebar {
+      position: relative;
+    }
+
+    .toc {
+      position: sticky;
+      top: 2rem;
+      margin-top: 5rem;
+      padding: 1.35rem;
+      background: rgba(255, 253, 248, 0.74);
+      border: 1px solid rgba(217, 221, 214, 0.85);
+      border-radius: 18px;
+      box-shadow: 0 12px 35px rgba(30, 45, 37, 0.05);
+      backdrop-filter: blur(10px);
+    }
+
+    .toc strong {
+      display: block;
+      margin-bottom: 0.8rem;
+      color: var(--forest);
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .toc ol {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: toc;
+    }
+
+    .toc li {
+      counter-increment: toc;
+      border-top: 1px solid var(--line);
+    }
+
+    .toc li:first-child {
+      border-top: 0;
+    }
+
+    .toc a {
+      display: grid;
+      grid-template-columns: 1.7rem 1fr;
+      padding: 0.62rem 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.45;
+      text-decoration: none;
+    }
+
+    .toc a::before {
+      content: "0" counter(toc);
+      color: var(--accent);
+      font-family: Georgia, serif;
+    }
+
+    .toc a:hover {
+      color: var(--ink);
+    }
+
+    .abstract {
+      position: relative;
+      margin: -2.6rem 0 4.8rem;
+      padding: 2.4rem 2.6rem;
+      background: var(--surface);
+      border-top: 5px solid var(--accent);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .abstract h2 {
+      margin: 0 0 0.8rem;
+      color: var(--forest);
+      font-size: 0.78rem;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .abstract p {
+      margin: 0;
+      font-family: Georgia, "Noto Serif KR", "Batang", serif;
+      font-size: 1.18rem;
+      line-height: 1.85;
+    }
+
+    section {
+      scroll-margin-top: 2rem;
+      margin: 5.5rem 0;
+    }
+
+    h2 {
+      margin: 0 0 1.45rem;
+      font-family: Georgia, "Noto Serif KR", "Batang", serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1.2;
+      letter-spacing: -0.038em;
+      text-wrap: balance;
+    }
+
+    h3 {
+      margin: 3.3rem 0 1rem;
+      color: var(--forest);
+      font-family: Georgia, "Noto Serif KR", "Batang", serif;
+      font-size: clamp(1.35rem, 2.5vw, 1.85rem);
+      line-height: 1.38;
+      letter-spacing: -0.025em;
+    }
+
+    p {
+      margin: 0 0 1.35rem;
+    }
+
+    .lead {
+      font-family: Georgia, "Noto Serif KR", "Batang", serif;
+      font-size: 1.23rem;
+      line-height: 1.88;
+    }
+
+    .lead::first-letter {
+      float: left;
+      margin: 0.08em 0.12em 0 0;
+      color: var(--accent);
+      font-size: 4.2rem;
+      font-weight: 700;
+      line-height: 0.82;
+    }
+
+    .video-card {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 1.25rem;
+      align-items: center;
+      margin: 2.2rem 0;
+      padding: 1rem;
+      background: var(--forest);
+      border-radius: 18px;
+      color: white;
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+
+    .video-card img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+
+    .video-card small {
+      display: block;
+      color: #9ed0bd;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .video-card strong {
+      display: block;
+      margin: 0.3rem 0;
+      font-family: Georgia, "Noto Serif KR", "Batang", serif;
+      font-size: 1.12rem;
+      line-height: 1.4;
+    }
+
+    .video-card span {
+      color: rgba(255, 255, 255, 0.69);
+      font-size: 0.82rem;
+    }
+
+    .notice {
+      margin: 2.4rem 0;
+      padding: 1.35rem 1.5rem;
+      background: var(--warning);
+      border-left: 4px solid var(--warning-line);
+      border-radius: 0 14px 14px 0;
+      color: #594821;
+      font-size: 0.91rem;
+    }
+
+    .notice strong {
+      display: block;
+      margin-bottom: 0.35rem;
+      color: #392c11;
+    }
+
+    .finding-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .finding {
+      padding: 1.35rem;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+
+    .finding .number {
+      display: block;
+      color: var(--accent);
+      font-family: Georgia, serif;
+      font-size: 1.9rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .finding strong {
+      display: block;
+      margin: 0.65rem 0 0.35rem;
+      color: var(--forest);
+      font-size: 1.02rem;
+    }
+
+    .finding p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.65;
+    }
+
+    .pullquote {
+      position: relative;
+      margin: 4rem -4rem;
+      padding: 2.6rem 4rem;
+      color: white;
+      background: var(--forest);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .pullquote::before {
+      content: "“";
+      position: absolute;
+      top: -0.28em;
+      left: 0.22em;
+      color: rgba(255, 255, 255, 0.14);
+      font-family: Georgia, serif;
+      font-size: 9rem;
+      line-height: 1;
+    }
+
+    .pullquote p {
+      position: relative;
+      margin: 0;
+      font-family: Georgia, "Noto Serif KR", "Batang", serif;
+      font-size: clamp(1.45rem, 3vw, 2.25rem);
+      font-weight: 700;
+      line-height: 1.48;
+      letter-spacing: -0.025em;
+    }
+
+    .system-map {
+      margin: 2.5rem 0;
+      padding: 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+    }
+
+    .system-map ol {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.7rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: process;
+    }
+
+    .system-map li {
+      position: relative;
+      min-height: 130px;
+      padding: 1rem;
+      background: var(--forest-soft);
+      border-radius: 13px;
+      counter-increment: process;
+    }
+
+    .system-map li::before {
+      content: "0" counter(process);
+      display: block;
+      margin-bottom: 0.55rem;
+      color: var(--accent);
+      font-family: Georgia, serif;
+      font-weight: 700;
+    }
+
+    .system-map li:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      top: 50%;
+      right: -0.78rem;
+      z-index: 2;
+      color: var(--accent);
+      font-weight: 800;
+      transform: translateY(-50%);
+    }
+
+    .system-map strong {
+      display: block;
+      color: var(--forest);
+      font-size: 0.9rem;
+    }
+
+    .system-map span {
+      display: block;
+      margin-top: 0.3rem;
+      color: var(--muted);
+      font-size: 0.75rem;
+      line-height: 1.5;
+    }
+
+    .evidence-chapter {
+      margin: 4rem 0;
+      padding-top: 1rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .chapter-head {
+      display: grid;
+      grid-template-columns: 4rem 1fr;
+      gap: 1rem;
+      align-items: start;
+      margin-bottom: 1.8rem;
+    }
+
+    .chapter-index {
+      color: var(--accent);
+      font-family: Georgia, serif;
+      font-size: 3.4rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .chapter-head h3 {
+      margin: 0;
+    }
+
+    .chapter-head p {
+      margin: 0.45rem 0 0;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    figure {
+      margin: 2.7rem 0;
+    }
+
+    figure img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      background: #d8d9d4;
+      border-radius: 18px;
+      box-shadow: 0 14px 40px rgba(30, 45, 37, 0.12);
+    }
+
+    figcaption {
+      display: grid;
+      grid-template-columns: 6rem 1fr;
+      gap: 1.2rem;
+      margin-top: 0.9rem;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.65;
+    }
+
+    .timestamp {
+      color: var(--accent-dark);
+      font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    figcaption strong {
+      color: var(--ink);
+    }
+
+    .evidence-pair {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.2rem;
+      margin: 2.4rem 0;
+    }
+
+    .evidence-pair figure {
+      margin: 0;
+    }
+
+    .evidence-pair figcaption {
+      display: block;
+    }
+
+    .evidence-pair .timestamp {
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+
+    .data-table {
+      width: 100%;
+      margin: 2rem 0;
+      border-collapse: collapse;
+      background: var(--surface);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(30, 45, 37, 0.05);
+      overflow: hidden;
+      font-size: 0.88rem;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 1rem;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .data-table th {
+      color: white;
+      background: var(--forest);
+      font-size: 0.76rem;
+      letter-spacing: 0.04em;
+    }
+
+    .data-table td:nth-child(2) {
+      color: var(--accent-dark);
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .metric-diagram {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 1rem;
+      align-items: stretch;
+      margin: 2.5rem 0;
+    }
+
+    .metric-card {
+      padding: 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+
+    .metric-card b {
+      display: block;
+      color: var(--accent);
+      font-family: Georgia, serif;
+      font-size: 2.15rem;
+      line-height: 1;
+    }
+
+    .metric-card strong {
+      display: block;
+      margin: 0.6rem 0;
+      color: var(--forest);
+    }
+
+    .metric-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.83rem;
+      line-height: 1.65;
+    }
+
+    .metric-plus {
+      align-self: center;
+      color: var(--accent);
+      font-family: Georgia, serif;
+      font-size: 2.1rem;
+      font-weight: 700;
+    }
+
+    .implications {
+      margin-top: 2.5rem;
+      padding: 0;
+      list-style: none;
+      counter-reset: implication;
+    }
+
+    .implications li {
+      display: grid;
+      grid-template-columns: 3.6rem 1fr;
+      gap: 1rem;
+      padding: 1.25rem 0;
+      border-top: 1px solid var(--line);
+      counter-increment: implication;
+    }
+
+    .implications li::before {
+      content: "0" counter(implication);
+      color: var(--accent);
+      font-family: Georgia, serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .implications strong {
+      color: var(--forest);
+    }
+
+    .share-box {
+      margin: 4.5rem 0 0;
+      padding: 2rem;
+      background: var(--sand);
+      border-radius: var(--radius);
+    }
+
+    .share-box h2 {
+      font-size: 1.6rem;
+    }
+
+    .copy-ready {
+      margin: 1rem 0 0;
+      padding: 1.2rem;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px dashed #bda987;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      user-select: all;
+    }
+
+    .source-notes {
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .source-notes ol {
+      padding-left: 1.25rem;
+    }
+
+    .source-notes li {
+      margin-bottom: 0.8rem;
+    }
+
+    .closing {
+      margin-top: 5rem;
+      padding: 4rem 2rem;
+      color: white;
+      background: var(--forest);
+      border-radius: var(--radius);
+      text-align: center;
+    }
+
+    .closing p {
+      max-width: 650px;
+      margin: 1rem auto 0;
+      color: rgba(255, 255, 255, 0.74);
+    }
+
+    .closing strong {
+      display: block;
+      max-width: 700px;
+      margin: 0 auto;
+      font-family: Georgia, "Noto Serif KR", "Batang", serif;
+      font-size: clamp(1.65rem, 4vw, 2.8rem);
+      line-height: 1.42;
+      letter-spacing: -0.025em;
+    }
+
+    footer {
+      width: min(var(--wide), calc(100% - 2.5rem));
+      margin: 0 auto;
+      padding: 2rem 0 4rem;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      font-size: 0.76rem;
+      text-align: center;
+    }
+
+    @media (max-width: 980px) {
+      .article-grid {
+        display: block;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .pullquote {
+        margin-right: 0;
+        margin-left: 0;
+      }
+    }
+
+    @media (max-width: 680px) {
+      body {
+        font-size: 16px;
+        word-break: normal;
+      }
+
+      .masthead {
+        min-height: 80vh;
+      }
+
+      .masthead-inner {
+        width: min(100% - 1.5rem, var(--wide));
+        padding-bottom: 3rem;
+      }
+
+      .article-grid {
+        width: min(100% - 1.5rem, var(--wide));
+      }
+
+      .abstract {
+        padding: 1.5rem;
+      }
+
+      .finding-grid,
+      .evidence-pair,
+      .system-map ol,
+      .metric-diagram {
+        grid-template-columns: 1fr;
+      }
+
+      .system-map li:not(:last-child)::after {
+        content: "↓";
+        top: auto;
+        right: 50%;
+        bottom: -1.25rem;
+        transform: translateX(50%);
+      }
+
+      .metric-plus {
+        text-align: center;
+      }
+
+      .video-card {
+        grid-template-columns: 1fr;
+      }
+
+      .video-card img {
+        max-height: 220px;
+      }
+
+      .pullquote {
+        padding: 2rem 1.5rem;
+      }
+
+      .chapter-head {
+        grid-template-columns: 3rem 1fr;
+      }
+
+      .chapter-index {
+        font-size: 2.5rem;
+      }
+
+      figcaption {
+        display: block;
+      }
+
+      .timestamp {
+        display: block;
+        margin-bottom: 0.25rem;
+      }
+
+      .data-table {
+        display: block;
+        overflow-x: auto;
+      }
+
+      .implications li {
+        grid-template-columns: 2.5rem 1fr;
+      }
+    }
+
+    @media print {
+      body {
+        color: #111;
+        background: white;
+      }
+
+      .masthead {
+        min-height: auto;
+        color: #111;
+        background: white;
+      }
+
+      .masthead-media,
+      .masthead::after,
+      .sidebar,
+      .tag-row {
+        display: none;
+      }
+
+      .masthead-inner {
+        padding: 3rem 0;
+      }
+
+      .dek,
+      .byline {
+        color: #444;
+      }
+
+      .abstract {
+        margin-top: 0;
+        box-shadow: none;
+      }
+
+      figure,
+      .finding,
+      .metric-card {
+        break-inside: avoid;
+      }
+
+      .pullquote,
+      .closing {
+        color: #111;
+        background: #eee;
+        box-shadow: none;
+      }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="The Next Era of Earthmoving: How Robotic Intelligence is Transforming Construction Productivity">
+<meta property="og:description" content="The Next Era of Earthmoving: How Robotic Intelligence is Transforming Construction Productivity 영상 정보 채널 : conexpoconagg 발표자 : Ryan Luke Johns (Gravis Robotics CEO·공동창업자) 게시일 : 2026 03 20 원래 스트리밍 일시 : 2026 03 04 11:00 PT 길이 : 41:07 링크 : htt">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/i8557o/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/i8557o/assets/e3itlbmiucm-ts-00-00-42.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Next Era of Earthmoving: How Robotic Intelligence is Transforming Construction Productivity">
+<meta name="twitter:description" content="The Next Era of Earthmoving: How Robotic Intelligence is Transforming Construction Productivity 영상 정보 채널 : conexpoconagg 발표자 : Ryan Luke Johns (Gravis Robotics CEO·공동창업자) 게시일 : 2026 03 20 원래 스트리밍 일시 : 2026 03 04 11:00 PT 길이 : 41:07 링크 : htt">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/i8557o/assets/e3itlbmiucm-ts-00-00-42.jpg">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-the-next-era-of-earthmoving-%EC%9A%94%EC%95%BD/">
+</head>
+<body>
+  <a class="skip-link" href="#article">본문으로 이동</a>
+
+  <header class="masthead">
+    <img class="masthead-media" src="assets/e3itlbmiucm-ts-00-40-25.jpg" alt="토사를 옮기는 자율 굴착기의 항공 장면">
+    <div class="masthead-inner">
+      <p class="eyebrow">Research Report · Construction Robotics</p>
+      <h1>굴착기는<br>어떻게 로봇이 되는가</h1>
+      <p class="dek">자율 굴착부터 실시간 3D 측량, 증강현실 안내, 원격 개입까지—건설 생산성의 다음 시대를 만드는 ‘작업자 중심 자동화’를 해부한다.</p>
+      <div class="byline">
+        <span>Ryan Luke Johns 발표 분석</span>
+        <span>Gravis Robotics CEO·공동창업자</span>
+        <time datetime="2026-08-18">2026. 08. 18.</time>
+        <span>읽는 시간 약 18분</span>
+      </div>
+      <div class="tag-row" aria-label="주제">
+        <span class="tag">건설로봇</span>
+        <span class="tag">자율굴착</span>
+        <span class="tag">로보틱 인텔리전스</span>
+        <span class="tag">생산성</span>
+      </div>
+    </div>
+  </header>
+
+  <main id="article">
+    <div class="article-grid">
+      <article class="article-body">
+        <aside class="abstract" aria-labelledby="abstract-title">
+          <h2 id="abstract-title">Abstract</h2>
+          <p>Gravis Robotics는 기존 굴착기와 휠로더에 센서·연산·제어 장치를 덧붙여 자율 굴착, 실시간 측량, 작업 안내와 원격 개입을 하나의 플랫폼으로 통합한다. 이 접근의 핵심은 사람을 장비에서 제거하는 데 있지 않다. 반복적이고 위험한 작업은 기계가 맡고, 한 명의 숙련 작업자가 여러 장비의 예외와 의사결정을 관리하도록 생산성의 단위를 재설계하는 데 있다.</p>
+        </aside>
+
+        <section id="overview">
+          <p class="section-kicker">01 · The proposition</p>
+          <h2>무인 굴착기보다 중요한 질문</h2>
+          <p class="lead">굴착기는 단순히 정해진 길을 따라 움직이지 않는다. 버킷으로 토양을 밀고 당기며 작업 환경 자체를 계속 바꾼다. 그래서 자율 굴착은 자율주행의 변형이 아니라, 불확실한 재료와 유압 장비를 동시에 다루는 로봇 조작 문제다.</p>
+          <p>Gravis Robotics의 해법은 새 장비를 처음부터 만드는 것이 아니다. 여러 제조사의 기존 장비에 공통 센서 랙과 제어 장치를 설치하고, 작업자는 태블릿 기반 인터페이스로 수동 안내에서 자율 작업과 원격 개입까지 단계적으로 이동한다.</p>
+
+          <a class="video-card" target="_blank" rel="noopener noreferrer" aria-label="YouTube에서 원본 발표 보기">
+            <img src="assets/e3itlbmiucm-ts-00-39-13.jpg" alt="CONEXPO 현장 시연 안내 화면">
+            <span>
+              <small>Source presentation · 41:07</small>
+              <strong>The Next Era of Earthmoving: How Robotic Intelligence is Transforming Construction Productivity</strong>
+              <span>conexpoconagg · 2026년 3월 20일 게시 · YouTube에서 보기 ↗</span>
+            </span>
+          </a>
+
+          <div class="notice">
+            <strong>근거와 해석 범위</strong>
+            이 보고서는 발표 영상 화면, 영상 설명과 영어 자동 자막을 바탕으로 작성했다. 접근 가능한 영상은 360p였고 한국어 자동 자막은 YouTube의 HTTP 429 제한으로 확보하지 못했다. 발표자가 제시한 생산성·시장·에너지 수치는 독립 자료로 재검증하지 않았으므로, 회사가 공개한 사례와 주장으로 읽어야 한다.
+          </div>
+        </section>
+
+        <section id="findings">
+          <p class="section-kicker">02 · Key findings</p>
+          <h2>여섯 가지 핵심 발견</h2>
+          <div class="finding-grid">
+            <article class="finding">
+              <span class="number">01</span>
+              <strong>개조형 플랫폼이 시장 진입을 앞당긴다</strong>
+              <p>새 자율 장비 대신 기존 6~40톤급 장비를 개조해 브랜드와 현장 유형을 가로지른다.</p>
+            </article>
+            <article class="finding">
+              <span class="number">02</span>
+              <strong>굴착은 이동보다 조작의 문제다</strong>
+              <p>토질, 하중, 유압 지연과 장비 편차에 실시간으로 적응해야 한다.</p>
+            </article>
+            <article class="finding">
+              <span class="number">03</span>
+              <strong>버킷 충전율이 생산성을 좌우한다</strong>
+              <p>회전과 덤프 시간이 비슷하다면 한 사이클에 얼마나 많이 담는지가 처리량을 결정한다.</p>
+            </article>
+            <article class="finding">
+              <span class="number">04</span>
+              <strong>시뮬레이션이 현장 데이터 부족을 보완한다</strong>
+              <p>수천 대의 가상 장비로 토양과 유압 조건을 병렬 학습해 제어 정책을 일반화한다.</p>
+            </article>
+            <article class="finding">
+              <span class="number">05</span>
+              <strong>Copilot은 제품이자 데이터 전략이다</strong>
+              <p>측량과 안전 보조부터 배치해 현장 데이터를 모으고 자율 기능을 점진적으로 개선한다.</p>
+            </article>
+            <article class="finding">
+              <span class="number">06</span>
+              <strong>경제성은 ‘한 사람, 여러 장비’에서 나온다</strong>
+              <p>완전 무인화보다 개입 빈도와 해결 시간을 낮춰 작업자의 관리 범위를 넓히는 것이 중요하다.</p>
+            </article>
+          </div>
+        </section>
+
+        <blockquote class="pullquote">
+          <p>건설 자동화의 목표는 사람을 현장에서 지우는 것이 아니라, 사람의 판단이 가장 필요한 순간에 집중되도록 만드는 것이다.</p>
+        </blockquote>
+
+        <section id="architecture">
+          <p class="section-kicker">03 · System architecture</p>
+          <h2>센서에서 원격 개입까지, 하나의 폐쇄 루프</h2>
+          <p>플랫폼은 주변을 감지하고, 현재 지형을 목표 설계면과 비교한 뒤, 장비를 제어하고 작업자에게 결과를 되돌려준다. 자동화가 실패하거나 특이 상황이 나타나면 같은 인터페이스에서 사람이 개입한다.</p>
+
+          <div class="system-map" role="img" aria-label="자율 굴착 시스템의 감지, 이해, 실행, 개입 과정">
+            <ol>
+              <li><strong>감지</strong><span>라이다·카메라·GPS·유압 압력으로 장비와 현장을 읽는다.</span></li>
+              <li><strong>이해</strong><span>실시간 지형, 토양 저항, 목표 설계면과 장애물을 비교한다.</span></li>
+              <li><strong>실행</strong><span>굴착·주행·적재 정책이 밸브와 전자유압 제어를 구동한다.</span></li>
+              <li><strong>개입</strong><span>Slate에서 안내·감시·무선 정지·원격 조작을 수행한다.</span></li>
+            </ol>
+          </div>
+
+          <figure>
+            <img src="assets/e3itlbmiucm-ts-00-00-42.jpg" alt="Gravis Rack의 감지, 연산, 네트워크와 인터페이스 계층" loading="lazy">
+            <figcaption>
+              <span class="timestamp">00:00:42</span>
+              <span><strong>Gravis Rack.</strong> 전면 라이다와 카메라, 후방 GPS 마스트, 연산·네트워크 모듈을 장비 상부에 통합한다. 전자유압 장비뿐 아니라 별도 밸브 블록을 추가한 기존 파일럿 유압 장비도 개조 대상으로 삼는다.</span>
+            </figcaption>
+          </figure>
+
+          <div class="evidence-pair">
+            <figure>
+              <img src="assets/e3itlbmiucm-ts-00-01-20.jpg" alt="트렌칭, 벌크 굴착과 적재 작업 사례" loading="lazy">
+              <figcaption><span class="timestamp">00:01:20</span><strong>하나의 키트, 여러 작업.</strong> 주행, 굴착, 트렌칭, 벌크 굴착, 트럭·호퍼·스크리너 적재를 공통 플랫폼에서 수행한다.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/e3itlbmiucm-ts-00-02-36.jpg" alt="굴착기와 로더 시장 규모를 설명하는 발표 자료" loading="lazy">
+              <figcaption><span class="timestamp">00:02:36</span><strong>큰 자동화 표면.</strong> 발표자는 굴착기와 로더가 핵심 토공 장비 판매의 약 90%를 차지하며 매년 약 100만 대가 생산된다고 주장한다.</figcaption>
+            </figure>
+          </div>
+
+          <figure>
+            <img src="assets/e3itlbmiucm-ts-00-03-44.jpg" alt="장비의 주행과 굴착 조작을 대비한 발표 화면" loading="lazy">
+            <figcaption>
+              <span class="timestamp">00:03:44</span>
+              <span><strong>운송 문제가 아니라 조작 문제.</strong> 정해진 경로를 따라가는 장비와 달리 굴착기는 토질을 느끼고 환경을 변형한다. 인식과 계획뿐 아니라 재료 접촉에 적응하는 폐쇄 루프 제어가 필요하다.</span>
+            </figcaption>
+          </figure>
+        </section>
+
+        <section id="robotics">
+          <p class="section-kicker">04 · From research to field robotics</p>
+          <h2>돌을 쌓던 연구가 토공 플랫폼으로 이어지다</h2>
+          <p>창업팀의 기술적 뿌리는 ETH Zurich와 DARPA Subterranean Challenge의 보행 로봇 연구에 있다. 복잡한 지형에서 균형을 잡는 문제는 23축 스파이더 굴착기의 이동과 유압 제어로 확장됐고, 다시 비정형 재료를 인식하고 배치하는 자율 시공 연구로 이어졌다.</p>
+
+          <div class="evidence-pair">
+            <figure>
+              <img src="assets/e3itlbmiucm-ts-00-06-41.jpg" alt="복잡한 지형을 이동하는 스파이더 굴착기 연구" loading="lazy">
+              <figcaption><span class="timestamp">00:06:41</span><strong>보행 로봇에서 굴착기로.</strong> 균형·이동·접촉 제어 경험을 다축 유압 장비에 적용했다.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/e3itlbmiucm-ts-00-08-13.jpg" alt="비정형 석재를 스캔해 쌓는 로봇 굴착기" loading="lazy">
+              <figcaption><span class="timestamp">00:08:13</span><strong>불규칙한 돌을 계산 가능한 재료로.</strong> 돌을 스캔해 메시를 만들고 안정적인 배치를 계획한 뒤 결과를 다시 측정한다.</figcaption>
+            </figure>
+          </div>
+
+          <figure>
+            <img src="assets/e3itlbmiucm-ts-00-09-22.jpg" alt="완성된 돌 구조물 앞에서 작업하는 스파이더 굴착기" loading="lazy">
+            <figcaption>
+              <span class="timestamp">00:09:22</span>
+              <span><strong>석축의 디지털 트윈.</strong> 각 돌의 형상과 위치를 기록해 완성 구조물의 공극률까지 계산할 수 있다. 숙련자의 감각에 의존하던 재료 배치를 측정·계획 가능한 과정으로 바꾼 사례다.</span>
+            </figcaption>
+          </figure>
+
+          <figure>
+            <img src="assets/e3itlbmiucm-ts-00-10-45.jpg" alt="공원 규모 석재 구조물과 로봇 시공 과정" loading="lazy">
+            <figcaption>
+              <span class="timestamp">00:10:45</span>
+              <span><strong>저가공 재료의 가능성.</strong> 발표자는 이 석재 구조물이 동등한 성능의 얇은 콘크리트 벽보다 투입 에너지가 약 78% 적었다고 주장한다. 비교 범위와 전과정평가 조건은 영상에서 충분히 제시되지 않았다.</span>
+            </figcaption>
+          </figure>
+        </section>
+
+        <section id="learning">
+          <p class="section-kicker">05 · Learning to dig</p>
+          <h2>유압 장비는 왜 학습해야 하는가</h2>
+          <p>같은 모델의 굴착기라도 온도, 마찰, 제조 공차와 마모 상태에 따라 반응이 다르다. 하나의 펌프를 공유하는 축들은 서로 영향을 주고, 버킷 하중과 토질은 매 순간 바뀐다. 미리 정한 궤적을 반복하는 방식만으로는 이런 차이를 흡수하기 어렵다.</p>
+
+          <figure>
+            <img src="assets/e3itlbmiucm-ts-00-11-40.jpg" alt="굴착기의 유압과 기구적 불확실성을 설명하는 도식" loading="lazy">
+            <figcaption>
+              <span class="timestamp">00:11:40</span>
+              <span><strong>제어의 불확실성.</strong> 다단 유압의 지연과 데드존, 공유 펌프의 축 결합, 온도와 마찰 변화, 장비 편차와 토양 저항이 동시에 작용한다.</span>
+            </figcaption>
+          </figure>
+
+          <div class="evidence-pair">
+            <figure>
+              <img src="assets/e3itlbmiucm-ts-00-13-37.jpg" alt="가상 환경과 실제 장비의 굴착 학습 장면" loading="lazy">
+              <figcaption><span class="timestamp">00:13:37</span><strong>시뮬레이션 우선.</strong> 웹 규모의 실제 로봇 데이터가 없는 상황에서 수천 대의 가상 장비를 병렬 학습시킨다.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/e3itlbmiucm-ts-00-14-53.jpg" alt="서로 다른 지형과 버킷 조건의 병렬 시뮬레이션" loading="lazy">
+              <figcaption><span class="timestamp">00:14:53</span><strong>조건의 무작위화.</strong> 지형·버킷·유압 특성을 다양하게 바꿔 실제 현장에서 일반화할 수 있는 정책을 만든다.</figcaption>
+            </figure>
+          </div>
+
+          <figure>
+            <img src="assets/e3itlbmiucm-ts-00-15-39.jpg" alt="여러 토질에서 버킷을 채우는 적응형 굴착 정책" loading="lazy">
+            <figcaption>
+              <span class="timestamp">00:15:39</span>
+              <span><strong>가득 찬 버킷을 보상으로.</strong> 연약토, 다짐토, 경질토와 숨은 암석에서 유압 압력과 장비 반응을 읽는다. 저항이 커지면 버킷을 들어 올렸다가 다시 파고드는 행동도 학습한다.</span>
+            </figcaption>
+          </figure>
+
+          <figure>
+            <img src="assets/e3itlbmiucm-ts-00-17-46.jpg" alt="토질별 버킷 충전 사례와 생산성 메시지" loading="lazy">
+            <figcaption>
+              <span class="timestamp">00:17:46</span>
+              <span><strong>생산성의 직접 변수.</strong> 회전과 덤프 시간이 비교적 일정하다면 평균 버킷 충전율과 전체 사이클 시간이 시간당 처리량을 결정한다.</span>
+            </figcaption>
+          </figure>
+        </section>
+
+        <section id="field-evidence">
+          <p class="section-kicker">06 · Field evidence</p>
+          <h2>현장 수치는 고무적이지만 아직 ‘주장’이다</h2>
+          <p>발표는 여러 브랜드와 국가의 배치 사례를 제시한다. 일부 작업에서 사람 운전자 대비 약 30%의 생산성 증가가 관찰됐고, 한 채석장에서는 스크리너가 새로운 병목이 됐다고 설명한다. 그러나 비교 조건과 측정 방법이 충분히 공개되지 않아 결과의 일반화에는 주의가 필요하다.</p>
+
+          <div class="evidence-pair">
+            <figure>
+              <img src="assets/e3itlbmiucm-ts-00-18-35.jpg" alt="여러 브랜드 굴착 장비와 생산성 향상 사례" loading="lazy">
+              <figcaption><span class="timestamp">00:18:35</span><strong>최대 약 30% 향상 주장.</strong> 20일에서 한 달가량 비교한 일부 작업의 결과이며, 발표자도 토질과 작업에 따른 편차를 인정한다.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/e3itlbmiucm-ts-00-19-43.jpg" alt="굴착과 적재 작업의 여러 실제 배치 사례" loading="lazy">
+              <figcaption><span class="timestamp">00:19:43</span><strong>다양한 배치 경험.</strong> 12개 이상 브랜드, 10개 이상 장비 크기·유형과 7개국의 데이터를 통해 일반화를 시도한다.</figcaption>
+            </figure>
+          </div>
+
+          <div class="evidence-pair">
+            <figure>
+              <img src="assets/e3itlbmiucm-ts-00-20-24.jpg" alt="아르헨티나 파이프라인 현장의 굴착기" loading="lazy">
+              <figcaption><span class="timestamp">00:20:24</span><strong>아르헨티나 파이프라인.</strong> 60마일 공사에 36톤급 Cat 굴착기 두 대를 투입해 얕은 암반과 인접 관로가 있는 지반을 굴착했다.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/e3itlbmiucm-ts-00-21-09.jpg" alt="영국 채석장에서 스크리너에 재료를 공급하는 굴착기" loading="lazy">
+              <figcaption><span class="timestamp">00:21:09</span><strong>병목의 이동.</strong> 영국 Holcim 채석장에서는 목표 처리량을 33% 초과해 스크리너 용량이 병목이 됐다고 발표했다.</figcaption>
+            </figure>
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>발표 지표</th>
+                <th>제시 수치</th>
+                <th>해석 시 주의점</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>굴착기·로더 판매 비중</td>
+                <td>약 90%</td>
+                <td>발표자 산정 기준이며 외부 검증 자료가 제시되지 않았다.</td>
+              </tr>
+              <tr>
+                <td>연간 신규 운전 역량</td>
+                <td>약 105억 시간</td>
+                <td>연 100만 대와 장비당 생애 1만 시간을 결합한 개념적 계산이다.</td>
+              </tr>
+              <tr>
+                <td>석축 시공 투입 에너지</td>
+                <td>약 78% 감소</td>
+                <td>콘크리트 벽과의 비교 범위 및 전과정평가 조건이 불명확하다.</td>
+              </tr>
+              <tr>
+                <td>일부 작업 생산성</td>
+                <td>약 30% 증가</td>
+                <td>토질, 작업, 비교 운전자와 측정 기간에 따라 결과가 달라질 수 있다.</td>
+              </tr>
+              <tr>
+                <td>영국 채석장 목표 초과</td>
+                <td>33%</td>
+                <td>스크리너 용량이 병목으로 이동한 개별 현장 사례다.</td>
+              </tr>
+              <tr>
+                <td>장비 크기 축소 가능성</td>
+                <td>생산능력 15%당 1단계</td>
+                <td>표준화된 설계 규칙이 아니라 발표자가 제시한 운영 경험칙이다.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="operator">
+          <p class="section-kicker">07 · Human-centered deployment</p>
+          <h2>작업자는 운전실에서 한 번에 사라지지 않는다</h2>
+          <p>Gravis가 제시하는 도입 경로는 수동 운전과 완전 자율 사이를 여러 단계로 나눈다. 작업자는 먼저 실시간 측량과 안전 안내를 사용한다. 이후 장비 밖에서 자율 작업을 시작하고 감시하다가, 예외가 발생하면 원격 조작으로 개입한다.</p>
+
+          <div class="evidence-pair">
+            <figure>
+              <img src="assets/e3itlbmiucm-ts-00-21-57.jpg" alt="굴착기 운전실에 설치된 Slate 태블릿" loading="lazy">
+              <figcaption><span class="timestamp">00:21:57</span><strong>운전실의 Slate.</strong> 현장 지식을 가진 작업자가 즉시 이해할 수 있는 인터페이스를 자동화의 출발점으로 삼는다.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/e3itlbmiucm-ts-00-22-34.jpg" alt="Gravis Rack과 작업자용 Slate의 구조" loading="lazy">
+              <figcaption><span class="timestamp">00:22:34</span><strong>기계와 사람의 연결.</strong> 라이다가 매초 지형을 스캔하고 목표 모델과 비교한 정보를 태블릿에 표시한다.</figcaption>
+            </figure>
+          </div>
+
+          <figure>
+            <img src="assets/e3itlbmiucm-ts-00-24-15.jpg" alt="Slate의 실시간 3D 측량과 컷 필 안내 화면" loading="lazy">
+            <figcaption>
+              <span class="timestamp">00:24:15</span>
+              <span><strong>측량과 작업 안내.</strong> 파란색은 추가 굴착, 초록색은 목표면, 노랑과 빨강은 성토가 필요한 영역을 뜻한다. 버킷 평면의 실제 지형 단면도 함께 표시해 과굴착과 재측량을 줄인다.</span>
+            </figcaption>
+          </figure>
+
+          <figure>
+            <img src="assets/e3itlbmiucm-ts-00-25-40.jpg" alt="카메라의 사람 인식 결과와 장비 주변 지도" loading="lazy">
+            <figcaption>
+              <span class="timestamp">00:25:40</span>
+              <span><strong>자율 기능 이전의 안전 가치.</strong> 사람 형상 인식, 상황 인지와 증강현실 안내는 수동 운전에서도 충돌과 매설물 위험을 줄이는 보조 기능으로 사용할 수 있다.</span>
+            </figcaption>
+          </figure>
+
+          <div class="evidence-pair">
+            <figure>
+              <img src="assets/e3itlbmiucm-ts-00-27-29.jpg" alt="운전실, 현장과 원격 위치를 잇는 Slate 사용 방식" loading="lazy">
+              <figcaption><span class="timestamp">00:27:29</span><strong>세 위치, 하나의 인터페이스.</strong> In-Cab Copilot, Site View와 Remote를 오가며 자동화를 점진적으로 채택한다.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/e3itlbmiucm-ts-00-28-42.jpg" alt="태블릿에서 작업을 지정하고 원격 조작하는 장면" loading="lazy">
+              <figcaption><span class="timestamp">00:28:42</span><strong>지정·감시·개입.</strong> 화면에서 작업 위치를 정하고 USB 조이스틱과 페달로 특이 상황에 개입한다. 무선 정지는 유압을 비활성화한다.</figcaption>
+            </figure>
+          </div>
+
+          <figure>
+            <img src="assets/e3itlbmiucm-ts-00-29-57.jpg" alt="자율 수준과 작업자 거리, 생산성의 관계를 나타낸 그래프" loading="lazy">
+            <figcaption>
+              <span class="timestamp">00:29:57</span>
+              <span><strong>자율성과 거리의 두 축.</strong> 원격 조작부터 시작하면 지연과 네트워크 문제로 생산성이 떨어질 수 있다. 발표자는 현장 가까이에서 자율 수준을 먼저 높이고 이후 작업자의 거리를 늘리는 경로를 선호한다.</span>
+            </figcaption>
+          </figure>
+        </section>
+
+        <section id="metrics">
+          <p class="section-kicker">08 · Operating economics</p>
+          <h2>MTBI와 MTTR: 다중 장비 운영을 결정하는 두 숫자</h2>
+          <p>완전 자율 여부만으로 시스템의 경제성을 판단하기는 어렵다. 개입이 얼마나 자주 필요한지, 그리고 문제가 생겼을 때 사람이 얼마나 빨리 해결할 수 있는지를 분리해 측정해야 한다.</p>
+
+          <div class="metric-diagram">
+            <article class="metric-card">
+              <b>MTBI</b>
+              <strong>개입 간 평균시간</strong>
+              <p>값이 길수록 장비가 중단 없이 작업하는 시간이 늘고 자율 처리량이 높아진다.</p>
+            </article>
+            <div class="metric-plus" aria-hidden="true">+</div>
+            <article class="metric-card">
+              <b>MTTR</b>
+              <strong>해결 평균시간</strong>
+              <p>값이 짧을수록 작업자가 장비에서 멀리 떨어져도 빠르게 예외를 처리할 수 있다.</p>
+            </article>
+          </div>
+
+          <figure>
+            <img src="assets/e3itlbmiucm-ts-00-32-20.jpg" alt="MTBI와 MTTR을 생산성 및 작업자 위치와 연결한 그래프" loading="lazy">
+            <figcaption>
+              <span class="timestamp">00:32:20</span>
+              <span><strong>두 지표가 함께 좋아져야 한다.</strong> 개입은 드물지만 해결에 몇 시간이 걸리는 시스템도, 해결은 빠르지만 몇 분마다 멈추는 시스템도 한 사람이 여러 장비를 관리하기 어렵다.</span>
+            </figcaption>
+          </figure>
+
+          <figure>
+            <img src="assets/e3itlbmiucm-ts-00-33-38.jpg" alt="굴착 현장과 태블릿 컷 필 지도 위의 Copilot 개선 메시지" loading="lazy">
+            <figcaption>
+              <span class="timestamp">00:33:38</span>
+              <span><strong>Copilot이 만드는 학습 순환.</strong> 완전 자율화가 어려운 현장에도 측량·사람 인식·지오리퍼런싱을 먼저 배치하면 실제 작업 데이터를 얻고 이를 자율 정책 개선에 다시 사용할 수 있다.</span>
+            </figcaption>
+          </figure>
+        </section>
+
+        <section id="limits">
+          <p class="section-kicker">09 · Limits and implications</p>
+          <h2>사람의 역할은 예외 처리로 이동한다</h2>
+          <p>돌 제거, 손상된 배관 수리, 급유와 그리스 주입, 현장 관계자와의 조율에는 여전히 정교한 손기술과 상황 판단이 필요하다. 이 기술이 가까운 미래에 자동화하려는 것은 현장 전체가 아니라 단조롭고 반복적이거나 위험한 작업 구간이다.</p>
+
+          <figure>
+            <img src="assets/e3itlbmiucm-ts-00-37-33.jpg" alt="농기계 주변에서 사람이 돌을 치우는 장면" loading="lazy">
+            <figcaption>
+              <span class="timestamp">00:37:33</span>
+              <span><strong>남아 있는 엣지 케이스.</strong> 작업의 긴 꼬리에 해당하는 수리, 정리, 급유와 대인 조율은 상당 기간 사람의 역할로 남는다. 자동화의 현실적인 목표는 사람이 이런 예외에 집중하도록 만드는 것이다.</span>
+            </figcaption>
+          </figure>
+
+          <ol class="implications">
+            <li><span><strong>자동화의 최소 단위는 장비가 아니라 작업 흐름이다.</strong> 측량, 설계면 비교, 안전 인식, 적재 대상 탐지와 원격 예외 처리가 연결돼야 현장 생산성으로 이어진다.</span></li>
+            <li><span><strong>범용성의 병목은 센서보다 제어 일반화다.</strong> 브랜드, 크기, 온도와 토질에 따른 유압 차이를 흡수하는 모델이 개조형 플랫폼의 성패를 좌우한다.</span></li>
+            <li><span><strong>Copilot은 초기 가치와 학습 데이터를 동시에 만든다.</strong> 보조 기능으로 먼저 현장에 들어가면 완전 자율이 어려운 작업의 데이터를 축적할 수 있다.</span></li>
+            <li><span><strong>생산성 향상은 전체 시스템을 다시 설계하게 한다.</strong> 굴착 처리량이 오르면 스크리너, 트럭, 인력 배치와 정비 역량이 새로운 병목이 될 수 있다.</span></li>
+            <li><span><strong>독립 벤치마크가 필요하다.</strong> 작업량 정의, 비교 운전자 숙련도, 토질, 가동률, 안전 정지, 연료와 유지비를 포함한 검증이 뒤따라야 한다.</span></li>
+          </ol>
+        </section>
+
+        <section id="conclusion">
+          <p class="section-kicker">10 · Conclusion</p>
+          <h2>다음 시대의 토공은 ‘무인’보다 ‘확장’에 가깝다</h2>
+          <p>Gravis Robotics의 비전은 자율 굴착기 한 대에 머물지 않는다. 자율 굴착, 장비 안내, 실시간 측량, 증강현실, 사람 인식과 원격 조작을 기존 장비 위에 하나의 운용 계층으로 올리려 한다.</p>
+          <p>이 전략이 설득력을 갖는 이유는 현장의 현실을 인정하기 때문이다. 모든 작업을 한 번에 자동화할 수 없고, 사람은 계속 예외를 해결해야 한다. 대신 장비가 반복 작업을 더 일정하게 수행하고 개입 빈도와 해결 시간을 낮춘다면, 한 명의 숙련자가 관리할 수 있는 장비와 현장의 수가 늘어난다.</p>
+
+          <div class="evidence-pair">
+            <figure>
+              <img src="assets/e3itlbmiucm-ts-00-39-13.jpg" alt="Develon 부스의 자율 굴착 시연 일정" loading="lazy">
+              <figcaption><span class="timestamp">00:39:13</span><strong>연구에서 시연으로.</strong> Develon·Hitachi 장비를 활용한 자율 굴착, 운전실 안내와 태블릿 기반 트렌칭 시연으로 기술을 공개했다.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/e3itlbmiucm-ts-00-40-25.jpg" alt="자율 굴착기와 Gravis Robotics의 발표 마무리 화면" loading="lazy">
+              <figcaption><span class="timestamp">00:40:25</span><strong>통합 플랫폼의 결론.</strong> 여러 자동화 기능을 하나의 개조형 시스템에 묶어 다양한 제조사와 현장으로 확장한다.</figcaption>
+            </figure>
+          </div>
+
+          <div class="closing">
+            <strong>건설 로봇의 가장 큰 변화는 운전석이 비는 순간이 아니라, 한 사람의 판단이 여러 대의 장비로 확장되는 순간 시작될 것이다.</strong>
+            <p>관건은 화려한 자율 시연이 아니라 다양한 토질과 장비에서 생산성, 안전성, 개입 비용을 반복해서 증명하는 일이다.</p>
+          </div>
+        </section>
+
+        <section id="sources" class="source-notes">
+          <p class="section-kicker">Source notes</p>
+          <h2>출처와 검증 메모</h2>
+          <ol>
+            <li>주요 출처: Ryan Luke Johns, “The Next Era of Earthmoving: How Robotic Intelligence is Transforming Construction Productivity,” conexpoconagg, 2026년 3월 20일 게시. 원래 스트리밍 일시 2026년 3월 4일 11:00 PT.</li>
+            <li>영상 주소: <a target="_blank" rel="noopener noreferrer">youtube.com/watch?v=E3iTlbmiUCM</a>.</li>
+            <li>장면 해석은 영상 화면과 영어 자동 자막을 교차 확인했다. 작은 슬라이드 문자는 화면과 자막이 동시에 뒷받침하는 경우를 중심으로 사용했다.</li>
+            <li>90%, 105억 시간, 78%, 30%, 33% 및 생산능력 15%당 장비 한 단계 축소 가능성은 발표자가 제시한 값이다. 독립적인 학술 검토나 현장 원자료 검증을 거치지 않았다.</li>
+            <li>향후 검증에는 시간당 실제 처리량, 토질 분류, 기준 운전자 숙련도, 사이클 시간과 충전율, 연료 사용량, 안전 정지 횟수, MTBI·MTTR, 설치·정비 비용이 포함돼야 한다.</li>
+          </ol>
+        </section>
+
+        <aside class="share-box" aria-labelledby="share-title">
+          <h2 id="share-title">공유할 때 사용할 문장</h2>
+          <p>이 보고서의 핵심을 짧게 소개하려면 아래 문장을 복사해 사용할 수 있다.</p>
+          <div class="copy-ready">굴착기의 미래는 단순한 무인화가 아니다. 자율 굴착, 실시간 측량과 원격 개입을 하나의 플랫폼으로 묶어 한 사람의 판단을 여러 장비로 확장하는 것이다. Gravis Robotics 발표를 바탕으로 건설 로봇의 기술 구조, 생산성 주장과 검증 과제를 정리했다. #건설로봇 #자율굴착 #ConstructionTech</div>
+        </aside>
+      </article>
+
+      <aside class="sidebar" aria-label="문서 목차">
+        <nav class="toc">
+          <strong>In this report</strong>
+          <ol>
+            <li><a href="#overview">무인 굴착기보다 중요한 질문</a></li>
+            <li><a href="#findings">여섯 가지 핵심 발견</a></li>
+            <li><a href="#architecture">시스템 구조</a></li>
+            <li><a href="#robotics">연구에서 현장 로봇으로</a></li>
+            <li><a href="#learning">굴착 학습과 제어</a></li>
+            <li><a href="#field-evidence">현장 근거와 수치</a></li>
+            <li><a href="#operator">작업자 중심 도입</a></li>
+            <li><a href="#metrics">MTBI와 MTTR</a></li>
+            <li><a href="#limits">한계와 시사점</a></li>
+            <li><a href="#conclusion">결론</a></li>
+          </ol>
+        </nav>
+      </aside>
+    </div>
+  </main>
+
+  <footer>
+    <p>Research report · 영상 기반 분석 · 2026년 8월 18일</p>
+    <p>본문의 기업 성과 수치는 발표 내용을 요약한 것이며 독립적으로 검증된 투자·구매 또는 안전성 판단 자료가 아니다.</p>
+  </footer>
+</body>
+</html>
