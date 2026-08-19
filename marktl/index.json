@@ -1,7 +1,28 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-19T07:45:06.820Z",
+  "updatedAt": "2026-08-19T13:48:01.836Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-duke-robotics-discussion-bridging-model-based-and-learning-based-methods-%EC%9A%94%EC%95%BD/",
+      "excerpt": "Bridging Model Based and Learning Based Methods for Robotic Loco Manipulation and Control 영상 정보 채널 : Duke Robotics 발표자 : Lujie Yang (MIT CSAIL, Robotic Locomotion Group 박사 졸업) 강연일 : 2025 11 07 (영상 설명 기준) 게시일 : 2026 06 22 길이 : 57분 23초 링크 : h",
+      "shortId": "gi31ng",
+      "slug": "yt-duke-robotics-discussion-bridging-model-based-and-learning-based-methods-요약",
+      "sourcePath": "clippings/yt_Duke_Robotics_Discussion_Bridging_Model-Based_and_Learning-Based_Methods_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료",
+        "로보틱스",
+        "robot-learning",
+        "loco-manipulation",
+        "trajectory-optimization",
+        "reinforcement-learning",
+        "Lyapunov-control"
+      ],
+      "title": "Bridging Model-Based and Learning-Based Methods for Robotic Loco-Manipulation and Control",
+      "updatedAt": "2026-08-19T13:48:01.836Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/gi31ng/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-yann-lecun-1b-bet-against-llms-part-2-%EC%9A%94%EC%95%BD/",
