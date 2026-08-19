@@ -1,7 +1,19 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-18T14:48:43.773Z",
+  "updatedAt": "2026-08-19T07:00:46.921Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-yann-lecun-1b-bet-against-llms-part-1-%EC%9A%94%EC%95%BD/",
+      "excerpt": "Yann LeCun's $1B Bet Against LLMs [Part 1] 영상 정보 채널 : Welch Labs 게시일 : 2026 05 02 길이 : 37분 24초 링크 : https://www.youtube.com/watch?v=kYkIdXwW2AE 후속편 : Part 2 <div style=\"position: relative; width: 100%; padding bottom: 56.25%; height: 0; ove",
+      "shortId": "zox1pk",
+      "slug": "yt-yann-lecun-1b-bet-against-llms-part-1-요약",
+      "sourcePath": "clippings/yt_Yann_LeCun_1B_Bet_Against_LLMs_Part_1_요약.md",
+      "tags": [],
+      "title": "Yann LeCun's $1B Bet Against LLMs [Part 1]",
+      "updatedAt": "2026-08-19T07:00:46.921Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/zox1pk/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-inside-the-worlds-smartest-robot-brain-%EC%9A%94%EC%95%BD/",

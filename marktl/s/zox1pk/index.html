@@ -1,0 +1,2272 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LLM 너머의 지능 — Yann LeCun은 왜 JEPA에 10억 달러를 거는가</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  <style>
+    :root {
+      --ink: #17211f;
+      --muted: #66716d;
+      --paper: #f7f3eb;
+      --paper-deep: #eee7da;
+      --card: #fffdf8;
+      --forest: #173f38;
+      --forest-2: #245f53;
+      --mint: #b7d9cc;
+      --mint-soft: #e2eee8;
+      --coral: #e7694f;
+      --amber: #e9ad48;
+      --line: rgba(23, 33, 31, .15);
+      --shadow: 0 22px 70px rgba(32, 43, 39, .10);
+      --serif: "Iowan Old Style", "Noto Serif KR", "Nanum Myeongjo", Georgia, serif;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--paper);
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 4%, rgba(183, 217, 204, .30), transparent 25rem),
+        radial-gradient(circle at 94% 14%, rgba(233, 173, 72, .13), transparent 25rem),
+        var(--paper);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.78;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      color: var(--forest-2);
+      text-decoration-color: rgba(36, 95, 83, .35);
+      text-underline-offset: .2em;
+    }
+
+    a:hover {
+      color: var(--coral);
+      text-decoration-color: currentColor;
+    }
+
+    ::selection {
+      color: var(--ink);
+      background: #f4cc84;
+    }
+
+    .masthead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 24px 34px;
+      border-bottom: 1px solid var(--line);
+      color: var(--forest);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .masthead-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .masthead-mark::before {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--coral);
+      box-shadow: 17px 0 0 var(--amber);
+      content: "";
+    }
+
+    .masthead-date {
+      color: var(--muted);
+      letter-spacing: .08em;
+    }
+
+    .hero {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 76px 34px 50px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.02fr) minmax(360px, .98fr);
+      gap: clamp(38px, 7vw, 100px);
+      align-items: center;
+    }
+
+    .eyebrow,
+    .section-kicker,
+    .mini-label {
+      color: var(--coral);
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      max-width: 780px;
+      margin: 18px 0 24px;
+      font-family: var(--serif);
+      font-size: clamp(47px, 6vw, 84px);
+      font-weight: 780;
+      letter-spacing: -.055em;
+      line-height: 1.02;
+    }
+
+    .hero h1 em {
+      color: var(--forest-2);
+      font-style: normal;
+    }
+
+    .hero-dek {
+      max-width: 700px;
+      margin: 0;
+      color: #45514d;
+      font-family: var(--serif);
+      font-size: clamp(20px, 2.1vw, 27px);
+      line-height: 1.55;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 32px;
+    }
+
+    .pill {
+      padding: 8px 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 253, 248, .62);
+      color: #43504c;
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .hero-figure {
+      position: relative;
+      margin: 0;
+    }
+
+    .hero-figure::before {
+      position: absolute;
+      inset: -18px 18px 18px -18px;
+      z-index: -1;
+      border-radius: 24px;
+      background: var(--mint);
+      content: "";
+    }
+
+    .hero-figure img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: 1px solid rgba(255, 255, 255, .6);
+      border-radius: 18px;
+      background: #0b1211;
+      box-shadow: var(--shadow);
+      object-fit: cover;
+    }
+
+    .hero-figure figcaption {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .source-ribbon {
+      max-width: 1252px;
+      margin: 16px auto 0;
+      padding: 0 34px;
+    }
+
+    .source-ribbon-inner {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 18px;
+      align-items: center;
+      padding: 17px 22px;
+      border: 1px solid rgba(255, 255, 255, .15);
+      border-radius: 14px;
+      background: var(--ink);
+      color: #e9efec;
+      box-shadow: 0 15px 45px rgba(23, 33, 31, .14);
+    }
+
+    .source-ribbon .source-label {
+      color: #a9bbb5;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .source-ribbon strong {
+      font-family: var(--serif);
+      font-size: 15px;
+    }
+
+    .source-ribbon a {
+      padding: 8px 13px;
+      border: 1px solid rgba(255, 255, 255, .25);
+      border-radius: 999px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .report-layout {
+      display: grid;
+      grid-template-columns: 210px minmax(0, 820px);
+      gap: clamp(42px, 7vw, 90px);
+      max-width: 1160px;
+      margin: 90px auto 0;
+      padding: 0 34px 100px;
+    }
+
+    .toc {
+      align-self: start;
+      position: sticky;
+      top: 24px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .toc-title {
+      margin-bottom: 18px;
+      color: var(--ink);
+      font-weight: 850;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .toc ol {
+      display: grid;
+      gap: 4px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: toc;
+    }
+
+    .toc li {
+      counter-increment: toc;
+    }
+
+    .toc a {
+      display: grid;
+      grid-template-columns: 24px 1fr;
+      gap: 7px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .toc a::before {
+      color: var(--coral);
+      font-weight: 800;
+      content: counter(toc, decimal-leading-zero);
+    }
+
+    .toc a:hover {
+      color: var(--ink);
+    }
+
+    .toc-facts {
+      margin-top: 30px;
+      padding: 18px;
+      border-radius: 12px;
+      background: var(--mint-soft);
+    }
+
+    .toc-facts dl {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px 10px;
+      margin: 11px 0 0;
+    }
+
+    .toc-facts dt,
+    .toc-facts dd {
+      margin: 0;
+    }
+
+    .toc-facts dd {
+      color: var(--ink);
+      font-weight: 750;
+      text-align: right;
+    }
+
+    article {
+      min-width: 0;
+    }
+
+    .abstract {
+      position: relative;
+      padding: clamp(28px, 4vw, 45px);
+      border: 1px solid rgba(23, 63, 56, .17);
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(226, 238, 232, .94), rgba(255, 253, 248, .94));
+      box-shadow: 0 18px 55px rgba(23, 63, 56, .07);
+    }
+
+    .abstract::after {
+      position: absolute;
+      top: 28px;
+      right: 30px;
+      color: rgba(23, 63, 56, .13);
+      font-family: var(--serif);
+      font-size: 96px;
+      line-height: 1;
+      content: "A";
+    }
+
+    .abstract h2 {
+      margin: 7px 0 14px;
+      font-family: var(--serif);
+      font-size: 34px;
+      letter-spacing: -.035em;
+      line-height: 1.2;
+    }
+
+    .abstract p {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      color: #33433e;
+      font-size: 17px;
+    }
+
+    .lede {
+      margin: 38px 0 0;
+      font-family: var(--serif);
+      font-size: 22px;
+      line-height: 1.75;
+    }
+
+    .lede::first-letter {
+      float: left;
+      margin: .08em .13em 0 0;
+      color: var(--coral);
+      font-size: 4.1em;
+      font-weight: 800;
+      line-height: .77;
+    }
+
+    .key-findings {
+      margin: 68px 0 0;
+    }
+
+    .key-findings h2,
+    .share-frame h2 {
+      margin: 9px 0 25px;
+      font-family: var(--serif);
+      font-size: 38px;
+      letter-spacing: -.035em;
+      line-height: 1.2;
+    }
+
+    .finding-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .finding {
+      min-height: 180px;
+      padding: 25px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 253, 248, .72);
+    }
+
+    .finding-index {
+      display: inline-grid;
+      width: 33px;
+      height: 33px;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--forest);
+      color: white;
+      font-family: var(--serif);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .finding h3 {
+      margin: 17px 0 8px;
+      font-family: var(--serif);
+      font-size: 21px;
+      letter-spacing: -.02em;
+      line-height: 1.3;
+    }
+
+    .finding p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .argument-map {
+      margin: 62px 0 18px;
+      padding: 30px;
+      border-radius: 20px;
+      background: var(--ink);
+      color: white;
+      overflow: hidden;
+    }
+
+    .argument-map h2 {
+      margin: 7px 0 25px;
+      font-family: var(--serif);
+      font-size: 29px;
+      letter-spacing: -.03em;
+    }
+
+    .argument-map .section-kicker {
+      color: #f2b95a;
+    }
+
+    .logic-flow {
+      display: grid;
+      grid-template-columns: 1fr 34px 1fr 34px 1fr;
+      align-items: stretch;
+      gap: 8px;
+    }
+
+    .logic-node {
+      padding: 19px;
+      border: 1px solid rgba(255, 255, 255, .13);
+      border-radius: 13px;
+      background: rgba(255, 255, 255, .055);
+    }
+
+    .logic-node strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #fff;
+      font-family: var(--serif);
+      font-size: 17px;
+    }
+
+    .logic-node span {
+      display: block;
+      color: #b8c5c1;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .logic-arrow {
+      display: grid;
+      place-items: center;
+      color: var(--amber);
+      font-size: 24px;
+    }
+
+    .report-section {
+      margin-top: 104px;
+      scroll-margin-top: 30px;
+    }
+
+    .section-heading {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 23px;
+      align-items: start;
+      margin-bottom: 34px;
+    }
+
+    .section-number {
+      padding-top: 3px;
+      border-top: 4px solid var(--coral);
+      color: var(--coral);
+      font-family: var(--serif);
+      font-size: 35px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .section-heading h2 {
+      margin: 5px 0 10px;
+      font-family: var(--serif);
+      font-size: clamp(35px, 5vw, 53px);
+      letter-spacing: -.045em;
+      line-height: 1.13;
+    }
+
+    .section-heading p {
+      max-width: 640px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .report-section > p {
+      margin: 22px 0;
+    }
+
+    .report-section h3 {
+      margin: 48px 0 15px;
+      font-family: var(--serif);
+      font-size: 27px;
+      letter-spacing: -.025em;
+      line-height: 1.35;
+    }
+
+    .pullquote {
+      margin: 52px -40px;
+      padding: 10px 40px 10px 35px;
+      border-left: 6px solid var(--coral);
+      color: var(--forest);
+      font-family: var(--serif);
+      font-size: clamp(25px, 3.7vw, 38px);
+      font-weight: 680;
+      letter-spacing: -.035em;
+      line-height: 1.43;
+    }
+
+    .pullquote cite {
+      display: block;
+      margin-top: 15px;
+      color: var(--muted);
+      font-family: var(--sans);
+      font-size: 11px;
+      font-style: normal;
+      font-weight: 750;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .figure {
+      margin: 42px 0;
+    }
+
+    .figure img {
+      width: 100%;
+      border: 1px solid rgba(23, 33, 31, .12);
+      border-radius: 15px;
+      background: #e8e5df;
+      box-shadow: 0 16px 45px rgba(23, 33, 31, .10);
+    }
+
+    .figure figcaption {
+      display: grid;
+      grid-template-columns: 86px 1fr;
+      gap: 13px;
+      margin-top: 13px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .figure-tag {
+      color: var(--coral);
+      font-weight: 850;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .figure-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+      margin: 42px 0;
+    }
+
+    .figure-grid .figure {
+      margin: 0;
+    }
+
+    .figure-grid .figure figcaption {
+      grid-template-columns: 1fr;
+      gap: 3px;
+    }
+
+    .note-card,
+    .caveat-card {
+      margin: 35px 0;
+      padding: 24px 26px;
+      border-radius: 14px;
+    }
+
+    .note-card {
+      border: 1px solid rgba(36, 95, 83, .17);
+      background: var(--mint-soft);
+    }
+
+    .caveat-card {
+      border: 1px solid rgba(231, 105, 79, .24);
+      background: #fff2ec;
+    }
+
+    .note-card strong,
+    .caveat-card strong {
+      display: block;
+      margin-bottom: 6px;
+      font-family: var(--serif);
+      font-size: 18px;
+    }
+
+    .note-card p,
+    .caveat-card p {
+      margin: 0;
+      color: #52605c;
+      font-size: 14px;
+    }
+
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      margin: 38px 0;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: var(--line);
+      overflow: hidden;
+    }
+
+    .comparison-column {
+      padding: 28px;
+      background: var(--card);
+    }
+
+    .comparison-column:first-child {
+      background: #edf5f1;
+    }
+
+    .comparison-column .mini-label {
+      margin-bottom: 10px;
+    }
+
+    .comparison-column h3 {
+      margin: 0 0 12px;
+      font-size: 23px;
+    }
+
+    .comparison-column p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .equation-card {
+      margin: 38px 0;
+      padding: 28px;
+      border-radius: 17px;
+      background: #eee7da;
+      text-align: center;
+    }
+
+    .equation-card .equation {
+      display: block;
+      margin: 12px 0;
+      font-family: "Times New Roman", serif;
+      font-size: clamp(21px, 4vw, 34px);
+      letter-spacing: .01em;
+      overflow-wrap: anywhere;
+    }
+
+    .equation-card p {
+      max-width: 630px;
+      margin: 12px auto 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .matrix-explainer {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 25px;
+      align-items: center;
+      margin: 40px 0;
+      padding: 28px;
+      border-radius: 17px;
+      background: var(--ink);
+      color: white;
+    }
+
+    .matrix {
+      display: grid;
+      grid-template-columns: repeat(5, 18px);
+      gap: 5px;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .matrix span {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      background: rgba(183, 217, 204, .16);
+    }
+
+    .matrix.target span:nth-child(1),
+    .matrix.target span:nth-child(7),
+    .matrix.target span:nth-child(13),
+    .matrix.target span:nth-child(19),
+    .matrix.target span:nth-child(25) {
+      background: var(--amber);
+      box-shadow: 0 0 15px rgba(233, 173, 72, .35);
+    }
+
+    .matrix-copy {
+      text-align: center;
+    }
+
+    .matrix-copy strong {
+      display: block;
+      font-family: var(--serif);
+      font-size: 16px;
+    }
+
+    .matrix-copy small {
+      color: #aebdb8;
+    }
+
+    .matrix-arrow {
+      color: var(--amber);
+      font-size: 28px;
+    }
+
+    .steps {
+      display: grid;
+      gap: 12px;
+      margin: 34px 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: step;
+    }
+
+    .steps li {
+      display: grid;
+      grid-template-columns: 43px 1fr;
+      gap: 16px;
+      align-items: start;
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: rgba(255, 253, 248, .72);
+      counter-increment: step;
+    }
+
+    .steps li::before {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--coral);
+      color: white;
+      font-size: 12px;
+      font-weight: 850;
+      content: counter(step, decimal-leading-zero);
+    }
+
+    .steps strong {
+      display: block;
+      margin-bottom: 4px;
+      font-family: var(--serif);
+      font-size: 18px;
+    }
+
+    .steps span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .table-wrap {
+      margin: 38px 0;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--card);
+      overflow-x: auto;
+      box-shadow: 0 12px 38px rgba(23, 33, 31, .05);
+    }
+
+    table {
+      width: 100%;
+      min-width: 600px;
+      border-collapse: collapse;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    caption {
+      padding: 17px 20px;
+      border-bottom: 1px solid var(--line);
+      color: var(--ink);
+      font-family: var(--serif);
+      font-size: 19px;
+      font-weight: 750;
+      text-align: left;
+    }
+
+    th,
+    td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #edf1ed;
+      color: #35423e;
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    tbody tr:hover td {
+      background: rgba(226, 238, 232, .38);
+    }
+
+    .metric {
+      color: var(--forest);
+      font-family: var(--serif);
+      font-size: 17px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .implication-grid,
+    .limitation-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 32px;
+    }
+
+    .implication,
+    .limitation {
+      padding: 23px;
+      border-radius: 15px;
+    }
+
+    .implication {
+      border: 1px solid rgba(23, 63, 56, .16);
+      background: var(--mint-soft);
+    }
+
+    .limitation {
+      border: 1px solid var(--line);
+      background: var(--card);
+    }
+
+    .implication h3,
+    .limitation h3 {
+      margin: 12px 0 9px;
+      font-size: 19px;
+    }
+
+    .implication p,
+    .limitation p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .icon-mark {
+      display: grid;
+      width: 35px;
+      height: 35px;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--forest);
+      color: white;
+      font-size: 15px;
+      font-weight: 850;
+    }
+
+    .limitation .icon-mark {
+      background: var(--coral);
+    }
+
+    .checklist {
+      display: grid;
+      gap: 10px;
+      margin: 28px 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .checklist li {
+      position: relative;
+      padding-left: 30px;
+      color: #43504c;
+    }
+
+    .checklist li::before {
+      position: absolute;
+      top: .35em;
+      left: 0;
+      display: grid;
+      width: 18px;
+      height: 18px;
+      place-items: center;
+      border: 1px solid var(--forest-2);
+      border-radius: 4px;
+      color: var(--forest-2);
+      font-size: 11px;
+      font-weight: 900;
+      content: "✓";
+    }
+
+    .share-frame {
+      margin-top: 95px;
+      padding: clamp(28px, 5vw, 48px);
+      border-radius: 22px;
+      background:
+        linear-gradient(135deg, rgba(23, 63, 56, .98), rgba(23, 33, 31, .98));
+      color: white;
+      box-shadow: var(--shadow);
+    }
+
+    .share-frame .section-kicker {
+      color: #f3bb5e;
+    }
+
+    .share-frame h2 {
+      color: white;
+    }
+
+    .share-frame p {
+      color: #c9d5d1;
+    }
+
+    .copy-block {
+      margin-top: 22px;
+      padding: 22px;
+      border: 1px solid rgba(255, 255, 255, .17);
+      border-radius: 13px;
+      background: rgba(255, 255, 255, .065);
+      color: #f8faf9;
+      font-family: var(--serif);
+      font-size: 18px;
+      line-height: 1.65;
+    }
+
+    .endnote {
+      margin: 80px 0 0;
+      padding-top: 35px;
+      border-top: 1px solid var(--line);
+    }
+
+    .endnote h2 {
+      margin: 7px 0 15px;
+      font-family: var(--serif);
+      font-size: 34px;
+      letter-spacing: -.035em;
+    }
+
+    .source-notes {
+      margin: 25px 0 0;
+      padding-left: 22px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .source-notes li {
+      margin: 11px 0;
+      padding-left: 6px;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 30px;
+    }
+
+    .tag {
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: var(--paper-deep);
+      color: #56615e;
+      font-size: 11px;
+      font-weight: 750;
+    }
+
+    footer {
+      padding: 35px 25px 45px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 11px;
+      text-align: center;
+      letter-spacing: .03em;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-figure {
+        max-width: 780px;
+      }
+
+      .report-layout {
+        grid-template-columns: 1fr;
+        max-width: 890px;
+      }
+
+      .toc {
+        position: static;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 15px;
+        background: rgba(255, 253, 248, .7);
+      }
+
+      .toc ol {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .toc-facts {
+        display: none;
+      }
+
+      .implication-grid,
+      .limitation-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 690px) {
+      body {
+        font-size: 16px;
+        line-height: 1.72;
+      }
+
+      .masthead,
+      .hero,
+      .source-ribbon,
+      .report-layout {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      .masthead {
+        padding-top: 18px;
+        padding-bottom: 18px;
+      }
+
+      .masthead-date {
+        display: none;
+      }
+
+      .hero {
+        padding-top: 48px;
+      }
+
+      .hero h1 {
+        font-size: clamp(43px, 13vw, 64px);
+      }
+
+      .hero-figure::before {
+        inset: -10px 10px 10px -10px;
+      }
+
+      .source-ribbon-inner {
+        grid-template-columns: 1fr auto;
+      }
+
+      .source-ribbon .source-label {
+        display: none;
+      }
+
+      .report-layout {
+        margin-top: 60px;
+      }
+
+      .toc ol,
+      .finding-grid,
+      .figure-grid,
+      .comparison {
+        grid-template-columns: 1fr;
+      }
+
+      .logic-flow {
+        grid-template-columns: 1fr;
+      }
+
+      .logic-arrow {
+        transform: rotate(90deg);
+      }
+
+      .section-heading {
+        grid-template-columns: 48px 1fr;
+        gap: 14px;
+      }
+
+      .section-number {
+        font-size: 25px;
+      }
+
+      .pullquote {
+        margin-right: 0;
+        margin-left: 0;
+        padding-right: 0;
+        padding-left: 23px;
+      }
+
+      .figure figcaption {
+        grid-template-columns: 1fr;
+        gap: 3px;
+      }
+
+      .matrix-explainer {
+        grid-template-columns: 1fr;
+      }
+
+      .matrix-arrow {
+        transform: rotate(90deg);
+        text-align: center;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+        color: black;
+      }
+
+      .toc,
+      .source-ribbon,
+      .share-frame {
+        display: none;
+      }
+
+      .hero,
+      .report-layout {
+        max-width: none;
+        padding-right: 0;
+        padding-left: 0;
+      }
+
+      .report-layout {
+        display: block;
+      }
+
+      .figure img,
+      .abstract,
+      .finding,
+      .table-wrap {
+        box-shadow: none;
+      }
+
+      a {
+        color: inherit;
+      }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Yann LeCun&#39;s $1B Bet Against LLMs [Part 1]">
+<meta property="og:description" content="Yann LeCun&#39;s $1B Bet Against LLMs [Part 1] 영상 정보 채널 : Welch Labs 게시일 : 2026 05 02 길이 : 37분 24초 링크 : https://www.youtube.com/watch?v=kYkIdXwW2AE 후속편 : Part 2 &lt;div style=&quot;position: relative; width: 100%; padding bottom: 56.25%; height: 0; ove">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/zox1pk/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/zox1pk/assets/kykidxww2ae-ts-00-01-10.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Yann LeCun&#39;s $1B Bet Against LLMs [Part 1]">
+<meta name="twitter:description" content="Yann LeCun&#39;s $1B Bet Against LLMs [Part 1] 영상 정보 채널 : Welch Labs 게시일 : 2026 05 02 길이 : 37분 24초 링크 : https://www.youtube.com/watch?v=kYkIdXwW2AE 후속편 : Part 2 &lt;div style=&quot;position: relative; width: 100%; padding bottom: 56.25%; height: 0; ove">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/zox1pk/assets/kykidxww2ae-ts-00-01-10.jpg">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-yann-lecun-1b-bet-against-llms-part-1-%EC%9A%94%EC%95%BD/">
+</head>
+
+<body>
+  <header>
+    <div class="masthead">
+      <div class="masthead-mark">AI Architecture Review</div>
+      <div class="masthead-date">Research Report · 19 Aug 2026</div>
+    </div>
+
+    <div class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">World Models · Joint Embedding · Part 1</div>
+          <h1>LLM 너머의 지능:<br><em>LeCun의 JEPA 베팅</em></h1>
+          <p class="hero-dek">
+            생성에서 예측으로, 픽셀에서 표현으로. Yann LeCun이 왜 거대한 언어 모델과 다른 길에
+            10억 달러 규모의 승부를 걸었는지 기술적 계보를 따라간다.
+          </p>
+          <div class="hero-meta" aria-label="기사 메타데이터">
+            <span class="pill">Welch Labs 영상 분석</span>
+            <span class="pill">37분 24초</span>
+            <span class="pill">25개 핵심 장면</span>
+            <span class="pill">읽는 시간 약 18분</span>
+          </div>
+        </div>
+
+        <figure class="hero-figure">
+          <img src="assets/kykidxww2ae-ts-00-01-10.jpg" alt="입력 x와 목표 y를 각각 임베딩한 뒤 표현 공간에서 예측하는 JEPA 구조" fetchpriority="high">
+          <figcaption>
+            JEPA의 최소 구조. 모델은 다음 픽셀을 그리지 않고, 입력의 임베딩으로부터 목표의 임베딩을 예측한다.
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div class="source-ribbon">
+      <div class="source-ribbon-inner">
+        <span class="source-label">Primary source</span>
+        <strong>Yann LeCun's $1B Bet Against LLMs [Part 1] · Welch Labs</strong>
+        <a target="_blank" rel="noopener noreferrer">영상 보기 ↗</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="report-layout">
+    <aside class="toc" aria-label="목차">
+      <div class="toc-title">Contents</div>
+      <ol>
+        <li><a href="#origin">두 갈래의 역사</a></li>
+        <li><a href="#blur">픽셀 생성의 한계</a></li>
+        <li><a href="#collapse">표현 붕괴</a></li>
+        <li><a href="#barlow">Barlow Twins</a></li>
+        <li><a href="#dino">DINO의 추격</a></li>
+        <li><a href="#world-model">JEPA 월드 모델</a></li>
+        <li><a href="#implications">실무적 시사점</a></li>
+        <li><a href="#limits">한계와 판정 유보</a></li>
+        <li><a href="#timeline">영상 타임라인</a></li>
+        <li><a href="#sources">방법과 출처</a></li>
+      </ol>
+
+      <div class="toc-facts">
+        <div class="mini-label">At a glance</div>
+        <dl>
+          <dt>GPT-2 출력</dt><dd>50,257</dd>
+          <dt>Barlow Twins</dt><dd>73.2%</dd>
+          <dt>DINOv3</dt><dd>88.4%</dd>
+          <dt>ViT 지도학습</dt><dd>88.6%</dd>
+        </dl>
+      </div>
+    </aside>
+
+    <article>
+      <section class="abstract" aria-labelledby="abstract-title">
+        <div class="section-kicker">Abstract</div>
+        <h2 id="abstract-title">좋은 지능은 모든 것을 생성해야 하는가?</h2>
+        <p>
+          이 보고서는 Welch Labs와 Yann LeCun의 인터뷰를 바탕으로, 생성형 자기지도학습이 영상에서
+          부딪히는 문제와 조인트 임베딩이 제안하는 대안을 분석한다. 핵심 경로는
+          <strong>비디오 예측의 블러 → 생성 대신 표현 학습 → 표현 붕괴 → Barlow Twins의 중복 감소 →
+          DINOv3의 성능 도약 → 행동 조건부 JEPA 월드 모델</strong>이다. 영상은 JEPA가 LLM을 실제로
+          대체했다는 결과를 제시하지 않는다. 대신 왜 LeCun이 픽셀·토큰 생성보다 표현 공간의 예측과
+          계획을 차세대 지능의 토대로 보는지 설명한다.
+        </p>
+      </section>
+
+      <p class="lede">
+        언어 모델은 다음 단어를 맞히는 단순한 과제를 엄청난 규모로 확장해 놀라운 내부 표현을 얻었다.
+        그러나 같은 공식을 영상에 적용하면 미래가 선명해지는 대신 흐려진다. 이 실패를 LeCun은
+        스케일 부족이 아니라 목표 자체의 문제로 읽는다. 세상의 모든 디테일을 생성하려 하지 말고,
+        행동에 필요한 핵심 표현만 예측하자는 것이다.
+      </p>
+
+      <section class="key-findings" aria-labelledby="findings-title">
+        <div class="section-kicker">Key Findings</div>
+        <h2 id="findings-title">이 보고서의 여섯 가지 결론</h2>
+
+        <div class="finding-grid">
+          <div class="finding">
+            <span class="finding-index">1</span>
+            <h3>언어와 영상의 출력 공간은 다르다</h3>
+            <p>언어는 유한한 토큰 확률로 불확실성을 보존할 수 있지만, 영상의 가능한 다음 프레임은 사실상 열거할 수 없다.</p>
+          </div>
+
+          <div class="finding">
+            <span class="finding-index">2</span>
+            <h3>블러는 단순한 화질 문제가 아니다</h3>
+            <p>여러 개의 가능한 미래를 픽셀 하나로 압축하면 평균이 되고, 그 평균은 흐릿한 공과 경계로 나타난다.</p>
+          </div>
+
+          <div class="finding">
+            <span class="finding-index">3</span>
+            <h3>가치는 생성물이 아니라 표현에 있다</h3>
+            <p>사전학습의 진짜 자산은 자동완성 결과보다 그 문제를 풀면서 모델 내부에 형성된 의미 구조다.</p>
+          </div>
+
+          <div class="finding">
+            <span class="finding-index">4</span>
+            <h3>조인트 임베딩에는 붕괴 방지 장치가 필요하다</h3>
+            <p>두 표현을 가깝게 만드는 목표만 두면 모든 입력을 같은 벡터로 보내는 자명한 해에 도달한다.</p>
+          </div>
+
+          <div class="finding">
+            <span class="finding-index">5</span>
+            <h3>중복 감소가 대조 샘플을 대신했다</h3>
+            <p>Barlow Twins는 교차상관 행렬을 단위행렬에 가깝게 만들어 유사성은 보존하고 표현 차원의 중복은 제거한다.</p>
+          </div>
+
+          <div class="finding">
+            <span class="finding-index">6</span>
+            <h3>행동을 조건으로 넣으면 월드 모델이 된다</h3>
+            <p>행동에 따른 다음 상태의 표현을 예측하고 목표 표현과 비교하면 탐색·계획·제어가 가능한 구조가 된다.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="argument-map" aria-labelledby="argument-map-title">
+        <div class="section-kicker">Argument in 30 seconds</div>
+        <h2 id="argument-map-title">LeCun의 논지는 세 번의 전환으로 압축된다</h2>
+
+        <div class="logic-flow" aria-label="생성 모델에서 월드 모델로 이어지는 논리">
+          <div class="logic-node">
+            <strong>생성의 병목</strong>
+            <span>다중 가능한 미래를 픽셀 하나로 예측하면 평균화와 블러가 발생한다.</span>
+          </div>
+          <div class="logic-arrow" aria-hidden="true">→</div>
+          <div class="logic-node">
+            <strong>표현의 전환</strong>
+            <span>픽셀이 아니라 핵심 특징이 남은 임베딩 공간에서 다음 상태를 예측한다.</span>
+          </div>
+          <div class="logic-arrow" aria-hidden="true">→</div>
+          <div class="logic-node">
+            <strong>계획의 탄생</strong>
+            <span>행동을 조건으로 미래 표현을 탐색해 목표 상태에 도달할 경로를 고른다.</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="report-section" id="origin">
+        <div class="section-heading">
+          <div class="section-number">01</div>
+          <div>
+            <div class="section-kicker">The historical fork</div>
+            <h2>하나의 뿌리에서 갈라진 두 개의 AI</h2>
+            <p>생성형 언어 모델과 조인트 임베딩은 서로 무관한 발명이 아니라, 자기지도학습이라는 공통 질문에 대한 두 답변이다.</p>
+          </div>
+        </div>
+
+        <figure class="figure">
+          <img src="assets/kykidxww2ae-ts-00-02-20.jpg" alt="생성형 AI 경로와 조인트 임베딩 경로를 보여주는 역사적 계보도" loading="lazy">
+          <figcaption>
+            <span class="figure-tag">Figure 01 · 00:02:20</span>
+            <span>위쪽은 GPT 계열의 생성 경로, 아래쪽은 Siamese Networks에서 Barlow Twins와 JEPA로 이어지는 조인트 임베딩 경로다.</span>
+          </figcaption>
+        </figure>
+
+        <p>
+          영상이 제시하는 역사는 두 줄로 갈라진다. 한쪽에는 GPT-1에서 GPT-2·GPT-3와 현대 LLM으로
+          이어지는 <strong>생성 경로</strong>가 있다. 다른 한쪽에는 Siamese Networks, 대조 학습,
+          BYOL, Barlow Twins, VICReg, DINO, JEPA로 이어지는 <strong>조인트 임베딩 경로</strong>가 있다.
+          흥미로운 점은 LeCun이 CNN과 Siamese Networks를 통해 두 계보의 초기 형성에 모두 관여했다는 사실이다.
+        </p>
+
+        <figure class="figure">
+          <img src="assets/kykidxww2ae-ts-00-04-45.jpg" alt="Welch Labs 진행자 Stephen Welch와 Yann LeCun의 원격 인터뷰 화면" loading="lazy">
+          <figcaption>
+            <span class="figure-tag">Figure 02 · 00:04:45</span>
+            <span>영상의 핵심 주장은 Stephen Welch와 Yann LeCun의 인터뷰를 축으로 전개된다.</span>
+          </figcaption>
+        </figure>
+
+        <h3>“지능은 케이크다”</h3>
+
+        <p>
+          LeCun은 2015년경부터 자기지도학습을 케이크의 몸통, 지도학습을 아이싱, 강화학습을 체리에
+          비유했다. 당시 주목받던 강화학습만으로 인간 수준의 지능에 접근하기에는 학습 효율이 지나치게
+          낮다는 문제 제기였다. 이후 언어 분야에서는 그의 비유와 닮은 순서가 실제로 자리 잡았다.
+          대규모 자기지도 사전학습 위에 지도 미세조정과 인간 피드백 기반 강화학습을 얹는 방식이다.
+        </p>
+
+        <figure class="figure">
+          <img src="assets/kykidxww2ae-ts-00-06-20.jpg" alt="GPT-1이 아홉 개 언어 벤치마크에서 기존 최고 성능을 앞선 막대그래프" loading="lazy">
+          <figcaption>
+            <span class="figure-tag">Figure 03 · 00:06:20</span>
+            <span>GPT-1은 약 7,000권의 도서로 자기지도 사전학습한 뒤 과제별 지도학습을 적용해 9개 벤치마크에서 기존 최고 성능을 경신했다.</span>
+          </figcaption>
+        </figure>
+
+        <p>
+          GPT-1의 성과는 과제마다 별도의 모델을 설계하던 흐름을 뒤집었다. 하나의 모델이 방대한 비라벨
+          텍스트에서 일반적인 표현을 먼저 학습하고, 소량의 라벨로 여러 과제에 적응했다. 언어에서
+          자기지도학습은 확장 가능한 범용 표현 학습법이 되었다.
+        </p>
+
+        <figure class="figure">
+          <img src="assets/kykidxww2ae-ts-00-07-40.jpg" alt="시각 분야의 지도학습 계보와 언어 분야의 자기지도학습 계보를 비교한 그림" loading="lazy">
+          <figcaption>
+            <span class="figure-tag">Figure 04 · 00:07:40</span>
+            <span>언어는 자기지도 사전학습으로 폭발했지만, 당시의 시각 모델은 여전히 대규모 라벨 데이터에 크게 의존했다.</span>
+          </figcaption>
+        </figure>
+
+        <p>
+          문제는 이 성공이 시각과 비디오에서 그대로 재현되지 않았다는 데 있다. AlexNet을 비롯한
+          비전 모델은 ImageNet의 사람이 붙인 라벨을 발판으로 성장했다. 언어와 같은 방식으로 다음
+          비디오 프레임을 생성하도록 학습하면, 모델은 의미 있는 세계 이해 대신 급속히 흐려지는 영상을 내놓았다.
+        </p>
+
+        <figure class="figure">
+          <img src="assets/kykidxww2ae-ts-00-08-25.jpg" alt="비디오 다음 프레임 예측 결과에서 공과 손이 흐릿해진 장면" loading="lazy">
+          <figcaption>
+            <span class="figure-tag">Figure 05 · 00:08:25</span>
+            <span>생성 방식의 다음 프레임 예측. 이 결과를 다시 입력하는 자기회귀 과정을 반복하면 불확실성과 오차가 누적된다.</span>
+          </figcaption>
+        </figure>
+
+        <blockquote class="pullquote">
+          언어에서는 통했던 자기지도 생성 목표가, 왜 영상에서는 세계를 배우기보다 흐리게 만드는가?
+          <cite>영상이 설정하는 핵심 질문</cite>
+        </blockquote>
+      </section>
+
+      <section class="report-section" id="blur">
+        <div class="section-heading">
+          <div class="section-number">02</div>
+          <div>
+            <div class="section-kicker">Why pixels become blurry</div>
+            <h2>블러는 불확실성을 평균낸 흔적이다</h2>
+            <p>출력 공간의 조합적 폭발과 단일 픽셀 예측이라는 제약이 만나면, 모델이 택하는 합리적인 답은 ‘평균적인 미래’가 된다.</p>
+          </div>
+        </div>
+
+        <figure class="figure">
+          <img src="assets/kykidxww2ae-ts-00-12-00.jpg" alt="GPT-2의 50,257개 토큰 출력과 Full HD 비디오 프레임의 경우의 수를 비교한 그림" loading="lazy">
+          <figcaption>
+            <span class="figure-tag">Figure 06 · 00:12:00</span>
+            <span>언어 모델의 출력은 유한한 토큰 목록이지만, Full HD 한 프레임의 가능한 조합은 약 10의 1,500만 제곱에 이른다.</span>
+          </figcaption>
+        </figure>
+
+        <div class="comparison" aria-label="언어 모델과 비디오 생성 모델 비교">
+          <div class="comparison-column">
+            <div class="mini-label">Language model</div>
+            <h3>가능성을 확률로 나눈다</h3>
+            <p>
+              GPT-2는 50,257개의 이산 토큰마다 확률을 둘 수 있다.
+              문장의 다음 단어가 left 또는 right일 수 있다면 두 가능성을 별도의 출력으로 유지한다.
+            </p>
+          </div>
+          <div class="comparison-column">
+            <div class="mini-label">Pixel predictor</div>
+            <h3>가능성을 한 장으로 합친다</h3>
+            <p>
+              비디오 모델은 가능한 모든 프레임에 별도 출력 노드를 만들 수 없다.
+              각 픽셀의 강도를 직접 예측하면 여러 미래가 하나의 평균 이미지로 겹친다.
+            </p>
+          </div>
+        </div>
+
+        <div class="equation-card">
+          <div class="mini-label">Output-space gap</div>
+          <span class="equation">256<sup>(1920 × 1080 × 3)</sup> ≈ 10<sup>15,000,000</sup></span>
+          <p>
+            관측 가능한 우주의 원자 수를 약 10<sup>80</sup>으로 잡아도 비교가 되지 않는다.
+            가능한 프레임을 토큰처럼 하나씩 열거하는 방식은 현실적인 선택지가 아니다.
+          </p>
+        </div>
+
+        <figure class="figure">
+          <img src="assets/kykidxww2ae-ts-00-13-15.jpg" alt="언어의 left와 right 확률 출력과 비디오의 여러 공 위치가 평균화되는 과정을 비교한 그림" loading="lazy">
+          <figcaption>
+            <span class="figure-tag">Figure 07 · 00:13:15</span>
+            <span>여러 방향으로 튈 수 있는 공을 픽셀 하나의 미래로 예측하면 각각의 가능성이 흐릿하게 포개진다.</span>
+          </figcaption>
+        </figure>
+
+        <p>
+          평균은 손실을 줄이는 통계적으로 합리적인 답이지만, 세계를 정확히 묘사하지는 않는다. 더구나
+          예측된 흐린 프레임을 다음 입력으로 다시 사용하면, 작은 불확실성이 매 단계 증폭된다. 영상이
+          표현한 “흐릿한 무”는 모델이 약해서라기보다 <strong>다중 모드의 미래를 단일 픽셀 출력으로
+          강제한 목적 함수</strong>의 결과다.
+        </p>
+
+        <h3>그렇다면 생성이 꼭 필요한가?</h3>
+
+        <figure class="figure">
+          <img src="assets/kykidxww2ae-ts-00-14-00.jpg" alt="The Beatles 문장을 완성하는 Transformer 내부 표현을 강조한 그림" loading="lazy">
+          <figcaption>
+            <span class="figure-tag">Figure 08 · 00:14:00</span>
+            <span>자동완성 결과보다 중요한 것은 정답을 예측하기 위해 어텐션과 MLP 내부에 형성된 표현이다.</span>
+          </figcaption>
+        </figure>
+
+        <p>
+          “The Beatles were a famous” 다음에 “band”를 맞히는 능력은 유용하지만, 사전학습이 남기는 더
+          큰 자산은 Beatles, 음악, 집단, 문장 구조의 관계가 정리된 내부 표현이다. 이 관점에서
+          생성은 목적이 아니라 표현을 얻기 위한 훈련 과제다. 그렇다면 이미지를 직접 만들어내지 않고도
+          좋은 표현만 학습할 수 있어야 한다.
+        </p>
+
+        <div class="note-card">
+          <strong>관점의 전환</strong>
+          <p>
+            생성 모델은 관측 공간의 모든 세부사항을 맞히도록 요구한다. 조인트 임베딩은 인코더를 통과해
+            살아남은 의미 있는 특징들 사이의 관계만 맞히도록 요구한다.
+          </p>
+        </div>
+      </section>
+
+      <section class="report-section" id="collapse">
+        <div class="section-heading">
+          <div class="section-number">03</div>
+          <div>
+            <div class="section-kicker">The collapse problem</div>
+            <h2>생성하지 않는 학습의 아킬레스건</h2>
+            <p>같은 장면의 두 표현을 가깝게 만들면 의미 불변성을 배울 수 있다. 그러나 그 목표만으로는 아무것도 배우지 않는 완벽한 지름길이 생긴다.</p>
+          </div>
+        </div>
+
+        <figure class="figure">
+          <img src="assets/kykidxww2ae-ts-00-16-25.jpg" alt="두 개의 동일한 네트워크로 서명의 유사성을 측정하는 Siamese Network 구조" loading="lazy">
+          <figcaption>
+            <span class="figure-tag">Figure 09 · 00:16:25</span>
+            <span>1990년대 초 서명 위조 탐지를 위해 사용된 Siamese Networks. 두 입력을 같은 가중치의 인코더로 처리하고 표현의 거리를 비교한다.</span>
+          </figcaption>
+        </figure>
+
+        <p>
+          LeCun이 Bell Labs에서 개발한 Siamese Networks는 두 장의 서명을 동일한 네트워크의 복사본에
+          넣는다. 같은 사람의 서명은 가까운 임베딩으로, 위조 서명은 먼 임베딩으로 보내도록 훈련한다.
+          이 방식은 이미지를 복원하거나 생성하지 않고도 비교에 유용한 표현을 얻는다.
+        </p>
+
+        <div class="figure-grid">
+          <figure class="figure">
+            <img src="assets/kykidxww2ae-ts-00-18-00.jpg" alt="원본 사진과 변형된 사진을 같은 임베딩으로 보내는 조인트 임베딩 구조" loading="lazy">
+            <figcaption>
+              <span class="figure-tag">Figure 10 · 00:18:00</span>
+              <span>원본과 가려진 뷰는 의미적으로 같은 장면이므로 표현도 같아야 한다.</span>
+            </figcaption>
+          </figure>
+
+          <figure class="figure">
+            <img src="assets/kykidxww2ae-ts-00-18-30.jpg" alt="모든 입력이 동일한 벡터가 되는 표현 붕괴 사례" loading="lazy">
+            <figcaption>
+              <span class="figure-tag">Figure 11 · 00:18:30</span>
+              <span>그러나 모든 입력을 같은 벡터로 보내도 두 표현의 유사도는 최대가 된다.</span>
+            </figcaption>
+          </figure>
+        </div>
+
+        <p>
+          이미지의 원본과 변형본을 같은 표현으로 보내면 조명, 가림, 색 변화에 흔들리지 않는 의미적
+          불변성을 얻을 수 있다. 하지만 두 벡터를 가깝게 만들라는 조건만 주면 네트워크는 모든 입력에
+          똑같은 벡터를 출력한다. 손실은 완벽하지만 정보는 사라진다. 이것이
+          <strong>표현 붕괴</strong>다.
+        </p>
+
+        <p>
+          원조 Siamese Networks는 일치하지 않는 입력인 negative 쌍을 멀리 보내는 대조 학습으로
+          붕괴를 막았다. 그러나 표현 공간이 커질수록 충분히 다양한 negative 샘플을 구성하는 비용이
+          증가한다. 영상 속 LeCun은 최악의 경우 필요한 대조 샘플 수가 표현 차원에 지수적으로 늘어날
+          수 있다고 설명한다.
+        </p>
+
+        <figure class="figure">
+          <img src="assets/kykidxww2ae-ts-00-20-40.jpg" alt="Horace Barlow의 1961년 논문 Possible Principles Underlying the Transformations of Sensory Messages" loading="lazy">
+          <figcaption>
+            <span class="figure-tag">Figure 12 · 00:20:40</span>
+            <span>돌파구는 Horace Barlow가 1961년에 제안한 감각계의 중복 감소 가설에서 왔다.</span>
+          </figcaption>
+        </figure>
+
+        <p>
+          2020년 LeCun과 일하던 포스닥 Stéphane Deny는 이 문제에 이론신경과학의 오래된 아이디어를
+          연결했다. Barlow는 시각계가 뉴런 간 중복 정보를 줄이는 방향으로 감각 메시지를 변환한다고
+          보았다. 표현을 서로 같게 만드는 동시에, 각 표현 차원이 서로 다른 정보를 맡도록 만들면
+          붕괴를 피할 수 있다는 발상이었다.
+        </p>
+
+        <figure class="figure">
+          <img src="assets/kykidxww2ae-ts-00-21-40.jpg" alt="이미지 배치에 걸친 한 뉴런의 활성값과 변형된 이미지 배치의 활성값을 비교한 그림" loading="lazy">
+          <figcaption>
+            <span class="figure-tag">Figure 13 · 00:21:40</span>
+            <span>각 임베딩 차원을 하나의 출력 뉴런으로 보고, 이미지 배치 전체에 걸친 활성 패턴을 비교한다.</span>
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="report-section" id="barlow">
+        <div class="section-heading">
+          <div class="section-number">04</div>
+          <div>
+            <div class="section-kicker">Redundancy reduction</div>
+            <h2>Barlow Twins: 단위행렬이 붕괴를 막는 법</h2>
+            <p>같은 장면의 대응 표현은 일치시키되, 서로 다른 표현 차원은 중복되지 않도록 만든다.</p>
+          </div>
+        </div>
+
+        <figure class="figure">
+          <img src="assets/kykidxww2ae-ts-00-23-30.jpg" alt="두 출력 벡터 사이의 Pearson 교차상관을 계산하는 수식과 시각화" loading="lazy">
+          <figcaption>
+            <span class="figure-tag">Figure 14 · 00:23:30</span>
+            <span>두 뷰에서 나온 각 뉴런의 배치별 활성값에 Pearson 상관계수를 적용해 모든 뉴런 쌍의 교차상관을 구한다.</span>
+          </figcaption>
+        </figure>
+
+        <div class="equation-card">
+          <div class="mini-label">Cross-correlation</div>
+          <span class="equation">
+            C<sub>ij</sub> =
+            Σ<sub>b</sub> z<sup>A</sup><sub>b,i</sub>z<sup>B</sup><sub>b,j</sub>
+            ÷
+            √(Σ<sub>b</sub>(z<sup>A</sup><sub>b,i</sub>)²)
+            √(Σ<sub>b</sub>(z<sup>B</sup><sub>b,j</sub>)²)
+          </span>
+          <p>
+            b는 배치의 이미지, i와 j는 두 네트워크의 임베딩 차원을 뜻한다.
+            모든 i·j 조합을 계산하면 표현 차원 사이의 교차상관 행렬이 만들어진다.
+          </p>
+        </div>
+
+        <figure class="figure">
+          <img src="assets/kykidxww2ae-ts-00-24-25.jpg" alt="관측된 교차상관 행렬과 목표 단위행렬을 비교한 Barlow Twins 손실 설명" loading="lazy">
+          <figcaption>
+            <span class="figure-tag">Figure 15 · 00:24:25</span>
+            <span>대응 차원의 상관은 1, 서로 다른 차원의 상관은 0에 가까워야 한다. 목표는 단위행렬이다.</span>
+          </figcaption>
+        </figure>
+
+        <div class="matrix-explainer" aria-label="교차상관 행렬이 단위행렬로 변하는 개념도">
+          <div class="matrix-copy">
+            <strong>관측 행렬</strong>
+            <small>중복되고 얽힌 표현</small>
+            <div class="matrix observed" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+
+          <div class="matrix-arrow" aria-hidden="true">→</div>
+
+          <div class="matrix-copy">
+            <strong>목표 행렬</strong>
+            <small>일치성과 비중복성</small>
+            <div class="matrix target" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+
+        <ol class="steps">
+          <li>
+            <div>
+              <strong>같은 이미지에서 두 개의 뷰를 만든다</strong>
+              <span>크롭, 가림, 색 변화 등으로 입력을 다르게 만들되 의미는 유지한다.</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <strong>두 뷰를 공유 가중치 인코더에 넣는다</strong>
+              <span>각 뷰에서 고차원 임베딩을 얻고 배치 전체의 활성 패턴을 모은다.</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <strong>대응 차원의 상관을 1로 보낸다</strong>
+              <span>같은 의미의 두 뷰가 같은 특징을 인식하도록 표현의 불변성을 강화한다.</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <strong>비대응 차원의 상관을 0으로 보낸다</strong>
+              <span>각 차원이 다른 정보를 담게 해 중복과 표현 붕괴를 억제한다.</span>
+            </div>
+          </li>
+        </ol>
+
+        <p>
+          Barlow Twins의 손실은 교차상관 행렬과 단위행렬 사이의 편차다. 대각 성분을 1로 만드는 항은
+          두 뷰의 대응 특징을 일치시킨다. 비대각 성분을 0으로 만드는 항은 서로 다른 특징이 같은 정보를
+          반복하지 않도록 한다. 모든 입력이 같은 벡터라면 비대각 상관이 커지므로 더는 최적해가 될 수 없다.
+        </p>
+
+        <figure class="figure">
+          <img src="assets/kykidxww2ae-ts-00-26-15.jpg" alt="동결된 Barlow Twins 인코더에 선형 분류층을 붙이는 리니어 프로브 평가" loading="lazy">
+          <figcaption>
+            <span class="figure-tag">Figure 16 · 00:26:15</span>
+            <span>동결된 인코더 위에 선형층 하나만 훈련하는 리니어 프로브에서 ImageNet 정확도 73.2%를 기록했다.</span>
+          </figcaption>
+        </figure>
+
+        <p>
+          표현 품질은 인코더를 동결하고 얕은 선형 분류층만 학습하는 리니어 프로브로 평가한다. 복잡한
+          파인튜닝의 효과를 줄이고, 사전학습된 특징이 이미 클래스를 얼마나 잘 분리하는지 보는 방식이다.
+          영상이 제시한 Barlow Twins의 ImageNet 정확도는 73.2%로, AlexNet의 59.3%를 13.9%포인트 앞선다.
+        </p>
+
+        <figure class="figure">
+          <img src="assets/kykidxww2ae-ts-00-26-50.jpg" alt="Siamese Networks에서 BYOL, Barlow Twins, VICReg와 DINO로 이어지는 자기지도 조인트 임베딩 계보" loading="lazy">
+          <figcaption>
+            <span class="figure-tag">Figure 17 · 00:26:50</span>
+            <span>Barlow Twins 이후 VICReg와 DINO 계열이 등장하며 비전 자기지도학습은 독립적인 주류 연구 축으로 성장했다.</span>
+          </figcaption>
+        </figure>
+
+        <div class="note-card">
+          <strong>구현상의 선택</strong>
+          <p>
+            영상 설명에 따르면 논문 부록은 같은 네트워크 안의 서로 다른 뉴런을 비교하는 대안도 실험했다.
+            결과 차이는 크지 않았고, 구현이 단순한 두 번째 네트워크 출력과의 비교가 최종 방식으로 채택됐다.
+          </p>
+        </div>
+      </section>
+
+      <section class="report-section" id="dino">
+        <div class="section-heading">
+          <div class="section-number">05</div>
+          <div>
+            <div class="section-kicker">Self-supervision catches up</div>
+            <h2>DINOv3가 보여준 2025년의 전환점</h2>
+            <p>라벨 없이 학습한 표현이 지도학습 모델의 ImageNet 성능과 사실상 동률에 도달했다.</p>
+          </div>
+        </div>
+
+        <figure class="figure">
+          <img src="assets/kykidxww2ae-ts-00-28-10.jpg" alt="DINOv3 논문과 AlexNet, Barlow Twins, ViT, DINOv3의 ImageNet 정확도 비교" loading="lazy">
+          <figcaption>
+            <span class="figure-tag">Figure 18 · 00:28:10</span>
+            <span>DINOv3 88.4%와 지도학습 ViT 88.6%의 격차는 0.2%포인트다. 영상은 이를 자기지도가 지도학습을 따라잡은 사건으로 제시한다.</span>
+          </figcaption>
+        </figure>
+
+        <div class="table-wrap">
+          <table>
+            <caption>영상에 제시된 ImageNet 성능 비교</caption>
+            <thead>
+              <tr>
+                <th>모델</th>
+                <th>연도</th>
+                <th>학습 방식</th>
+                <th>정확도</th>
+                <th>해석</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>AlexNet</td>
+                <td>2012</td>
+                <td>지도학습</td>
+                <td class="metric">59.3%</td>
+                <td>대규모 라벨 기반 비전 학습의 출발점</td>
+              </tr>
+              <tr>
+                <td>Barlow Twins</td>
+                <td>2021</td>
+                <td>자기지도 + 리니어 프로브</td>
+                <td class="metric">73.2%</td>
+                <td>중복 감소 기반 조인트 임베딩의 성과</td>
+              </tr>
+              <tr>
+                <td>ViT</td>
+                <td>2020</td>
+                <td>지도학습</td>
+                <td class="metric">88.6%</td>
+                <td>영상이 비교 기준으로 제시한 지도학습 성능</td>
+              </tr>
+              <tr>
+                <td>DINOv3</td>
+                <td>2025</td>
+                <td>자기지도학습</td>
+                <td class="metric">88.4%</td>
+                <td>지도학습 모델과 사실상 동률</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="caveat-card">
+          <strong>숫자를 읽을 때의 주의점</strong>
+          <p>
+            이 비교는 자기지도 표현의 장기적 발전을 보여주지만, 방법론만의 순수 효과를 측정하지는 않는다.
+            AlexNet과 DINOv3 사이에는 13년의 아키텍처·데이터·연산 차이가 있다.
+          </p>
+        </div>
+
+        <figure class="figure">
+          <img src="assets/kykidxww2ae-ts-00-28-40.jpg" alt="손바닥 패치를 기준으로 DINO 임베딩 유사도를 시각화해 손 영역이 분리된 장면" loading="lazy">
+          <figcaption>
+            <span class="figure-tag">Figure 19 · 00:28:40</span>
+            <span>손바닥의 한 패치를 기준으로 유사도를 표시하면 손 전체가 배경과 분리된다. 사람의 분할 라벨 없이 형성된 공간적 의미 구조다.</span>
+          </figcaption>
+        </figure>
+
+        <p>
+          정확도 하나보다 더 인상적인 증거는 패치 임베딩의 구조다. DINO는 이미지의 각 패치를 벡터로
+          표현한다. 손바닥의 한 패치와 가까운 임베딩을 찾아 색으로 표시하면, 배경이 아니라 손의 다른
+          부위가 함께 선택된다. 모델은 “손”이라는 라벨을 받지 않았지만 형태와 의미를 공유하는 영역을
+          표현 공간에서 묶었다.
+        </p>
+
+        <blockquote class="pullquote">
+          자기지도 비전의 성과는 이미지를 잘 복원한 것이 아니라, 라벨 없이도 세계의 의미적 경계를 드러낸 데 있다.
+          <cite>핵심 해석</cite>
+        </blockquote>
+      </section>
+
+      <section class="report-section" id="world-model">
+        <div class="section-heading">
+          <div class="section-number">06</div>
+          <div>
+            <div class="section-kicker">From representation to agency</div>
+            <h2>JEPA에 행동을 더하면 월드 모델이 된다</h2>
+            <p>다음 상태의 표현을 예측하고, 가능한 행동을 탐색해 목표 표현에 가까워지는 경로를 선택한다.</p>
+          </div>
+        </div>
+
+        <figure class="figure">
+          <img src="assets/kykidxww2ae-ts-00-29-28.jpg" alt="Configurator, Perception, World Model, Actor, Cost 모듈로 구성된 LeCun의 자율지능 아키텍처" loading="lazy">
+          <figcaption>
+            <span class="figure-tag">Figure 20 · 00:29:28</span>
+            <span>LeCun의 2022년 포지션 페이퍼가 제시한 자율지능 구조. 지각, 월드 모델, 기억, 행위자와 비용 모듈이 순환한다.</span>
+          </figcaption>
+        </figure>
+
+        <p>
+          LeCun은 상식을 “무엇이 그럴듯하고 무엇이 불가능한지 알려주는 세계 모델들의 집합”으로 본다.
+          세계 모델이 있어야 적은 시행으로 새 기술을 배우고, 행동의 결과를 예상하며, 추론·계획·탐색·
+          상상을 수행할 수 있다는 주장이다.
+        </p>
+
+        <p>
+          영상은 인간 청소년이 약 20시간의 연습으로 운전의 기본을 익히는 반면, 자율주행 시스템은
+          수백만 시간의 데이터에도 높은 수준의 일반화에 어려움을 겪는다는 대비를 든다. 수치 자체보다
+          중요한 논점은 인간이 관찰 데이터만 축적하는 것이 아니라 물리적 세계의 지속성, 원인과 결과,
+          가능한 행동을 압축된 모델로 학습한다는 것이다.
+        </p>
+
+        <figure class="figure">
+          <img src="assets/kykidxww2ae-ts-00-31-30.jpg" alt="비디오와 다음 프레임을 임베딩하고 예측 오차를 줄이는 V-JEPA 구조" loading="lazy">
+          <figcaption>
+            <span class="figure-tag">Figure 21 · 00:31:30</span>
+            <span>JEPA는 다음 프레임의 픽셀을 생성하지 않는다. 현재 비디오의 표현으로부터 다음 상태의 표현을 예측한다.</span>
+          </figcaption>
+        </figure>
+
+        <p>
+          현재 비디오와 다음 프레임을 각각 인코딩하면 두 벡터가 생긴다. 예측기는 현재 벡터로부터
+          다음 벡터를 예상하고 실제 목표 벡터와의 오차를 줄인다. 인코더가 나뭇잎의 미세한 흔들림이나
+          센서 노이즈를 버리고 객체, 위치, 운동처럼 안정적인 특징을 보존한다면 예측기도 그 핵심만
+          모델링하면 된다.
+        </p>
+
+        <figure class="figure">
+          <img src="assets/kykidxww2ae-ts-00-31-55.jpg" alt="대시캠 영상과 나뭇잎 움직임이 강조된 광학 흐름 시각화" loading="lazy">
+          <figcaption>
+            <span class="figure-tag">Figure 22 · 00:31:55</span>
+            <span>픽셀 수는 많지만 본질적으로 예측하기 어려운 나뭇잎 움직임. 생성 모델은 이런 세부사항에도 예측 자원을 써야 한다.</span>
+          </figcaption>
+        </figure>
+
+        <div class="comparison">
+          <div class="comparison-column">
+            <div class="mini-label">Generative objective</div>
+            <h3>보이는 모든 것을 맞힌다</h3>
+            <p>나뭇잎, 그림자, 질감, 센서 잡음처럼 행동과 무관하거나 예측 불가능한 픽셀도 손실에 포함한다.</p>
+          </div>
+          <div class="comparison-column">
+            <div class="mini-label">JEPA objective</div>
+            <h3>살아남은 특징을 맞힌다</h3>
+            <p>인코더가 보존한 객체와 상태의 핵심 특징을 표현 공간에서 예측해 모델링 부담을 줄인다.</p>
+          </div>
+        </div>
+
+        <figure class="figure">
+          <img src="assets/kykidxww2ae-ts-00-33-20.jpg" alt="행동 신호를 조건으로 미래 임베딩을 예측하고 목표 임베딩과 비교하는 JEPA 월드 모델" loading="lazy">
+          <figcaption>
+            <span class="figure-tag">Figure 23 · 00:33:20</span>
+            <span>예측기에 행동 신호를 추가하면 행동에 따른 미래 상태를 시뮬레이션할 수 있다. 목표 임베딩에 가까운 행동 시퀀스를 탐색해 제어한다.</span>
+          </figcaption>
+        </figure>
+
+        <ol class="steps">
+          <li>
+            <div>
+              <strong>현재 상태를 표현한다</strong>
+              <span>카메라 영상이나 센서 관측을 인코더에 넣어 현재 상태 임베딩을 얻는다.</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <strong>후보 행동을 조건으로 미래를 예측한다</strong>
+              <span>로봇 팔의 제어 신호처럼 실행 가능한 행동을 예측기의 추가 입력으로 넣는다.</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <strong>목표 상태도 같은 공간에 표현한다</strong>
+              <span>도달하려는 장면이나 상태를 인코딩해 목표 임베딩을 만든다.</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <strong>오차가 가장 작은 행동 시퀀스를 찾는다</strong>
+              <span>예측된 미래와 목표 표현의 거리를 최소화하도록 탐색·계획하고 선택한 행동을 실행한다.</span>
+            </div>
+          </li>
+        </ol>
+
+        <p>
+          LeCun은 이 구조를 고전 최적제어에 새로운 반전을 준 것으로 설명한다. 목표와 비용을 두고
+          행동 시퀀스를 최적화한다는 골격은 고전적이다. 다른 점은 환경의 동역학 모델을 사람이 쓰지
+          않고 데이터에서 학습하며, 더 나아가 최적화가 이루어지는 상태 표현 자체도 함께 학습한다는 데 있다.
+        </p>
+
+        <blockquote class="pullquote">
+          “행동의 결과를 예측할 능력 없이 에이전틱 시스템을 만든다는 발상 자체를 이해할 수 없다.”
+          <cite>Yann LeCun · 영상 인터뷰 취지</cite>
+        </blockquote>
+
+        <p>
+          이 관점에서 신뢰할 수 있는 에이전트는 답을 연속 생성하는 시스템이 아니다. 행동 후보의 결과를
+          먼저 예측하고, 목표 달성과 안전 조건을 함께 만족하는 경로를 탐색하는 시스템이다. 추론의 중심도
+          자기회귀 생성에서 <strong>탐색과 계획</strong>으로 이동한다.
+        </p>
+
+        <figure class="figure">
+          <img src="assets/kykidxww2ae-ts-00-35-00.jpg" alt="LeWorldModel의 Two-Room, Reacher, Push-T, OGBench Cube 성공률 비교 그래프" loading="lazy">
+          <figcaption>
+            <span class="figure-tag">Figure 24 · 00:35:00</span>
+            <span>Part 2에서 다룰 LeWorldModel 벤치마크 예고. 이 영상은 원리와 계보를 설명한 뒤 실제 성능 판정을 후속편으로 넘긴다.</span>
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="report-section" id="implications">
+        <div class="section-heading">
+          <div class="section-number">07</div>
+          <div>
+            <div class="section-kicker">Implications</div>
+            <h2>연구실 밖에서 무엇이 달라지는가</h2>
+            <p>JEPA의 실질적 가치는 생성 모델과의 철학적 경쟁보다 라벨, 예측 자원, 제어 구조를 다시 설계하게 한다는 데 있다.</p>
+          </div>
+        </div>
+
+        <div class="implication-grid">
+          <div class="implication">
+            <span class="icon-mark">01</span>
+            <h3>야외 로봇과 자율작업</h3>
+            <p>
+              흙, 먼지, 초목처럼 픽셀 비중은 크지만 예측 가치가 낮은 요소가 많은 환경에서 표현 공간 예측은
+              픽셀 재구성보다 효율적인 모델 예측 제어의 토대가 될 수 있다.
+            </p>
+          </div>
+
+          <div class="implication">
+            <span class="icon-mark">02</span>
+            <h3>라벨 비용 절감</h3>
+            <p>
+              현장 영상에 정교한 라벨을 붙이기 어려운 건설·농업·제조 도메인에서는 자체 비디오를 이용한
+              자기지도 사전학습을 먼저 검토할 근거가 생긴다.
+            </p>
+          </div>
+
+          <div class="implication">
+            <span class="icon-mark">03</span>
+            <h3>표현 중심 평가</h3>
+            <p>
+              동결 인코더와 리니어 프로브를 사용하면 대규모 파인튜닝 없이 사전학습 표현의 품질을 비교할 수
+              있다. 사내 모델 선택에 적용하기 쉬운 저비용 프로토콜이다.
+            </p>
+          </div>
+        </div>
+
+        <h3>실무 검토 체크리스트</h3>
+        <ul class="checklist">
+          <li>우리 데이터에서 행동에 중요한 변화와 예측 불가능한 픽셀 변화를 구분할 수 있는가?</li>
+          <li>인코더의 표현 품질을 측정할 고정된 리니어 프로브 과제와 데이터 분할이 있는가?</li>
+          <li>표현 붕괴를 평균 분산, 특이값, 차원별 상관 등으로 지속적으로 감시하는가?</li>
+          <li>목표 임베딩과 실제 과업 성공률 사이의 정렬을 별도로 검증하는가?</li>
+          <li>월드 모델의 예측 오차가 계획 단계에서 누적될 때 안전 제약을 어떻게 적용할 것인가?</li>
+        </ul>
+      </section>
+
+      <section class="report-section" id="limits">
+        <div class="section-heading">
+          <div class="section-number">08</div>
+          <div>
+            <div class="section-kicker">Limits & counterweights</div>
+            <h2>아직 승자는 정해지지 않았다</h2>
+            <p>영상은 설득력 있는 계보를 제공하지만 JEPA가 LLM 또는 생성형 월드 모델보다 우월하다는 최종 실증은 제시하지 않는다.</p>
+          </div>
+        </div>
+
+        <div class="limitation-grid">
+          <div class="limitation">
+            <span class="icon-mark">!</span>
+            <h3>판정은 Part 2로 유보</h3>
+            <p>
+              “But is JEPA good?” 챕터가 시작된 직후 LeWorldModel 예고로 넘어간다. 실제 비교 성능은
+              후속편의 증거를 함께 검토해야 한다.
+            </p>
+          </div>
+
+          <div class="limitation">
+            <span class="icon-mark">!</span>
+            <h3>비교 조건이 다르다</h3>
+            <p>
+              2012년 AlexNet과 2025년 DINOv3는 아키텍처, 데이터, 연산 규모가 모두 다르다.
+              하나의 막대그래프로 방법론의 순수 효과를 분리할 수 없다.
+            </p>
+          </div>
+
+          <div class="limitation">
+            <span class="icon-mark">!</span>
+            <h3>인터뷰 화자의 관점</h3>
+            <p>
+              LLM의 한계에 관한 강한 진술은 LeCun의 연구 관점이다. LLM 기반 멀티모달 모델과 생성형
+              월드 모델 진영의 반론은 영상에 충분히 포함되지 않는다.
+            </p>
+          </div>
+
+          <div class="limitation">
+            <span class="icon-mark">!</span>
+            <h3>리니어 프로브의 범위</h3>
+            <p>
+              분류에 선형 분리 가능한 표현이 계획·제어에도 좋은 표현이라는 보장은 없다.
+              동역학 예측과 장기 계획 평가는 별도로 필요하다.
+            </p>
+          </div>
+
+          <div class="limitation">
+            <span class="icon-mark">!</span>
+            <h3>표현 공간도 정보를 버린다</h3>
+            <p>
+              인코더가 예측하기 어려운 정보를 제거할 때 과업에 필요한 희귀 신호까지 버릴 수 있다.
+              무엇을 보존할지는 여전히 학습 목표와 데이터에 좌우된다.
+            </p>
+          </div>
+
+          <div class="limitation">
+            <span class="icon-mark">!</span>
+            <h3>자동 자막의 오류</h3>
+            <p>
+              수동 자막이 없어 기술 용어와 숫자는 화면 표기를 우선했다. 고유명사 자동 인식 오류가 많아
+              세부 인용은 원 논문과 대조해야 한다.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="report-section" id="timeline">
+        <div class="section-heading">
+          <div class="section-number">09</div>
+          <div>
+            <div class="section-kicker">Viewing guide</div>
+            <h2>37분 영상을 다시 볼 때의 지도</h2>
+            <p>핵심 논증과 기술 전환이 등장하는 구간을 중심으로 정리했다.</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <caption>챕터별 타임라인</caption>
+            <thead>
+              <tr>
+                <th>시각</th>
+                <th>챕터</th>
+                <th>핵심 역할</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="metric">00:00</td><td>Intro</td><td>10억 달러 베팅과 JEPA 문제 설정</td></tr>
+              <tr><td class="metric">02:28</td><td>The Problem with Deep Learning</td><td>생성 경로와 조인트 임베딩 경로의 분기</td></tr>
+              <tr><td class="metric">04:17</td><td>Intelligence is a Cake</td><td>자기지도·지도·강화학습의 역할 구분</td></tr>
+              <tr><td class="metric">05:15</td><td>The Rise of Generative AI</td><td>GPT-1과 언어 자기지도학습의 성공</td></tr>
+              <tr><td class="metric">08:00</td><td>Blurry Images</td><td>비디오 다음 프레임 생성의 실패</td></tr>
+              <tr><td class="metric">08:54</td><td>Hudson River Trading</td><td>스폰서 구간, 기술 분석에서 제외</td></tr>
+              <tr><td class="metric">11:16</td><td>But why so Blurry?</td><td>출력 공간과 불확실성 평균화 설명</td></tr>
+              <tr><td class="metric">13:30</td><td>Do models need to be generative?</td><td>생성에서 내부 표현으로 관점 전환</td></tr>
+              <tr><td class="metric">15:16</td><td>Siamese Networks</td><td>생성 없는 표현 학습의 기원</td></tr>
+              <tr><td class="metric">17:53</td><td>Representation Collapse</td><td>조인트 임베딩의 자명한 해</td></tr>
+              <tr><td class="metric">19:54</td><td>Barlow Twins</td><td>중복 감소와 단위행렬 손실</td></tr>
+              <tr><td class="metric">27:22</td><td>DINO</td><td>비전 자기지도학습의 성능 도약</td></tr>
+              <tr><td class="metric">28:58</td><td>JEPA &amp; World Models</td><td>표현 예측과 행동 조건부 계획</td></tr>
+              <tr><td class="metric">34:09</td><td>But is JEPA good?</td><td>LeWorldModel과 Part 2 예고</td></tr>
+              <tr><td class="metric">36:19</td><td>Welch Labs Book</td><td>도서 홍보 구간</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <caption>핵심 수치와 영상 내 근거</caption>
+            <thead>
+              <tr>
+                <th>항목</th>
+                <th>값</th>
+                <th>근거 위치</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>GPT-2 어휘 크기</td><td class="metric">50,257</td><td>00:12:00 화면</td></tr>
+              <tr><td>Full HD 프레임 경우의 수</td><td class="metric">≈ 10<sup>15,000,000</sup></td><td>00:12:00 화면 계산</td></tr>
+              <tr><td>관측 가능한 우주의 원자 수</td><td class="metric">≈ 10<sup>80</sup></td><td>00:12:00 비교</td></tr>
+              <tr><td>GPT-1 사전학습 데이터</td><td class="metric">도서 약 7,000권</td><td>05:55 자막</td></tr>
+              <tr><td>GPT-1 SOTA 벤치마크</td><td class="metric">9개</td><td>06:17 자막·그래프</td></tr>
+              <tr><td>AlexNet ImageNet</td><td class="metric">59.3%</td><td>00:26:15·00:28:10</td></tr>
+              <tr><td>Barlow Twins 리니어 프로브</td><td class="metric">73.2%</td><td>00:26:15·00:28:10</td></tr>
+              <tr><td>ViT 지도학습</td><td class="metric">88.6%</td><td>00:28:10 그래프</td></tr>
+              <tr><td>DINOv3 자기지도학습</td><td class="metric">88.4%</td><td>00:28:10 그래프</td></tr>
+              <tr><td>LeCun의 자금 조달 규모</td><td class="metric">10억 달러</td><td>00:08 자막·영상 프레이밍</td></tr>
+              <tr><td>2022 포지션 페이퍼</td><td class="metric">약 60쪽</td><td>29:06 자막</td></tr>
+              <tr><td>청소년 운전 습득 예시</td><td class="metric">약 20시간</td><td>29:36 인터뷰</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="share-frame" aria-labelledby="share-title">
+        <div class="section-kicker">Share framing</div>
+        <h2 id="share-title">이 글을 한 문단으로 공유한다면</h2>
+        <p>아래 문구는 제목과 핵심 논지를 함께 전달하도록 압축한 요약이다.</p>
+        <div class="copy-block">
+          LLM은 다음 토큰을 예측하며 강력한 표현을 배웠다. 그러나 영상의 다음 픽셀을 예측하면 가능한
+          미래가 평균화되어 흐려진다. Yann LeCun의 JEPA는 이 목표를 뒤집는다. 세계를 전부 생성하는 대신,
+          중요한 상태의 표현을 예측하고 행동에 따른 결과를 탐색한다. Barlow Twins의 표현 붕괴 해법에서
+          DINOv3와 행동 조건부 월드 모델까지, ‘생성 이후의 AI’가 어떤 계보로 만들어졌는지 살펴본다.
+        </div>
+      </section>
+
+      <section class="endnote" id="sources">
+        <div class="section-kicker">Method & source notes</div>
+        <h2>읽는 법과 출처</h2>
+
+        <p>
+          이 글은 독립적인 실험 재현 보고서가 아니라 Welch Labs 영상의 논증을 구조화하고 실무적 함의를
+          덧붙인 분석 기사다. 영상에는 수동 자막이 없어 영어 자동 생성 자막을 1차 근거로 사용하고,
+          한국어 자동 번역 자막은 보조 대조에만 사용했다. 한국어 자막은 원어 대비 분량 손실이 커
+          기술 용어 확인에는 사용하지 않았다.
+        </p>
+
+        <p>
+          JEPA, VICReg, Stéphane Deny, Barlow Twins 등 자동 자막에서 오인식된 고유명사는 영상 화면과
+          논문 표기를 우선했다. 숫자와 수식 역시 프레임에서 판독 가능한 항목을 중심으로 기재했다.
+          08:54–11:16의 스폰서 구간과 36:19 이후 도서 홍보는 기술 장면 선정에서 제외했다.
+        </p>
+
+        <ol class="source-notes">
+          <li>
+            주 영상:
+            <a target="_blank" rel="noopener noreferrer">
+              Welch Labs, “Yann LeCun's $1B Bet Against LLMs [Part 1]”
+            </a>, 게시일 2026-05-02, 37:24.
+          </li>
+          <li>
+            후속편:
+            <a target="_blank" rel="noopener noreferrer">
+              “Yann LeCun's $1B Bet Against LLMs [Part 2]”
+            </a>.
+          </li>
+          <li>
+            H. B. Barlow, “Possible Principles Underlying the Transformations of Sensory Messages,” 1961.
+            Barlow Twins의 중복 감소 논리를 설명하는 역사적 출발점으로 영상에 제시된다.
+          </li>
+          <li>
+            DINOv3, arXiv:2508.10104, 2025-08-13. 영상은 자기지도 비전 모델이 지도학습 모델과
+            대등한 ImageNet 성능에 도달한 사례로 인용한다.
+          </li>
+          <li>
+            Yann LeCun, “A Path Towards Autonomous Machine Intelligence,” 2022.
+            지각·월드 모델·기억·행위자·비용 모듈을 포함한 자율지능 아키텍처의 근거다.
+          </li>
+          <li>
+            <a target="_blank" rel="noopener noreferrer">
+              Meta AI, V-JEPA 연구 페이지
+            </a>.
+          </li>
+          <li>
+            <a target="_blank" rel="noopener noreferrer">
+              LeCun 외, CNN 관련 1989년 논문
+            </a>.
+          </li>
+          <li>
+            <a target="_blank" rel="noopener noreferrer">
+              LeCun 외, LeNet-5 관련 1998년 논문
+            </a>.
+          </li>
+          <li>
+            영상 내 감사 표기: Yann LeCun, Stéphane Deny, David Fan, Nicolas Ballas.
+          </li>
+        </ol>
+
+        <h2>독자에게 남는 질문</h2>
+        <p>
+          JEPA의 가장 강한 주장은 “LLM은 끝났다”가 아니다. 지능을 만드는 학습 목표가 관측의 모든
+          세부사항을 재생하는 일이어야 하는지, 아니면 행동의 결과를 예측하는 데 필요한 구조를 보존하는
+          일이어야 하는지 다시 묻는 데 있다. DINOv3는 표현 학습의 가능성을 보여줬지만, 계획 가능한
+          월드 모델의 우월성은 아직 검증 중이다. 따라서 다음에 확인할 것은 더 선명한 데모가 아니라
+          <strong>장기 예측 오차, 과업 성공률, 데이터 효율, 안전 제약 아래의 계획 성능</strong>이다.
+        </p>
+
+        <div class="note-card">
+          <strong>한 문장으로 끝내기</strong>
+          <p>
+            생성형 AI가 “다음에 무엇이 보일까?”를 묻는다면, JEPA는 “다음에 무엇이 중요하게 달라질까,
+            그리고 내가 무엇을 하면 목표에 도달할까?”를 묻는다.
+          </p>
+        </div>
+
+        <div class="tags" aria-label="태그">
+          <span class="tag">#AI</span>
+          <span class="tag">#JEPA</span>
+          <span class="tag">#WorldModel</span>
+          <span class="tag">#SelfSupervisedLearning</span>
+          <span class="tag">#JointEmbedding</span>
+          <span class="tag">#YannLeCun</span>
+          <span class="tag">#DINOv3</span>
+          <span class="tag">#BarlowTwins</span>
+        </div>
+      </section>
+    </article>
+  </main>
+
+  <footer>
+    Editorial research report · Source reviewed 19 August 2026 · Static, script-free publication
+  </footer>
+</body>
+</html>
