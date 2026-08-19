@@ -1,7 +1,19 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-19T07:00:46.921Z",
+  "updatedAt": "2026-08-19T07:45:06.820Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-yann-lecun-1b-bet-against-llms-part-2-%EC%9A%94%EC%95%BD/",
+      "excerpt": "Yann LeCun's $1B Bet Against LLMs [Part 2] 영상 정보 채널 : Welch Labs 게시일 : 2026 05 30 길이 : 40분 57초 링크 : https://www.youtube.com/watch?v=v jDvpEGTIg 선행편 : Part 1 → [[yt Yann LeCun 1B Bet Against LLMs Part 1 요약]] <div style=\"position: relative; w",
+      "shortId": "6nb1cr",
+      "slug": "yt-yann-lecun-1b-bet-against-llms-part-2-요약",
+      "sourcePath": "clippings/yt_Yann_LeCun_1B_Bet_Against_LLMs_Part_2_요약.md",
+      "tags": [],
+      "title": "Yann LeCun's $1B Bet Against LLMs [Part 2]",
+      "updatedAt": "2026-08-19T07:45:06.820Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/6nb1cr/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-yann-lecun-1b-bet-against-llms-part-1-%EC%9A%94%EC%95%BD/",

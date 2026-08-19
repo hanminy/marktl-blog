@@ -1,0 +1,1789 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LLM 이후의 AI는 세계를 예측할 수 있을까 — Yann LeCun의 10억 달러 JEPA 베팅</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      --ink: #17221f;
+      --muted: #64706b;
+      --paper: #f7f5ef;
+      --surface: #fffdf8;
+      --surface-2: #edf1eb;
+      --line: #d9ded7;
+      --green: #1e5b48;
+      --green-dark: #123c30;
+      --green-soft: #dceae3;
+      --coral: #c9614a;
+      --coral-soft: #f5e3dc;
+      --gold: #b88828;
+      --blue: #35657c;
+      --shadow: 0 18px 54px rgba(22, 42, 35, .09);
+      --radius: 22px;
+      --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "Noto Serif KR", "Nanum Myeongjo", Georgia, serif;
+      --sans: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--paper);
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 4%, rgba(30, 91, 72, .11), transparent 30rem),
+        radial-gradient(circle at 96% 20%, rgba(201, 97, 74, .08), transparent 28rem),
+        var(--paper);
+      font-family: var(--sans);
+      line-height: 1.78;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    a {
+      color: var(--green);
+      text-decoration-color: rgba(30, 91, 72, .35);
+      text-underline-offset: .2em;
+    }
+
+    a:hover,
+    a:focus-visible {
+      color: var(--coral);
+      text-decoration-color: currentColor;
+    }
+
+    :focus-visible {
+      outline: 3px solid rgba(201, 97, 74, .65);
+      outline-offset: 4px;
+    }
+
+    .skip-link {
+      position: absolute;
+      top: -5rem;
+      left: 1rem;
+      z-index: 100;
+      padding: .65rem 1rem;
+      color: white;
+      background: var(--green-dark);
+      border-radius: 999px;
+    }
+
+    .skip-link:focus {
+      top: 1rem;
+    }
+
+    .masthead {
+      border-bottom: 1px solid rgba(23, 34, 31, .12);
+    }
+
+    .masthead-inner {
+      width: min(1180px, calc(100% - 36px));
+      margin: 0 auto;
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand {
+      color: var(--ink);
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .13em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .masthead-meta {
+      color: var(--muted);
+      font-size: .78rem;
+    }
+
+    .hero {
+      width: min(1180px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: clamp(3.8rem, 9vw, 8.5rem) 0 clamp(3.2rem, 7vw, 6.5rem);
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(250px, .55fr);
+      gap: clamp(2rem, 7vw, 6rem);
+      align-items: end;
+    }
+
+    .eyebrow,
+    .section-kicker {
+      margin: 0 0 1rem;
+      color: var(--coral);
+      font-size: .76rem;
+      font-weight: 850;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    .display {
+      font-family: var(--serif);
+      font-weight: 750;
+      letter-spacing: -.035em;
+    }
+
+    h1 {
+      max-width: 900px;
+      margin: 0;
+      font-size: clamp(3rem, 7.6vw, 7.1rem);
+      line-height: .99;
+    }
+
+    .hero-deck {
+      max-width: 780px;
+      margin: 2rem 0 0;
+      color: #34423d;
+      font-family: var(--serif);
+      font-size: clamp(1.15rem, 2.1vw, 1.65rem);
+      line-height: 1.55;
+    }
+
+    .hero-aside {
+      padding: 1.4rem 0 0 1.4rem;
+      border-top: 4px solid var(--ink);
+      border-left: 1px solid var(--line);
+    }
+
+    .hero-aside strong {
+      display: block;
+      margin-bottom: .55rem;
+      font-size: .76rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .hero-aside p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    .hero-aside p + p {
+      margin-top: .65rem;
+    }
+
+    .hero-image {
+      width: min(1440px, 100%);
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+      background: var(--ink);
+    }
+
+    .hero-image img {
+      aspect-ratio: 16 / 8.7;
+      object-fit: cover;
+      opacity: .91;
+    }
+
+    .hero-image figcaption {
+      position: absolute;
+      right: clamp(1rem, 3vw, 2.5rem);
+      bottom: clamp(1rem, 3vw, 2.5rem);
+      max-width: 34rem;
+      padding: .85rem 1rem;
+      color: rgba(255, 255, 255, .88);
+      background: rgba(10, 21, 17, .76);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, .16);
+      font-size: .76rem;
+      line-height: 1.5;
+    }
+
+    .report-shell {
+      width: min(1180px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: clamp(4rem, 8vw, 8rem) 0;
+      display: grid;
+      grid-template-columns: 220px minmax(0, 760px);
+      gap: clamp(2.5rem, 7vw, 7rem);
+      justify-content: center;
+    }
+
+    .toc {
+      align-self: start;
+      position: sticky;
+      top: 1.5rem;
+      padding-top: .75rem;
+      border-top: 3px solid var(--ink);
+    }
+
+    .toc h2 {
+      margin: 0 0 1rem;
+      font-family: var(--sans);
+      font-size: .72rem;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    .toc ol {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: toc;
+    }
+
+    .toc li {
+      counter-increment: toc;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .toc a {
+      display: grid;
+      grid-template-columns: 1.6rem 1fr;
+      gap: .25rem;
+      padding: .72rem 0;
+      color: var(--muted);
+      font-size: .79rem;
+      line-height: 1.45;
+      text-decoration: none;
+    }
+
+    .toc a::before {
+      content: "0" counter(toc);
+      color: var(--coral);
+      font-size: .65rem;
+      font-weight: 800;
+      letter-spacing: .05em;
+    }
+
+    .toc a:hover,
+    .toc a:focus-visible {
+      color: var(--ink);
+    }
+
+    article {
+      min-width: 0;
+    }
+
+    .article-meta {
+      margin: 0 0 3rem;
+      padding: 1rem 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .6rem 1.2rem;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      font-size: .78rem;
+    }
+
+    .article-meta span {
+      white-space: nowrap;
+    }
+
+    .abstract {
+      margin-bottom: 4.5rem;
+      padding: clamp(1.5rem, 4vw, 2.8rem);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .abstract h2 {
+      margin: 0 0 1rem;
+      font-family: var(--sans);
+      font-size: .75rem;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    .abstract p {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(1.2rem, 2.4vw, 1.55rem);
+      line-height: 1.65;
+    }
+
+    section {
+      scroll-margin-top: 2rem;
+    }
+
+    .report-section {
+      margin: 0 0 clamp(5rem, 10vw, 8rem);
+    }
+
+    .report-section > h2 {
+      margin: 0 0 1.4rem;
+      font-size: clamp(2.1rem, 5vw, 3.6rem);
+      line-height: 1.12;
+    }
+
+    .report-section > h3 {
+      margin: 3.2rem 0 1rem;
+      font-size: clamp(1.35rem, 3vw, 1.85rem);
+      line-height: 1.3;
+    }
+
+    .lead {
+      margin: 0 0 2rem;
+      color: #35433e;
+      font-family: var(--serif);
+      font-size: 1.17rem;
+      line-height: 1.75;
+    }
+
+    p {
+      margin: 0 0 1.35rem;
+    }
+
+    .key-findings {
+      margin: 0 0 5.5rem;
+    }
+
+    .key-findings > h2 {
+      margin: 0 0 1.6rem;
+      font-size: clamp(2rem, 4vw, 3rem);
+    }
+
+    .finding-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .finding {
+      min-height: 210px;
+      padding: 1.45rem;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+
+    .finding .number {
+      display: block;
+      margin-bottom: 2.2rem;
+      color: var(--coral);
+      font-family: var(--serif);
+      font-size: 2.4rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .finding h3 {
+      margin: 0 0 .65rem;
+      font-family: var(--sans);
+      font-size: 1rem;
+      letter-spacing: -.015em;
+    }
+
+    .finding p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .86rem;
+      line-height: 1.65;
+    }
+
+    .verdict-strip {
+      margin: 2.5rem 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    .verdict {
+      padding: 1.35rem;
+    }
+
+    .verdict + .verdict {
+      border-left: 1px solid var(--line);
+    }
+
+    .verdict small {
+      display: block;
+      margin-bottom: .45rem;
+      color: var(--muted);
+      font-size: .67rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .verdict strong {
+      display: block;
+      margin-bottom: .35rem;
+      font-family: var(--serif);
+      font-size: 1.35rem;
+    }
+
+    .verdict p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .77rem;
+      line-height: 1.55;
+    }
+
+    .pullquote {
+      margin: clamp(3.5rem, 8vw, 6rem) calc(50% - 45vw);
+      padding: clamp(2.2rem, 6vw, 5rem) max(5vw, calc((90vw - 760px) / 2));
+      color: #f7f5ef;
+      background: var(--green-dark);
+      text-align: center;
+    }
+
+    .pullquote blockquote {
+      max-width: 960px;
+      margin: 0 auto;
+      font-family: var(--serif);
+      font-size: clamp(2rem, 5.4vw, 4.7rem);
+      font-weight: 750;
+      line-height: 1.13;
+      letter-spacing: -.04em;
+    }
+
+    .pullquote cite {
+      display: block;
+      margin-top: 1.4rem;
+      color: #a9c8bb;
+      font-size: .74rem;
+      font-style: normal;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .note {
+      margin: 2rem 0;
+      padding: 1.25rem 1.4rem;
+      background: var(--green-soft);
+      border-left: 4px solid var(--green);
+      border-radius: 0 14px 14px 0;
+    }
+
+    .note.warning {
+      background: var(--coral-soft);
+      border-left-color: var(--coral);
+    }
+
+    .note strong {
+      display: block;
+      margin-bottom: .35rem;
+      font-size: .82rem;
+      letter-spacing: .03em;
+    }
+
+    .note p {
+      margin: 0;
+      color: #3b4944;
+      font-size: .87rem;
+      line-height: 1.65;
+    }
+
+    figure.evidence {
+      margin: 2.7rem 0;
+      background: #111916;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    figure.evidence img {
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      background: #111;
+    }
+
+    figure.evidence figcaption {
+      padding: 1rem 1.2rem 1.2rem;
+      color: #d6dfdb;
+      font-size: .79rem;
+      line-height: 1.6;
+    }
+
+    figure.evidence figcaption strong {
+      color: white;
+    }
+
+    .figure-pair,
+    .figure-grid {
+      display: grid;
+      gap: 1rem;
+      margin: 2.7rem 0;
+    }
+
+    .figure-pair {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .figure-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .figure-pair .evidence,
+    .figure-grid .evidence {
+      margin: 0;
+    }
+
+    .figure-grid figure.evidence figcaption {
+      font-size: .72rem;
+    }
+
+    .diagram {
+      margin: 2.6rem 0;
+      padding: clamp(1.2rem, 4vw, 2.3rem);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .diagram-title {
+      margin: 0 0 1.4rem;
+      font-size: .75rem;
+      font-weight: 850;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .stack-map {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: .8rem;
+      align-items: stretch;
+    }
+
+    .stack-column {
+      display: grid;
+      gap: .7rem;
+    }
+
+    .stack-column h4 {
+      margin: 0 0 .2rem;
+      color: var(--muted);
+      font-size: .72rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .stack-node {
+      padding: 1rem;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    .stack-node.accent {
+      color: white;
+      background: var(--green);
+      border-color: var(--green);
+    }
+
+    .stack-node strong,
+    .stack-node span {
+      display: block;
+    }
+
+    .stack-node span {
+      margin-top: .25rem;
+      color: var(--muted);
+      font-size: .72rem;
+      line-height: 1.45;
+    }
+
+    .stack-node.accent span {
+      color: rgba(255, 255, 255, .74);
+    }
+
+    .map-arrows {
+      display: grid;
+      place-items: center;
+      padding-top: 2rem;
+      color: var(--coral);
+      font-size: 1.4rem;
+      font-weight: 900;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: .6rem;
+      align-items: stretch;
+    }
+
+    .flow-step {
+      position: relative;
+      padding: 1rem .8rem;
+      background: var(--surface-2);
+      border-radius: 12px;
+      text-align: center;
+      font-size: .75rem;
+      line-height: 1.5;
+    }
+
+    .flow-step:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      top: 50%;
+      right: -.58rem;
+      z-index: 2;
+      width: .58rem;
+      color: var(--coral);
+      transform: translateY(-50%);
+      font-weight: 900;
+    }
+
+    .flow-step b {
+      display: block;
+      margin-bottom: .3rem;
+      color: var(--green);
+      font-size: .68rem;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .equation {
+      margin: 1.8rem 0;
+      padding: 1.15rem 1.3rem;
+      overflow-x: auto;
+      color: #ecf6f1;
+      background: var(--ink);
+      border-radius: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: clamp(.78rem, 2vw, .95rem);
+      line-height: 1.65;
+      white-space: nowrap;
+    }
+
+    .table-wrap {
+      margin: 2.5rem 0;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 620px;
+      font-size: .79rem;
+      line-height: 1.55;
+    }
+
+    caption {
+      padding: 1rem 1.1rem;
+      color: var(--muted);
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-align: left;
+      text-transform: uppercase;
+    }
+
+    th,
+    td {
+      padding: .82rem 1rem;
+      border-top: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--green-dark);
+      background: var(--surface-2);
+      font-size: .71rem;
+      letter-spacing: .03em;
+    }
+
+    tbody tr:nth-child(even) td {
+      background: rgba(237, 241, 235, .42);
+    }
+
+    .rank-good {
+      color: var(--green);
+      font-weight: 800;
+    }
+
+    .rank-caution {
+      color: var(--coral);
+      font-weight: 800;
+    }
+
+    .takeaway-list,
+    .limitations {
+      margin: 2rem 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: takeaway;
+    }
+
+    .takeaway-list li,
+    .limitations li {
+      position: relative;
+      margin: 0;
+      padding: 1.15rem 0 1.15rem 3.2rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .takeaway-list li:last-child,
+    .limitations li:last-child {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .takeaway-list li {
+      counter-increment: takeaway;
+    }
+
+    .takeaway-list li::before {
+      content: counter(takeaway);
+      position: absolute;
+      top: 1.15rem;
+      left: 0;
+      display: grid;
+      width: 2rem;
+      height: 2rem;
+      place-items: center;
+      color: white;
+      background: var(--green);
+      border-radius: 50%;
+      font-family: var(--serif);
+      font-weight: 800;
+    }
+
+    .limitations li::before {
+      content: "!";
+      position: absolute;
+      top: 1.15rem;
+      left: 0;
+      display: grid;
+      width: 2rem;
+      height: 2rem;
+      place-items: center;
+      color: white;
+      background: var(--coral);
+      border-radius: 50%;
+      font-family: var(--serif);
+      font-weight: 800;
+    }
+
+    .takeaway-list strong,
+    .limitations strong {
+      display: block;
+      margin-bottom: .3rem;
+    }
+
+    .takeaway-list p,
+    .limitations p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    .share-card {
+      margin: 4rem 0;
+      padding: clamp(1.5rem, 4vw, 2.4rem);
+      color: #f7f5ef;
+      background: linear-gradient(135deg, var(--green-dark), #214f44);
+      border-radius: var(--radius);
+    }
+
+    .share-card h2 {
+      margin: 0 0 .7rem;
+      font-size: 1.8rem;
+    }
+
+    .share-card > p {
+      color: #c7d8d1;
+    }
+
+    .share-copy {
+      margin: 1.2rem 0 0;
+      padding: 1rem 1.1rem;
+      color: #eef8f4;
+      background: rgba(255, 255, 255, .08);
+      border: 1px solid rgba(255, 255, 255, .14);
+      border-radius: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: .78rem;
+      line-height: 1.65;
+      white-space: pre-wrap;
+    }
+
+    .source-list {
+      margin: 1.5rem 0 0;
+      padding-left: 1.25rem;
+    }
+
+    .source-list li {
+      margin: 0 0 .85rem;
+      padding-left: .3rem;
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.6;
+    }
+
+    .source-list strong {
+      color: var(--ink);
+    }
+
+    .method-box {
+      padding: 1.5rem;
+      background: var(--surface-2);
+      border-radius: 16px;
+    }
+
+    .method-box h3 {
+      margin: 0 0 .8rem;
+      font-family: var(--sans);
+      font-size: .95rem;
+    }
+
+    .method-box p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .84rem;
+    }
+
+    .closing {
+      margin: 6rem 0 2rem;
+      padding-top: 2.5rem;
+      border-top: 5px solid var(--ink);
+    }
+
+    .closing h2 {
+      max-width: 700px;
+      margin: 0 0 1.5rem;
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      line-height: 1.15;
+    }
+
+    .closing p {
+      font-family: var(--serif);
+      font-size: 1.15rem;
+    }
+
+    footer {
+      padding: 2rem 18px 4rem;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      text-align: center;
+      font-size: .75rem;
+    }
+
+    @media (max-width: 920px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-aside {
+        max-width: 520px;
+      }
+
+      .report-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .toc {
+        position: static;
+        display: none;
+      }
+
+      .pullquote {
+        margin-left: calc(50% - 50vw);
+        margin-right: calc(50% - 50vw);
+        padding-left: 5vw;
+        padding-right: 5vw;
+      }
+    }
+
+    @media (max-width: 700px) {
+      body {
+        line-height: 1.72;
+      }
+
+      .masthead-meta {
+        display: none;
+      }
+
+      .finding-grid,
+      .figure-pair,
+      .figure-grid,
+      .verdict-strip,
+      .stack-map,
+      .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .verdict + .verdict {
+        border-top: 1px solid var(--line);
+        border-left: 0;
+      }
+
+      .map-arrows {
+        min-height: 2rem;
+        padding: 0;
+        transform: rotate(90deg);
+      }
+
+      .flow-step:not(:last-child)::after {
+        content: "↓";
+        top: auto;
+        right: 50%;
+        bottom: -.68rem;
+        width: auto;
+        transform: translateX(50%);
+      }
+
+      .hero-image img {
+        aspect-ratio: 4 / 3;
+      }
+
+      .hero-image figcaption {
+        position: static;
+        background: var(--ink);
+      }
+
+      h1 {
+        font-size: clamp(2.8rem, 14vw, 4.8rem);
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+        color: black;
+      }
+
+      .masthead,
+      .toc,
+      .share-card,
+      .skip-link {
+        display: none;
+      }
+
+      .hero,
+      .report-shell {
+        width: 100%;
+        padding: 2rem 0;
+      }
+
+      .report-shell {
+        display: block;
+      }
+
+      figure,
+      .diagram,
+      .table-wrap,
+      .finding {
+        break-inside: avoid;
+        box-shadow: none;
+      }
+
+      .pullquote {
+        margin-left: 0;
+        margin-right: 0;
+        color: black;
+        background: #eee;
+      }
+
+      .pullquote cite {
+        color: #444;
+      }
+
+      a {
+        color: inherit;
+      }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Yann LeCun&#39;s $1B Bet Against LLMs [Part 2]">
+<meta property="og:description" content="Yann LeCun&#39;s $1B Bet Against LLMs [Part 2] 영상 정보 채널 : Welch Labs 게시일 : 2026 05 30 길이 : 40분 57초 링크 : https://www.youtube.com/watch?v=v jDvpEGTIg 선행편 : Part 1 → [[yt Yann LeCun 1B Bet Against LLMs Part 1 요약]] &lt;div style=&quot;position: relative; w">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/6nb1cr/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/6nb1cr/assets/v-jdvpegtig-ts-00-00-47.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Yann LeCun&#39;s $1B Bet Against LLMs [Part 2]">
+<meta name="twitter:description" content="Yann LeCun&#39;s $1B Bet Against LLMs [Part 2] 영상 정보 채널 : Welch Labs 게시일 : 2026 05 30 길이 : 40분 57초 링크 : https://www.youtube.com/watch?v=v jDvpEGTIg 선행편 : Part 1 → [[yt Yann LeCun 1B Bet Against LLMs Part 1 요약]] &lt;div style=&quot;position: relative; w">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/6nb1cr/assets/v-jdvpegtig-ts-00-00-47.jpg">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-yann-lecun-1b-bet-against-llms-part-2-%EC%9A%94%EC%95%BD/">
+</head>
+<body>
+  <a class="skip-link" href="#article">본문으로 이동</a>
+
+  <header class="masthead">
+    <div class="masthead-inner">
+      <a class="brand" href="#top">Research Editorial</a>
+      <div class="masthead-meta">AI · World Models · Robotics · 2026</div>
+    </div>
+  </header>
+
+  <main id="top">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Research Report · Yann LeCun’s $1B Bet, Part 2</p>
+        <h1>LLM 이후의 AI는<br>세계를 예측할 수 있을까</h1>
+        <p class="hero-deck">
+          V-JEPA 2에서 계층적 월드 모델까지. Yann LeCun의 “VLA는 망했다”는 주장을
+          인식·언어·로봇 제어의 세 층으로 분해해 검증한다.
+        </p>
+      </div>
+      <aside class="hero-aside" aria-label="보고서 요약 정보">
+        <strong>핵심 판정</strong>
+        <p>인식에서는 JEPA가 이미 강하다.</p>
+        <p>언어 결합에서는 효율 우위가 보인다.</p>
+        <p>그러나 로봇 제어에서는 아직 VLA가 압도적이다.</p>
+      </aside>
+    </header>
+
+    <figure class="hero-image">
+      <img src="assets/v-jdvpegtig-ts-00-39-06.jpg" alt="생성형 AI와 공동 임베딩 학습의 발전 계보를 보여주는 The Web of AI 포스터" fetchpriority="high">
+      <figcaption>
+        생성형 AI와 공동 임베딩이라는 두 계보가 각각 VLA와 JEPA 월드 모델로 이어진다.
+        영상의 마지막 장면은 이 논쟁이 단일 모델의 승부가 아니라 서로 다른 학습 철학의 충돌임을 보여준다.
+      </figcaption>
+    </figure>
+
+    <div class="report-shell">
+      <nav class="toc" aria-label="목차">
+        <h2>Contents</h2>
+        <ol>
+          <li><a href="#abstract">초록</a></li>
+          <li><a href="#findings">핵심 발견</a></li>
+          <li><a href="#stack">세 층의 대결</a></li>
+          <li><a href="#vision">인식: V-JEPA 2</a></li>
+          <li><a href="#language">언어: VL-JEPA</a></li>
+          <li><a href="#vla">VLA 비판</a></li>
+          <li><a href="#world-model">월드 모델과 계획</a></li>
+          <li><a href="#hierarchy">계층적 계획</a></li>
+          <li><a href="#numbers">수치와 판정</a></li>
+          <li><a href="#implications">시사점과 한계</a></li>
+          <li><a href="#sources">출처 노트</a></li>
+        </ol>
+      </nav>
+
+      <article id="article">
+        <div class="article-meta">
+          <span>작성일 <time datetime="2026-08-19">2026. 08. 19</time></span>
+          <span>원본 게시일 <time datetime="2026-05-30">2026. 05. 30</time></span>
+          <span>영상 길이 40:57</span>
+          <span>채널 Welch Labs</span>
+          <span>분류 AI Research</span>
+        </div>
+
+        <section class="abstract" id="abstract">
+          <h2>Abstract</h2>
+          <p>
+            이 보고서의 결론은 양쪽 모두에 냉정하다. 언어 감독 없이 비디오를 학습한
+            V-JEPA 2는 인식과 시간적 이해에서 최상위권 성능을 보이고, VL-JEPA는 출력 문장
+            대신 의미 임베딩을 예측해 학습 효율을 크게 높인다. 하지만 행동 조건부 월드 모델의
+            로봇 제어는 아직 VLA보다 극적으로 뒤처진다. LeCun의 베팅이 겨냥하는 것은 현재의
+            승자가 아니라, 행동하기 전에 결과를 예측하고 탐색할 수 있는 장기적 시스템 구조다.
+          </p>
+        </section>
+
+        <section class="key-findings" id="findings">
+          <p class="section-kicker">Executive summary</p>
+          <h2>먼저 읽는 다섯 가지 결론</h2>
+          <div class="finding-grid">
+            <article class="finding">
+              <span class="number">01</span>
+              <h3>JEPA의 성과는 층별로 다르다</h3>
+              <p>비전 인코더, 비전-언어, 로봇 제어를 하나의 승패로 묶으면 핵심을 놓친다. 인식에서는 강하고, 제어에서는 아직 약하다.</p>
+            </article>
+            <article class="finding">
+              <span class="number">02</span>
+              <h3>언어 없이 배운 표현도 언어 모델과 결합된다</h3>
+              <p>V-JEPA 2는 비디오 100만 시간으로 세계의 시각적 변화를 학습한 뒤 LLM과 정렬해 여러 비디오 벤치마크에서 SOTA급 결과를 냈다.</p>
+            </article>
+            <article class="finding">
+              <span class="number">03</span>
+              <h3>VL-JEPA의 장점은 ‘절대 승리’보다 효율</h3>
+              <p>500만 학습 예시에서 Top-5 정확도 35% 대 20%. 그러나 GQA에서는 일부 7B 모델을 앞설 뿐 최상위 비교군에는 뒤진다.</p>
+            </article>
+            <article class="finding">
+              <span class="number">04</span>
+              <h3>VLA 비판의 핵심은 일반화와 계획</h3>
+              <p>행동 복제는 시연 분포에 의존하고, 종단간 정책은 명시적으로 결과를 예측하지 않는다. 다만 RT-2 이후 VLA도 시연 밖 일반화를 보여왔다.</p>
+            </article>
+            <article class="finding">
+              <span class="number">05</span>
+              <h3>JEPA 진영의 병목은 계획 지평</h3>
+              <p>예측을 되먹일수록 오차가 누적된다. Push-T의 단일 계층 지평은 약 5회였고, 2계층 모델은 이를 15스텝으로 늘렸다.</p>
+            </article>
+            <article class="finding">
+              <span class="number">?</span>
+              <h3>최종 판정은 아직 유보</h3>
+              <p>JEPA가 스케일업되어 차세대 AI의 기반이 될지, 더 큰 해법의 한 부품에 머물지는 아직 증명되지 않았다.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="report-section" id="stack">
+          <p class="section-kicker">01 · The contest</p>
+          <h2>같은 로봇, 전혀 다른 출발점</h2>
+          <p class="lead">
+            영상은 일부러 불리한 장면에서 시작한다. 한쪽에서는 Physical Intelligence의
+            π0.7이 애호박을 자르고, 다른 쪽에서는 V-JEPA 기반 로봇이 컵 하나를 옮기는 데
+            60초를 쓴다. 질문은 “JEPA가 이미 더 좋은가”가 아니다. <strong>왜 LeCun은 지금
+            뒤처진 접근에 10억 달러를 걸었는가</strong>다.
+          </p>
+
+          <figure class="evidence">
+            <img src="assets/v-jdvpegtig-ts-00-00-47.jpg" alt="애호박을 자르는 VLA 로봇과 컵을 옮기는 JEPA 로봇의 비교 화면">
+            <figcaption><strong>장면 1 · 00:00:47</strong> — π0.7의 복잡한 조작과 JEPA 로봇의 느린 컵 이동. 현재 제어 능력의 간극을 숨기지 않는 출발점이다.</figcaption>
+          </figure>
+
+          <div class="figure-pair">
+            <figure class="evidence">
+              <img src="assets/v-jdvpegtig-ts-00-01-14.jpg" alt="비전 인코더, LLM, 액션 전문가로 구성된 VLA 스택">
+              <figcaption><strong>장면 2 · 00:01:14</strong> — VLA는 VLM을 감싸고, VLM은 비전 인코더와 LLM으로 구성된다. 최근 모델은 별도의 Action Expert도 사용한다.</figcaption>
+            </figure>
+            <figure class="evidence">
+              <img src="assets/v-jdvpegtig-ts-00-01-28.jpg" alt="V-JEPA 2, VL-JEPA, LeWorldModel을 VLA 스택의 각 층에 대응한 지도">
+              <figcaption><strong>장면 3 · 00:01:28</strong> — 비전에는 V-JEPA 2, 비전-언어에는 VL-JEPA, 행동에는 LeWorldModel이 대응한다.</figcaption>
+            </figure>
+          </div>
+
+          <div class="diagram" aria-label="VLA 스택과 JEPA 대안 비교">
+            <p class="diagram-title">Architecture map · 층별 대응 관계</p>
+            <div class="stack-map">
+              <div class="stack-column">
+                <h4>현재의 생성형 스택</h4>
+                <div class="stack-node">
+                  <strong>Vision Encoder</strong>
+                  <span>이미지·비디오를 표현으로 변환</span>
+                </div>
+                <div class="stack-node">
+                  <strong>VLM</strong>
+                  <span>비전 표현 + LLM으로 텍스트 생성</span>
+                </div>
+                <div class="stack-node">
+                  <strong>VLA</strong>
+                  <span>관측에서 로봇 행동을 직접 출력</span>
+                </div>
+              </div>
+              <div class="map-arrows" aria-hidden="true">⇄</div>
+              <div class="stack-column">
+                <h4>공동 임베딩 대안</h4>
+                <div class="stack-node accent">
+                  <strong>V-JEPA 2</strong>
+                  <span>가려진 비디오의 임베딩 예측</span>
+                </div>
+                <div class="stack-node accent">
+                  <strong>VL-JEPA</strong>
+                  <span>정답 문장이 아닌 의미 표현 예측</span>
+                </div>
+                <div class="stack-node accent">
+                  <strong>LeWorldModel</strong>
+                  <span>행동에 따른 다음 상태 표현 예측</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="verdict-strip" aria-label="층별 판정">
+            <div class="verdict">
+              <small>Perception</small>
+              <strong class="rank-good">JEPA 우세</strong>
+              <p>언어 감독 없는 비디오 표현이 SOTA급 결과를 낸다.</p>
+            </div>
+            <div class="verdict">
+              <small>Vision + Language</small>
+              <strong>혼합 판정</strong>
+              <p>효율은 강하지만 절대 성능의 전면 우위는 아니다.</p>
+            </div>
+            <div class="verdict">
+              <small>Robot control</small>
+              <strong class="rank-caution">VLA 우세</strong>
+              <p>월드 모델은 계획 지평과 실제 조작에서 크게 뒤처진다.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="report-section" id="vision">
+          <p class="section-kicker">02 · Perception</p>
+          <h2>언어를 버리고도 세계를 이해할 수 있는가</h2>
+          <p class="lead">
+            CLIP은 이미지를 사람이 쓴 캡션에 맞추지만, V-JEPA는 비디오에서 가려진 부분의
+            표현을 예측한다. 전자는 시각을 언어에 정렬하고, 후자는 언어에 구속되지 않은 채
+            세계의 변화 규칙을 학습하려 한다.
+          </p>
+
+          <div class="figure-pair">
+            <figure class="evidence">
+              <img src="assets/v-jdvpegtig-ts-00-03-39.jpg" alt="이미지와 캡션의 유사도를 학습하는 CLIP 설명 화면">
+              <figcaption><strong>장면 4 · 00:03:39</strong> — CLIP은 맞는 이미지·캡션 쌍을 가깝게, 틀린 쌍을 멀게 만든다.</figcaption>
+            </figure>
+            <figure class="evidence">
+              <img src="assets/v-jdvpegtig-ts-00-04-39.jpg" alt="V-JEPA 2 논문의 제목과 저자 정보">
+              <figcaption><strong>장면 5 · 00:04:39</strong> — V-JEPA 2는 이해, 예측, 계획을 하나의 자기지도 비디오 모델에 연결한다.</figcaption>
+            </figure>
+          </div>
+
+          <figure class="evidence">
+            <img src="assets/v-jdvpegtig-ts-00-05-26.jpg" alt="마스킹된 비디오로부터 사라진 패치의 임베딩을 예측하는 V-JEPA 2 학습 구조">
+            <figcaption><strong>장면 6 · 00:05:26</strong> — 손상된 클립의 표현으로부터 사라진 패치의 표현을 예측한다. 픽셀을 복원하는 것이 아니라 추상 표현 사이의 차이를 줄인다.</figcaption>
+          </figure>
+
+          <div class="equation" aria-label="V-JEPA 학습 목표">
+            predictor(encoder(masked video)) ≈ encoder(missing regions)
+          </div>
+
+          <div class="figure-pair">
+            <figure class="evidence">
+              <img src="assets/v-jdvpegtig-ts-00-06-02.jpg" alt="현실 지능은 언어가 아니라 세계에서 시작한다는 AMI Labs 페이지">
+              <figcaption><strong>장면 7 · 00:06:02</strong> — AMI의 선언은 명확하다. “Real intelligence does not start in language. It starts in the world.”</figcaption>
+            </figure>
+            <figure class="evidence">
+              <img src="assets/v-jdvpegtig-ts-00-06-20.jpg" alt="언어 없이 비디오를 학습하는 V-JEPA와 캡션에 정렬하는 CLIP 비교">
+              <figcaption><strong>장면 8 · 00:06:20</strong> — 같은 비전 인코더라도 목표가 다르다. V-JEPA는 세계 안의 규칙을, CLIP은 이미지와 언어의 대응을 배운다.</figcaption>
+            </figure>
+          </div>
+
+          <div class="pullquote">
+            <blockquote>지능은 언어에서 시작되지 않는다.<br>세계에서 시작된다.</blockquote>
+            <cite>AMI Labs의 문제 설정</cite>
+          </div>
+
+          <h3>통념과 반대되는 결과</h3>
+          <p>
+            당연한 반론이 남는다. 언어 없이 자기 방식대로 학습한 표현을 언어 모델이 쓸 수
+            있을까? V-JEPA 2 논문은 가능하다고 답한다. 언어 감독 없이 사전학습한 비디오
+            인코더를 언어 모델과 정렬한 뒤 MVP 44.5, PerceptionTest 84.0,
+            TempCompass 76.9 등의 성적을 기록했다. Epic-Kitchens-100의 행동 예측에서는
+            recall-at-5 39.7로 직전 최고 대비 44%의 상대 개선을 보고했다.
+          </p>
+
+          <figure class="evidence">
+            <img src="assets/v-jdvpegtig-ts-00-07-26.jpg" alt="언어 감독 없이 학습한 비디오 인코더가 최첨단 성능을 달성했다는 V-JEPA 2 논문 문단">
+            <figcaption><strong>장면 9 · 00:07:26</strong> — 논문은 언어 없는 사전학습이 언어 모델과 정렬될 수 있으며, 통념과 반대로 SOTA급 성능을 낸다고 주장한다.</figcaption>
+          </figure>
+
+          <div class="figure-pair">
+            <figure class="evidence">
+              <img src="assets/v-jdvpegtig-ts-00-07-52.jpg" alt="파인애플 영상의 정방향과 역방향을 구별하는 TempCompass 문제">
+              <figcaption><strong>장면 10 · 00:07:52</strong> — TempCompass는 같은 장면의 시간 방향을 뒤집어 진짜 시간적 이해를 시험한다.</figcaption>
+            </figure>
+            <figure class="evidence">
+              <img src="assets/v-jdvpegtig-ts-00-07-57.jpg" alt="여러 프런티어 모델의 정방향과 역방향 영상 문제 결과표">
+              <figcaption><strong>장면 11 · 00:07:57</strong> — 상용 프런티어 모델도 정·역방향 문제에서 일관되지 않았다. 시간 방향 이해는 여전히 열린 문제다.</figcaption>
+            </figure>
+          </div>
+
+          <div class="note">
+            <strong>해석의 핵심</strong>
+            <p>
+              V-JEPA 2가 증명한 것은 “언어가 필요 없다”가 아니다. 언어에 정렬되지 않은
+              시각 표현도 나중에 언어 모델과 연결할 수 있으며, 초기 표현 학습 단계에서
+              언어가 유일한 감독 신호일 필요는 없다는 것이다.
+            </p>
+          </div>
+        </section>
+
+        <section class="report-section" id="language">
+          <p class="section-kicker">03 · Vision and language</p>
+          <h2>문장 대신 의미를 예측하면 무엇이 달라지는가</h2>
+          <p class="lead">
+            표준 VLM은 다음 토큰을 생성한다. VL-JEPA는 정답 텍스트 자체가 아니라 그 문장의
+            임베딩을 예측한다. 표현이 달라도 의미가 같으면 같은 목표로 취급할 수 있다는 것이
+            이 설계의 가장 중요한 효율 가설이다.
+          </p>
+
+          <figure class="evidence">
+            <img src="assets/v-jdvpegtig-ts-00-09-50.jpg" alt="표준 VLM과 JEPA 방식 VLM의 구조적 대응을 설명하는 화면">
+            <figcaption><strong>장면 12 · 00:09:50</strong> — 비전 표현과 프롬프트가 예측기에 입력된다. 차이는 출력 토큰이 아니라 출력 문장의 임베딩을 맞힌다는 점이다.</figcaption>
+          </figure>
+
+          <div class="figure-pair">
+            <figure class="evidence">
+              <img src="assets/v-jdvpegtig-ts-00-10-44.jpg" alt="대시캠 영상과 나뭇잎 움직임의 광학 흐름을 비교한 화면">
+              <figcaption><strong>장면 13 · 00:10:44</strong> — 픽셀 생성은 예측할 수 없지만 정보량이 큰 나뭇잎의 움직임에도 계산을 쓴다.</figcaption>
+            </figure>
+            <figure class="evidence">
+              <img src="assets/v-jdvpegtig-ts-00-11-08.jpg" alt="먹으면 안 된다는 동일한 의미의 서로 다른 문장을 비교한 버섯 질문 예시">
+              <figcaption><strong>장면 14 · 00:11:08</strong> — “먹지 마라”와 “먹기에 안전하지 않다”는 표현상 다르지만 의미상 같은 답이다.</figcaption>
+            </figure>
+          </div>
+
+          <p>
+            생성 모델은 데이터에 기록된 한 문장을 정답으로 삼을 때 같은 의미의 다른 문장을
+            불필요하게 벌줄 수 있다. 공동 임베딩 공간에서는 서로 바꿔 말한 문장들이 가까운
+            위치에 놓이므로, 학습 목표가 표면적 표현 차이를 자동으로 무시한다.
+          </p>
+
+          <h3>효율은 분명하지만, 절대 성능의 승리는 아니다</h3>
+          <div class="figure-pair">
+            <figure class="evidence">
+              <img src="assets/v-jdvpegtig-ts-00-12-02.jpg" alt="VL-JEPA와 표준 VLM의 학습 예시 수에 따른 Top-5 정확도 비교 곡선">
+              <figcaption><strong>장면 15 · 00:12:02</strong> — 동일 인코더·데이터·설정에서 500만 예시 기준 VL-JEPA 35%, VLM 20%다.</figcaption>
+            </figure>
+            <figure class="evidence">
+              <img src="assets/v-jdvpegtig-ts-00-12-50.jpg" alt="VL-JEPA와 여러 비전 언어 모델의 GQA 점수 비교표">
+              <figcaption><strong>장면 16 · 00:12:50</strong> — 1.6B VL-JEPA는 여러 7B 모델보다 높지만 LLaVA-1.5 7B와 InternVL-Chat 13B에는 뒤진다.</figcaption>
+            </figure>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <caption>GQA 화면 수치의 보수적 판독</caption>
+              <thead>
+                <tr>
+                  <th>모델</th>
+                  <th>규모</th>
+                  <th>GQA</th>
+                  <th>VL-JEPA와 비교</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Qwen-VL</td>
+                  <td>7B</td>
+                  <td>59.3</td>
+                  <td class="rank-good">VL-JEPA 우세</td>
+                </tr>
+                <tr>
+                  <td>InternVL-Chat</td>
+                  <td>7B</td>
+                  <td>59.5</td>
+                  <td class="rank-good">VL-JEPA 우세</td>
+                </tr>
+                <tr>
+                  <td>VL-JEPA SFT</td>
+                  <td>1.6B</td>
+                  <td><strong>61.5</strong></td>
+                  <td>기준</td>
+                </tr>
+                <tr>
+                  <td>LLaVA-1.5</td>
+                  <td>7B</td>
+                  <td>62.0</td>
+                  <td class="rank-caution">VL-JEPA 열세</td>
+                </tr>
+                <tr>
+                  <td>InternVL-Chat</td>
+                  <td>13B</td>
+                  <td>66.6</td>
+                  <td class="rank-caution">VL-JEPA 열세</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <figure class="evidence">
+            <img src="assets/v-jdvpegtig-ts-00-13-24.jpg" alt="예측 임베딩과 후보 답의 임베딩을 비교해 답을 선택하는 VL-JEPA 추론 구조">
+            <figcaption><strong>장면 17 · 00:13:24</strong> — 비생성 모델은 후보 답 중 가장 가까운 임베딩을 선택하거나, 별도 텍스트 디코더를 붙여 문장을 생성한다.</figcaption>
+          </figure>
+
+          <figure class="evidence">
+            <img src="assets/v-jdvpegtig-ts-00-15-29.jpg" alt="네 살 아이의 시각 입력량과 LLM 학습 텍스트량을 비교한 손글씨 계산">
+            <figcaption><strong>장면 18 · 00:15:29</strong> — LeCun의 거친 계산은 네 살 아이의 누적 시각 입력을 약 10<sup>15</sup> bytes, 대형 LLM의 학습 텍스트를 약 10<sup>13</sup> bytes로 놓는다.</figcaption>
+          </figure>
+
+          <div class="note warning">
+            <strong>숫자를 읽는 방식</strong>
+            <p>
+              “VL-JEPA가 7B 모델들을 능가한다”는 내레이션은 화면 표의 일부에만 해당한다.
+              이 보고서는 서술보다 표에 적힌 값을 우선하며, 1.6B 모델의 높은 효율과
+              최상위 비교군 대비 열세를 동시에 기록한다.
+            </p>
+          </div>
+        </section>
+
+        <section class="report-section" id="vla">
+          <p class="section-kicker">04 · The VLA critique</p>
+          <h2>“VLA는 망했다”는 주장에는 두 개의 근거가 있다</h2>
+          <p class="lead">
+            LeCun의 비판은 성능 시연을 부정하는 데 있지 않다. 그는 행동 복제의 데이터
+            확장성과 명시적 계획의 부재를 문제 삼는다. 첫 번째 비판에는 강한 반론이 있지만,
+            두 번째는 시스템 구조에 관한 더 근본적인 질문이다.
+          </p>
+
+          <figure class="evidence">
+            <img src="assets/v-jdvpegtig-ts-00-17-18.jpg" alt="행동 복제 확장성과 명시적 계획 부재라는 두 가지 VLA 비판">
+            <figcaption><strong>장면 19 · 00:17:18</strong> — 비판 ① 행동 복제는 확장하기 어렵다. 비판 ② VLA에는 명시적으로 드러난 계획 과정이 없다.</figcaption>
+          </figure>
+
+          <h3>비판 ① 행동 복제는 시연 데이터에 묶인다</h3>
+          <figure class="evidence">
+            <img src="assets/v-jdvpegtig-ts-00-18-24.jpg" alt="사람의 손 동작을 로봇에 전달하는 ALOHA 원격조작 장비">
+            <figcaption><strong>장면 20 · 00:18:24</strong> — ALOHA 같은 원격조작 장비는 고품질 시연을 만들지만, 원하는 모든 과제와 변형을 사람이 보여줄 수는 없다.</figcaption>
+          </figure>
+
+          <div class="figure-pair">
+            <figure class="evidence">
+              <img src="assets/v-jdvpegtig-ts-00-18-55.jpg" alt="RT-2 로봇이 콜라 캔을 테일러 스위프트 이미지로 옮기는 모습">
+              <figcaption><strong>장면 21 · 00:18:55</strong> — RT-2는 시연에 없던 ‘Taylor Swift’ 개념을 사전학습 지식과 연결해 행동했다.</figcaption>
+            </figure>
+            <figure class="evidence">
+              <img src="assets/v-jdvpegtig-ts-00-19-38.jpg" alt="에어프라이어 과제와 가장 가까운 시연 데이터를 설명하는 Physical Intelligence 자료">
+              <figcaption><strong>장면 22 · 00:19:38</strong> — 새로운 과제에도 비슷한 시연은 존재할 수 있다. 일반화는 성공·실패의 이분법이 아니라 거리의 문제다.</figcaption>
+            </figure>
+          </div>
+
+          <p>
+            RT-2 이후의 VLA는 시연 데이터에 정확히 존재하지 않던 개념과 과제로 일반화해
+            왔다. 따라서 “행동 복제는 전혀 일반화하지 못한다”는 강한 명제는 유지되기 어렵다.
+            남는 질문은 <strong>시연 분포에서 얼마나 멀리, 얼마나 안정적으로 일반화할 수
+            있는가</strong>다.
+          </p>
+
+          <h3>비판 ② 행동하기 전에 결과를 예측하지 않는다</h3>
+          <div class="figure-pair">
+            <figure class="evidence">
+              <img src="assets/v-jdvpegtig-ts-00-20-24.jpg" alt="관측에서 다음 로봇 관절 위치를 직접 출력하는 종단간 VLA 루프">
+              <figcaption><strong>장면 23 · 00:20:24</strong> — VLA는 이미지와 관절 상태를 받고 다음 행동을 직접 출력한다. 여러 스텝을 한꺼번에 내더라도 계획 과정은 블랙박스다.</figcaption>
+            </figure>
+            <figure class="evidence">
+              <img src="assets/v-jdvpegtig-ts-00-20-48.jpg" alt="열쇠를 두 그리퍼 사이에서 교대하며 자물쇠를 여는 로봇">
+              <figcaption><strong>장면 24 · 00:20:48</strong> — 블랙박스라는 사실은 무능함을 뜻하지 않는다. π 로봇은 열쇠를 다시 쥐는 복잡한 행동 분해를 실제로 수행한다.</figcaption>
+            </figure>
+          </div>
+
+          <figure class="evidence">
+            <img src="assets/v-jdvpegtig-ts-00-22-20.jpg" alt="Stephen Welch와 Yann LeCun의 원격 인터뷰 화면">
+            <figcaption><strong>장면 25 · 00:22:20</strong> — LeCun은 신뢰 가능한 에이전트가 행동의 결과를 예측하고, 과제 달성과 안전 제약을 함께 만족하는 행동 시퀀스를 탐색해야 한다고 말한다.</figcaption>
+          </figure>
+
+          <div class="pullquote">
+            <blockquote>행동을 생성하는 것과<br>행동의 결과를 예측하는 것은 다르다.</blockquote>
+            <cite>생성과 계획을 가르는 구조적 차이</cite>
+          </div>
+        </section>
+
+        <section class="report-section" id="world-model">
+          <p class="section-kicker">05 · Planning in latent space</p>
+          <h2>월드 모델은 추론을 생성에서 탐색으로 바꾼다</h2>
+          <p class="lead">
+            행동 조건부 월드 모델은 사람의 행동을 그대로 흉내 내지 않는다. 현재 상태에서
+            특정 행동을 했을 때 다음 상태가 어떻게 변할지를 학습한다. 목표가 주어지면 여러
+            행동 시퀀스의 결과를 미리 굴려 보고 가장 나은 경로를 선택한다.
+          </p>
+
+          <figure class="evidence">
+            <img src="assets/v-jdvpegtig-ts-00-22-46.jpg" alt="파란색 T자 물체를 목표 위치로 미는 Push-T 과제">
+            <figcaption><strong>장면 26 · 00:22:46</strong> — Push-T는 단순해 보이지만 접촉 지점에 따라 물체가 회전·병진하므로 결과 예측이 필요하다.</figcaption>
+          </figure>
+
+          <figure class="evidence">
+            <img src="assets/v-jdvpegtig-ts-00-23-34.jpg" alt="현재 프레임과 행동으로 다음 프레임의 임베딩을 예측하는 월드 모델 학습 구조">
+            <figcaption><strong>장면 27 · 00:23:34</strong> — 현재 상태의 임베딩과 행동을 예측기에 넣어 다음 상태의 임베딩을 맞힌다.</figcaption>
+          </figure>
+
+          <div class="equation" aria-label="행동 조건부 월드 모델의 학습 목표">
+            predictor(embed(s<sub>t</sub>), a<sub>t</sub>) ≈ embed(s<sub>t+1</sub>)
+          </div>
+
+          <p>
+            입력은 원본 픽셀과 행동뿐이다. 모델은 T가 강체라는 사실, 어디를 밀면 어떤 방향으로
+            회전하는지, 엔드이펙터와 물체가 어떻게 상호작용하는지를 데이터에서 배운다.
+            예측 결과 자체는 사람이 읽을 수 없는 벡터이므로 분석할 때만 별도 이미지 디코더를
+            사용한다.
+          </p>
+
+          <div class="figure-pair">
+            <figure class="evidence">
+              <img src="assets/v-jdvpegtig-ts-00-24-48.jpg" alt="예측 임베딩을 디코딩해 행동에 따른 다음 장면을 시각화한 화면">
+              <figcaption><strong>장면 28 · 00:24:48</strong> — 예측 임베딩을 이미지로 되돌리면 모델이 상상한 다음 상태를 눈으로 확인할 수 있다.</figcaption>
+            </figure>
+            <figure class="evidence">
+              <img src="assets/v-jdvpegtig-ts-00-25-50.jpg" alt="월드 모델 롤아웃과 실제 환경의 상태 변화를 나란히 비교한 화면">
+              <figcaption><strong>장면 29 · 00:25:50</strong> — 짧은 지평에서는 대체로 맞지만 반복할수록 자세 오차가 누적된다. 이것이 계획 지평을 제한한다.</figcaption>
+            </figure>
+          </div>
+
+          <h3>CEM: 500개의 미래를 굴려 최선의 행동을 찾는다</h3>
+          <div class="diagram" aria-label="교차 엔트로피 방법 계획 절차">
+            <p class="diagram-title">Cross-Entropy Method · 계획 루프</p>
+            <div class="flow">
+              <div class="flow-step"><b>Sample</b>무작위 궤적<br>500개</div>
+              <div class="flow-step"><b>Rollout</b>월드 모델로<br>25스텝 예측</div>
+              <div class="flow-step"><b>Score</b>목표 임베딩과<br>거리 계산</div>
+              <div class="flow-step"><b>Select</b>상위 궤적<br>30개 선택</div>
+              <div class="flow-step"><b>Refine</b>분포를 갱신해<br>반복</div>
+            </div>
+          </div>
+
+          <div class="equation" aria-label="CEM 궤적 평가식">
+            score(trajectory) = ‖ predicted z<sub>final</sub> − z<sub>goal</sub> ‖<sub>2</sub>
+          </div>
+
+          <div class="figure-grid">
+            <figure class="evidence">
+              <img src="assets/v-jdvpegtig-ts-00-29-00.jpg" alt="목표 임베딩과의 거리로 색칠된 500개의 Push-T 후보 궤적">
+              <figcaption><strong>장면 30 · 00:29:00</strong> — 500개 무작위 궤적을 롤아웃하고 목표와의 거리로 채점한다.</figcaption>
+            </figure>
+            <figure class="evidence">
+              <img src="assets/v-jdvpegtig-ts-00-29-20.jpg" alt="목표와 가장 가까운 30개 엘리트 궤적을 선택하는 화면">
+              <figcaption><strong>장면 31 · 00:29:20</strong> — 상위 30개의 평균과 분산으로 후보 분포를 좁힌다.</figcaption>
+            </figure>
+            <figure class="evidence">
+              <img src="assets/v-jdvpegtig-ts-00-29-58.jpg" alt="계획된 경로를 실행해 T자 물체를 목표 위치로 옮긴 결과">
+              <figcaption><strong>장면 32 · 00:29:58</strong> — 선택한 궤적을 실행해 T를 목표 자세로 정렬한다.</figcaption>
+            </figure>
+          </div>
+
+          <div class="note">
+            <strong>왜 이것이 중요한가</strong>
+            <p>
+              비용 함수가 사람이 작성한 복잡한 규칙이 아니라 목표 이미지 한 장으로 대체된다.
+              계획은 픽셀이나 언어가 아닌 학습된 임베딩 공간에서 진행된다. 구조적으로는
+              표현 공간에서 수행하는 모델 예측 제어(MPC)에 가깝다.
+            </p>
+          </div>
+        </section>
+
+        <section class="report-section" id="hierarchy">
+          <p class="section-kicker">06 · The horizon problem</p>
+          <h2>멀리 보려면 디테일을 버려야 한다</h2>
+          <p class="lead">
+            단일 월드 모델의 가장 큰 약점은 롤아웃 오차다. 자세한 상태를 멀리까지 예측하려
+            할수록 현실과 빠르게 어긋난다. 계층적 월드 모델은 상위 층에서 성긴 서브골을
+            예측하고 하위 층에서 짧고 자세한 행동을 채우는 방식으로 이 문제를 다룬다.
+          </p>
+
+          <figure class="evidence">
+            <img src="assets/v-jdvpegtig-ts-00-32-48.jpg" alt="상위 예측기가 서브골을 만들고 하위 예측기가 세부 행동을 계획하는 계층적 월드 모델">
+            <figcaption><strong>장면 33 · 00:32:48</strong> — 상위 예측기는 굵은 시간 단위의 서브골을, 하위 예측기는 그 사이의 세밀한 행동을 담당한다.</figcaption>
+          </figure>
+
+          <figure class="evidence">
+            <img src="assets/v-jdvpegtig-ts-00-34-02.jpg" alt="뉴욕대학교 연구실에서 파리까지 이동하는 과제를 계층적으로 분해한 그림">
+            <figcaption><strong>장면 34 · 00:34:02</strong> — ‘내일 파리에 있기’는 공항 이동, 탑승, 택시 잡기, 자리에서 일어나기처럼 서로 다른 시간 규모의 하위 목표로 분해된다.</figcaption>
+          </figure>
+
+          <div class="diagram" aria-label="계층적 계획 예시">
+            <p class="diagram-title">한 목표, 여러 시간 규모</p>
+            <div class="stack-column">
+              <div class="stack-node accent">
+                <strong>장기 목표 · 내일 파리에 있기</strong>
+                <span>도시·시간 단위의 추상 계획</span>
+              </div>
+              <div class="stack-node">
+                <strong>상위 서브골 · 공항으로 이동 → 비행기 탑승</strong>
+                <span>수십 분에서 수 시간 단위</span>
+              </div>
+              <div class="stack-node">
+                <strong>중간 서브골 · 택시 잡기 → 건물 밖으로 나가기</strong>
+                <span>분 단위의 계획</span>
+              </div>
+              <div class="stack-node">
+                <strong>저수준 행동 · 일어나기 → 걷기 → 버튼 누르기</strong>
+                <span>초·밀리초 단위의 제어</span>
+              </div>
+            </div>
+          </div>
+
+          <p>
+            계층 사이의 인터페이스가 언어일 필요는 없다. LeCun은 심층 신경망의 층 사이와
+            같은 종류의 학습된 표현을 상정한다. 다만 완전 무작위 행동만으로는 고수준 구조가
+            드러나지 않으므로, 계층을 학습하려면 준전문가 궤적이 필요하다는 조건이 붙는다.
+          </p>
+
+          <div class="note warning">
+            <strong>아직은 작은 전진</strong>
+            <p>
+              영상이 제시한 Push-T 결과에서 계획 지평은 단일 계층 약 5회에서 2계층
+              15스텝으로 늘었다. 의미 있는 개선이지만 2D·완전 관측·단일 강체 환경을 넘어
+              실제 다자유도 로봇에 적용될지는 검증되지 않았다.
+            </p>
+          </div>
+        </section>
+
+        <section class="report-section" id="numbers">
+          <p class="section-kicker">07 · Evidence ledger</p>
+          <h2>수치로 다시 보는 판정</h2>
+
+          <div class="table-wrap">
+            <table>
+              <caption>영상과 논문 화면에서 확인한 주요 수치</caption>
+              <thead>
+                <tr>
+                  <th>항목</th>
+                  <th>값</th>
+                  <th>근거</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>V-JEPA 2 사전학습 비디오</td><td>100만 시간</td><td>자막 04:32</td></tr>
+                <tr><td>V-JEPA 2 파라미터</td><td>최대 10억</td><td>자막 04:37</td></tr>
+                <tr><td>MVP paired accuracy</td><td>44.5</td><td>논문 화면 07:26</td></tr>
+                <tr><td>PerceptionTest</td><td>84.0</td><td>논문 화면 07:26</td></tr>
+                <tr><td>TempCompass</td><td>76.9</td><td>논문 화면 07:26</td></tr>
+                <tr><td>TemporalBench</td><td>36.7</td><td>논문 화면 07:26</td></tr>
+                <tr><td>TOMATO</td><td>40.3</td><td>논문 화면 07:26</td></tr>
+                <tr><td>Epic-Kitchens-100 recall-at-5</td><td>39.7, 직전 최고 대비 +44%</td><td>논문 화면 07:26</td></tr>
+                <tr><td>V-JEPA 2-AC 사후학습</td><td>라벨 없는 로봇 데이터 62시간</td><td>논문 화면 07:26</td></tr>
+                <tr><td>VL-JEPA 대 VLM, 500만 예시</td><td>35% 대 20%</td><td>화면 12:02</td></tr>
+                <tr><td>VL-JEPA 대 VLM, 1,500만 예시</td><td>약 41% 대 27%</td><td>화면 12:02</td></tr>
+                <tr><td>VL-JEPA SFT</td><td>1.6B / GQA 61.5</td><td>화면 12:50</td></tr>
+                <tr><td>JEPA 로봇의 컵 이동</td><td>60초</td><td>자막 00:46</td></tr>
+                <tr><td>CEM 초기 후보</td><td>500개 궤적</td><td>화면 29:00</td></tr>
+                <tr><td>CEM 엘리트 집합</td><td>30개 궤적</td><td>화면 29:20</td></tr>
+                <tr><td>CEM 계획 길이</td><td>행동 5개씩, 총 25스텝</td><td>자막 27:54·28:22</td></tr>
+                <tr><td>단일 계층 계획 지평</td><td>약 5회 예측 루프</td><td>자막 30:33</td></tr>
+                <tr><td>2계층 계획 지평</td><td>15스텝</td><td>자막 32:47</td></tr>
+                <tr><td>AMI 산업 응용 예상 시점</td><td>1–2년 내</td><td>자막 36:08</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>결론을 한 문장씩 압축하면</h3>
+          <ol class="takeaway-list">
+            <li>
+              <strong>인식 층: JEPA의 가설은 이미 상당 부분 작동한다.</strong>
+              <p>언어 감독 없이 학습한 비디오 표현도 LLM과 결합되며 시간적 이해 벤치마크에서 강한 결과를 낸다.</p>
+            </li>
+            <li>
+              <strong>비전-언어 층: 목표 함수의 효율 개선은 유망하다.</strong>
+              <p>텍스트 표면형 대신 의미 임베딩을 예측하면 같은 데이터에서 더 빨리 학습하지만, 전 과제에서 절대 우위가 증명된 것은 아니다.</p>
+            </li>
+            <li>
+              <strong>제어 층: 현재 성능은 VLA가 앞선다.</strong>
+              <p>월드 모델의 명시적 계획은 구조적으로 매력적이지만, 오차 누적과 짧은 지평 때문에 실제 로봇 능력은 아직 제한적이다.</p>
+            </li>
+            <li>
+              <strong>장기 승부: 안전하고 검증 가능한 계획이 차별점이다.</strong>
+              <p>행동 전 결과를 예측할 수 있다면 목표 달성뿐 아니라 안전 제약도 탐색 단계에서 평가할 수 있다.</p>
+            </li>
+          </ol>
+        </section>
+
+        <section class="report-section" id="implications">
+          <p class="section-kicker">08 · Implications</p>
+          <h2>연구와 현장에 남는 다섯 가지 시사점</h2>
+
+          <ol class="takeaway-list">
+            <li>
+              <strong>목표 이미지 기반 제어를 검토할 가치가 있다.</strong>
+              <p>목표 상태를 수식으로 쓰기 어려운 굴착 형상, 적재 상태, 비정형 조작에서는 임베딩 거리 기반 MPC가 손으로 설계한 보상 함수를 보완할 수 있다.</p>
+            </li>
+            <li>
+              <strong>장주기 작업은 처음부터 계층형으로 설계해야 한다.</strong>
+              <p>롤아웃 오차는 구현상의 작은 버그가 아니라 예측 모델의 구조적 제약이다. 장기 목표와 저수준 제어를 같은 해상도로 다루기 어렵다.</p>
+            </li>
+            <li>
+              <strong>‘방정식으로 충분히 쓸 수 없는 복잡계’가 우선 적용처다.</strong>
+              <p>제트 엔진, 공정 플랜트, 혈당 제어, 줄기세포 분화, 소재·촉매·배터리 설계처럼 정확한 동역학을 쓰기 어려운 시스템이 AMI의 표적이다.</p>
+            </li>
+            <li>
+              <strong>통제 실험의 설계를 본받을 만하다.</strong>
+              <p>인코더·데이터·학습 설정을 고정하고 예측 목표만 교체한 VL-JEPA 비교는 아키텍처 효과를 분리하는 좋은 평가 템플릿이다.</p>
+            </li>
+            <li>
+              <strong>데이터 수집에는 준전문가 궤적이 필요하다.</strong>
+              <p>완전 무작위 탐색만으로는 고수준 서브골 구조가 나타나지 않는다. 반숙련 조작자의 다양한 궤적이 계층 학습의 현실적인 출발점이 된다.</p>
+            </li>
+          </ol>
+
+          <h3>이 보고서가 넘어서지 않는 한계</h3>
+          <ul class="limitations">
+            <li>
+              <strong>주장의 출발점 자체가 LeCun 진영에 기울어 있다.</strong>
+              <p>“VLA는 망했다”는 핵심 명제는 LeCun의 발언이다. 영상은 RT-2와 π0.7 사례로 균형을 시도하지만 VLA 연구자의 직접 반론은 포함하지 않는다.</p>
+            </li>
+            <li>
+              <strong>VL-JEPA의 효�� 우위는 제한된 통제 과제에서 측정됐다.</strong>
+              <p>제로샷 비디오 분류의 학습 곡선이 다른 추론·생성·로봇 과제로 그대로 일반화된다고 볼 수 없다.</p>
+            </li>
+            <li>
+              <strong>Push-T는 장난감 환경이다.</strong>
+              <p>2D 제어, 단일 강체, 완전 관측 조건에서 얻은 5→15스텝 개선은 부분 관측과 복잡한 접촉이 있는 실제 로봇의 증거가 아니다.</p>
+            </li>
+            <li>
+              <strong>JEPA와 VLA의 직접 대결표가 없다.</strong>
+              <p>같은 로봇 과제, 데이터, 지표에서 두 접근을 비교한 정량 실험 없이 층별 대리 지표와 시연을 종합해 판단한다.</p>
+            </li>
+            <li>
+              <strong>자동 자막과 화면 판독에 의존한다.</strong>
+              <p>수동 자막이 없어 영어 자동 자막을 사용했다. 고유명사와 숫자는 화면 표기를 우선했으며 자막만 근거인 값은 시각을 함께 기록했다.</p>
+            </li>
+          </ul>
+        </section>
+
+        <aside class="share-card" aria-labelledby="share-title">
+          <h2 id="share-title">공유용 요약</h2>
+          <p>아래 문장은 뉴스레터·메신저·소셜 포스트에 바로 사용할 수 있도록 압축한 설명이다.</p>
+          <div class="share-copy">Yann LeCun의 JEPA 베팅은 현재의 로봇 성능에 거는 돈이 아니다. V-JEPA 2는 인식에서 이미 강하고 VL-JEPA는 학습 효율을 보여줬지만, 월드 모델 기반 제어는 아직 VLA에 크게 뒤처진다. 승부처는 “행동을 얼마나 잘 생성하는가”가 아니라 “행동하기 전에 결과를 예측하고 안전한 경로를 탐색할 수 있는가”다.</div>
+        </aside>
+
+        <section class="report-section" id="sources">
+          <p class="section-kicker">09 · Source notes</p>
+          <h2>출처와 조사 방법</h2>
+
+          <div class="method-box">
+            <h3>방법론 메모</h3>
+            <p>
+              이 글은 Welch Labs 영상의 영어 자동 자막 1,177줄과 영상 프레임을 1차 근거로
+              재구성했다. 자동 자막이 JEPA, V-JEPA, LeWorldModel, π0.7 등의 고유명사를
+              오인식하는 경우 화면에 표시된 철자와 숫자를 우선했다. 스폰서 구간
+              15:13–17:14와 포스터·Patreon 홍보 구간은 기술 분석에서 제외했다.
+            </p>
+          </div>
+
+          <ol class="source-list">
+            <li><strong>원본 영상:</strong> <a rel="noopener noreferrer">Welch Labs, “Yann LeCun’s $1B Bet Against LLMs [Part 2]”</a>, 2026-05-30.</li>
+            <li><strong>선행편:</strong> <a rel="noopener noreferrer">Yann LeCun’s $1B Bet Against LLMs [Part 1]</a>.</li>
+            <li><strong>V-JEPA 2:</strong> <a rel="noopener noreferrer">Self-Supervised Video Models Enable Understanding, Prediction and Planning</a>, arXiv:2506.09985.</li>
+            <li><strong>VL-JEPA:</strong> <a rel="noopener noreferrer">VL-JEPA paper</a>, arXiv:2512.10942.</li>
+            <li><strong>LeWorldModel:</strong> <a rel="noopener noreferrer">LeWorldModel paper</a>, arXiv:2603.19312.</li>
+            <li><strong>계층적 월드 모델:</strong> <a rel="noopener noreferrer">Hierarchical Planning with Latent World Models</a>, arXiv:2604.03208.</li>
+            <li><strong>LeJEPA와 SIGReg:</strong> <a rel="noopener noreferrer">LeJEPA theory</a>, arXiv:2511.08544.</li>
+            <li><strong>자기지도 학습과 스펙트럴 임베딩:</strong> <a rel="noopener noreferrer">관련 이론 연구</a>, arXiv:2205.11508.</li>
+            <li><strong>월드 모델 식별가능성:</strong> <a rel="noopener noreferrer">LeWorldModel identifiability theory</a>, arXiv:2605.26379.</li>
+            <li><strong>Physical Intelligence:</strong> <a rel="noopener noreferrer">π0.7 소개</a>.</li>
+            <li><strong>ALOHA:</strong> <a rel="noopener noreferrer">Zipeng Fu의 Stanford 원격조작 영상</a>.</li>
+            <li><strong>시간적 비디오 이해:</strong> Liu Yuanxin 외, “TempCompass: Do Video LLMs Really Understand Videos?”, ACL Findings 2024.</li>
+          </ol>
+        </section>
+
+        <section class="closing">
+          <p class="section-kicker">Final perspective</p>
+          <h2>지금 앞선 모델과 오래 살아남을 구조는 같지 않을 수 있다</h2>
+          <p>
+            현재의 로봇 시연만 보면 VLA가 승자다. 월드 모델은 더 느리고, 더 단순한 과제에서,
+            더 짧은 미래만 예측한다. 그러나 LeCun이 거는 베팅은 장기적인 시스템 원리에 있다.
+            신뢰 가능한 에이전트라면 행동을 출력하는 것만으로는 부족하고, 행동이 세계를 어떻게
+            바꿀지 예측하며 여러 미래를 비교할 수 있어야 한다는 주장이다.
+          </p>
+          <p>
+            JEPA가 그 원리를 실제 규모에서 구현할지는 아직 알 수 없다. 인식 층의 성공은
+            고무적이지만 제어 층의 격차도 명백하다. 가장 정확한 결론은 승리 선언이 아니라
+            연구 의제다. <strong>언어 밖의 세계를 학습하고, 긴 시간 규모에서 안정적으로
+            예측하며, 탐색 가능한 계획으로 연결할 수 있는가.</strong> 10억 달러의 베팅은
+            바로 그 질문에 걸려 있다.
+          </p>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <footer>
+    <p>Research editorial based on Welch Labs · Source published 2026-05-30 · Report prepared 2026-08-19</p>
+  </footer>
+</body>
+</html>
