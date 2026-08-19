@@ -1,9 +1,12 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>모델은 경계를 세우고, 학습은 그 안에서 확장한다 | 로봇 로코-매니퓰레이션 연구</title>
+  <title>모델과 학습 사이에 다리를 놓다 — 로봇 로코-매니퓰레이션의 세 가지 해법</title>
+  
+  
+  
   
   
   
@@ -20,23 +23,22 @@
   
   <style>
     :root {
-      color-scheme: light;
-      --ink: #17211f;
-      --ink-soft: #52605d;
+      --ink: #172029;
+      --ink-soft: #46535d;
+      --muted: #6d7982;
       --paper: #f7f4ed;
-      --paper-strong: #fffdf8;
-      --forest: #153b36;
-      --forest-deep: #102b28;
-      --mint: #dcebe4;
-      --mint-light: #edf5f0;
-      --coral: #d7674d;
-      --coral-light: #fae6df;
-      --gold: #ad7b2d;
-      --line: #d7d6cc;
-      --white: #ffffff;
-      --shadow: 0 20px 55px rgba(25, 52, 48, .11);
-      --radius-lg: 28px;
-      --radius-md: 18px;
+      --paper-deep: #eee9de;
+      --surface: #fffdf8;
+      --navy: #102b3f;
+      --blue: #1f5f78;
+      --teal: #148178;
+      --teal-soft: #dcefeb;
+      --orange: #d56b3e;
+      --gold: #d7a640;
+      --line: #d9d5cb;
+      --line-dark: #bfc5c5;
+      --shadow: 0 24px 65px rgba(16, 43, 63, 0.11);
+      --radius: 22px;
       --content: 760px;
       --wide: 1160px;
     }
@@ -54,25 +56,25 @@
       margin: 0;
       color: var(--ink);
       background:
-        radial-gradient(circle at 8% 4%, rgba(215, 103, 77, .10), transparent 24rem),
-        linear-gradient(180deg, #faf8f3 0, var(--paper) 42rem);
-      font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+        radial-gradient(circle at 8% 3%, rgba(20, 129, 120, 0.09), transparent 27rem),
+        radial-gradient(circle at 92% 14%, rgba(213, 107, 62, 0.08), transparent 30rem),
+        var(--paper);
+      font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, -apple-system, sans-serif;
       font-size: 17px;
-      line-height: 1.82;
+      line-height: 1.78;
       word-break: keep-all;
       overflow-wrap: break-word;
     }
 
     a {
-      color: var(--forest);
-      text-decoration-color: rgba(21, 59, 54, .35);
-      text-underline-offset: .18em;
+      color: var(--blue);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.2em;
     }
 
     a:hover,
-    a:focus {
-      color: var(--coral);
-      text-decoration-color: currentColor;
+    a:focus-visible {
+      color: var(--orange);
     }
 
     img {
@@ -81,52 +83,22 @@
       height: auto;
     }
 
-    h1,
-    h2,
-    h3,
-    blockquote,
-    .display {
-      font-family: "Iowan Old Style", "Noto Serif KR", "AppleMyungjo", "Batang", Georgia, serif;
-      letter-spacing: -.025em;
+    figure {
+      margin: 0;
     }
 
-    h1,
-    h2,
-    h3,
-    p {
-      margin-top: 0;
-    }
-
-    h2 {
-      margin: 0 0 1.5rem;
-      color: var(--forest-deep);
-      font-size: clamp(2rem, 5vw, 3.35rem);
-      line-height: 1.16;
-    }
-
-    h3 {
-      margin: 2.8rem 0 1rem;
-      color: var(--forest-deep);
-      font-size: clamp(1.35rem, 3vw, 1.85rem);
-      line-height: 1.35;
-    }
-
-    p {
-      margin-bottom: 1.25rem;
-    }
-
-    strong {
-      color: var(--forest-deep);
+    blockquote {
+      margin: 0;
     }
 
     .skip-link {
       position: absolute;
-      top: -4rem;
+      top: -5rem;
       left: 1rem;
-      z-index: 20;
-      padding: .7rem 1rem;
-      color: var(--white);
-      background: var(--forest-deep);
+      z-index: 100;
+      padding: 0.7rem 1rem;
+      color: white;
+      background: var(--navy);
       border-radius: 8px;
     }
 
@@ -134,14 +106,14 @@
       top: 1rem;
     }
 
-    .site-bar {
-      border-bottom: 1px solid rgba(21, 59, 54, .14);
-      background: rgba(250, 248, 243, .92);
+    .site-header {
+      border-bottom: 1px solid rgba(16, 43, 63, 0.13);
+      background: rgba(247, 244, 237, 0.94);
     }
 
-    .site-bar-inner {
+    .site-header-inner {
       width: min(calc(100% - 2rem), var(--wide));
-      min-height: 66px;
+      min-height: 64px;
       margin: 0 auto;
       display: flex;
       align-items: center;
@@ -150,145 +122,214 @@
     }
 
     .brand {
-      color: var(--forest-deep);
-      font-weight: 800;
-      letter-spacing: .08em;
+      color: var(--navy);
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 700;
+      letter-spacing: 0.04em;
       text-decoration: none;
-      text-transform: uppercase;
     }
 
-    .site-tag {
-      color: var(--ink-soft);
-      font-size: .8rem;
-      letter-spacing: .08em;
+    .report-label {
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 750;
+      letter-spacing: 0.13em;
       text-transform: uppercase;
     }
 
     .hero {
-      padding: clamp(3.5rem, 9vw, 8rem) 1rem 4rem;
+      position: relative;
+      overflow: hidden;
+      color: white;
+      background: var(--navy);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(118deg, rgba(7, 25, 38, 0.98) 0%, rgba(12, 44, 61, 0.92) 56%, rgba(20, 129, 120, 0.55) 100%),
+        repeating-linear-gradient(135deg, transparent 0 38px, rgba(255,255,255,0.025) 38px 39px);
     }
 
     .hero-inner {
-      width: min(100%, var(--wide));
+      position: relative;
+      z-index: 1;
+      width: min(calc(100% - 2rem), var(--wide));
       margin: 0 auto;
+      padding: clamp(4.5rem, 10vw, 8.5rem) 0 clamp(3.4rem, 7vw, 6rem);
+      display: grid;
+      grid-template-columns: minmax(0, 1.14fr) minmax(310px, 0.86fr);
+      gap: clamp(2.5rem, 6vw, 6.5rem);
+      align-items: center;
     }
 
     .eyebrow {
-      display: flex;
-      align-items: center;
-      gap: .7rem;
-      margin-bottom: 1.4rem;
-      color: var(--coral);
-      font-size: .78rem;
+      margin: 0 0 1.25rem;
+      color: #85d6ca;
+      font-size: 0.76rem;
       font-weight: 800;
-      letter-spacing: .14em;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
     }
 
-    .eyebrow::before {
-      width: 42px;
-      height: 2px;
-      content: "";
-      background: currentColor;
+    h1,
+    h2,
+    h3,
+    .display {
+      font-family: Georgia, "Noto Serif KR", "Nanum Myeongjo", serif;
+      letter-spacing: -0.035em;
     }
 
     h1 {
-      max-width: 1050px;
+      max-width: 760px;
       margin: 0;
-      color: var(--forest-deep);
-      font-size: clamp(3rem, 8.5vw, 7.2rem);
-      line-height: .98;
-      text-wrap: balance;
-    }
-
-    .dek {
-      max-width: 850px;
-      margin: 2rem 0;
-      color: #33423f;
-      font-size: clamp(1.15rem, 2.4vw, 1.55rem);
-      line-height: 1.62;
-    }
-
-    .meta-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: .55rem;
-      margin: 2rem 0 2.6rem;
-    }
-
-    .meta-pill {
-      padding: .46rem .78rem;
-      color: var(--forest-deep);
-      background: var(--mint);
-      border: 1px solid rgba(21, 59, 54, .12);
-      border-radius: 999px;
-      font-size: .82rem;
+      font-size: clamp(2.65rem, 6.2vw, 5.6rem);
+      line-height: 1.04;
       font-weight: 700;
     }
 
-    .hero-figure {
-      position: relative;
-      margin: 0;
-      overflow: hidden;
-      background: var(--forest-deep);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow);
+    .hero-deck {
+      max-width: 730px;
+      margin: 1.65rem 0 0;
+      color: #d9e5e8;
+      font-family: Georgia, "Noto Serif KR", "Nanum Myeongjo", serif;
+      font-size: clamp(1.08rem, 2vw, 1.38rem);
+      line-height: 1.62;
     }
 
-    .hero-figure img {
+    .hero-meta {
+      margin-top: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem 1.3rem;
+      color: #acc2ca;
+      font-size: 0.82rem;
+    }
+
+    .hero-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .hero-meta span::before {
+      content: "";
+      width: 5px;
+      height: 5px;
+      background: var(--gold);
+      border-radius: 50%;
+    }
+
+    .hero-visual {
+      position: relative;
+    }
+
+    .hero-visual::before {
+      content: "";
+      position: absolute;
+      inset: -18px 28px 18px -18px;
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 24px;
+    }
+
+    .hero-visual figure {
+      position: relative;
+      overflow: hidden;
+      background: #071923;
+      border: 1px solid rgba(255,255,255,0.17);
+      border-radius: 20px;
+      box-shadow: 0 32px 70px rgba(0,0,0,0.34);
+    }
+
+    .hero-visual img {
       aspect-ratio: 16 / 9;
       object-fit: cover;
     }
 
-    .hero-figure figcaption {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 1rem;
-      padding: 1rem 1.2rem 1.15rem;
-      color: rgba(255, 255, 255, .82);
-      font-size: .83rem;
-      line-height: 1.55;
+    .hero-visual figcaption {
+      padding: 0.85rem 1rem;
+      color: #c4d5da;
+      background: rgba(7, 25, 35, 0.95);
+      font-size: 0.72rem;
+      line-height: 1.5;
     }
 
-    .timecode {
-      align-self: start;
-      padding: .15rem .48rem;
-      color: var(--white);
-      background: var(--coral);
-      border-radius: 5px;
-      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-      font-size: .72rem;
+    .hero-source-link {
+      position: absolute;
+      right: 0.8rem;
+      bottom: 3.6rem;
+      padding: 0.45rem 0.7rem;
+      color: white;
+      background: rgba(213, 107, 62, 0.95);
+      border-radius: 999px;
+      font-size: 0.68rem;
       font-weight: 800;
-      letter-spacing: .03em;
-      white-space: nowrap;
+      text-decoration: none;
+      letter-spacing: 0.04em;
     }
 
-    .article-layout {
+    main {
+      padding-bottom: 5rem;
+    }
+
+    .reading-rail {
+      width: min(calc(100% - 2rem), var(--wide));
+      margin: -1px auto 0;
+      padding: 1.05rem 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.65rem 1rem;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.77rem;
+    }
+
+    .reading-rail .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .tag {
+      padding: 0.18rem 0.52rem;
+      color: var(--blue);
+      background: rgba(31, 95, 120, 0.07);
+      border: 1px solid rgba(31, 95, 120, 0.13);
+      border-radius: 999px;
+    }
+
+    .article-shell {
       width: min(calc(100% - 2rem), var(--wide));
       margin: 0 auto;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 250px;
-      gap: clamp(2rem, 6vw, 5rem);
+      grid-template-columns: minmax(0, 1fr) 220px;
+      gap: clamp(2rem, 5vw, 5.5rem);
       align-items: start;
+    }
+
+    .article-body {
+      min-width: 0;
+      padding-top: 4.2rem;
     }
 
     .toc {
       position: sticky;
       top: 1.5rem;
-      grid-column: 2;
-      grid-row: 1;
-      padding: 1.25rem;
-      background: rgba(255, 253, 248, .72);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-md);
+      margin-top: 4.4rem;
+      padding: 1.2rem 0 1.2rem 1.1rem;
+      border-left: 2px solid var(--line);
+      font-size: 0.77rem;
+      line-height: 1.48;
     }
 
-    .toc-title {
-      margin: 0 0 .8rem;
-      color: var(--forest-deep);
-      font-size: .75rem;
-      font-weight: 800;
-      letter-spacing: .12em;
+    .toc strong {
+      display: block;
+      margin-bottom: 0.75rem;
+      color: var(--navy);
+      letter-spacing: 0.1em;
       text-transform: uppercase;
     }
 
@@ -296,611 +337,839 @@
       margin: 0;
       padding: 0;
       list-style: none;
-      counter-reset: toc;
     }
 
-    .toc li {
-      counter-increment: toc;
-      border-top: 1px solid rgba(215, 214, 204, .7);
-    }
-
-    .toc li:first-child {
-      border-top: 0;
+    .toc li + li {
+      margin-top: 0.6rem;
     }
 
     .toc a {
-      display: grid;
-      grid-template-columns: 1.5rem 1fr;
-      gap: .45rem;
-      padding: .62rem 0;
-      color: var(--ink-soft);
-      font-size: .82rem;
-      line-height: 1.4;
+      color: var(--muted);
       text-decoration: none;
     }
 
-    .toc a::before {
-      content: counter(toc, decimal-leading-zero);
-      color: var(--coral);
-      font-family: ui-monospace, monospace;
-      font-size: .7rem;
-    }
-
-    .article {
-      min-width: 0;
-      grid-column: 1;
-      grid-row: 1;
-    }
-
-    .section {
-      padding: clamp(3.5rem, 8vw, 7rem) 0;
-      border-top: 1px solid var(--line);
-      scroll-margin-top: 2rem;
-    }
-
-    .section:first-child {
-      border-top: 0;
-      padding-top: 1rem;
-    }
-
-    .section-kicker {
-      margin-bottom: .7rem;
-      color: var(--coral);
-      font-size: .75rem;
-      font-weight: 900;
-      letter-spacing: .16em;
-      text-transform: uppercase;
-    }
-
-    .lead {
-      color: #33423f;
-      font-size: 1.12rem;
-      line-height: 1.82;
+    .toc a:hover,
+    .toc a:focus-visible {
+      color: var(--orange);
     }
 
     .abstract {
-      padding: clamp(1.5rem, 5vw, 2.7rem);
-      background: var(--paper-strong);
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: clamp(1.6rem, 4vw, 2.5rem);
+      background: var(--surface);
       border: 1px solid var(--line);
-      border-radius: var(--radius-lg);
-      box-shadow: 0 14px 36px rgba(25, 52, 48, .06);
+      border-top: 4px solid var(--teal);
+      border-radius: 0 0 var(--radius) var(--radius);
+      box-shadow: 0 18px 45px rgba(16, 43, 63, 0.07);
     }
 
     .abstract-label {
-      display: block;
-      margin-bottom: .8rem;
-      color: var(--coral);
-      font-size: .72rem;
-      font-weight: 900;
-      letter-spacing: .16em;
+      margin: 0 0 0.8rem;
+      color: var(--teal);
+      font-size: 0.72rem;
+      font-weight: 850;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
     }
 
-    .abstract p:last-child {
-      margin-bottom: 0;
-    }
-
-    .share-frame {
-      margin-top: 1.3rem;
-      padding: 1.2rem 1.4rem;
-      color: var(--white);
-      background: var(--forest-deep);
-      border-radius: var(--radius-md);
-    }
-
-    .share-frame small {
-      display: block;
-      margin-bottom: .45rem;
-      color: #9fcbc0;
-      font-size: .7rem;
-      font-weight: 800;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-    }
-
-    .share-frame p {
+    .abstract p {
       margin: 0;
-      font-size: .96rem;
+      font-family: Georgia, "Noto Serif KR", "Nanum Myeongjo", serif;
+      font-size: 1.08rem;
+      line-height: 1.84;
+    }
+
+    .provenance-note {
+      max-width: var(--content);
+      margin: 1.25rem auto 0;
+      padding: 1rem 1.15rem;
+      color: var(--ink-soft);
+      background: #edf3f2;
+      border-left: 4px solid var(--teal);
+      font-size: 0.79rem;
       line-height: 1.65;
     }
 
+    .provenance-note strong {
+      color: var(--navy);
+    }
+
+    .section {
+      padding: clamp(4.5rem, 9vw, 8rem) 0 0;
+    }
+
+    .section-header {
+      max-width: var(--content);
+      margin: 0 auto 2.5rem;
+    }
+
+    .section-index {
+      display: block;
+      margin-bottom: 0.6rem;
+      color: var(--orange);
+      font-size: 0.73rem;
+      font-weight: 850;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 0;
+      color: var(--navy);
+      font-size: clamp(2rem, 4.2vw, 3.55rem);
+      line-height: 1.18;
+    }
+
+    .section-lead {
+      max-width: 700px;
+      margin: 1rem 0 0;
+      color: var(--ink-soft);
+      font-size: 1.04rem;
+      line-height: 1.8;
+    }
+
+    .prose {
+      max-width: var(--content);
+      margin: 0 auto;
+    }
+
+    .prose p {
+      margin: 0 0 1.35rem;
+    }
+
+    .prose > p:first-child::first-letter {
+      float: left;
+      margin: 0.09em 0.11em 0 0;
+      color: var(--teal);
+      font-family: Georgia, "Noto Serif KR", serif;
+      font-size: 3.8rem;
+      line-height: 0.78;
+      font-weight: 700;
+    }
+
+    .prose h3 {
+      margin: 3rem 0 1rem;
+      color: var(--navy);
+      font-size: 1.55rem;
+      line-height: 1.35;
+    }
+
+    .pull-quote {
+      max-width: 900px;
+      margin: 3.5rem auto;
+      padding: 1.4rem 0 1.4rem clamp(1.4rem, 4vw, 3rem);
+      border-left: 6px solid var(--orange);
+      color: var(--navy);
+      font-family: Georgia, "Noto Serif KR", "Nanum Myeongjo", serif;
+      font-size: clamp(1.45rem, 3vw, 2.35rem);
+      font-weight: 700;
+      line-height: 1.48;
+      letter-spacing: -0.025em;
+    }
+
+    .pull-quote cite {
+      display: block;
+      margin-top: 0.9rem;
+      color: var(--muted);
+      font-family: Pretendard, "Noto Sans KR", sans-serif;
+      font-size: 0.72rem;
+      font-style: normal;
+      font-weight: 650;
+      letter-spacing: 0.05em;
+    }
+
     .findings {
-      margin: 2rem 0 0;
-      padding: 0;
+      width: min(100%, 980px);
+      margin: 2.5rem auto 0;
       display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 1rem;
-      list-style: none;
-      counter-reset: findings;
     }
 
-    .findings li {
-      position: relative;
-      padding: 1.35rem 1.35rem 1.35rem 4.25rem;
-      background: var(--mint-light);
-      border: 1px solid rgba(21, 59, 54, .12);
-      border-radius: var(--radius-md);
-      counter-increment: findings;
+    .finding {
+      min-height: 190px;
+      padding: 1.45rem;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 18px;
     }
 
-    .findings li::before {
-      position: absolute;
-      top: 1.15rem;
-      left: 1.2rem;
-      width: 2.2rem;
-      height: 2.2rem;
-      display: grid;
+    .finding:first-child {
+      grid-column: span 2;
+      color: white;
+      background: var(--navy);
+      border-color: var(--navy);
+    }
+
+    .finding-no {
+      display: inline-grid;
+      width: 2.1rem;
+      height: 2.1rem;
       place-items: center;
-      content: counter(findings);
-      color: var(--white);
-      background: var(--forest);
+      margin-bottom: 1rem;
+      color: var(--orange);
+      border: 1px solid currentColor;
       border-radius: 50%;
       font-family: Georgia, serif;
+      font-size: 0.84rem;
       font-weight: 700;
     }
 
-    .findings strong {
-      display: block;
-      margin-bottom: .25rem;
+    .finding:first-child .finding-no {
+      color: #86d7cb;
     }
 
-    .editorial-quote {
-      position: relative;
-      margin: 3.8rem 0;
-      padding: 2.2rem 0 2.2rem clamp(1.5rem, 5vw, 3rem);
-      color: var(--forest-deep);
-      border-left: 5px solid var(--coral);
-      font-size: clamp(1.55rem, 4vw, 2.4rem);
-      font-weight: 700;
-      line-height: 1.42;
+    .finding h3 {
+      margin: 0 0 0.55rem;
+      font-size: 1.06rem;
+      line-height: 1.45;
     }
 
-    .editorial-quote cite {
-      display: block;
-      margin-top: 1rem;
+    .finding p {
+      margin: 0;
       color: var(--ink-soft);
-      font-family: Pretendard, "Noto Sans KR", sans-serif;
-      font-size: .76rem;
-      font-style: normal;
-      font-weight: 600;
-      letter-spacing: .04em;
+      font-size: 0.83rem;
+      line-height: 1.7;
+    }
+
+    .finding:first-child p {
+      color: #c8d9de;
     }
 
     .comparison-wrap {
-      margin: 2.5rem 0;
+      width: min(100%, 980px);
+      margin: 3rem auto 0;
       overflow-x: auto;
+      background: var(--surface);
       border: 1px solid var(--line);
-      border-radius: var(--radius-md);
+      border-radius: 18px;
+      box-shadow: 0 14px 40px rgba(16,43,63,0.06);
     }
 
     table {
       width: 100%;
-      min-width: 660px;
       border-collapse: collapse;
-      background: var(--paper-strong);
-      font-size: .88rem;
+      min-width: 680px;
+      font-size: 0.82rem;
       line-height: 1.58;
     }
 
     caption {
-      padding: 1rem 1.2rem;
-      color: var(--forest-deep);
-      background: var(--mint);
+      padding: 1rem 1.1rem;
+      color: var(--navy);
       font-weight: 800;
       text-align: left;
     }
 
     th,
     td {
-      padding: .9rem 1rem;
-      border-top: 1px solid var(--line);
+      padding: 0.9rem 1rem;
       text-align: left;
       vertical-align: top;
+      border-top: 1px solid var(--line);
     }
 
-    th {
-      color: var(--forest-deep);
-      font-size: .78rem;
-      letter-spacing: .03em;
+    thead th {
+      color: white;
+      background: var(--navy);
+      border-top: 0;
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
     }
 
-    tbody tr:nth-child(even) {
-      background: #faf8f2;
+    tbody th {
+      color: var(--navy);
+      background: rgba(16, 43, 63, 0.035);
+      white-space: nowrap;
     }
 
-    .pipeline {
-      margin: 2.4rem 0;
+    .argument-map {
+      width: min(100%, 980px);
+      margin: 3rem auto 0;
+      padding: clamp(1.2rem, 3vw, 2rem);
+      background: linear-gradient(135deg, #112e40, #174d59);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .argument-map h3 {
+      margin: 0 0 1.4rem;
+      color: white;
+      font-size: 1.18rem;
+    }
+
+    .flow {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: .65rem;
+      grid-template-columns: repeat(7, auto);
+      gap: 0.7rem;
       align-items: stretch;
     }
 
-    .pipeline-step {
-      position: relative;
-      min-height: 116px;
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      background: var(--paper-strong);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-    }
-
-    .pipeline-step:not(:last-child)::after {
-      position: absolute;
-      top: 50%;
-      right: -.58rem;
-      z-index: 2;
-      content: "→";
-      color: var(--coral);
-      font-weight: 900;
-      transform: translateY(-50%);
-    }
-
-    .pipeline-step b {
-      color: var(--forest-deep);
-      font-size: .88rem;
-      line-height: 1.35;
-    }
-
-    .pipeline-step span {
-      color: var(--ink-soft);
-      font-size: .7rem;
-      line-height: 1.4;
-    }
-
-    .formula-row {
-      margin: 2rem 0;
+    .flow-node {
+      min-width: 0;
+      padding: 1rem 0.85rem;
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-    }
-
-    .formula-card {
-      padding: 1.4rem;
-      background: var(--forest-deep);
-      border-radius: var(--radius-md);
-      color: rgba(255, 255, 255, .76);
-    }
-
-    .formula {
-      display: block;
-      margin-bottom: .5rem;
-      color: var(--white);
-      font-family: "Iowan Old Style", Georgia, serif;
-      font-size: 1.5rem;
-      font-style: italic;
-    }
-
-    .evidence-grid {
-      margin: 2rem 0;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 1.25rem;
-    }
-
-    .evidence-grid .wide {
-      grid-column: 1 / -1;
-    }
-
-    .evidence {
-      margin: 0;
-      overflow: hidden;
-      background: var(--paper-strong);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-md);
-      box-shadow: 0 8px 22px rgba(25, 52, 48, .055);
-    }
-
-    .evidence img {
-      aspect-ratio: 16 / 9;
-      object-fit: cover;
-      background: #d9d9d4;
-    }
-
-    .evidence figcaption {
-      padding: 1rem 1.1rem 1.15rem;
-      font-size: .8rem;
-      line-height: 1.62;
-    }
-
-    .caption-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: .5rem;
-      margin-bottom: .55rem;
-    }
-
-    .caption-head strong {
-      font-size: .88rem;
-    }
-
-    .evidence-note {
-      display: block;
-      color: var(--ink-soft);
-    }
-
-    .evidence-note + .evidence-note {
-      margin-top: .38rem;
-    }
-
-    .label {
-      margin-right: .32rem;
-      color: var(--coral);
-      font-size: .68rem;
-      font-weight: 900;
-      letter-spacing: .06em;
-    }
-
-    .callout {
-      margin: 2rem 0;
-      padding: 1.3rem 1.4rem;
-      background: var(--coral-light);
-      border-left: 5px solid var(--coral);
-      border-radius: 0 var(--radius-md) var(--radius-md) 0;
-      font-size: .91rem;
-    }
-
-    .callout-title {
-      display: block;
-      margin-bottom: .35rem;
-      color: #8c3f2d;
-      font-weight: 900;
-    }
-
-    .metric-row {
-      margin: 2rem 0;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-    }
-
-    .metric {
-      padding: 1.35rem;
-      background: var(--mint-light);
-      border-radius: var(--radius-md);
+      place-items: center;
+      color: #eff8f7;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 13px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      line-height: 1.48;
       text-align: center;
     }
 
-    .metric-value {
-      display: block;
-      color: var(--forest-deep);
-      font-family: "Iowan Old Style", Georgia, serif;
-      font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 800;
-      line-height: 1;
+    .flow-arrow {
+      align-self: center;
+      color: #82d3c8;
+      font-size: 1.4rem;
     }
 
-    .metric-label {
-      display: block;
-      margin-top: .55rem;
-      color: var(--ink-soft);
-      font-size: .74rem;
-      line-height: 1.4;
+    .visual-grid {
+      width: min(100%, 1040px);
+      margin: 3rem auto 0;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.2rem;
     }
 
-    .boundary-list,
-    .takeaway-list {
-      margin: 1.5rem 0 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .boundary-list li,
-    .takeaway-list li {
-      position: relative;
-      padding: .9rem 0 .9rem 2rem;
-      border-top: 1px solid var(--line);
-    }
-
-    .boundary-list li::before {
-      position: absolute;
-      left: 0;
-      content: "△";
-      color: var(--gold);
-      font-weight: 900;
-    }
-
-    .takeaway-list li::before {
-      position: absolute;
-      left: 0;
-      content: "✓";
-      color: var(--forest);
-      font-weight: 900;
-    }
-
-    .closing {
-      padding: clamp(2rem, 6vw, 3.5rem);
-      color: var(--white);
-      background:
-        linear-gradient(135deg, rgba(255, 255, 255, .04), transparent 55%),
-        var(--forest-deep);
-      border-radius: var(--radius-lg);
-    }
-
-    .closing h2 {
-      color: var(--white);
-    }
-
-    .closing p {
-      color: rgba(255, 255, 255, .78);
-    }
-
-    .closing .takeaway-list li {
-      border-color: rgba(255, 255, 255, .15);
-    }
-
-    .closing .takeaway-list li::before,
-    .closing strong {
-      color: #b9ded5;
-    }
-
-    .source-card {
-      padding: 1.35rem;
-      background: var(--paper-strong);
+    .visual-card {
+      overflow: hidden;
+      background: var(--surface);
       border: 1px solid var(--line);
-      border-radius: var(--radius-md);
+      border-radius: 16px;
+      box-shadow: 0 13px 35px rgba(16, 43, 63, 0.07);
     }
 
-    .source-card + .source-card {
-      margin-top: 1rem;
+    .visual-card.featured {
+      grid-column: span 2;
     }
 
-    .source-card h3 {
-      margin: 0 0 .65rem;
-      font-family: Pretendard, "Noto Sans KR", sans-serif;
-      font-size: 1rem;
-      letter-spacing: 0;
+    .visual-card img {
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      background: #d9d9d9;
     }
 
-    .source-card p,
-    .source-card li {
+    .visual-card figcaption {
+      min-height: 94px;
+      padding: 0.9rem 1rem 1rem;
       color: var(--ink-soft);
-      font-size: .86rem;
+      font-size: 0.75rem;
+      line-height: 1.55;
     }
 
-    .source-card p:last-child {
-      margin-bottom: 0;
+    .timestamp {
+      display: inline-block;
+      margin-right: 0.42rem;
+      color: var(--orange);
+      font-size: 0.66rem;
+      font-weight: 850;
+      letter-spacing: 0.08em;
     }
 
-    .source-card ul {
-      margin: .6rem 0 0;
+    .visual-card figcaption strong {
+      color: var(--navy);
+    }
+
+    .method-card {
+      max-width: var(--content);
+      margin: 2.3rem auto;
+      padding: 1.4rem 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+
+    .method-card h3 {
+      margin: 0 0 0.8rem;
+      color: var(--navy);
+      font-size: 1.15rem;
+    }
+
+    .method-card ul {
+      margin: 0;
+      padding-left: 1.15rem;
+    }
+
+    .method-card li + li {
+      margin-top: 0.55rem;
+    }
+
+    .equation {
+      max-width: var(--content);
+      margin: 2.5rem auto;
+      padding: 1.5rem;
+      color: white;
+      background: var(--navy);
+      border-radius: 16px;
+      text-align: center;
+    }
+
+    .equation .formula {
+      display: block;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.2rem, 3vw, 1.85rem);
+      letter-spacing: 0.01em;
+    }
+
+    .equation small {
+      display: block;
+      margin-top: 0.65rem;
+      color: #b9cdd4;
+      font-size: 0.73rem;
+    }
+
+    .evidence-note {
+      max-width: var(--content);
+      margin: 2rem auto;
+      padding: 1rem 1.2rem;
+      color: var(--ink-soft);
+      background: #fff7e7;
+      border: 1px solid #ead4a6;
+      border-radius: 12px;
+      font-size: 0.79rem;
+      line-height: 1.65;
+    }
+
+    .evidence-note strong {
+      color: #8c5623;
+    }
+
+    .number-strip {
+      width: min(100%, 920px);
+      margin: 2.8rem auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      background: var(--navy);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    .number-item {
+      padding: 1.5rem 1rem;
+      color: #c8d8dd;
+      text-align: center;
+    }
+
+    .number-item + .number-item {
+      border-left: 1px solid rgba(255,255,255,0.14);
+    }
+
+    .number-item strong {
+      display: block;
+      color: white;
+      font-family: Georgia, serif;
+      font-size: clamp(1.55rem, 4vw, 2.5rem);
+      line-height: 1.15;
+    }
+
+    .number-item span {
+      display: block;
+      margin-top: 0.45rem;
+      font-size: 0.7rem;
+      line-height: 1.45;
+    }
+
+    .insight-band {
+      margin-top: clamp(4rem, 8vw, 7rem);
+      padding: clamp(3.5rem, 8vw, 7rem) 1rem;
+      color: white;
+      background:
+        linear-gradient(110deg, rgba(16,43,63,0.98), rgba(20,129,120,0.91)),
+        var(--navy);
+    }
+
+    .insight-inner {
+      width: min(100%, 960px);
+      margin: 0 auto;
+    }
+
+    .insight-inner .section-index {
+      color: #f4c86b;
+    }
+
+    .insight-inner h2 {
+      max-width: 790px;
+      color: white;
+    }
+
+    .insight-grid {
+      margin-top: 2.4rem;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .insight-card {
+      padding: 1.35rem;
+      background: rgba(255,255,255,0.075);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 16px;
+    }
+
+    .insight-card h3 {
+      margin: 0 0 0.55rem;
+      font-size: 1rem;
+    }
+
+    .insight-card p {
+      margin: 0;
+      color: #d2e2e5;
+      font-size: 0.8rem;
+      line-height: 1.68;
+    }
+
+    .limits {
+      width: min(100%, 980px);
+      margin: 2.5rem auto 0;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .limit-card {
+      padding: 1.3rem;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 15px;
+    }
+
+    .limit-card h3 {
+      margin: 0 0 0.55rem;
+      color: var(--orange);
+      font-size: 0.95rem;
+    }
+
+    .limit-card p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 0.79rem;
+      line-height: 1.7;
+    }
+
+    .takeaway {
+      max-width: 900px;
+      margin: 3.5rem auto 0;
+      padding: clamp(1.5rem, 4vw, 2.4rem);
+      background: var(--teal-soft);
+      border: 1px solid rgba(20,129,120,0.22);
+      border-radius: var(--radius);
+    }
+
+    .takeaway h3 {
+      margin: 0 0 1rem;
+      color: var(--navy);
+      font-size: 1.35rem;
+    }
+
+    .takeaway ol {
+      margin: 0;
       padding-left: 1.2rem;
     }
 
-    .tags {
-      margin-top: 2rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: .5rem;
+    .takeaway li {
+      padding-left: 0.3rem;
     }
 
-    .tags span {
-      padding: .38rem .7rem;
-      color: var(--ink-soft);
-      background: var(--paper-strong);
+    .takeaway li + li {
+      margin-top: 0.75rem;
+    }
+
+    .source-panel {
+      width: min(100%, 960px);
+      margin: 2.5rem auto 0;
+      overflow: hidden;
+      background: var(--surface);
       border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+
+    .source-panel-header {
+      padding: 1.2rem 1.35rem;
+      color: white;
+      background: var(--navy);
+    }
+
+    .source-panel-header h3 {
+      margin: 0;
+      font-size: 1.15rem;
+    }
+
+    .source-panel-body {
+      padding: 1.3rem 1.4rem;
+    }
+
+    .source-panel dl {
+      margin: 0;
+      display: grid;
+      grid-template-columns: 130px minmax(0, 1fr);
+      gap: 0.65rem 1rem;
+      font-size: 0.8rem;
+    }
+
+    .source-panel dt {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .source-panel dd {
+      margin: 0;
+      color: var(--ink);
+    }
+
+    .source-list {
+      max-width: var(--content);
+      margin: 2rem auto 0;
+      padding-left: 1.2rem;
+      color: var(--ink-soft);
+      font-size: 0.8rem;
+    }
+
+    .source-list li + li {
+      margin-top: 0.75rem;
+    }
+
+    .share-block {
+      width: min(100%, 900px);
+      margin: 3.2rem auto 0;
+      padding: clamp(1.5rem, 4vw, 2.3rem);
+      color: white;
+      background: var(--navy);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .share-block h3 {
+      margin: 0 0 0.7rem;
+      font-size: 1.25rem;
+    }
+
+    .share-block > p {
+      margin: 0;
+      color: #c8d8de;
+      font-size: 0.82rem;
+    }
+
+    .share-copy {
+      margin-top: 1.2rem;
+      padding: 1rem 1.1rem;
+      color: #f5faf9;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 12px;
+      font-family: Georgia, "Noto Serif KR", serif;
+      font-size: 0.91rem;
+      line-height: 1.75;
+      user-select: all;
+    }
+
+    .closing {
+      max-width: var(--content);
+      margin: 4.5rem auto 0;
+      text-align: center;
+    }
+
+    .closing-rule {
+      width: 70px;
+      height: 3px;
+      margin: 0 auto 1.8rem;
+      background: linear-gradient(90deg, var(--teal), var(--orange));
+      border-radius: 99px;
+    }
+
+    .closing p {
+      margin: 0;
+      color: var(--navy);
+      font-family: Georgia, "Noto Serif KR", "Nanum Myeongjo", serif;
+      font-size: clamp(1.15rem, 2.5vw, 1.55rem);
+      line-height: 1.75;
+    }
+
+    .closing-actions {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.7rem;
+    }
+
+    .button-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0.65rem 1rem;
+      color: white;
+      background: var(--teal);
       border-radius: 999px;
-      font-size: .72rem;
+      font-size: 0.78rem;
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .button-link.secondary {
+      color: var(--navy);
+      background: transparent;
+      border: 1px solid var(--line-dark);
     }
 
     footer {
-      width: min(calc(100% - 2rem), var(--wide));
-      margin: 5rem auto 0;
-      padding: 2rem 0 3rem;
-      display: flex;
-      justify-content: space-between;
-      gap: 1.5rem;
-      color: var(--ink-soft);
-      border-top: 1px solid var(--line);
-      font-size: .76rem;
+      margin-top: 6rem;
+      padding: 2rem 1rem;
+      color: #9eb0b7;
+      background: #0b202e;
     }
 
-    @media (max-width: 920px) {
-      .article-layout {
+    .footer-inner {
+      width: min(100%, var(--wide));
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.7rem 1rem;
+      font-size: 0.72rem;
+    }
+
+    @media (max-width: 960px) {
+      .hero-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-visual {
+        max-width: 720px;
+      }
+
+      .article-shell {
         display: block;
       }
 
       .toc {
         position: static;
-        margin: 0 0 2rem;
+        margin: 2rem auto 0;
+        max-width: var(--content);
+        padding: 1rem;
+        border: 1px solid var(--line);
+        border-radius: 14px;
       }
 
       .toc ol {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0 1rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem 1rem;
       }
 
-      .pipeline {
+      .toc li + li {
+        margin-top: 0;
+      }
+
+      .flow {
         grid-template-columns: 1fr;
       }
 
-      .pipeline-step {
-        min-height: auto;
-      }
-
-      .pipeline-step:not(:last-child)::after {
-        top: auto;
-        right: 50%;
-        bottom: -.78rem;
-        transform: translateX(50%) rotate(90deg);
+      .flow-arrow {
+        justify-self: center;
+        transform: rotate(90deg);
       }
     }
 
     @media (max-width: 680px) {
       body {
         font-size: 16px;
-        line-height: 1.75;
+        word-break: normal;
       }
 
-      .site-tag {
+      .site-header-inner {
+        min-height: 56px;
+      }
+
+      .hero-inner {
+        padding-top: 3.6rem;
+      }
+
+      .hero-visual::before {
         display: none;
       }
 
-      .hero {
-        padding-top: 3rem;
+      .article-body {
+        padding-top: 2.7rem;
       }
 
-      .hero-figure figcaption,
-      .evidence-grid,
-      .formula-row,
-      .metric-row,
-      .toc ol {
+      .findings,
+      .visual-grid,
+      .insight-grid,
+      .limits {
         grid-template-columns: 1fr;
       }
 
-      .evidence-grid .wide {
+      .finding:first-child,
+      .visual-card.featured {
         grid-column: auto;
       }
 
-      .hero-figure figcaption {
-        gap: .5rem;
+      .number-strip {
+        grid-template-columns: 1fr;
       }
 
-      .section {
-        padding: 4rem 0;
+      .number-item + .number-item {
+        border-top: 1px solid rgba(255,255,255,0.14);
+        border-left: 0;
       }
 
-      footer {
-        display: block;
+      .source-panel dl {
+        grid-template-columns: 1fr;
+        gap: 0.15rem;
+      }
+
+      .source-panel dd + dt {
+        margin-top: 0.65rem;
       }
     }
 
     @media print {
       body {
-        background: #fff;
+        color: black;
+        background: white;
         font-size: 11pt;
       }
 
-      .site-bar,
+      .site-header,
       .toc,
-      .share-frame {
+      .closing-actions {
         display: none;
       }
 
-      .article-layout {
-        display: block;
-        width: 100%;
+      .hero {
+        color: black;
+        background: white;
       }
 
-      .hero,
-      .section {
-        padding: 1.5rem 0;
+      .hero::before {
+        display: none;
       }
 
-      .hero-inner,
-      footer {
-        width: 100%;
+      .hero-inner {
+        padding: 2rem 0;
+        grid-template-columns: 1fr;
       }
 
-      .evidence,
+      .hero-deck,
+      .hero-meta,
+      .hero-visual figcaption {
+        color: #333;
+      }
+
+      .visual-card,
       .abstract,
-      .closing {
+      .comparison-wrap,
+      .source-panel {
         box-shadow: none;
         break-inside: avoid;
+      }
+
+      .section {
+        padding-top: 3rem;
       }
 
       a {
@@ -920,870 +1189,726 @@
 <link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-duke-robotics-discussion-bridging-model-based-and-learning-based-methods-%EC%9A%94%EC%95%BD/">
 </head>
 <body>
-  <a class="skip-link" href="#main">본문으로 바로가기</a>
+  <a class="skip-link" href="#main-content">본문으로 건너뛰기</a>
 
-  <header class="site-bar">
-    <div class="site-bar-inner">
-      <a class="brand" href="#top">Marktl Research</a>
-      <span class="site-tag">Robotics · Research Report · 19 Aug 2026</span>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="brand" href="#top">MARKTL</a>
+      <span class="report-label">Research Editorial · Robotics</span>
     </div>
   </header>
 
-  <main id="main">
-    <article id="top">
-      <header class="hero">
-        <div class="hero-inner">
-          <p class="eyebrow">Research Report · Robot Learning</p>
-          <h1>모델은 경계를 세우고,<br>학습은 그 안에서 확장한다</h1>
-          <p class="dek">
-            Neural Lyapunov Control, PhysicsGen, OmniRetarget. 세 연구를 관통하는 질문은 하나다.
-            모델 기반 방법의 구조와 검증 가능성을 학습 기반 방법의 표현력과 확장성에 어떻게 연결할 것인가.
-          </p>
-
-          <div class="meta-row" aria-label="글 정보">
-            <span class="meta-pill">Lujie Yang</span>
-            <span class="meta-pill">MIT CSAIL</span>
-            <span class="meta-pill">Duke Robotics</span>
-            <span class="meta-pill">57분 23초</span>
-            <span class="meta-pill">분석일 2026.08.19</span>
-          </div>
-
-          <figure class="hero-figure">
-            <img src="assets/2myi6rv-6sq-ts-00-00-10.jpg" alt="강연 제목과 발표자 Lujie Yang, 휴머노이드 실험 장면이 보이는 첫 슬라이드">
-            <figcaption>
-              <a class="timecode">00:00:10</a>
-              <span>
-                강연은 ‘스케일링인가 모델링인가’라는 양자택일 대신 두 접근을 연결하는 설계를 제안한다.
-                이 보고서는 화면에서 직접 확인되는 내용과 로컬 전사에 근거한 해석을 구분해 정리했다.
-              </span>
-            </figcaption>
-          </figure>
-        </div>
-      </header>
-
-      <div class="article-layout">
-        <nav class="toc" aria-label="목차">
-          <p class="toc-title">Contents</p>
-          <ol>
-            <li><a href="#abstract">초록과 핵심 발견</a></li>
-            <li><a href="#problem">문제의 구조</a></li>
-            <li><a href="#lyapunov">보증의 다리</a></li>
-            <li><a href="#physicsgen">물리 데이터의 다리</a></li>
-            <li><a href="#omniretarget">상호작용의 다리</a></li>
-            <li><a href="#synthesis">통합 비전</a></li>
-            <li><a href="#implications">시사점과 한계</a></li>
-            <li><a href="#sources">출처와 작성 방법</a></li>
-          </ol>
-        </nav>
-
-        <div class="article">
-          <section class="section" id="abstract">
-            <p class="section-kicker">Abstract</p>
-            <h2>두 진영의 절충이 아니라,<br>병목에 맞춘 역할 분담</h2>
-
-            <div class="abstract">
-              <span class="abstract-label">연구 초록</span>
-              <p>
-                이 강연은 모델 기반 방법의 <strong>구조·최적화·검증 가능성</strong>과 학습 기반 방법의
-                <strong>표현력·적응성·확장성</strong>을 결합하면 로봇 학습의 두 약점인 데이터 부족과
-                성능 보증 부재를 함께 줄일 수 있다고 주장한다.
-              </p>
-              <p>
-                논증은 세 사례로 구성된다. Neural Lyapunov Control은 안정성 조건을 학습과 사후 검증에
-                연결하고, PhysicsGen은 소수의 사람 시연을 물리적으로 실현 가능한 접촉 궤적 분포로 확장한다.
-                OmniRetarget은 사람·로봇·물체·지형 사이의 상대적 상호작용을 보존해 전신 로코-매니퓰레이션용
-                기준 모션을 생성한다.
-              </p>
-            </div>
-
-            <div class="share-frame" aria-label="공유용 요약 문구">
-              <small>Share-ready framing</small>
-              <p>
-                로봇 학습의 다음 돌파구는 더 큰 정책만이 아닐 수 있다. 실패를 찾아내는 인증서,
-                물리를 만족하는 궤적, 접촉 관계를 보존한 기준 데이터가 학습의 확장성을 결정한다.
-              </p>
-            </div>
-
-            <h3>핵심 발견</h3>
-            <ol class="findings">
-              <li>
-                <strong>모델 기반 도구는 정책의 대체재가 아니라 경계 장치다.</strong>
-                실패 상태 탐색, 제약 적용, 궤적 최적화와 형식 검증처럼 학습이 취약한 경계에서 가장 큰 가치를 낸다.
-              </li>
-              <li>
-                <strong>데이터 품질은 학습 파이프라인의 복잡도를 선행 결정한다.</strong>
-                잘못된 기준 모션을 복잡한 보상으로 수선하기보다 원천 데이터의 기하와 물리를 먼저 고치는 편이 단순하다.
-              </li>
-              <li>
-                <strong>로코-매니퓰레이션의 보존 단위는 관절 위치보다 상호작용이다.</strong>
-                손과 물체, 발과 지형의 상대 관계가 유지돼야 embodiment가 달라져도 과제의 의미가 남는다.
-              </li>
-              <li>
-                <strong>형식 보증에는 분명한 적용 경계가 있다.</strong>
-                저차원·폐형식 동역학에서는 강력하지만 고차원 접촉 시스템에서는 정책 능력과 검증 가능성 사이 절충이 커진다.
-              </li>
-              <li>
-                <strong>다음 스케일링 병목은 embodied fidelity다.</strong>
-                인터넷 영상의 다양성을 접촉·마찰·깊이가 살아 있는 로봇 궤적으로 변환하고 지각과 연결해야 한다.
-              </li>
-            </ol>
-          </section>
-
-          <section class="section" id="problem">
-            <p class="section-kicker">01 · Problem Setting</p>
-            <h2>로봇이 이동하며 조작할 때,<br>두 방법의 약점이 동시에 드러난다</h2>
-
-            <p class="lead">
-              정교한 손 조작에서 전신 이동과 협응이 필요한 로코-매니퓰레이션으로 범위를 넓히면,
-              로봇은 접촉을 만들고 끊는 긴 시퀀스를 계획하면서 균형과 동역학적 실현 가능성도 유지해야 한다.
-              이때 순수 모델링은 복잡성에, 순수 학습은 데이터와 보증에 부딪힌다.
-            </p>
-
-            <div class="evidence-grid">
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-01-00.jpg" alt="펜 스피닝, 양팔 조작, 물류 작업, 휴머노이드 운반 작업을 보여주는 슬라이드" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>덱스터리티에서 전신 작업으로</strong>
-                    <a class="timecode">00:01:00</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>손 조작, 양팔 조작, 물류, 휴머노이드 운반이 한 범위로 제시된다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>과제가 커질수록 접촉 계획과 전신 협응이 하나의 문제로 합쳐진다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-02-53.jpg" alt="강화학습, 모방학습, 파운데이션 모델의 로봇 사례를 비교한 슬라이드" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>학습 기반 제어의 세 계열</strong>
-                    <a class="timecode">00:02:53</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>강화학습, 모방학습, 파운데이션 모델이 병렬로 배치된다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>탐색은 보상에, 모방은 시연에, 파운데이션 모델은 데이터 규모와 품질에 묶인다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-03-54.jpg" alt="모델 기반 방법과 학습 기반 방법의 장점 및 약점을 비교한 슬라이드" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>상보적인 강점과 약점</strong>
-                    <a class="timecode">00:03:54</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>모델 기반은 계산과 보증, 학습은 유연성과 표현력이 장점으로 정리된다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>핵심 병목은 학습의 데이터 희소성과 성능 보증 부재다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-05-00.jpg" alt="Neural Lyapunov Control과 두 데이터 생성 연구를 세 기여로 정리한 슬라이드" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>세 기여의 지도</strong>
-                    <a class="timecode">00:05:00</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>Performance Guarantees와 Data Generation이라는 두 축이 보인다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>보증, 접촉 조작 데이터, 전신 상호작용 데이터가 세 개의 연결부가 된다.</span>
-                </figcaption>
-              </figure>
-            </div>
-
-            <div class="comparison-wrap">
-              <table>
-                <caption>모델 기반 방법과 학습 기반 방법의 역할 비교</caption>
-                <thead>
-                  <tr>
-                    <th scope="col">구분</th>
-                    <th scope="col">강점</th>
-                    <th scope="col">주요 약점</th>
-                    <th scope="col">강연이 부여한 역할</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">모델 기반</th>
-                    <td>구조, 제약, 계산 효율, 검증</td>
-                    <td>정확한 모델·상태 추정 의존, 접촉 수식화의 난도</td>
-                    <td>인증서, 최적화기, 물리·기하 제약 생성기</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">학습 기반</th>
-                    <td>표현력, 적응성, 지각 통합, 확장성</td>
-                    <td>비싼 데이터, 분포 밖 취약성, 형식 보증 부재</td>
-                    <td>시연 분포 학습, 반응형 제어, 복잡한 정책 표현</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">결합 설계</th>
-                    <td>깨끗한 데이터와 강력한 정책의 결합</td>
-                    <td>보증 범위와 계산 확장성의 절충</td>
-                    <td>모델이 경계를 만들고 학습이 그 안에서 일반화</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <blockquote class="editorial-quote">
-              “질문은 모델이냐 학습이냐가 아니다. 어느 병목에 어떤 구조를 삽입할 것인가다.”
-              <cite>강연의 세 사례를 관통하는 편집 요약</cite>
-            </blockquote>
-          </section>
-
-          <section class="section" id="lyapunov">
-            <p class="section-kicker">02 · Performance Guarantees</p>
-            <h2>보증의 다리:<br>인증서가 반례 데이터를 만든다</h2>
-
-            <p class="lead">
-              첫 번째 연결은 신경망 제어기에 형식적 안정성의 언어를 부여한다. 목표는 상태를 직접 아는
-              상태 피드백을 넘어, 센서 관측에서 상태를 추정해야 하는 출력 피드백 시스템에서도
-              제어기·관측기·Lyapunov 함수를 함께 학습하고 사후 검증하는 것이다.
-            </p>
-
-            <div class="formula-row" aria-label="Lyapunov 안정성 조건">
-              <div class="formula-card">
-                <span class="formula">V(x<sub>t</sub>) &gt; 0</span>
-                평형점 밖에서 에너지에 해당하는 함수가 양수여야 한다.
-              </div>
-              <div class="formula-card">
-                <span class="formula">V(x<sub>t+1</sub>) − V(x<sub>t</sub>) &lt; 0</span>
-                시스템이 전개될수록 함수값이 감소해야 한다.
-              </div>
-            </div>
-
-            <div class="pipeline" aria-label="인증서 유도 학습 흐름">
-              <div class="pipeline-step"><b>상태 샘플링</b><span>관심 영역의 후보 상태</span></div>
-              <div class="pipeline-step"><b>동역학 전개</b><span>폐루프 한 스텝 계산</span></div>
-              <div class="pipeline-step"><b>위반 탐색</b><span>Lyapunov 조건 반례 수집</span></div>
-              <div class="pipeline-step"><b>공동 학습</b><span>제어기·관측기·인증서 갱신</span></div>
-              <div class="pipeline-step"><b>완전 검증</b><span>compact region 사후 인증</span></div>
-            </div>
-
-            <div class="evidence-grid">
-              <figure class="evidence wide">
-                <img src="assets/2myi6rv-6sq-ts-00-07-00.jpg" alt="관측기, 제어기, Lyapunov 함수와 자율주행 사례를 보여주는 출력 피드백 제어 슬라이드" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>부분 관측 시스템으로의 확장</strong>
-                    <a class="timecode">00:07:00</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>observer, controller, Lyapunov function이 하나의 폐루프에 배치된다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>비전·LiDAR 관측으로 상태를 추정하는 출력 피드백에서도 학습과 검증을 결합한다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-08-00.jpg" alt="그릇 모양 함수와 Lyapunov 함수의 양수 및 감소 조건을 설명한 슬라이드" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>안정성의 두 조건</strong>
-                    <a class="timecode">00:08:00</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>양수 조건과 시간에 따른 감소 조건이 도식화된다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>양수성은 구조적으로 만족시키고 감소 조건은 학습·검증 대상으로 둔다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-10-00.jpg" alt="double integrator 예에서 원형 부분수준집합과 정사각형 불변집합을 비교한 슬라이드" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>더 넓은 인증 영역</strong>
-                    <a class="timecode">00:10:00</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>기존 원형 부분수준집합과 제안법의 정사각형 불변집합이 비교된다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>불필요한 영역의 조건을 제거해 전체 불변집합을 attraction region으로 인증하려는 접근이다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-11-00.jpg" alt="데이터와 동역학, 관측기, 제어기, Lyapunov 함수, 안정성 조건이 순환하는 학습 도식" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>반례가 다음 데이터가 되는 폐루프</strong>
-                    <a class="timecode">00:11:00</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>안정성 위반이 데이터 버퍼로 되돌아가는 화살표가 보인다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>인증서가 critic과 유사한 학습 신호이자 최종적으로 검증해야 할 명세가 된다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-12-00.jpg" alt="전도진자와 경로 추종의 인증 영역 및 기준선 결과를 비교한 그래프" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>저차원 시스템의 결과</strong>
-                    <a class="timecode">00:12:00</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>전도진자와 경로 추종에서 여러 인증 영역 윤곽이 비교된다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>LiDAR 기반 2D 쿼드로터까지 검증했지만 고차원 접촉 시스템 확장은 별도 난제다.</span>
-                </figcaption>
-              </figure>
-            </div>
-
-            <div class="callout">
-              <span class="callout-title">적용 경계</span>
-              이 접근의 강한 주장인 완전한 형식 인증에는 폐형식 동역학이 필요하다. 휴머노이드나
-              사족보행처럼 상태 차원과 접촉 조합이 큰 시스템에서는 정책 성능, 인증 범위, 계산 가능성
-              사이의 절충이 커진다고 발표자도 질의응답에서 명시한다.
-            </div>
-          </section>
-
-          <section class="section" id="physicsgen">
-            <p class="section-kicker">03 · PhysicsGen</p>
-            <h2>물리 데이터의 다리:<br>시연 하나를 가능한 궤적의 분포로</h2>
-
-            <p class="lead">
-              PhysicsGen의 출발점은 단순하다. 사람 시연은 긴 다중 접촉 과제에 대한 좋은 전역 초기값을
-              제공하지만 로봇의 embodiment와 물성을 만족하지는 않는다. 궤적 최적화는 물리를 만족시키지만
-              복잡한 접촉 과제를 처음부터 찾기 어렵다. 두 방법을 직렬로 연결하면 서로의 약점을 상쇄할 수 있다.
-            </p>
-
-            <div class="metric-row" aria-label="PhysicsGen 핵심 수치">
-              <div class="metric">
-                <span class="metric-value">7분</span>
-                <span class="metric-label">VR 시연 수집 시간<br>발표 전사 기준</span>
-              </div>
-              <div class="metric">
-                <span class="metric-value">24</span>
-                <span class="metric-label">시스템별 원시 장기 시연</span>
-              </div>
-              <div class="metric">
-                <span class="metric-value">500</span>
-                <span class="metric-label">비교에 사용된 증강 궤적</span>
-              </div>
-            </div>
-
-            <div class="pipeline" aria-label="PhysicsGen 데이터 생성 파이프라인">
-              <div class="pipeline-step"><b>VR 시연</b><span>과제의 전역적 안내</span></div>
-              <div class="pipeline-step"><b>운동학 재표적화</b><span>비관통·관절 한계 적용</span></div>
-              <div class="pipeline-step"><b>궤적 최적화</b><span>동역학·입력 제약 적용</span></div>
-              <div class="pipeline-step"><b>물리 섭동</b><span>질량·마찰·크기·초기값</span></div>
-              <div class="pipeline-step"><b>정책 학습</b><span>BC·diffusion policy</span></div>
-            </div>
-
-            <div class="evidence-grid">
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-17-59.jpg" alt="물리 데이터 수집과 데이터 증강의 기존 사례를 비교한 슬라이드" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>데이터 병목의 기존 해법</strong>
-                    <a class="timecode">00:17:59</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>대규모 물리 수집과 생성·시각 증강 사례가 대비된다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>접촉이 풍부하고 동역학적으로 가능한 증강 데이터는 여전히 부족하다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-18-14.jpg" alt="궤적 최적화로 시연을 과제 분포로 증강한다는 PhysicsGen 핵심 문장" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>PhysicsGen의 핵심 명제</strong>
-                    <a class="timecode">00:18:14</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>“Use trajectory optimization to augment demonstrations to a distribution of tasks.”</span>
-                  <span class="evidence-note"><span class="label">해석</span>시연 주변에서 물리를 만족하는 국소 해의 분포를 만든다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence wide">
-                <img src="assets/2myi6rv-6sq-ts-00-19-44.jpg" alt="사람 시연부터 하드웨어 배치까지 이어지는 PhysicsGen 전체 파이프라인" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>시연에서 하드웨어까지</strong>
-                    <a class="timecode">00:19:44</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>Human Demonstration → Kinematic Retargeting → Trajectory Optimization → Domain Randomization → Policy의 흐름이 보인다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>소수 시연을 여러 로봇과 물리 파라미터에 맞춘 대규모 데이터셋으로 확장한다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-20-10.jpg" alt="VR로 손과 큐브 시연을 수집하는 사람과 가상환경 화면" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>7분의 VR 수집</strong>
-                    <a class="timecode">00:20:10</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>실제 VR 동작과 가상 손·큐브가 나란히 표시된다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>24개 장기 시연을 빠르게 수집한 뒤 서로 다른 로봇 embodiment로 옮긴다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-22-04.jpg" alt="시연 추종 비용과 동역학, 입력, 비관통, 관절 제약을 포함한 궤적 최적화식" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>동역학 제약을 포함한 최적화</strong>
-                    <a class="timecode">00:22:04</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>추종·제어 노력 항과 비관통·관절·동역학·입력 제약이 표시된다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>시뮬레이터 time stepping을 사용하므로 폐형식 동역학을 요구하지 않는다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence wide">
-                <img src="assets/2myi6rv-6sq-ts-00-23-36.jpg" alt="Allegro 손, iiwa, Panda에서 사람 시연과 운동학 재생 및 궤적 최적화를 비교한 슬라이드" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>같은 시연, 다른 embodiment</strong>
-                    <a class="timecode">00:23:36</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>단순 운동학 재생은 실패, 궤적 최적화 결과는 성공으로 표시된다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>지속적인 접촉 생성·해제가 필요한 과제에서는 물리적 실현 가능성 복원이 핵심이다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-24-14.jpg" alt="서로 다른 물체 색, 크기, 자세를 다루는 여러 로봇 궤적의 격자" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>하나의 시연에서 물리 분포로</strong>
-                    <a class="timecode">00:24:14</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>다양한 큐브와 상자를 다루는 세 시스템의 궤적이 제시된다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>크기·마찰·질량·강성·초기 상태를 바꾼 물리적 궤적이 증강 단위다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-25-00.jpg" alt="24개 원시 시연과 500개 증강 궤적으로 훈련한 행동 복제 정책의 성공률 비교" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>24개 원시 시연 대 500개 증강 궤적</strong>
-                    <a class="timecode">00:25:00</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>시뮬레이션·하드웨어 성공률 막대의 방향이 증강 정책 우세를 나타낸다.</span>
-                  <span class="evidence-note"><span class="label">주의</span>360p 화면에서 정확한 개별 수치는 판독하지 않았다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence wide">
-                <img src="assets/2myi6rv-6sq-ts-00-25-30.jpg" alt="시뮬레이션 양팔 조작과 실제 iiwa 양팔 로봇의 상자 조작 장면" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>분포 밖 회복과 sim-to-real</strong>
-                    <a class="timecode">00:25:30</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>시뮬레이션과 실제 양팔 iiwa의 상자 조작이 나란히 재생된다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>증강 정책은 접촉을 놓친 뒤 재접촉하며, 미세조정 없이 실제 시스템에 배치됐다고 보고된다.</span>
-                </figcaption>
-              </figure>
-            </div>
-
-            <blockquote class="editorial-quote">
-              “증강의 단위가 픽셀이 아니라 물리적으로 가능한 궤적이 될 때, 정책은 실패 뒤의 회복까지 배운다.”
-              <cite>PhysicsGen 결과에 대한 편집 요약</cite>
-            </blockquote>
-          </section>
-
-          <section class="section" id="omniretarget">
-            <p class="section-kicker">04 · OmniRetarget</p>
-            <h2>상호작용의 다리:<br>좌표가 아니라 관계를 보존한다</h2>
-
-            <p class="lead">
-              조작은 모방학습, 이동은 강화학습을 중심으로 각각 발전해 왔다. 두 문제를 합치면
-              기존 재표적화가 만든 물체·지면 관통, foot skating, 장면 상호작용 손실이 정책 학습의
-              복잡한 보상 설계로 전가된다. OmniRetarget은 이 결함을 데이터 생성 단계에서 줄인다.
-            </p>
-
-            <div class="pipeline" aria-label="OmniRetarget 파이프라인">
-              <div class="pipeline-step"><b>사람 시연</b><span>MoCap·영상 기반 모션</span></div>
-              <div class="pipeline-step"><b>Interaction Mesh</b><span>몸·물체·지형의 관계</span></div>
-              <div class="pipeline-step"><b>제약 최적화</b><span>비관통·미끄러짐·한계</span></div>
-              <div class="pipeline-step"><b>체계적 증강</b><span>pose·shape·robot·terrain</span></div>
-              <div class="pipeline-step"><b>모방 유도 RL</b><span>동역학적 action과 실기 전이</span></div>
-            </div>
-
-            <div class="evidence-grid">
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-27-08.jpg" alt="조작과 이동의 기존 학습 사례 사이에 로코-매니퓰레이션 문제를 배치한 슬라이드" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>분리되어 발전한 도구 사슬</strong>
-                    <a class="timecode">00:27:08</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>조작/모방학습과 이동/강화학습 사이에 로코-매니퓰레이션이 놓인다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>전신 이동과 접촉 조작을 함께 다루는 데이터 파이프라인이 비어 있다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-29-00.jpg" alt="기존 재표적화의 관통, 발 미끄러짐, 상호작용 무시 문제와 OmniRetarget을 비교한 슬라이드" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>원천 데이터의 세 가지 인공물</strong>
-                    <a class="timecode">00:29:00</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>관통, foot skating, object/scene interaction 무시가 표시된다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>후단 reward engineering보다 앞단의 기하·접촉 구조를 고치는 전략이다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence wide">
-                <img src="assets/2myi6rv-6sq-ts-00-30-00.jpg" alt="직접 keypoint matching과 사면체 interaction mesh 기반 관계 보존을 비교한 그림" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>Keypoint matching에서 interaction mesh로</strong>
-                    <a class="timecode">00:30:00</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>직접 좌표 대응에서 발생한 관통과 사람·로봇-물체 사이의 사면체 mesh가 대비된다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>체형 차이가 있어도 상대적 상호작용 구조를 보존하는 것이 목표다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-31-00.jpg" alt="상자를 든 사람과 휴머노이드에 신체 keypoint와 물체 표면 점을 연결한 3D interaction mesh" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>사람과 로봇의 대응 mesh</strong>
-                    <a class="timecode">00:31:00</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>파란 신체 keypoint와 녹색 물체 표면 샘플이 3D mesh로 연결된다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>Delaunay tetrahedralization으로 가까운 점을 연결하며 정확한 접촉 라벨을 요구하지 않는다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-32-00.jpg" alt="이웃 꼭짓점 변위로 Laplacian coordinate를 정의하고 source와 target mesh를 비교한 슬라이드" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>Laplacian 좌표로 관계 보존</strong>
-                    <a class="timecode">00:32:00</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>꼭짓점과 이웃의 변위로 Laplacian coordinate를 정의한다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>손-물체와 발-지면 관계를 접촉 라벨 없이 소프트하게 보존한다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence wide">
-                <img src="assets/2myi6rv-6sq-ts-00-34-00.jpg" alt="물체 위치와 회전, 크기, 로봇 종류, 지형 형상을 다양하게 바꾼 휴머노이드 모션" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>공간·형상·embodiment·지형 증강</strong>
-                    <a class="timecode">00:34:00</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>물체 pose와 크기, 여러 휴머노이드, 플랫폼 형상이 변화한다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>각 변형마다 최적화를 다시 풀어 고품질 기준 모션의 분포를 만든다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-36-00.jpg" alt="사람 시연에서 OmniRetarget, 체계적 증강, 로코-매니퓰레이션 데이터로 이어지는 파이프라인" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>자동 생성에서 imitation-guided RL까지</strong>
-                    <a class="timecode">00:36:00</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>Human Demonstration → OmniRetarget → Systematic Augmentation의 흐름이 보인다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>운동학 기준을 RL이 동역학적으로 가능한 action으로 바꾸고 실제 로봇에 전이한다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-37-00.jpg" alt="기존 연구의 긴 보상 목록과 OmniRetarget의 다섯 가지 보상을 비교한 슬라이드" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>짧아진 보상식</strong>
-                    <a class="timecode">00:37:00</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>기존 긴 항목과 body/object tracking, jerk, joint limit, self-collision의 짧은 목록이 대비된다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>깨끗한 기준 모션이 결함 상쇄용 ad hoc 보상의 필요를 줄인다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-38-00.jpg" alt="공간 및 크기 변화에 맞춰 생성한 고품질 기준 데이터의 실제 하드웨어 장면" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>Domain randomization의 한계</strong>
-                    <a class="timecode">00:38:00</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>공간 변화와 크기 변화에 대응하는 실제 로봇 동작이 나란히 보인다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>명목 기준 주변의 무작위화보다 목적별로 재최적화한 기준이 더 넓은 변화를 다룬다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-40-02.jpg" alt="실제 휴머노이드가 경사면을 기어가며 무릎과 발끝으로 접촉하는 장면" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>지형과의 전신 상호작용</strong>
-                    <a class="timecode">00:40:02</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>경사면을 기어가는 휴머노이드와 무릎·발끝 접촉 라벨이 보인다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>상자 운반뿐 아니라 crawling·climbing·stepping에도 지형 점 집합을 활용한다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-45-23.jpg" alt="실제 휴머노이드가 박스를 넘는 Stepping Over Box 장면" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>박스를 넘는 전신 동작</strong>
-                    <a class="timecode">00:45:23</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>실제 휴머노이드가 박스를 넘는 순간이 제시된다.</span>
-                  <span class="evidence-note"><span class="label">Q&amp;A</span>프레임별 최적화와 warm start를 쓰며 50–100개 물체 점에서도 밀리초 규모라고 설명한다.</span>
-                </figcaption>
-              </figure>
-            </div>
-
-            <div class="comparison-wrap">
-              <table>
-                <caption>OmniRetarget이 앞단에서 제거하려는 학습 비용</caption>
-                <thead>
-                  <tr>
-                    <th scope="col">기준 데이터의 결함</th>
-                    <th scope="col">후단에서 생기는 부담</th>
-                    <th scope="col">앞단의 대응</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>물체·지면 관통</td>
-                    <td>충돌 회피용 보상과 예외 규칙</td>
-                    <td>Hard kinematic constraint</td>
-                  </tr>
-                  <tr>
-                    <td>Foot skating</td>
-                    <td>접촉 상태 추정과 미끄러짐 페널티</td>
-                    <td>지지발 미끄러짐 제약</td>
-                  </tr>
-                  <tr>
-                    <td>손-물체 관계 손실</td>
-                    <td>과제별 reward shaping</td>
-                    <td>Interaction mesh와 Laplacian 변형 최소화</td>
-                  </tr>
-                  <tr>
-                    <td>하나의 명목 모션</td>
-                    <td>기준에서 멀리 탐색하기 어려운 RL</td>
-                    <td>Pose·shape·embodiment·terrain별 재최적화</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          <section class="section" id="synthesis">
-            <p class="section-kicker">05 · Synthesis</p>
-            <h2>세 개의 다리가 가리키는<br>범용 로봇 데이터 프레임워크</h2>
-
-            <p class="lead">
-              세 연구의 공통점은 모델 기반 도구를 최종 정책으로 배치하지 않는다는 데 있다.
-              모델은 학습 앞에서 데이터를 정제하고, 학습 중에는 반례를 찾으며, 학습 뒤에는 성��의 일부를
-              인증한다. 학습은 그 구조가 만든 유효 영역에서 복잡한 표현과 적응을 담당한다.
-            </p>
-
-            <div class="evidence-grid">
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-46-30.jpg" alt="Neural Lyapunov Control, 접촉 조작 데이터, 로코-매니퓰레이션 데이터를 세 기여로 정리한 결론 슬라이드" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>세 기여의 결론</strong>
-                    <a class="timecode">00:46:30</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>Performance Guarantees와 Data Generation의 세 결과가 완성된 지도에 놓인다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>검증기·데이터 생성기·기준 모션 생성기로 모델 기반 기술의 역할을 재배치한다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence">
-                <img src="assets/2myi6rv-6sq-ts-00-47-00.jpg" alt="Teleop, MoCap, 인터넷 영상을 일반 데이터 생성 프레임워크와 여러 학습법으로 연결한 슬라이드" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>범용 데이터 생성 프레임워크</strong>
-                    <a class="timecode">00:47:00</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>Teleop·MoCap·인터넷 영상이 OmniRetarget·PhysicsGen을 거쳐 BC·RL·인증서 학습으로 갈라진다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>상류 데이터 소스와 하류 학습법 모두에 독립적인 변환 계층이 장기 목표다.</span>
-                </figcaption>
-              </figure>
-
-              <figure class="evidence wide">
-                <img src="assets/2myi6rv-6sq-ts-00-48-00.jpg" alt="덱스터리티와 민첩성, 인지 능력을 두 축으로 배치한 미래 로봇 연구 슬라이드" loading="lazy">
-                <figcaption>
-                  <div class="caption-head">
-                    <strong>물리적 지능과 인지의 결합</strong>
-                    <a class="timecode">00:48:00</a>
-                  </div>
-                  <span class="evidence-note"><span class="label">화면</span>세로축 Dexterity/Agility와 가로축 Cognition 사이에 로봇 실기와 인터넷 이미지 데이터가 배치된다.</span>
-                  <span class="evidence-note"><span class="label">해석</span>상위 VLM의 의미 계획, 하위 반응형 제어, 실행 결과에 따른 세계 모델 갱신이 양방향으로 연결돼야 한다.</span>
-                </figcaption>
-              </figure>
-            </div>
-
-            <h3>통합 논증 지도</h3>
-            <div class="comparison-wrap">
-              <table>
-                <caption>세 연구가 학습 파이프라인의 서로 다른 병목을 다루는 방식</caption>
-                <thead>
-                  <tr>
-                    <th scope="col">연구</th>
-                    <th scope="col">병목</th>
-                    <th scope="col">모델 기반 장치</th>
-                    <th scope="col">학습이 맡는 역할</th>
-                    <th scope="col">남는 경계</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">Neural Lyapunov</th>
-                    <td>안정성 보증 부재</td>
-                    <td>Lyapunov 조건과 완전 검증기</td>
-                    <td>제어기·관측기·인증서 표현</td>
-                    <td>고차원·접촉 동역학의 확장성</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">PhysicsGen</th>
-                    <td>접촉 조작 데이터 부족</td>
-                    <td>재표적화와 궤적 최적화</td>
-                    <td>증강 분포의 행동 복제</td>
-                    <td>시뮬레이터와 현실의 모델 오차</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">OmniRetarget</th>
-                    <td>전신 상호작용 데이터 결함</td>
-                    <td>Interaction mesh와 기하 제약</td>
-                    <td>기준 모션의 동역학적 실행</td>
-                    <td>암묵적 접촉 근사와 지각 통합</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          <section class="section" id="implications">
-            <p class="section-kicker">06 · Implications &amp; Limits</p>
-            <h2>데이터의 양보다 먼저 물어야 할 것</h2>
-
-            <h3>연구와 시스템 설계에 주는 시사점</h3>
-            <ul class="takeaway-list">
-              <li>
-                <strong>학습 실패를 보상 항으로만 다루지 않는다.</strong>
-                실패가 데이터 결함, 기하 제약 누락, 인증 부재 중 어디에서 시작되는지 먼저 분리해야 한다.
-              </li>
-              <li>
-                <strong>정책 성능 지표와 함께 데이터 실현 가능성을 측정한다.</strong>
-                동역학 일관성, 접촉 관계, 분포 커버리지와 회복 행동이 sim-to-real의 핵심 평가축이 된다.
-              </li>
-              <li>
-                <strong>제약은 표현력을 줄이는 비용이 아니라 탐색 공간을 정리하는 도구다.</strong>
-                좋은 제약은 학습기가 풀어야 할 불필요한 모순을 제거한다.
-              </li>
-              <li>
-                <strong>형식 보증과 경험적 강건성을 구분한다.</strong>
-                검증 가능한 저차원 영역과 실험으로만 평가되는 고차원 영역을 같은 언어로 과장하지 않아야 한다.
-              </li>
-              <li>
-                <strong>인터넷 영상의 규모를 embodied data의 품질로 변환하는 계층이 필요하다.</strong>
-                3D 구조, 접촉, 마찰, 깊이에 대한 믿음과 시각 인식을 제어에 연결해야 한다.
-              </li>
-            </ul>
-
-            <h3>질의응답에서 드러난 경계 조건</h3>
-            <ul class="boundary-list">
-              <li>
-                <strong>고차원 형식 검증:</strong> 휴머노이드와 사족보행에서는 완전한 결정론적 인증과 정책 능력 사이 절충이 크다.
-              </li>
-              <li>
-                <strong>동역학 표현:</strong> Neural Lyapunov는 폐형식 동역학이 필요하지만 PhysicsGen은 시뮬레이터 time stepping을 활용한다.
-              </li>
-              <li>
-                <strong>접촉 보존:</strong> OmniRetarget은 접촉을 hard label로 직접 지정하지 않고 Laplacian 관계로 암묵적으로 보존한다.
-              </li>
-              <li>
-                <strong>최적화 확장성:</strong> 프레임별로 풀고 직전 해를 warm start로 사용한다. 발표 전사에서는 잔차를 약 10<sup>−3</sup> 수준까지 줄인다고 설명한다.
-              </li>
-              <li>
-                <strong>인지와 제어:</strong> 상위 VLM과 하위 제어의 단방향 계층만으로는 부족하다. 실행 결과가 상위 세계 이해를 갱신해야 한다.
-              </li>
-              <li>
-                <strong>다음 2–3년:</strong> 인터넷·egocentric·tutorial video의 확장성, 데이터 fidelity, 시각 지각과 상태 기반 정책의 결합이 우선 과제로 제시된다.
-              </li>
-            </ul>
-
-            <div class="closing">
-              <p class="section-kicker">Reader Takeaway</p>
-              <h2>학습을 더 크게 만들기 전에,<br>학습이 서 있는 바닥을 고쳐라</h2>
-              <p>
-                이 강연의 가장 유용한 메시지는 특정 알고리즘보다 설계 순서에 있다. 접촉이 깨진 기준 모션,
-                물리를 위반하는 증강 데이터, 검증할 수 없는 안정성 주장을 그대로 둔 채 정책만 확장하면
-                복잡성은 보상 설계와 데이터 수집, 배치 실패로 이동할 뿐이다.
-              </p>
-              <ul class="takeaway-list">
-                <li><strong>보증이 필요한 곳에는</strong> 인증 가능한 조건과 반례 생성 루프를 둔다.</li>
-                <li><strong>데이터가 부족한 곳에는</strong> 물리를 만족하는 최적화 기반 증강을 둔다.</li>
-                <li><strong>embodiment가 달라지는 곳에는</strong> 좌표보다 상호작용 관계를 보존한다.</li>
-              </ul>
-              <p>
-                모델은 학습의 경쟁자가 아니다. 좋은 모델 기반 구조는 학습이 낭비하지 않아도 될 탐색을
-                제거하고, 더 멀리 일반화할 수 있는 출발점을 만든다.
-              </p>
-            </div>
-          </section>
-
-          <section class="section" id="sources">
-            <p class="section-kicker">07 · Source Notes</p>
-            <h2>출처, 근거 수준과 작성 방법</h2>
-
-            <div class="source-card">
-              <h3>1. 1차 출처</h3>
-              <p>
-                Duke Robotics, Lujie Yang,
-                <a>“Bridging Model-Based and Learning-Based Methods for Robotic Loco-Manipulation and Control”</a>.
-                영상 설명 기준 강연일은 2025년 11월 7일, 게시일은 2026년 6월 22일이며 길이는 57분 23초다.
-              </p>
-            </div>
-
-            <div class="source-card">
-              <h3>2. 언어 근거</h3>
-              <p>
-                영상에는 영어 자동 자막과 한국어 자동 번역 자막이 노출됐으나 자막 파일 요청은 반복해서
-                HTTP 429로 차단됐다. 이 보고서는 전체 오디오를 로컬 Whisper <code>small</code> 영어 모드로
-                전사한 476개 시간 구간을 1차 언어 근거로 사용했다. 프로젝트명, 로봇명, 수식과 수치는
-                화면 및 영상 설명을 우선 대조했다.
-              </p>
-            </div>
-
-            <div class="source-card">
-              <h3>3. 시각 근거</h3>
-              <p>
-                장면 변화 감지, 전사 주제 전환, 장기 정적 슬라이드의 보완 샘플을 합쳐 후보를 만든 뒤
-                직접 검수해 33개 프레임을 유지했다. 접근 가능한 원본 스트림은 640×360이었으며 업스케일하지 않았다.
-                작은 그래프와 수식에서 판독할 수 없는 개별 수치는 본문에 옮기지 않았다.
-              </p>
-            </div>
-
-            <div class="source-card">
-              <h3>4. 해석상의 한계</h3>
-              <ul>
-                <li>로컬 ASR은 발음이 유사한 기술 용어를 오인할 수 있다.</li>
-                <li>PhysicsGen과 OmniRetarget의 결과는 발표자가 제시한 실험 범위에 근거한다.</li>
-                <li>고차원 형식 검증, interaction mesh의 접촉 근사, 미모델링 충돌과 상태 추정 오류는 열린 문제다.</li>
-                <li>각 이미지 설명은 화면에서 직접 보이는 사실과 전사에 근거한 해석을 분리해 표기했다.</li>
-              </ul>
-            </div>
-
-            <div class="tags" aria-label="주제 태그">
-              <span>#로보틱스</span>
-              <span>#robot-learning</span>
-              <span>#loco-manipulation</span>
-              <span>#trajectory-optimization</span>
-              <span>#reinforcement-learning</span>
-              <span>#Lyapunov-control</span>
-              <span>#sim-to-real</span>
-              <span>#연구자료</span>
-            </div>
-          </section>
+  <section class="hero" id="top">
+    <div class="hero-inner">
+      <div>
+        <p class="eyebrow">Robotics Research Report · 2026</p>
+        <h1>모델과 학습 사이에<br>다리를 놓다</h1>
+        <p class="hero-deck">
+          로봇 학습의 두 병목—비싼 데이터와 부족한 보증—을 신경 Lyapunov 제어,
+          PhysicsGen, OmniRetarget은 어떻게 다시 설계하는가.
+        </p>
+        <div class="hero-meta" aria-label="기사 정보">
+          <span>Duke Robotics 강연 분석</span>
+          <span>읽는 시간 약 22분</span>
+          <span>33개 장면 근거</span>
+          <span>2026년 8월 19일</span>
         </div>
       </div>
-    </article>
+
+      <div class="hero-visual">
+        <figure>
+          <img src="assets/2myi6rv-6sq-ts-00-00-10.jpg" alt="Lujie Yang의 로봇 로코-매니퓰레이션 강연 제목 슬라이드">
+          <figcaption>MIT CSAIL Lujie Yang의 Duke Robotics 발표. 모델 기반 제어와 학습 기반 로보틱스의 결합을 세 연구 사례로 설명한다.</figcaption>
+        </figure>
+        <a class="hero-source-link">원본 영상 57:23 ↗</a>
+      </div>
+    </div>
+  </section>
+
+  <main id="main-content">
+    <div class="reading-rail">
+      <span>Research report · Editorial analysis</span>
+      <div class="tags" aria-label="주제 태그">
+        <span class="tag">Robot Learning</span>
+        <span class="tag">Loco-Manipulation</span>
+        <span class="tag">Trajectory Optimization</span>
+        <span class="tag">Lyapunov Control</span>
+        <span class="tag">Sim-to-Real</span>
+      </div>
+    </div>
+
+    <div class="article-shell">
+      <article class="article-body">
+        <section class="abstract" aria-labelledby="abstract-heading">
+          <p class="abstract-label" id="abstract-heading">Abstract</p>
+          <p>
+            모델 기반 방법의 <strong>구조·최적화·검증 가능성</strong>을 학습 기반 방법의
+            <strong>표현력·적응성·확장성</strong>에 결합하면 로봇 학습의 데이터 부족과
+            보증 부재를 동시에 줄일 수 있다. 이 보고서는 신경 Lyapunov 제어의 안정성 인증,
+            PhysicsGen의 접촉 풍부 조작 데이터 증강, OmniRetarget의 상호작용 보존형 전신
+            데이터 생성을 중심으로 이 주장을 분석한다. 세 연구가 공유하는 핵심은 모델을
+            정책의 경쟁자로 두지 않고, 검증기·데이터 생성기·고품질 기준 모션 생성기로
+            재배치한다는 데 있다.
+          </p>
+        </section>
+
+        <aside class="provenance-note" aria-label="자료 근거 안내">
+          <strong>근거 안내.</strong> YouTube 자막 파일 요청이 HTTP 429로 차단되어 전체 오디오를
+          로컬 Whisper <code>small</code> 영어 모드로 전사한 476개 시간 구간을 1차 언어 근거로
+          사용했다. 기술 용어·도식·수치는 영상 설명과 640×360 캡처 화면으로 교차 확인했으며,
+          판독할 수 없는 세부 수치는 옮기지 않았다.
+        </aside>
+
+        <section class="section" id="findings">
+          <header class="section-header">
+            <span class="section-index">Executive Summary</span>
+            <h2>다섯 가지 핵심 발견</h2>
+            <p class="section-lead">
+              이 발표는 “모델인가, 학습인가”라는 선택보다 각 접근이 가장 잘하는 일을
+              파이프라인의 올바른 위치에 배치하는 것이 중요하다고 주장한다.
+            </p>
+          </header>
+
+          <div class="findings">
+            <article class="finding">
+              <span class="finding-no">01</span>
+              <h3>모델과 학습은 경쟁 관계가 아니라 역할 분담 관계다.</h3>
+              <p>
+                모델 기반 도구는 신경 정책을 대체하지 않는다. 안정성 위반을 찾고, 물리적으로
+                가능한 궤적을 만들며, 상호작용 제약을 보존하는 경계 장치로 배치된다.
+              </p>
+            </article>
+            <article class="finding">
+              <span class="finding-no">02</span>
+              <h3>데이터 품질이 학습 복잡도를 결정한다.</h3>
+              <p>
+                결함 있는 기준 모션을 복잡한 보상으로 수선하는 대신 최적화로 원천 데이터를
+                정제하면 학습과 sim-to-real 전이가 단순해진다.
+              </p>
+            </article>
+            <article class="finding">
+              <span class="finding-no">03</span>
+              <h3>보증은 학습 이후의 감사가 아니라 학습 데이터의 원천이 될 수 있다.</h3>
+              <p>
+                Lyapunov 조건을 위반하는 반례가 다시 학습 버퍼로 들어가면서 인증서가
+                능동적인 데이터 생성기 역할을 한다.
+              </p>
+            </article>
+            <article class="finding">
+              <span class="finding-no">04</span>
+              <h3>로코-매니퓰레이션의 보존 단위는 관절 좌표보다 상호작용이다.</h3>
+              <p>
+                손–물체, 발–지형, 몸–장면의 상대 관계를 보존해야 체형이 다른 로봇에서도
+                접촉 의미가 유지된다.
+              </p>
+            </article>
+            <article class="finding">
+              <span class="finding-no">05</span>
+              <h3>스케일링의 다음 병목은 embodied fidelity다.</h3>
+              <p>
+                인터넷 영상은 풍부하지만 접촉·마찰·깊이 정보는 거칠다. 대규모 인간 영상을
+                고품질 로봇 궤적으로 바꾸는 변환 계층이 필요하다.
+              </p>
+            </article>
+          </div>
+
+          <div class="comparison-wrap">
+            <table>
+              <caption>모델 기반 방법과 학습 기반 방법의 상보성</caption>
+              <thead>
+                <tr>
+                  <th scope="col">관점</th>
+                  <th scope="col">모델 기반 방법</th>
+                  <th scope="col">학습 기반 방법</th>
+                  <th scope="col">결합 전략</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">강점</th>
+                  <td>구조, 계산 효율, 명시적 제약, 검증 가능성</td>
+                  <td>표현력, 적응성, 지각 통합, 복잡한 행동 표현</td>
+                  <td>모델을 검증기와 데이터 생성기로 사용</td>
+                </tr>
+                <tr>
+                  <th scope="row">약점</th>
+                  <td>정확한 모델과 상태 추정에 민감, 복잡한 접촉 수식화가 어려움</td>
+                  <td>비싼 데이터, 높은 탐색 비용, 분포 밖 취약성, 보증 부재</td>
+                  <td>제약·최적화로 학습 공간과 데이터 분포를 정돈</td>
+                </tr>
+                <tr>
+                  <th scope="row">대표 사례</th>
+                  <td>Lyapunov 분석, trajectory optimization, kinematic constraints</td>
+                  <td>강화학습, 모방학습, diffusion policy, VLM</td>
+                  <td>Neural Lyapunov Control, PhysicsGen, OmniRetarget</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="argument-map" aria-label="전체 논증 흐름">
+            <h3>전체 논증 지도</h3>
+            <div class="flow">
+              <div class="flow-node">데이터 부족<br>보증 부재</div>
+              <div class="flow-arrow" aria-hidden="true">→</div>
+              <div class="flow-node">모델 기반<br>구조 삽입</div>
+              <div class="flow-arrow" aria-hidden="true">→</div>
+              <div class="flow-node">인증·최적화<br>상호작용 보존</div>
+              <div class="flow-arrow" aria-hidden="true">→</div>
+              <div class="flow-node">더 견고한 정책<br>단순한 학습</div>
+            </div>
+          </div>
+
+          <div class="visual-grid">
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-01-00.jpg" alt="손 조작부터 휴머노이드 운반까지 다양한 로봇 작업을 보여주는 슬라이드" loading="lazy">
+              <figcaption><span class="timestamp">00:01:00</span><strong>과제의 확장.</strong> 손가락 수준의 덱스터리티에서 이동과 전신 협응이 필요한 로코-매니퓰레이션까지, 접촉 시퀀스의 길이와 복잡도가 증가한다.</figcaption>
+            </figure>
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-02-53.jpg" alt="강화학습, 모방학습, 파운데이션 모델을 비교한 슬라이드" loading="lazy">
+              <figcaption><span class="timestamp">00:02:53</span><strong>학습의 세 계열.</strong> 강화학습은 탐색과 보상, 모방학습은 시연과 일반화, 파운데이션 모델은 데이터 품질과 embodied experience가 병목이다.</figcaption>
+            </figure>
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-03-54.jpg" alt="모델 기반 방법과 학습 기반 방법의 장단점을 비교한 슬라이드" loading="lazy">
+              <figcaption><span class="timestamp">00:03:54</span><strong>상보적 약점.</strong> 모델 기반의 보증과 학습 기반의 유연성을 결합하는 것이 강연의 중심 문제다.</figcaption>
+            </figure>
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-05-00.jpg" alt="Neural Lyapunov Control, PhysicsGen, OmniRetarget의 세 기여를 정리한 슬라이드" loading="lazy">
+              <figcaption><span class="timestamp">00:05:00</span><strong>세 개의 다리.</strong> 성능 보증에는 Neural Lyapunov Control, 데이터 생성에는 PhysicsGen과 OmniRetarget을 배치한다.</figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <blockquote class="pull-quote">
+          “좋은 모델이 모든 행동을 결정할 필요는 없다. 실패를 찾고, 가능한 데이터를 만들고,
+          학습이 지켜야 할 구조를 제공하는 것만으로도 충분히 강력하다.”
+          <cite>강연 전체 논증을 바탕으로 한 편집 요약</cite>
+        </blockquote>
+
+        <section class="section" id="lyapunov">
+          <header class="section-header">
+            <span class="section-index">Evidence I · Performance Guarantees</span>
+            <h2>인증서가 반례를 만들고, 반례가 정책을 개선한다</h2>
+            <p class="section-lead">
+              첫 번째 다리는 학습 정책의 성능 보증이다. 제어기뿐 아니라 관측기와
+              Lyapunov 함수까지 함께 학습하고, 마지막에는 완전한 신경망 검증기로
+              관심 영역의 안정성 조건을 확인한다.
+            </p>
+          </header>
+
+          <div class="prose">
+            <p>
+              Lyapunov 안정성은 직관적으로 시스템의 “에너지”가 시간이 지날수록 줄어드는지를
+              묻는다. 평형점이 아닌 상태에서 함수값이 양수이고, 다음 시점으로 이동할 때 그
+              값이 감소한다면 시스템 상태는 평형으로 수렴한다. 발표된 방법은 함수의 양성을
+              구조적으로 만족시키고, 감소 조건은 학습과 검증을 통해 확보한다.
+            </p>
+            <p>
+              중요한 확장은 <strong>부분 관측</strong>이다. 실제 로봇은 완전한 상태 벡터 대신
+              카메라나 LiDAR 같은 센서 관측을 받는다. 따라서 출력 피드백 시스템에서는
+              관측기가 상태를 추정하고, 제어기는 그 추정값으로 행동하며, Lyapunov 인증서는
+              이 폐루프 전체를 다뤄야 한다. 이 연구는 세 요소를 공동 합성하는 방향을 제시한다.
+            </p>
+          </div>
+
+          <div class="equation" aria-label="Lyapunov 안정성의 기본 조건">
+            <span class="formula">V(x<sub>t</sub>) &gt; 0 &nbsp;&nbsp;and&nbsp;&nbsp; V(x<sub>t+1</sub>) − V(x<sub>t</sub>) &lt; 0</span>
+            <small>평형점을 제외한 관심 영역에서 함수는 양수이고 시간에 따라 감소해야 한다.</small>
+          </div>
+
+          <div class="method-card">
+            <h3>Certificate-guided training의 폐루프</h3>
+            <ul>
+              <li>관심 영역에서 상태를 샘플링하고 동역학을 한 스텝 전개한다.</li>
+              <li>Lyapunov 감소 조건을 위반하는 상태를 반례로 식별한다.</li>
+              <li>반례를 데이터 버퍼에 추가해 제어기·관측기·인증서를 역전파로 갱신한다.</li>
+              <li>학습 후 complete neural-network verifier로 연속 상태 영역을 사후 인증한다.</li>
+            </ul>
+          </div>
+
+          <div class="visual-grid">
+            <figure class="visual-card featured">
+              <img src="assets/2myi6rv-6sq-ts-00-07-00.jpg" alt="출력 피드백용 신경 Lyapunov 제어의 구조와 자율주행 예시" loading="lazy">
+              <figcaption><span class="timestamp">00:07:00</span><strong>출력 피드백으로의 확장.</strong> 센서 관측에서 상태를 추정하는 observer, neural controller, Lyapunov certificate를 하나의 폐루프로 다룬다.</figcaption>
+            </figure>
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-08-00.jpg" alt="그릇 모양 Lyapunov 함수와 양성 및 감소 조건을 보여주는 슬라이드" loading="lazy">
+              <figcaption><span class="timestamp">00:08:00</span><strong>두 안정성 조건.</strong> 함수는 평형점 밖에서 양수이고 시스템이 진행될수록 감소해야 한다.</figcaption>
+            </figure>
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-10-00.jpg" alt="기존 부분수준집합과 제안한 불변 정사각형 인증 영역의 비교" loading="lazy">
+              <figcaption><span class="timestamp">00:10:00</span><strong>더 넓은 인증 영역.</strong> 불필요한 영역의 검증을 제거하는 논리식을 사용해 원형 부분수준집합보다 큰 불변집합 전체를 인증 대상으로 삼는다.</figcaption>
+            </figure>
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-11-00.jpg" alt="안정성 위반 반례가 학습 데이터로 돌아가는 폐루프 다이어그램" loading="lazy">
+              <figcaption><span class="timestamp">00:11:00</span><strong>인증서가 만드는 데이터.</strong> 안정성 위반 반례가 버퍼로 돌아가며 학습과 검증을 연결한다.</figcaption>
+            </figure>
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-12-00.jpg" alt="전도진자와 경로 추종에서 인증 영역을 비교한 실험 결과" loading="lazy">
+              <figcaption><span class="timestamp">00:12:00</span><strong>저차원 검증 결과.</strong> 전도진자와 경로 추종을 포함한 부분 관측 시스템에서 기준선과 인증 영역을 비교한다.</figcaption>
+            </figure>
+          </div>
+
+          <div class="evidence-note">
+            <strong>적용 경계.</strong> 완전한 형식 인증에는 폐형식 동역학과 검증 가능한 네트워크
+            구조가 필요하다. 휴머노이드나 사족보행처럼 차원이 높고 접촉이 복잡한 시스템에서는
+            정책의 표현력과 완전 검증의 확장성 사이에 큰 절충이 생긴다. 이 결과를 모든
+            로봇 제어기로 일반화해서는 안 된다.
+          </div>
+        </section>
+
+        <section class="section" id="physicsgen">
+          <header class="section-header">
+            <span class="section-index">Evidence II · PhysicsGen</span>
+            <h2>이미지가 아니라 물리적으로 가능한 궤적을 증강한다</h2>
+            <p class="section-lead">
+              두 번째 다리는 접촉 풍부 조작 데이터다. 사람의 시연은 긴 과제를 풀기 위한
+              전역적 힌트를 제공하고, 궤적 최적화는 그 주변에서 물리 법칙을 만족하는
+              다양한 국소 해를 생성한다.
+            </p>
+          </header>
+
+          <div class="prose">
+            <p>
+              로봇 데이터 부족에 대한 전통적 답은 두 가지다. 원격조작과 외골격을 통해
+              물리 데이터를 대량 수집하거나, 기존 데이터를 시각·의미적으로 증강하는 것이다.
+              전자는 비용과 시간이 크고, 후자는 접촉을 만들고 끊는 동역학적 실현 가능성을
+              직접 보장하지 않는다.
+            </p>
+            <p>
+              PhysicsGen은 소수의 VR 시연을 운동학적으로 재표적화한 뒤, 시연 추종과 제어
+              노력을 목적함수로 두고 동역학·입력·비관통·관절 한계 제약을 만족하도록 궤적을
+              다시 푼다. 이후 물체 크기·질량·마찰, 로봇 구성·강성, 초기 상태를 섭동하면서
+              같은 과제의 물리적 분포를 만든다.
+            </p>
+          </div>
+
+          <div class="argument-map" aria-label="PhysicsGen 파이프라인">
+            <h3>PhysicsGen 데이터 파이프라인</h3>
+            <div class="flow">
+              <div class="flow-node">VR 인간 시연</div>
+              <div class="flow-arrow" aria-hidden="true">→</div>
+              <div class="flow-node">운동학<br>재표적화</div>
+              <div class="flow-arrow" aria-hidden="true">→</div>
+              <div class="flow-node">궤적 최적화<br>+ 물성 섭동</div>
+              <div class="flow-arrow" aria-hidden="true">→</div>
+              <div class="flow-node">BC 학습<br>하드웨어 배치</div>
+            </div>
+          </div>
+
+          <div class="number-strip" aria-label="PhysicsGen 주요 수치">
+            <div class="number-item">
+              <strong>7분</strong>
+              <span>VR 원시 시연 수집 시간</span>
+            </div>
+            <div class="number-item">
+              <strong>24개</strong>
+              <span>비교에 사용된 원시 시연</span>
+            </div>
+            <div class="number-item">
+              <strong>500개</strong>
+              <span>최적화로 만든 증강 궤적</span>
+            </div>
+          </div>
+
+          <div class="visual-grid">
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-17-59.jpg" alt="물리적 데이터 수집과 기존 데이터 증강 방식을 비교한 슬라이드" loading="lazy">
+              <figcaption><span class="timestamp">00:17:59</span><strong>기존의 두 해법.</strong> 물리 수집은 비싸고, 기존 증강은 접촉 동역학보다 의미·시각 변화에 집중한다.</figcaption>
+            </figure>
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-18-14.jpg" alt="궤적 최적화로 시연을 과제 분포로 증강한다는 PhysicsGen 핵심 문장" loading="lazy">
+              <figcaption><span class="timestamp">00:18:14</span><strong>핵심 명제.</strong> “Use trajectory optimization to augment demonstrations to a distribution of tasks.”</figcaption>
+            </figure>
+            <figure class="visual-card featured">
+              <img src="assets/2myi6rv-6sq-ts-00-19-44.jpg" alt="인간 시연부터 운동학 재표적화, 궤적 최적화, 도메인 무작위화, 정책 학습까지의 PhysicsGen 파이프라인" loading="lazy">
+              <figcaption><span class="timestamp">00:19:44</span><strong>전체 흐름.</strong> 소수의 인간 시연을 여러 embodiment와 물성에 맞는 데이터셋으로 변환하고 imitation learning과 실제 배치로 연결한다.</figcaption>
+            </figure>
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-20-10.jpg" alt="VR 환경에서 사람이 손으로 큐브를 조작하며 데이터를 수집하는 장면" loading="lazy">
+              <figcaption><span class="timestamp">00:20:10</span><strong>빠른 초기 수집.</strong> 약 7분의 VR 수집으로 긴 접촉 과제의 전역적 초기 추측을 확보한다.</figcaption>
+            </figure>
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-22-04.jpg" alt="시연 추종 목적함수와 동역학 및 입력 제약을 포함한 궤적 최적화 슬라이드" loading="lazy">
+              <figcaption><span class="timestamp">00:22:04</span><strong>동역학 제약.</strong> simulator time stepping을 이용해 운동학적으로 가능하지만 물리적으로 불가능한 재생 궤적을 수정한다.</figcaption>
+            </figure>
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-23-36.jpg" alt="Allegro 손, iiwa, Panda에서 인간 시연, 운동학 재생, 궤적 최적화를 비교한 장면" loading="lazy">
+              <figcaption><span class="timestamp">00:23:36</span><strong>최적화 전과 후.</strong> 동일한 시연의 운동학 재생은 여러 embodiment에서 실패하지만 궤적 최적화가 동역학적 실현 가능성을 회복한다.</figcaption>
+            </figure>
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-24-14.jpg" alt="여러 크기와 자세의 물체를 다루는 다양한 증강 궤적" loading="lazy">
+              <figcaption><span class="timestamp">00:24:14</span><strong>물리 분포로의 확장.</strong> 물체 물성, 로봇 구성, 초기 상태를 바꿔 한 시연 주변의 가능한 궤적 분포를 만든다.</figcaption>
+            </figure>
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-25-00.jpg" alt="24개 원시 시연과 500개 증강 궤적으로 훈련한 정책의 성공률 비교" loading="lazy">
+              <figcaption><span class="timestamp">00:25:00</span><strong>정책 성능 비교.</strong> 500개 증강 궤적으로 훈련한 diffusion policy가 세 플랫폼에서 더 견고한 방향의 결과를 보인다. 작은 개별 수치는 판독에서 제외했다.</figcaption>
+            </figure>
+            <figure class="visual-card featured">
+              <img src="assets/2myi6rv-6sq-ts-00-25-30.jpg" alt="시뮬레이션 양팔 조작과 실제 iiwa 하드웨어 배치를 비교하는 장면" loading="lazy">
+              <figcaption><span class="timestamp">00:25:30</span><strong>회복과 sim-to-real.</strong> 증강 정책은 초기 접촉을 놓친 뒤 재접촉을 시도하며, 실제 양팔 iiwa에 미세조정 없이 배치된다.</figcaption>
+            </figure>
+          </div>
+
+          <blockquote class="pull-quote">
+            데이터 증강의 단위가 픽셀이 아니라 궤적이 되면,
+            다양성은 곧 물리적 회복 가능성의 학습 신호가 된다.
+          </blockquote>
+
+          <div class="prose">
+            <h3>왜 회복 행동이 달라지는가</h3>
+            <p>
+              원시 시연만 본 정책은 접촉을 놓친 상태를 충분히 경험하지 못한다. 반면 초기조건과
+              물성을 바꿔 다시 최적화한 궤적은 명목 경로 주변의 실패·회복 상태까지 포함한다.
+              실제 iiwa에서 미모델링 충돌 형상과 상태 추정 오차가 남아도 정책이 재접촉을
+              시도했다는 설명은 단순한 데이터 양보다 <strong>분포 커버리지</strong>가 중요하다는
+              점을 보여준다.
+            </p>
+          </div>
+        </section>
+
+        <section class="section" id="omniretarget">
+          <header class="section-header">
+            <span class="section-index">Evidence III · OmniRetarget</span>
+            <h2>좌표를 복사하지 말고 상호작용을 보존하라</h2>
+            <p class="section-lead">
+              세 번째 다리는 전신 로코-매니퓰레이션 데이터다. 사람과 로봇의 관절 위치를
+              직접 맞추는 대신 몸·물체·지형 사이의 상대적인 기하 구조를 보존한다.
+            </p>
+          </header>
+
+          <div class="prose">
+            <p>
+              조작은 주로 모방학습, 이동은 주로 강화학습이라는 별도의 도구 사슬로 발전했다.
+              두 문제를 합치면 손과 물체의 관계뿐 아니라 발과 지면, 무릎과 경사면, 전신과
+              장면의 접촉까지 동시에 유지해야 한다. 기존 keypoint matching은 사람과 로봇의
+              체형 차이를 단순 축척하는 과정에서 물체 관통, foot skating, 장면 상호작용
+              손실을 만들기 쉽다.
+            </p>
+            <p>
+              OmniRetarget은 사람과 로봇의 의미 대응 관절, 물체와 지형 표면의 샘플 점을
+              하나의 interaction mesh로 연결한다. 각 꼭짓점이 이웃과 맺는 Laplacian 좌표
+              관계를 source와 target 사이에서 가깝게 유지하면, 정확한 접촉 라벨 없이도
+              손–물체와 발–지면의 상대 배치를 소프트하게 보존할 수 있다.
+            </p>
+          </div>
+
+          <div class="method-card">
+            <h3>최적화가 보존하는 것</h3>
+            <ul>
+              <li><strong>Interaction:</strong> 몸·물체·지형 샘플 사이의 상대적 Laplacian 구조</li>
+              <li><strong>Feasibility:</strong> 비관통, 관절·속도 한계, 지지발 미끄러짐 제약</li>
+              <li><strong>Continuity:</strong> 프레임 간 시간적 매끄러움과 직전 해의 warm start</li>
+              <li><strong>Diversity:</strong> 물체 pose·shape, 로봇 embodiment, terrain geometry의 체계적 변화</li>
+            </ul>
+          </div>
+
+          <div class="visual-grid">
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-27-08.jpg" alt="조작과 이동을 결합한 로코-매니퓰레이션의 빈 영역을 보여주는 슬라이드" loading="lazy">
+              <figcaption><span class="timestamp">00:27:08</span><strong>통합의 공백.</strong> 모방 기반 조작과 강화학습 기반 이동 사이에 전신 상호작용을 위한 일관된 데이터 파이프라인이 부족하다.</figcaption>
+            </figure>
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-29-00.jpg" alt="기존 재표적화의 관통과 발 미끄러짐 문제를 OmniRetarget과 비교한 슬라이드" loading="lazy">
+              <figcaption><span class="timestamp">00:29:00</span><strong>원천 데이터의 결함.</strong> 관통과 foot skating을 복잡한 RL 보상으로 사후 수선하지 않고 재표적화 단계에서 제거한다.</figcaption>
+            </figure>
+            <figure class="visual-card featured">
+              <img src="assets/2myi6rv-6sq-ts-00-30-00.jpg" alt="직접 keypoint matching과 interaction mesh 방식을 비교한 슬라이드" loading="lazy">
+              <figcaption><span class="timestamp">00:30:00</span><strong>표현의 전환.</strong> 개별 관절 좌표를 직접 맞추는 대신 사람–물체와 로봇–물체의 interaction mesh가 만드는 상대 구조를 비교한다.</figcaption>
+            </figure>
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-31-00.jpg" alt="상자를 든 사람과 휴머노이드에 대응 keypoint와 3D mesh를 표시한 장면" loading="lazy">
+              <figcaption><span class="timestamp">00:31:00</span><strong>대응 mesh.</strong> 의미 대응 관절과 물체 표면 샘플을 Delaunay tetrahedralization으로 연결한다.</figcaption>
+            </figure>
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-32-00.jpg" alt="이웃 꼭짓점과의 변위로 Laplacian 좌표를 정의하는 수식과 그림" loading="lazy">
+              <figcaption><span class="timestamp">00:32:00</span><strong>Laplacian 관계.</strong> 각 점의 절대 위치보다 이웃에 대한 상대 배치를 유지해 접촉 의미를 소프트하게 보존한다.</figcaption>
+            </figure>
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-34-00.jpg" alt="물체 위치와 크기, 여러 휴머노이드, 지형을 변화시킨 데이터 증강 예시" loading="lazy">
+              <figcaption><span class="timestamp">00:34:00</span><strong>체계적 증강.</strong> 공간, 물체 형상, embodiment, 지형을 바꾸고 각 조건에서 최적화를 다시 푼다.</figcaption>
+            </figure>
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-36-00.jpg" alt="인간 시연에서 OmniRetarget과 증강을 거쳐 로코-매니퓰레이션 데이터를 생성하는 흐름" loading="lazy">
+              <figcaption><span class="timestamp">00:36:00</span><strong>학습으로 연결.</strong> 고품질 운동학 기준을 만든 뒤 imitation-guided RL이 이를 동역학적으로 가능한 행동으로 변환한다.</figcaption>
+            </figure>
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-37-00.jpg" alt="기존 방법의 긴 보상 목록과 OmniRetarget의 짧은 보상 목록 비교" loading="lazy">
+              <figcaption><span class="timestamp">00:37:00</span><strong>짧아진 보상식.</strong> 기준 모션이 깨끗해지면서 몸·물체 추종, jerk, 관절 한계, self-collision 중심의 공통 보상만으로 학습할 수 있다.</figcaption>
+            </figure>
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-38-00.jpg" alt="물체 위치와 크기 변화에 대응하는 실제 휴머노이드 하드웨어 장면" loading="lazy">
+              <figcaption><span class="timestamp">00:38:00</span><strong>고품질 기준의 가치.</strong> 명목 모션 주변의 domain randomization만으로 어려운 큰 공간·크기 변화에 목적별 최적화 모션으로 대응한다.</figcaption>
+            </figure>
+            <figure class="visual-card featured">
+              <img src="assets/2myi6rv-6sq-ts-00-40-02.jpg" alt="휴머노이드가 경사면을 기어가며 무릎과 발끝을 접촉하는 실제 장면" loading="lazy">
+              <figcaption><span class="timestamp">00:40:02</span><strong>장면 상호작용 전이.</strong> 상자 운반뿐 아니라 crawling, climbing, stepping처럼 지형과 전신 접촉이 필요한 기술에도 interaction mesh를 적용한다.</figcaption>
+            </figure>
+          </div>
+
+          <div class="evidence-note">
+            <strong>해석상의 주의.</strong> OmniRetarget은 접촉을 모두 hard constraint로 직접
+            표기하는 방식이 아니다. Laplacian 변형 최소화가 접촉 관계를 암묵적이고 소프트하게
+            보존하며, 이후 imitation-guided RL이 동역학적 실현 가능성을 보완한다.
+          </div>
+        </section>
+
+        <section class="section" id="integration">
+          <header class="section-header">
+            <span class="section-index">Synthesis · A General Framework</span>
+            <h2>세 연구는 하나의 설계 원칙으로 수렴한다</h2>
+            <p class="section-lead">
+              검증, 조작 데이터, 전신 데이터라는 서로 다른 문제를 다루지만 세 방법은
+              모두 모델 기반 구조를 학습 파이프라인의 병목에 삽입한다.
+            </p>
+          </header>
+
+          <div class="comparison-wrap">
+            <table>
+              <caption>세 기여가 연결하는 모델 기반 구조와 학습 기반 결과</caption>
+              <thead>
+                <tr>
+                  <th scope="col">연구</th>
+                  <th scope="col">병목</th>
+                  <th scope="col">모델 기반 역할</th>
+                  <th scope="col">학습 기반 결과</th>
+                  <th scope="col">주요 경계</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Neural Lyapunov</th>
+                  <td>정책 안정성 보증</td>
+                  <td>인증 조건, 반례 탐색, complete verification</td>
+                  <td>제어기·관측기·인증서 공동 학습</td>
+                  <td>고차원 검증 확장성과 폐형식 동역학</td>
+                </tr>
+                <tr>
+                  <th scope="row">PhysicsGen</th>
+                  <td>접촉 조작 데이터 부족</td>
+                  <td>재표적화, 궤적 최적화, 동역학 제약</td>
+                  <td>다양한 궤적의 diffusion policy 학습</td>
+                  <td>시뮬레이터 모델 오차와 상태 추정</td>
+                </tr>
+                <tr>
+                  <th scope="row">OmniRetarget</th>
+                  <td>전신 상호작용 손실</td>
+                  <td>interaction mesh, 기하 제약, 체계적 증강</td>
+                  <td>단순한 보상의 imitation-guided RL</td>
+                  <td>소프트 접촉 근사와 후속 RL 의존성</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="visual-grid">
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-45-23.jpg" alt="실제 휴머노이드가 박스를 넘는 Stepping Over Box 장면" loading="lazy">
+              <figcaption><span class="timestamp">00:45:23</span><strong>전신 동작의 확장.</strong> 프레임별 최적화와 warm start를 사용하며, 후속 RL이 접촉 동역학을 보완한다. 발표에서는 이어지는 wall flip이 최대 선속도 3.5m/s, 각속도 15rad/s에 이른다고 설명한다.</figcaption>
+            </figure>
+            <figure class="visual-card">
+              <img src="assets/2myi6rv-6sq-ts-00-46-30.jpg" alt="신경 Lyapunov 제어와 두 데이터 생성 연구를 정리한 결론 슬라이드" loading="lazy">
+              <figcaption><span class="timestamp">00:46:30</span><strong>세 기여의 결론.</strong> 모델 기반 기법을 검증기, 물리 데이터 생성기, 고품질 기준 모션 생성기로 배치한다.</figcaption>
+            </figure>
+            <figure class="visual-card featured">
+              <img src="assets/2myi6rv-6sq-ts-00-47-00.jpg" alt="Teleop, MoCap, 인터넷 영상에서 OmniRetarget과 PhysicsGen을 거쳐 여러 학습법으로 연결되는 범용 데이터 생성 프레임워크" loading="lazy">
+              <figcaption><span class="timestamp">00:47:00</span><strong>범용 데이터 생성 프레임워크.</strong> Teleop·MoCap·인터넷 영상을 상류 입력으로 받고 BC·RL·certificate-guided training을 하류 소비자로 연결하는 소스 및 학습법 독립 구조를 지향한다.</figcaption>
+            </figure>
+            <figure class="visual-card featured">
+              <img src="assets/2myi6rv-6sq-ts-00-48-00.jpg" alt="덱스터리티와 인지를 두 축으로 나타낸 물리적 지능의 미래 비전 슬라이드" loading="lazy">
+              <figcaption><span class="timestamp">00:48:00</span><strong>인지와 물리적 지능의 결합.</strong> VLM의 의미 계획과 반응형 제어를 계층화하되 실행 결과가 상위 세계 이해를 다시 갱신하는 양방향 구조가 필요하다.</figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <section class="insight-band" id="implications">
+          <div class="insight-inner">
+            <span class="section-index">Implications</span>
+            <h2>로봇 학습 시스템을 설계할 때 무엇이 달라지는가</h2>
+            <div class="insight-grid">
+              <article class="insight-card">
+                <h3>01 · 모델은 경계에서 가장 강하다</h3>
+                <p>
+                  모델이 전체 정책을 대신하게 하기보다 안전 조건, 접촉 제약, 물리적 실현
+                  가능성처럼 실패 비용이 큰 경계에 집중시키는 편이 효과적이다.
+                </p>
+              </article>
+              <article class="insight-card">
+                <h3>02 · 데이터 생성기는 학습 알고리즘만큼 중요하다</h3>
+                <p>
+                  정책 구��를 바꾸기 전에 어떤 상태와 회복 경로가 데이터에 포함되는지
+                  점검해야 한다. 다양성·fidelity·분포 커버리지가 견고성을 좌우한다.
+                </p>
+              </article>
+              <article class="insight-card">
+                <h3>03 · 복잡한 보상은 데이터 결함의 신호일 수 있다</h3>
+                <p>
+                  관통이나 발 미끄러짐을 수많은 보상 항으로 억제해야 한다면 기준 모션과
+                  표현 방식부터 다시 살펴볼 필요가 있다.
+                </p>
+              </article>
+              <article class="insight-card">
+                <h3>04 · 인증과 스케일링은 서로 다른 층에서 공존할 수 있다</h3>
+                <p>
+                  전체 휴머노이드 정책을 완전 검증하기 어렵더라도 저차원 안전 필터,
+                  국소 안정성 영역, 부분 시스템 인증을 학습 정책과 조합할 수 있다.
+                </p>
+              </article>
+              <article class="insight-card">
+                <h3>05 · 파운데이션 모델에는 물리 변환 계층이 필요하다</h3>
+                <p>
+                  인터넷 영상의 의미적 풍부함을 로봇 제어에 쓰려면 3D 기하, 접촉, 마찰,
+                  깊이와 embodiment 차이를 보완하는 데이터 정제 계층이 필요하다.
+                </p>
+              </article>
+              <article class="insight-card">
+                <h3>06 · 인지는 제어 결과로부터 다시 배워야 한다</h3>
+                <p>
+                  상위 VLM이 명령하고 하위 제어기가 실행하는 단방향 계층만으로는 부족하다.
+                  실행 실패와 물리적 관측이 상위 세계 모델의 믿음을 갱신해야 한다.
+                </p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="limits">
+          <header class="section-header">
+            <span class="section-index">Boundaries & Open Questions</span>
+            <h2>설득력 있는 방향이지만, 아직 남은 경계가 분명하다</h2>
+            <p class="section-lead">
+              발표가 보여주는 것은 완성된 범용 해법이 아니라 모델과 학습의 결합이
+              효과를 내는 구체적 위치와 앞으로 검증해야 할 연구 질문이다.
+            </p>
+          </header>
+
+          <div class="limits">
+            <article class="limit-card">
+              <h3>고차원 형식 검증</h3>
+              <p>휴머노이드·사족보행까지 결정론적 완전 인증을 확장하기에는 상태 차원과 접촉 모드가 너무 빠르게 증가한다.</p>
+            </article>
+            <article class="limit-card">
+              <h3>동역학 표현의 차이</h3>
+              <p>Neural Lyapunov 검증은 폐형식 동역학을 요구하지만 PhysicsGen은 simulator time stepping을 쓸 수 있어 적용 조건이 다르다.</p>
+            </article>
+            <article class="limit-card">
+              <h3>접촉의 소프트 근사</h3>
+              <p>Interaction mesh가 접촉 라벨 없이 상대 관계를 보존하는 것은 장점이지만 실제 힘과 마찰 조건을 완전히 표현하지는 않는다.</p>
+            </article>
+            <article class="limit-card">
+              <h3>시뮬레이터와 현실의 간극</h3>
+              <p>미모델링 충돌 형상, 상태 추정 오차, 물성 불확실성은 증강 데이터만으로 완전히 제거되지 않는다.</p>
+            </article>
+            <article class="limit-card">
+              <h3>인터넷 영상의 물리 정보</h3>
+              <p>대규모 영상은 다양하지만 3D 깊이, 마찰, 힘, 가림 뒤의 접촉 상태가 부족해 로봇 데이터로 직접 쓰기 어렵다.</p>
+            </article>
+            <article class="limit-card">
+              <h3>지각 통합</h3>
+              <p>현재 결과의 상당 부분은 상태 기반 또는 proprioceptive 정책이다. 실제 환경에서 시각과 제어를 안정적으로 연결하는 작업이 남는다.</p>
+            </article>
+          </div>
+
+          <div class="takeaway">
+            <h3>실무자를 위한 체크리스트</h3>
+            <ol>
+              <li>실패 원인이 정책 용량인지, 원천 데이터의 물리적 결함인지 먼저 구분한다.</li>
+              <li>도메인 무작위화 전에 목적 조건별 고품질 기준 궤적을 생성할 수 있는지 검토한다.</li>
+              <li>관절 좌표 오차보다 과제 성공을 직접 결정하는 상호작용 관계를 표현한다.</li>
+              <li>형식 검증이 가능한 저차원 하위 시스템과 경험적 정책의 경계를 명확히 나눈다.</li>
+              <li>sim-to-real 평가에서 명목 성공률뿐 아니라 접촉 실패 후 회복 행동을 측정한다.</li>
+            </ol>
+          </div>
+        </section>
+
+        <section class="section" id="sources">
+          <header class="section-header">
+            <span class="section-index">Source Notes</span>
+            <h2>출처와 작성 방법</h2>
+            <p class="section-lead">
+              이 글은 발표 내용을 비평적으로 재구성한 연구 노트다. 화면에서 직접 확인한
+              사실과 자동 전사에서 해석한 설명을 구분해 사용했다.
+            </p>
+          </header>
+
+          <div class="source-panel">
+            <div class="source-panel-header">
+              <h3>원본 영상</h3>
+            </div>
+            <div class="source-panel-body">
+              <dl>
+                <dt>제목</dt>
+                <dd>Bridging Model-Based and Learning-Based Methods for Robotic Loco-Manipulation and Control</dd>
+                <dt>발표자</dt>
+                <dd>Lujie Yang · MIT CSAIL, Robotic Locomotion Group 박사 졸업</dd>
+                <dt>채널</dt>
+                <dd>Duke Robotics</dd>
+                <dt>강연일</dt>
+                <dd>2025년 11월 7일 · 영상 설명 기준</dd>
+                <dt>게시일</dt>
+                <dd>2026년 6월 22일</dd>
+                <dt>길이</dt>
+                <dd>57분 23초</dd>
+                <dt>링크</dt>
+                <dd><a>youtube.com/watch?v=2MYI6RV_6SQ</a></dd>
+              </dl>
+            </div>
+          </div>
+
+          <ol class="source-list">
+            <li><strong>메타데이터:</strong> <code>yt-dlp --dump-single-json --skip-download</code>로 수집했다.</li>
+            <li><strong>전사:</strong> YouTube 자동 자막 파일 요청 실패 후 전체 오디오를 로컬 Whisper <code>small</code> 영어 모드로 전사했다. 총 476개 시간 구간을 분석했다.</li>
+            <li><strong>시각 근거:</strong> 장면 변화 감지, 전사 주제 전환, 장기 정적 슬라이드 보완 샘플을 결합해 후보를 만든 뒤 직접 검수하여 33장을 유지했다.</li>
+            <li><strong>프레임 품질:</strong> 접근 가능한 영상 스트림이 640×360이므로 업스케일하지 않았다. 작은 그래프와 수식에서 확실히 읽을 수 없는 개별 수치는 본문에서 제외했다.</li>
+            <li><strong>해석 범위:</strong> PhysicsGen과 OmniRetarget의 성능 설명은 발표자가 제시한 실험 범위에 근거한다. 독립적인 재현 실험이나 외부 논문 비교를 수행한 보고서는 아니다.</li>
+          </ol>
+
+          <div class="share-block">
+            <h3>공유용 요약</h3>
+            <p>아래 문장은 뉴스레터나 소셜 게시물에 바로 사용할 수 있도록 정리했다.</p>
+            <div class="share-copy">
+              로봇 학습의 다음 돌파구는 모델을 버리는 데 있지 않을 수 있다. Neural Lyapunov
+              Control은 실패 상태를 인증 반례로 만들고, PhysicsGen은 시연을 물리적으로 가능한
+              궤적 분포로 확장하며, OmniRetarget은 관절 좌표 대신 몸·물체·지형의 상호작용을
+              보존한다. 모델은 정책의 경쟁자가 아니라 검증기이자 데이터 생성기다.
+            </div>
+          </div>
+
+          <div class="closing">
+            <div class="closing-rule"></div>
+            <p>
+              모델 기반 로보틱스가 학습을 제한하는 울타리가 아니라,<br>
+              학습이 더 멀리 갈 수 있도록 지면을 다지는 기반이라면 어떨까.
+            </p>
+            <div class="closing-actions">
+              <a class="button-link">원본 강연 보기 ↗</a>
+              <a class="button-link secondary" href="#top">글 맨 위로 ↑</a>
+            </div>
+          </div>
+        </section>
+      </article>
+
+      <nav class="toc" aria-label="기사 목차">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#findings">핵심 발견</a></li>
+          <li><a href="#lyapunov">Neural Lyapunov Control</a></li>
+          <li><a href="#physicsgen">PhysicsGen</a></li>
+          <li><a href="#omniretarget">OmniRetarget</a></li>
+          <li><a href="#integration">통합 프레임워크</a></li>
+          <li><a href="#implications">시사점</a></li>
+          <li><a href="#limits">한계와 질문</a></li>
+          <li><a href="#sources">출처와 방법</a></li>
+        </ol>
+      </nav>
+    </div>
   </main>
 
   <footer>
-    <span>Research note prepared 19 August 2026 · Asia/Seoul</span>
-    <span>Primary source: Duke Robotics · Editorial analysis in Korean</span>
+    <div class="footer-inner">
+      <span>© 2026 Marktl Research Notes</span>
+      <span>Robotics · Robot Learning · Loco-Manipulation</span>
+    </div>
   </footer>
 </body>
 </html>
