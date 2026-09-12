@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+  <title>테슬라 vs 웨이모, 자율주행 경쟁은 ‘분모’에서 갈린다</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      --paper: #f5f2eb;
+      --surface: #fffdf8;
+      --ink: #222c2c;
+      --muted: #646b67;
+      --line: #d9d9ce;
+      --green: #244d43;
+      --green-soft: #e8eee7;
+      --red: #a44331;
+      --red-soft: #f4e8df;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "AppleMyungjo", "Batang", serif;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 17px; line-height: 1.9; word-break: keep-all; overflow-wrap: break-word; }
+    a { color: var(--green); text-underline-offset: .22em; text-decoration-thickness: 1px; }
+    a:hover { color: var(--red); }
+    a:focus-visible { outline: 3px solid var(--red); outline-offset: 5px; border-radius: 2px; }
+    ::selection { background: #dce8d8; color: #152a24; }
+    .skip { position: absolute; top: -100px; left: 20px; z-index: 10; padding: 10px 20px; background: var(--ink); color: white; }
+    .skip:focus { top: 12px; }
+    .wrap { width: min(1180px, calc(100% - 64px)); margin-inline: auto; }
+    .masthead { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 24px 0 19px; border-bottom: 1px solid var(--ink); font-size: 11px; line-height: 1.5; letter-spacing: .13em; text-transform: uppercase; }
+    .brand { font-weight: 850; font-size: 14px; letter-spacing: .15em; }
+    .masthead span:last-child { color: var(--muted); text-align: right; }
+    .hero { padding: 70px 0 46px; }
+    .eyebrow { display: flex; align-items: center; gap: 12px; margin: 0 0 24px; font-size: 11px; letter-spacing: .16em; font-weight: 800; color: var(--red); text-transform: uppercase; }
+    .eyebrow::before { content: ""; display: block; width: 28px; height: 3px; background: currentColor; }
+    h1, h2, h3, p, blockquote, figure { margin-top: 0; }
+    h1 { max-width: 1040px; margin-bottom: 27px; font-family: var(--serif); font-size: clamp(39px, 5.6vw, 72px); line-height: 1.25; letter-spacing: -.055em; font-weight: 800; text-wrap: balance; }
+    h1 em { font-style: normal; color: var(--green); }
+    .dek { max-width: 820px; margin-bottom: 30px; color: #505d56; font-size: clamp(18px, 2vw, 22px); line-height: 1.8; letter-spacing: -.025em; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px 23px; font-size: 12px; color: var(--muted); }
+    .hero-rule { height: 7px; margin-top: 35px; background: linear-gradient(to right, var(--green) 0 71%, var(--red) 71% 85%, var(--line) 85%); }
+    .opening { display: grid; grid-template-columns: 1.4fr 1fr; gap: 42px; padding: 32px 0 40px; }
+    .small-label { margin-bottom: 13px; font-size: 10px; font-weight: 850; line-height: 1.5; color: var(--green); letter-spacing: .17em; text-transform: uppercase; }
+    .abstract p:last-child { margin-bottom: 0; }
+    .abstract p { font-size: 16px; }
+    .scope { padding: 24px; background: var(--green-soft); align-self: start; border-top: 3px solid var(--green); }
+    .scope h2 { margin: 0 0 10px; font-size: 16px; font-family: var(--sans); }
+    .scope p { margin: 0; font-size: 13px; line-height: 1.85; color: #49584e; }
+    .finding-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+    .finding { background: var(--surface); padding: 28px; }
+    .finding .num { display: block; color: var(--red); font-size: 12px; font-weight: 750; margin-bottom: 15px; letter-spacing: .12em; }
+    .finding h3 { font-size: 20px; line-height: 1.5; letter-spacing: -.035em; margin-bottom: 12px; }
+    .finding p { font-size: 14px; color: var(--muted); margin: 0; }
+    .reading-layout { display: grid; grid-template-columns: 205px minmax(0, 1fr); gap: 64px; margin-top: 66px; align-items: start; }
+    .toc { position: sticky; top: 28px; font-size: 13px; line-height: 1.6; border-top: 2px solid var(--ink); padding-top: 18px; }
+    .toc ol { list-style: none; padding: 0; margin: 0; }
+    .toc li { border-bottom: 1px solid var(--line); }
+    .toc a { display: flex; gap: 13px; padding: 13px 0; text-decoration: none; color: var(--ink); }
+    .toc a:hover { color: var(--red); }
+    .toc .n { color: var(--red); font-size: 10px; padding-top: 3px; }
+    .toc-note { margin-top: 22px; color: var(--muted); font-size: 11px; line-height: 1.8; }
+    .article-body { min-width: 0; }
+    .chapter { padding-bottom: 58px; margin-bottom: 48px; border-bottom: 1px solid var(--line); }
+    .section-no { color: var(--red); font-size: 11px; font-weight: 800; letter-spacing: .14em; margin-bottom: 11px; }
+    h2 { font-family: var(--serif); font-size: clamp(27px, 3vw, 37px); line-height: 1.4; letter-spacing: -.045em; margin-bottom: 23px; text-wrap: balance; }
+    h3 { font-size: 21px; line-height: 1.5; letter-spacing: -.03em; margin: 34px 0 15px; }
+    p { margin-bottom: 22px; }
+    strong { font-weight: 750; }
+    .lead { font-size: 19px; line-height: 1.9; }
+    .term-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 25px 0; }
+    .term { border: 1px solid var(--line); padding: 20px; background: var(--surface); }
+    .term dt { font-weight: 800; font-size: 16px; margin-bottom: 6px; color: var(--green); }
+    .term dd { margin: 0; font-size: 13px; line-height: 1.75; color: var(--muted); }
+    .evidence { margin: 30px 0; }
+    .evidence img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: contain; background: #e4e3db; border: 1px solid var(--line); }
+    figcaption { padding-top: 11px; font-size: 12px; line-height: 1.75; color: var(--muted); }
+    .stamp { display: inline-block; color: var(--green); font-family: monospace; font-weight: 700; margin-right: 8px; white-space: nowrap; }
+    .figure-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 28px 0; }
+    .figure-pair .evidence { margin: 0; }
+    .table-wrap { overflow-x: auto; margin: 26px 0; border: 1px solid var(--line); background: var(--surface); }
+    table { border-collapse: collapse; width: 100%; font-size: 13px; line-height: 1.8; text-align: left; }
+    caption { text-align: left; padding: 15px 18px; font-size: 12px; font-weight: 750; background: #edece3; color: var(--green); border-bottom: 1px solid var(--line); }
+    th, td { padding: 15px 18px; vertical-align: top; border-bottom: 1px solid var(--line); }
+    thead th { color: var(--green); background: #f1f2e9; font-size: 12px; font-weight: 800; }
+    tbody th { font-weight: 750; }
+    tr:last-child td, tr:last-child th { border-bottom: 0; }
+    .table-wide { min-width: 610px; }
+    .number { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .pullquote { margin: 38px 0; padding: 29px 0 29px 26px; border-left: 4px solid var(--red); font-family: var(--serif); font-size: clamp(24px, 2.8vw, 33px); line-height: 1.65; letter-spacing: -.04em; }
+    .pullquote p { margin-bottom: 10px; }
+    .pullquote cite { display: block; font-family: var(--sans); font-size: 11px; letter-spacing: 0; font-style: normal; color: var(--muted); }
+    .note { padding: 21px 24px; background: #eeeee5; border-left: 3px solid #8c9a82; font-size: 14px; margin: 25px 0; line-height: 1.85; }
+    .note p:last-child { margin-bottom: 0; }
+    .note-title { display: block; color: var(--green); margin-bottom: 7px; }
+    .note.warm { background: var(--red-soft); border-color: var(--red); }
+    .metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 28px 0; }
+    .metric { background: var(--green); color: #fffdf5; padding: 22px 20px; }
+    .metric:first-child { background: #394745; }
+    .metric-label { font-size: 11px; line-height: 1.6; color: #dbe5d7; }
+    .metric-value { display: block; font-size: clamp(26px, 3vw, 39px); font-weight: 800; letter-spacing: -.05em; line-height: 1.4; margin: 10px 0 8px; font-variant-numeric: tabular-nums; }
+    .metric small { display: block; font-size: 11px; line-height: 1.7; color: #e1e8dc; }
+    .source-line { font-size: 12px; color: var(--muted); line-height: 1.8; }
+    .pathways { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 28px 0; }
+    .pathway { padding: 25px; border-top: 4px solid var(--green); background: var(--green-soft); }
+    .pathway.tesla { background: var(--red-soft); border-color: var(--red); }
+    .pathway h3 { font-size: 17px; margin: 0 0 17px; }
+    .pathway ol { list-style: none; padding: 0; margin: 0; }
+    .pathway li { font-size: 14px; text-align: center; border: 1px solid #c7cfc0; background: var(--surface); padding: 10px 12px; }
+    .pathway li + li { margin-top: 25px; position: relative; }
+    .pathway li + li::before { content: "↓"; position: absolute; top: -26px; left: calc(50% - 6px); color: var(--muted); }
+    .pathway p { margin: 17px 0 0; font-size: 12px; color: var(--muted); }
+    .bullets { padding-left: 22px; margin: 20px 0 26px; }
+    .bullets li { padding-left: 4px; margin-bottom: 12px; }
+    .bullets li::marker { color: var(--red); }
+    .status { display: inline-block; padding: 2px 8px; white-space: nowrap; font-size: 11px; font-weight: 750; border-radius: 3px; }
+    .unmet { background: #f2e1da; color: #853723; }
+    .partial { background: #f2ecd2; color: #6c5822; }
+    .met { background: #e0ebdf; color: #28533d; }
+    .checklist { list-style: none; padding: 0; margin: 25px 0; border-top: 1px solid var(--line); }
+    .checklist li { display: flex; gap: 16px; padding: 19px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+    .checklist li::before { content: "□"; color: var(--green); font-size: 23px; line-height: 1.45; }
+    .ending { padding: 36px; background: var(--green); color: #fffdf5; margin-top: 32px; }
+    .ending .small-label { color: #cbdac4; }
+    .ending h3 { font-family: var(--serif); font-size: 28px; margin: 0 0 18px; line-height: 1.6; }
+    .ending p { font-size: 16px; margin-bottom: 0; color: #e4ebdf; }
+    .sources { font-size: 14px; }
+    .sources h2 { font-size: 28px; }
+    .sources ol { padding-left: 22px; }
+    .sources li { padding: 0 0 16px 4px; }
+    .source-tag { color: var(--red); font-size: 11px; font-weight: 750; }
+    .share { margin: 35px 0 0; padding: 27px; border: 1px solid var(--line); background: var(--surface); }
+    .share h3 { margin: 0 0 12px; font-size: 17px; }
+    .share p { margin: 0 0 14px; font-size: 15px; }
+    .share .copy { font-family: var(--serif); font-size: 19px; color: var(--green); user-select: all; }
+    .share-links { display: flex; flex-wrap: wrap; gap: 20px; font-size: 12px; }
+    footer { display: flex; justify-content: space-between; gap: 24px; padding: 25px 0 45px; margin-top: 55px; border-top: 1px solid var(--ink); font-size: 11px; color: var(--muted); }
+    @media (max-width: 1050px) {
+      .reading-layout { grid-template-columns: 160px minmax(0, 1fr); gap: 35px; }
+      .metric-grid { gap: 8px; }
+      .metric { padding: 18px 14px; }
+    }
+    @media (max-width: 820px) {
+      .reading-layout { display: block; margin-top: 42px; }
+      .toc { position: static; margin-bottom: 45px; }
+      .toc ol { display: grid; grid-template-columns: 1fr 1fr; gap: 0 25px; }
+      .toc-note { display: none; }
+      .opening { gap: 24px; }
+      .finding { padding: 21px; }
+      .hero { padding-top: 46px; }
+    }
+    @media (max-width: 600px) {
+      body { font-size: 16px; line-height: 1.9; }
+      .wrap { width: calc(100% - 36px); }
+      .masthead { padding: 18px 0; }
+      .brand { font-size: 11px; }
+      .masthead span:last-child { font-size: 9px; letter-spacing: .04em; }
+      .hero { padding-top: 37px; padding-bottom: 16px; }
+      h1 { font-size: 39px; }
+      .dek { font-size: 18px; }
+      .opening, .finding-grid, .term-grid, .figure-pair, .pathways { grid-template-columns: 1fr; }
+      .opening { padding-top: 18px; }
+      .finding { padding: 24px; }
+      .finding .num { margin-bottom: 7px; }
+      .finding h3 { margin-bottom: 8px; }
+      .metric-grid { grid-template-columns: 1fr; }
+      .metric { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 0 16px; padding: 18px 20px; }
+      .metric-value { grid-row: span 2; grid-column: 2; font-size: 34px; margin: 0; }
+      .metric small { grid-column: 1; }
+      .term { padding: 17px 20px; }
+      .term dt { margin-bottom: 3px; }
+      .chapter { margin-bottom: 35px; padding-bottom: 37px; }
+      .pullquote { padding-left: 20px; font-size: 25px; }
+      .lead { font-size: 18px; }
+      th, td { padding: 12px; }
+      .note, .scope { padding: 20px; }
+      .ending { padding: 25px; }
+      .ending h3 { font-size: 25px; }
+      footer { display: block; }
+      footer p { margin-bottom: 8px; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    @media print {
+      body { background: white; color: black; font-size: 11pt; }
+      .wrap { width: 100%; }
+      .hero { padding-top: 25px; }
+      h1 { font-size: 32pt; }
+      .reading-layout { display: block; }
+      .toc, .skip, .share-links { display: none; }
+      .chapter { margin-bottom: 24px; padding-bottom: 24px; }
+      .table-wrap { overflow: visible; }
+      .table-wide { min-width: 0; }
+      figure, tr, .note, .finding, .metric { break-inside: avoid; }
+      h2, h3 { break-after: avoid; }
+      .ending, .metric { background: #eee; color: black; }
+      .ending p, .ending .small-label, .metric small, .metric-label { color: #333; }
+      a { color: inherit; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="자율주행 근황, 테슬라 사이버 캡 출시 vs 웨이모">
+<meta property="og:description" content="자율주행 근황, 테슬라 사이버 캡 출시 vs 웨이모 영상 정보 채널 : sudoremove 게시일 : 2026 09 10 길이 : 29분 6초 (1,746초) 챕터 : 26개 링크 : https://www.youtube.com/watch?v=vS5VrNKPOiw &lt;div style=&quot;position: relative; width: 100%; padding bottom: 56.25%; height: 0; overflow: hid">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/etsdbu/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/etsdbu/assets/vs5vrnkpoiw-ts-00-02-34.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="자율주행 근황, 테슬라 사이버 캡 출시 vs 웨이모">
+<meta name="twitter:description" content="자율주행 근황, 테슬라 사이버 캡 출시 vs 웨이모 영상 정보 채널 : sudoremove 게시일 : 2026 09 10 길이 : 29분 6초 (1,746초) 챕터 : 26개 링크 : https://www.youtube.com/watch?v=vS5VrNKPOiw &lt;div style=&quot;position: relative; width: 100%; padding bottom: 56.25%; height: 0; overflow: hid">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/etsdbu/assets/vs5vrnkpoiw-ts-00-02-34.jpg">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-%EC%9E%90%EC%9C%A8%EC%A3%BC%ED%96%89-%EA%B7%BC%ED%99%A9-%ED%85%8C%EC%8A%AC%EB%9D%BC-%EC%82%AC%EC%9D%B4%EB%B2%84-%EC%BA%A1-%EC%B6%9C%EC%8B%9C-vs-%EC%9B%A8%EC%9D%B4%EB%AA%A8-%EC%9A%94%EC%95%BD/">
+</head>
+<body>
+  <a class="skip" href="#article-content">본문 바로가기</a>
+  <div class="wrap">
+    <header class="masthead" id="top">
+      <span class="brand">Mobility / Research Notes</span>
+      <span>영상 기반 리서치 · 2026.09.12</span>
+    </header>
+
+    <main>
+      <article aria-labelledby="article-title">
+        <header class="hero">
+          <p class="eyebrow">Autonomous Driving · Tesla × Waymo</p>
+          <h1 id="article-title">테슬라 vs 웨이모,<br>자율주행 경쟁은<br><em>‘분모’에서 갈린다</em></h1>
+          <p class="dek">많이 달린 차와 운전석을 비운 차는 같은 지표로 평가할 수 없다. 사이버캡 출시 뉴스 너머, 두 회사의 센서·AI·요금·약속을 따라가면 로보택시 경쟁의 다른 지도가 보인다.</p>
+          <div class="meta">
+            <span>원영상 · sudoremove</span>
+            <span>영상 게시 <time datetime="2026-09-10">2026.09.10</time></span>
+            <span>노트 작성 <time datetime="2026-09-12">2026.09.12</time></span>
+            <span>29분 6초 · 26개 챕터 · 14개 프레임</span>
+            <a>원영상 보기 ↗</a>
+          </div>
+          <div class="hero-rule" aria-hidden="true"></div>
+        </header>
+
+        <div class="opening">
+          <section class="abstract" aria-labelledby="abstract-title">
+            <p class="small-label" id="abstract-title">Abstract / 초록</p>
+            <p>“자동차가 감가상각 자산을 넘어 수익 자산이 될 수 있는가.” 영상은 일론 머스크의 주장에서 출발해, 웨이모와 테슬라가 같은 자율주행 문제를 서로 다른 사업과 기술로 풀어 온 과정을 비교한다.</p>
+            <p>핵심은 <strong>운전자 감독이 있는 주행과 없는 주행, 서비스 투입과 개인 판매, 기술 성취와 약속 이행을 구분하는 것</strong>이다. 이 글은 영상 노트를 주제별로 재구성해 무엇이 관측되었고, 무엇이 해석이며, 무엇을 더 확인해야 하는지 정리한다.</p>
+          </section>
+          <aside class="scope" aria-labelledby="scope-title">
+            <h2 id="scope-title">이 글의 근거 범위</h2>
+            <p>제공된 노트는 한국어 수동 자막 801개 큐, 약 13,250자, 영상 메타데이터와 설명란, 1080p 추출 프레임 14개를 근거로 한다. <strong>아래 기업 현황과 수치는 영상·슬라이드의 주장을 옮긴 2차 자료이며, 이 글에서 원출처를 별도로 검증하지 않았다.</strong> ‘현재’는 별도 표기가 없으면 영상 기준 시점인 2026년 9월을 뜻한다.</p>
+          </aside>
+        </div>
+
+        <section aria-labelledby="findings-title">
+          <p class="small-label" id="findings-title">Key Findings / 먼저 읽을 세 가지</p>
+          <div class="finding-grid">
+            <div class="finding">
+              <span class="num">01 / EVIDENCE</span>
+              <h3>마일 수보다<br>주행 조건이 먼저다</h3>
+              <p>Tesla의 감독형 FSD 누적 거리와 Waymo의 무인 누적 거리는 서로 다른 경험을 센다. 총량만으로 안전성이나 무인화 수준을 판단할 수 없다.</p>
+            </div>
+            <div class="finding">
+              <span class="num">02 / BUSINESS</span>
+              <h3>승차 서비스와<br>차량 판매를 나눠 보자</h3>
+              <p>Cybercab이 승객을 태우는 일과 일반인이 약속된 가격에 구매해 원하는 곳에서 운행하는 일은 별개의 완료 조건이다.</p>
+            </div>
+            <div class="finding">
+              <span class="num">03 / ECONOMICS</span>
+              <h3>무인화가 곧<br>낮은 요금은 아니다</h3>
+              <p>영상이 인용한 SF Bay 요금 관측에서 Waymo는 Uber보다 약 13% 비쌌다. 원가 절감, 승객 요금, 사업 수익성은 각각 확인해야 한다.</p>
+            </div>
+          </div>
+        </section>
+
+        <div class="reading-layout">
+          <nav class="toc" aria-label="기사 목차">
+            <p class="small-label">Contents</p>
+            <ol>
+              <li><a href="#products"><span class="n">01</span><span>서로 다른 상품</span></a></li>
+              <li><a href="#denominator"><span class="n">02</span><span>숫자의 분모</span></a></li>
+              <li><a href="#architecture"><span class="n">03</span><span>센서·지도·칩</span></a></li>
+              <li><a href="#models"><span class="n">04</span><span>모델과 안전 검증</span></a></li>
+              <li><a href="#pricing"><span class="n">05</span><span>무인 승차의 가격</span></a></li>
+              <li><a href="#promises"><span class="n">06</span><span>출시와 약속</span></a></li>
+              <li><a href="#implications"><span class="n">07</span><span>다음에 볼 지표</span></a></li>
+              <li><a href="#sources"><span class="n">08</span><span>출처와 한계</span></a></li>
+            </ol>
+            <p class="toc-note">프레임의 타임코드를 누르면<br>해당 영상 장면으로 이동합니다.<br><br>자료 기준일은 지표마다 다릅니다.</p>
+          </nav>
+
+          <div class="article-body" id="article-content">
+            <section class="chapter" id="products" aria-labelledby="products-title">
+              <p class="section-no">01 / THE PRODUCT</p>
+              <h2 id="products-title">같은 로보택시 이야기,<br>애초에 파는 것이 다르다</h2>
+              <p class="lead">웨이모는 무인 승차를 판다. 테슬라는 고객 차량에 운전 소프트웨어를 팔아 왔고, 여기에 직접 운영하는 승차 서비스를 더하고 있다.</p>
+              <p>이 차이를 놓치면 서비스 이름, 차량 이름, 소프트웨어 이름이 뒤섞인다. 영상의 첫 비교 슬라이드는 세 이름을 구분하는 데서 시작한다.</p>
+
+              <dl class="term-grid">
+                <div class="term"><dt>Waymo One</dt><dd>앱으로 호출하는 웨이모의 무인 승차 서비스.</dd></div>
+                <div class="term"><dt>Tesla robotaxi</dt><dd>테슬라가 직접 운영하는 승차 서비스. 영상에서는 소문자로 표기한다.</dd></div>
+                <div class="term"><dt>Cybercab</dt><dd>그 서비스에 투입할 전용 차량. 서비스 자체의 이름이 아니다.</dd></div>
+              </dl>
+
+              <figure class="evidence">
+                <img src="assets/vs5vrnkpoiw-ts-00-02-34.jpg" alt="승차 서비스를 판매하는 Waymo와 차량·소프트웨어를 판매하는 Tesla를 비교한 영상 슬라이드" width="1920" height="1080" decoding="async">
+                <figcaption><a class="stamp">00:02:34 ↗</a>“파는 물건이 다르다 — 승차 vs 차와 소프트웨어.” 비교의 단위를 먼저 정리하는 장면.</figcaption>
+              </figure>
+
+              <div class="table-wrap">
+                <table class="table-wide">
+                  <caption>영상 슬라이드가 정리한 두 회사의 출발점</caption>
+                  <thead><tr><th scope="col">구분</th><th scope="col">Waymo</th><th scope="col">Tesla</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">사업의 중심</th><td>무인 승차 서비스. 고객에게 차를 판매하지 않는다.</td><td>차량과 FSD(Supervised) 소프트웨어. 영상 기준 구독료 월 $99.</td></tr>
+                    <tr><th scope="row">출발과 전개</th><td>2009년 Google 프로젝트 → 2016년 Alphabet 산하 독립 → 2018년 Phoenix 상용 서비스 → 2020년 운전석 없는 일반 공개.</td><td>2015년 Autopilot → 2024년 Cybercab 공개 → 2025년 Austin에서 Model Y 약 10대로 robotaxi 시작.</td></tr>
+                    <tr><th scope="row">전용 차량</th><td>2014년 운전대·페달 없는 Firefly 시제차. 2017년 은퇴 후 기성 차체 개조 방식으로 전환.</td><td>2024년 공개한 Cybercab. 2인승, 운전대·페달 없음, 버터플라이 도어.</td></tr>
+                    <tr><th scope="row">2026년 9월 서술</th><td>Phoenix·SF·LA·Austin·Atlanta 유료 운행을 소개.</td><td>Cybercab이 Austin 서비스 차량에 합류했다고 소개.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3>샌프란시스코의 일상, 오스틴의 첫 배치</h3>
+              <p>영상 속 샌프란시스코는 차량 종류가 섞이기 시작한 도시다. 슬라이드는 Bay Area에 Waymo 차량이 1,000대 이상 있으며, 회사 전체 Jaguar I-Pace 보유량을 약 3,700대로 적었다. Zeekr 기반 6세대 차량인 Ojai는 2026년 5월 테스트, 8월 19일 유료 운행으로 소개된다.</p>
+              <p>반면 Cybercab의 Austin 합류는 9월 3일 사건으로 제시된다. 영상 게시일인 9월 10일에서 일주일 전이다. 장면의 “사흘 전”이라는 표현은 게시일과 기준이 다르므로 절대 날짜로 읽는 편이 낫다. 초대장에 콘텐츠 크리에이터 제외 조건이 있었고 기자·라이브 스트리밍이 없었다는 설명도 노트에 담겼다.</p>
+
+              <div class="figure-pair">
+                <figure class="evidence">
+                  <img src="assets/vs5vrnkpoiw-ts-00-03-43.jpg" alt="샌프란시스코 Waymo 차량 규모와 Ojai 투입 시점을 정리한 슬라이드" width="1920" height="1080" loading="lazy" decoding="async">
+                  <figcaption><a class="stamp">00:03:43 ↗</a>SF Bay: 이미 운영 중인 서비스에 새로운 차종이 추가되는 단계.</figcaption>
+                </figure>
+                <figure class="evidence">
+                  <img src="assets/vs5vrnkpoiw-ts-00-03-53.jpg" alt="오스틴 Cybercab 초기 배치와 런치 현장 반응을 정리한 슬라이드" width="1920" height="1080" loading="lazy" decoding="async">
+                  <figcaption><a class="stamp">00:03:53 ↗</a>Austin: Cybercab의 첫 배치와 도어·조명에 집중된 현장 반응.</figcaption>
+                </figure>
+              </div>
+
+              <figure class="evidence">
+                <img src="assets/vs5vrnkpoiw-ts-00-05-59.jpg" alt="BTS 등 아티스트 광고로 래핑된 Waymo 차량의 소셜미디어 이미지 검색 결과" width="1920" height="1080" loading="lazy" decoding="async">
+                <figcaption><a class="stamp">00:05:59 ↗</a>광고 래핑 차량의 소셜미디어 이미지. 일상 속 노출 사례를 보여 주지만, 이용률이나 광고 매출을 측정한 자료는 아니다.</figcaption>
+              </figure>
+              <p>광고로 래핑된 Waymo 사진은 이 차이를 직관적으로 보여 준다. 진행자는 BTS 래핑 차량을 언급하며 로보택시가 일상적인 광고 매체로도 소비된다고 해석한다. 다만 몇 장의 소셜미디어 사진에서 시장 전체의 성숙도를 단정할 수는 없다.</p>
+            </section>
+
+            <section class="chapter" id="denominator" aria-labelledby="denominator-title">
+              <p class="section-no">02 / THE DENOMINATOR</p>
+              <h2 id="denominator-title">120억 마일과 2억 마일을<br>그대로 비교할 수 없는 이유</h2>
+              <p>영상에서 가장 유용한 사고 도구는 “분모”다. 누적 주행 거리는 그럴듯한 단일 숫자지만, <strong>누가 운전을 책임졌는지, 어떤 조건에서 달렸는지</strong>를 지우면 숫자의 의미도 사라진다.</p>
+
+              <div class="metric-grid" aria-label="영상 슬라이드의 주행 거리 비교">
+                <div class="metric">
+                  <span class="metric-label">TESLA · 감독형 FSD</span>
+                  <strong class="metric-value">~12B</strong>
+                  <small>약 120억 마일<br>운전자 감독이 있는 주행</small>
+                </div>
+                <div class="metric">
+                  <span class="metric-label">TESLA · 무인 주행</span>
+                  <strong class="metric-value">380K</strong>
+                  <small>38만 마일 · 2026년 Q2<br>6개 도시 합산으로 제시</small>
+                </div>
+                <div class="metric">
+                  <span class="metric-label">WAYMO · RIDER-ONLY</span>
+                  <strong class="metric-value">220.6M</strong>
+                  <small>2억 2,060만 마일<br>2026년 3월 · 전 도시</small>
+                </div>
+              </div>
+              <p class="source-line">출처: 00:04:20 슬라이드 전사. 지표의 정의와 집계 기준일이 다르다. Tesla의 유료 robotaxi 누적 약 240만 마일은 별도 지표로 소개되며, 무인 38만 마일과 같지 않다.</p>
+
+              <figure class="evidence">
+                <img src="assets/vs5vrnkpoiw-ts-00-04-20.jpg" alt="Tesla 감독형·무인 주행과 Waymo rider-only 주행을 구분하고 시뮬레이션과 안전 통계의 한계를 설명한 슬라이드" width="1920" height="1080" loading="lazy" decoding="async">
+                <figcaption><a class="stamp">00:04:20 ↗</a>“다른 건 분자가 아니라 분모다.” 주행 거리의 총량보다 감독 여부와 측정 조건을 보라는 주장.</figcaption>
+              </figure>
+
+              <p>표의 숫자만 나누면 Tesla 감독형 주행은 Waymo rider-only 주행의 약 54배이고, Waymo rider-only 주행은 Tesla 무인 주행의 약 581배다. 영상의 “50배 대 1/500”은 규모를 압축한 표현이다. <strong>이 비율은 주행 거리의 비교이지 기술력이나 안전성의 배수가 아니다.</strong></p>
+              <p>Waymo의 220.6M 마일 중 슬라이드에 나열된 도시별 수치는 Phoenix 80.6M, SF Bay 67.1M, LA 51.8M이다. 세 도시 수치만으로 전 도시 합계가 완성되는 것은 아니다.</p>
+
+              <blockquote class="pullquote">
+                <p>“사람이 잡고 있으니까 얼마나 사람이 개입했는지까지 알 순 없구나.”</p>
+                <cite>영상 자막에 기록된 반응 · 발언자 실명은 제공 자료에서 확인되지 않음</cite>
+              </blockquote>
+
+              <h3>도로 주행만이 학습의 재료는 아니다</h3>
+              <p>슬라이드는 Ken Goldberg의 설명을 빌려 데이터 외에 모듈화, 알고리즘, 평가 지표가 중요하다고 덧붙인다. 영상에서 <strong>GOFE</strong>로 소개한 이 관점은 모델 규모와 데이터만으로 자율주행 시스템 전체를 설명하지 말자는 취지다.</p>
+              <p>Waymo의 <em>10 AI Lessons</em>를 인용한 대목에서는 closed-loop 시뮬레이션이 강조된다. 녹화된 주변 차량이 내 행동과 무관하게 움직이는 재생 방식과 달리, closed-loop 환경에서는 내 선택에 주변 환경도 반응한다. 슬라이드는 Waymo Critic이 매주 실주행 수백만 마일과 시뮬레이션 수백억 마일을 분석한다고 설명한다.</p>
+
+              <aside class="note warm">
+                <strong class="note-title">안전 통계는 여기서 비교를 멈춰야 한다</strong>
+                <p>슬라이드의 Waymo “중상 관련 94% 감소”와 Tesla “no notable incidents”는 대응하는 통계가 아니다. 전자는 비교 기준·사건 정의·노출량을 확인해야 하는 비율이고, 후자는 정성적 서술이다. 노트만으로는 동일한 조건의 안전성 비교나 유의미한 사고율 추정을 할 수 없다.</p>
+              </aside>
+            </section>
+
+            <section class="chapter" id="architecture" aria-labelledby="architecture-title">
+              <p class="section-no">03 / THE ARCHITECTURE</p>
+              <h2 id="architecture-title">지도를 준비하는 길과<br>차 안에서 계산하는 길</h2>
+              <p class="lead">영상은 2015년 10월을 갈림길로 잡는다. 웨이모는 운전석을 비우고 시작해 도시를 늘렸고, 테슬라는 운전자를 앉히고 시작해 감독을 줄이는 방향으로 전개했다는 해석이다.</p>
+
+              <figure class="evidence">
+                <img src="assets/vs5vrnkpoiw-ts-00-07-47.jpg" alt="2015년 10월을 출발점으로 Waymo와 Tesla의 기술 및 서비스 발전을 나란히 배치한 연표" width="1920" height="1080" loading="lazy" decoding="async">
+                <figcaption><a class="stamp">00:07:47 ↗</a>칩·지도·알고리즘·데이터에 사전 지식을 얼마나 넣는가를 축으로 삼은 비교.</figcaption>
+              </figure>
+
+              <p>여기서 <strong>prior</strong>는 시스템에 미리 넣은 지식이나 구조를 뜻한다. 영상은 Waymo를 HD맵과 다중 센서 등 사전 구조를 적극 활용하는 쪽으로, Tesla를 영상 데이터와 학습·실시간 추론의 비중을 높이는 쪽으로 배치한다. “넷 다 넣었다 / 넷 다 걷어냈다”는 설명은 차이를 강조한 도식이며, 실제 시스템에 사전 가정이 전혀 없다는 뜻으로 읽어서는 안 된다.</p>
+
+              <div class="pathways" aria-label="영상이 대비한 두 회사의 개발 경로">
+                <div class="pathway">
+                  <h3>Waymo의 경로</h3>
+                  <ol>
+                    <li>지도·다중 센서·운행 구역 준비</li>
+                    <li>정해진 조건에서 무인 승차 운영</li>
+                    <li>도시 확대와 센서 비용 절감</li>
+                  </ol>
+                  <p>운영 가능한 영역을 확보하고 넓혀 가는 접근.</p>
+                </div>
+                <div class="pathway tesla">
+                  <h3>Tesla의 경로</h3>
+                  <ol>
+                    <li>고객 차량과 감독형 주행 데이터</li>
+                    <li>학습 모델·차량 내 연산 확대</li>
+                    <li>감독을 줄이며 무인 서비스 진입</li>
+                  </ol>
+                  <p>영상 학습을 바탕으로 무인 운행까지 확장하는 접근.</p>
+                </div>
+              </div>
+
+              <h3>센서를 덜어낸 비용은 어디로 이동하는가</h3>
+              <p>슬라이드의 주장은 명확하다. 지도가 해 주던 일을 줄이면 그만큼의 일을 차 안에서 실시간으로 해결해야 한다. 영상은 이를 Tesla의 HW2 → HW3 → HW4 → AI5 변화와 연결한다. 다만 지도 의존도 하나만으로 칩 세대교체의 원인을 모두 설명할 수는 없다.</p>
+
+              <figure class="evidence">
+                <img src="assets/vs5vrnkpoiw-ts-00-12-07.jpg" alt="Tesla 하드웨어 네 세대와 Waymo 6세대 센서 수 감소 및 원가를 비교한 슬라이드" width="1920" height="1080" loading="lazy" decoding="async">
+                <figcaption><a class="stamp">00:12:07 ↗</a>“한쪽은 칩을 네 번 갈았고, 한쪽은 센서를 42% 덜어냈다.” AI5는 슬라이드에서도 양산 전 단계로 구분한다.</figcaption>
+              </figure>
+
+              <div class="table-wrap">
+                <table class="table-wide">
+                  <caption>Tesla 하드웨어 — 아래 사양과 일정은 영상 슬라이드의 서술</caption>
+                  <thead><tr><th scope="col">세대</th><th scope="col">칩·성능 표기</th><th scope="col">핵심 단서</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">HW2 · 2016</th><td>NVIDIA Drive PX2 · 약 20 TOPS</td><td>Mobileye와 결별 후 사용한 외부 칩. 카메라 8대 전체 처리에 제약이 있었다고 설명.</td></tr>
+                    <tr><th scope="row">HW3 · 2019</th><td>자체 FSD 칩 · 삼성 14nm · 144 TOPS · 칩 2개 이중화</td><td>2026년 4월 무인 주행 불가 판정으로 서술. 해당 발언의 원문·대상 범위 확인 필요.</td></tr>
+                    <tr><th scope="row">HW4 / AI4 · 2023</th><td>삼성 7nm · CPU 20코어 · 카메라 11 · TOPS 미공개</td><td>HW3 대비 메모리 대역폭 8배, 기존 차량 retrofit 불가로 기재.</td></tr>
+                    <tr><th scope="row">AI5 · 양산 전</th><td>TSMC + 삼성 2nm · dual-SoC AI4 대비 약 5배</td><td>2026년 4월 tape-out, 2027년 양산 일정. Optimus·데이터센터 우선으로 설명.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <p>반대편의 Waymo 6세대는 카메라 29대에서 13대, lidar 5대에서 4대로 줄이되 카메라·lidar·radar의 세 종류를 유지했다고 소개된다. 슬라이드는 전체 센서 수 약 42% 감소, 17MP 카메라, 2021년 대비 lidar 가격 약 75% 하락, 유닛 원가 2만 달러 미만을 제시한다. 마지막 원가 수치는 무엇을 포함하는지 원출처 확인이 필요하다.</p>
+              <aside class="note">
+                <strong class="note-title">학습이 된다는 것과 차량에 탑재된다는 것</strong>
+                <p>영상이 강조하는 병목은 TOPS만이 아니라 <strong>메모리 대역폭</strong>이다. 큰 모델을 서버에서 학습시키는 능력과 차량의 전력·메모리·지연시간 제약 안에서 실행하는 능력은 별도의 문제다.</p>
+              </aside>
+            </section>
+
+            <section class="chapter" id="models" aria-labelledby="models-title">
+              <p class="section-no">04 / MODELS &amp; VALIDATION</p>
+              <h2 id="models-title">모델은 합쳐져도,<br>안전 검증까지 사라지는가</h2>
+              <p>자율주행의 변화는 센서 수에만 있지 않다. 영상은 사람이 정한 중간 표현과 모듈 경계를 학습으로 대체하는 흐름을 소개한다. Tesla의 FSD v12와 Waymo의 EMMA가 이 맥락에서 나란히 등장한다.</p>
+
+              <figure class="evidence">
+                <img src="assets/vs5vrnkpoiw-ts-00-12-50.jpg" alt="FSD 차량 제어의 C++ 코드 30만 줄 이상을 신경망으로 대체하겠다는 일론 머스크의 2023년 게시물" width="1920" height="1080" loading="lazy" decoding="async">
+                <figcaption><a class="stamp">00:12:50 ↗</a>2023년 8월 2일 게시물과 FSD v12 릴리즈 노트가 연결되는 장면.</figcaption>
+              </figure>
+
+              <p>“C++ 30만 줄을 걷어냈다”는 말에서 중요한 것은 범위다. 노트가 병기한 FSD 12.3.5 릴리즈 문구는 <strong>도심 주행 스택(city-streets driving stack)</strong>을 수백만 영상 클립으로 학습한 하나의 신경망으로 바꿨다고 설명한다. 차량 소프트웨어 전체나 모든 안전 로직이 사라졌다는 뜻은 아니다.</p>
+
+              <h3>인식에서 계획까지, 사람이 넣은 경계를 줄이는 흐름</h3>
+              <div class="table-wrap">
+                <table class="table-wide">
+                  <caption>영상이 제시한 인식·계획 기술의 계보 — 분야 전체의 엄밀한 대체 연표는 아님</caption>
+                  <thead><tr><th scope="col">단계</th><th scope="col">무엇을 표현하는가</th><th scope="col">영상의 해석</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">Kalman filter<br>~2019</th><td>프레임별 검출을 시간축으로 결합해 물체의 움직임을 추적.</td><td>관측과 기존 트랙을 연결하는 association이 중요한 문제.</td></tr>
+                    <tr><th scope="row">BEV<br>2020–2022</th><td>카메라 이미지에서 위에서 본 공간 격자로 변환. LSS·BEVFormer를 예시로 제시.</td><td>깊이 추정과 시간 정보를 학습해 공간 표현을 만든다.</td></tr>
+                    <tr><th scope="row">Occupancy<br>2022~</th><td>물체의 이름보다 공간이 차 있는지를 예측.</td><td>처음 보는 물체도 점유 공간으로 다룰 수 있다.</td></tr>
+                    <tr><th scope="row">Planning 통합<br>2023~</th><td>인식·예측·계획을 주행 목표 아래 연결. UniAD와 driving VLA로 확장.</td><td>사람이 나눈 모듈 경계를 줄이는 방향.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <figure class="evidence">
+                <img src="assets/vs5vrnkpoiw-ts-00-13-37.jpg" alt="Kalman filter, BEV, occupancy, planning 통합의 흐름과 lidar·radar·카메라의 한계를 비교한 슬라이드" width="1920" height="1080" loading="lazy" decoding="async">
+                <figcaption><a class="stamp">00:13:37 ↗</a>인식의 표현 방식과 각 센서의 강점·약점을 함께 정리한 장면.</figcaption>
+              </figure>
+
+              <p>센서 비교도 단순한 우열이 아니다. 슬라이드는 lidar의 직접적인 3차원 거리 측정과 악천후 산란, radar의 속도 측정과 낮은 공간 해상도, 카메라의 풍부한 시각 정보와 깊이 추정 필요성을 대비한다. “lidar는 밀리미터 3D”, “악천후 탐지 성능 50% 감소” 같은 표현은 센서·시험 조건에 따라 달라질 수 있어 보편적 성능 수치로 인용하기 어렵다.</p>
+              <p>노트에는 Tesla가 lidar를 학습용 데이터 수집에 활용했다는 설명과, HW4의 HD radar가 물리적으로 있어도 활성화되지 않았다는 슬라이드 주장이 함께 담겨 있다. <strong>센서 탑재, 학습 데이터 활용, 실제 주행 추론 사용은 서로 구분해야 한다.</strong> 레이더 제거와 팬텀 브레이킹, 재탑재의 인과관계 역시 자막의 설명만으로 확정할 수 없다.</p>
+
+              <h3>EMMA 연구와 실제 Waymo 차량은 같은 범위가 아니다</h3>
+              <figure class="evidence">
+                <img src="assets/vs5vrnkpoiw-ts-00-14-25.jpg" alt="Gemini 기반 EMMA 모델이 영상·텍스트 입력으로 주행 경로와 설명을 출력하는 연구 구조도" width="1920" height="1080" loading="lazy" decoding="async">
+                <figcaption><a class="stamp">00:14:25 ↗</a>EMMA의 연구 구조도. 그림에 lidar 입력이 없다는 사실을 실제 Waymo 운행 스택 전체로 확대할 수는 없다.</figcaption>
+              </figure>
+
+              <p><em>EMMA: End-to-End Multimodal Model for Autonomous Driving</em>은 Gemini 위에 구축된 모델로 소개된다. 영상·텍스트와 과거 차량 상태를 받아 향후 경로점, 장면 이해, 주행 판단의 설명 등을 출력하는 구조다.</p>
+              <p>그렇다면 모델을 크게 바꿀 때 안전성은 어떻게 지키는가. 노트가 인용한 Waymo <em>10 AI Lessons</em>는 더 적고 큰 모델로 통합하는 방향과 함께 <strong>독립적인 온보드 검증 계층</strong>을 유지한다고 설명한다. 경로를 제안하는 모델과 그 경로가 물리 제약·교통 규칙을 만족하는지 확인하는 기능을 구분하는 것이다. 이 설명만으로 개별 배포의 안전성이 입증되는 것은 아니지만, “통합 모델이면 별도 검증도 없다”는 추론은 피할 수 있다.</p>
+              <p class="source-line">자막의 AlphaMaio·Cosmos 3 백본 관련 언급은 진행자의 추정으로 기록되어 있다. 이 글에서는 모델 구조가 확인된 사실로 사용하지 않았다.</p>
+            </section>
+
+            <section class="chapter" id="pricing" aria-labelledby="pricing-title">
+              <p class="section-no">05 / THE PRICE OF AUTONOMY</p>
+              <h2 id="pricing-title">운전자가 없어졌는데,<br>왜 더 비쌀까</h2>
+              <p class="lead">무인화는 비용 구조를 바꾼다. 그러나 승객이 내는 요금은 비용뿐 아니라 수요, 공급, 서비스 경험, 시장 진입 전략의 영향을 받는다.</p>
+
+              <figure class="evidence">
+                <img src="assets/vs5vrnkpoiw-ts-00-16-00.jpg" alt="SF Bay에서 Waymo·Uber·Lyft의 평균 호출 요금과 변화율을 비교한 슬라이드" width="1920" height="1080" loading="lazy" decoding="async">
+                <figcaption><a class="stamp">00:16:00 ↗</a>Obi의 약 94,000건 시뮬레이션 요청을 인용한 요금 비교. 실제 완료된 승차 94,000건을 뜻하지 않는다.</figcaption>
+              </figure>
+
+              <div class="table-wrap">
+                <table>
+                  <caption>SF Bay 평균 제시 요금 · 관측 기간 2025.11.27–2026.01.01</caption>
+                  <thead><tr><th scope="col">사업자</th><th scope="col">평균 요금</th><th scope="col">2025년 4월 값</th><th scope="col">변화</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">Waymo</th><td class="number"><strong>$19.69</strong></td><td class="number">$20.43</td><td class="number">−3.62%</td></tr>
+                    <tr><th scope="row">Uber</th><td class="number">$17.47</td><td class="number">$15.58</td><td class="number">약 +12%</td></tr>
+                    <tr><th scope="row">Lyft</th><td class="number">$15.47</td><td class="number">$14.44</td><td class="number">약 +7%</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <p>이 표에서 Waymo는 Uber보다 약 13%, Lyft보다 약 27% 비싸다. 대기시간도 5.74분 대 3.15분으로 더 길게 제시된다. 한편 요금 격차는 줄었다. <strong>Waymo의 소폭 인하와 Uber·Lyft의 인상이 함께 작용했으며, 경쟁사의 인상 폭이 더 컸다.</strong> “Waymo가 내려서가 아니라”라는 슬라이드 문구는 강조법이고, 표 자체에는 Waymo의 인하도 반영되어 있다.</p>
+              <p>진행자는 운전자가 없는 공간이 주는 편안함을 프리미엄의 이유로 해석한다. 민감한 통화를 하거나 타인의 음악 취향을 신경 쓰지 않아도 된다는 체험담이다. 이는 가능한 수요 설명이지만, 요금 관측만으로 선호의 원인이나 지불 의사를 입증한 것은 아니다.</p>
+
+              <h3>Tesla에는 두 개의 요금표가 있다</h3>
+              <p>소유자는 FSD 소프트웨어에 돈을 내고, 승객은 robotaxi 승차에 돈을 낸다. 영상은 소프트웨어의 구매 가격이 고점에서 내려와 구독으로 이동하는 동안, 초기 승차 요금은 오르는 흐름을 포착한다.</p>
+
+              <figure class="evidence">
+                <img src="assets/vs5vrnkpoiw-ts-00-17-30.jpg" alt="Tesla FSD 구매·구독 가격의 변화와 Austin robotaxi 승차 요금 변화를 정리한 슬라이드" width="1920" height="1080" loading="lazy" decoding="async">
+                <figcaption><a class="stamp">00:17:30 ↗</a>소유자에게 파는 소프트웨어와 승객에게 파는 승차는 다른 상품이며, 요금 변화도 별도로 읽어야 한다.</figcaption>
+              </figure>
+
+              <div class="table-wrap">
+                <table>
+                  <caption>소유자 대상 FSD 가격 · 영상 슬라이드 전사</caption>
+                  <thead><tr><th scope="col">시점</th><th scope="col">가격·방식</th><th scope="col">변화</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">2019.04</th><td class="number">$5,000</td><td>FSD 재편 후 가격</td></tr>
+                    <tr><th scope="row">2020.10</th><td class="number">$10,000</td><td>약 1년 반 만에 두 배</td></tr>
+                    <tr><th scope="row">2022.09</th><td class="number">$15,000</td><td>슬라이드상 최고가</td></tr>
+                    <tr><th scope="row">2024.04</th><td class="number">$8,000</td><td>최고가 대비 약 47% 하락</td></tr>
+                    <tr><th scope="row">2026.02</th><td>구독 전용 전환</td><td>월 $99, EA 보유자는 $49로 기재</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="source-line">별도의 월 구독료는 2021년 $199에서 2024년 $99로 내려갔다고 소개된다. 지역·구매 이력별 적용 조건은 원출처 확인 대상이다.</p>
+
+              <div class="table-wrap">
+                <table>
+                  <caption>승객 대상 Austin robotaxi 요금 · 영상에 제시된 시점별 값</caption>
+                  <thead><tr><th scope="col">시점</th><th scope="col">요금</th><th scope="col">메모</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">2025.06</th><td>$4.20 정액</td><td>권역 확대 후 $6.90</td></tr>
+                    <tr><th scope="row">2025.07</th><td>기본 $1 + 마일당 $1</td><td>정액에서 거리제로 전환</td></tr>
+                    <tr><th scope="row">2026.03 · 표기 A</th><td>기본 $3.25</td><td>5마일 요금 $6 → $8.25로 제시</td></tr>
+                    <tr><th scope="row">2026.03 · 표기 B</th><td>기본 $3 + 마일당 $1.40</td><td>마일당 요금 40% 인상으로 설명</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <aside class="note">
+                <strong class="note-title">도시와 시점을 섞으면 가격 비교도 흐려진다</strong>
+                <p>같은 2026년 3월에 두 요율이 기재되어 있지만, 제공 자료만으로 적용 순서와 조건을 확정할 수 없다. Dallas의 2026년 4월 2.25마일 관측값인 Tesla $6.15·Waymo $13.93도 단일 사례다. SF Bay 평균과 직접 비교하거나 전국 요금으로 일반화할 수 없다. 영상에서 별도로 언급한 Tesla의 SF 서비스는 직원이 운전하는 charter permit 기반 서비스로 설명된다.</p>
+              </aside>
+
+              <h3>수익 자산이라는 가설에는 비용표가 빠져 있다</h3>
+              <p>영상은 주 60시간, 시간당 20달러, 연 52주를 가정해 소유 차량의 수익 가능성을 이야기한다. 이 가정의 단순 곱은 <strong>연 62,400달러의 매출</strong>이다. 노트의 “연 3천만 원” 환산은 환율이나 추가 가정이 없어 같은 계산으로 재현되지 않는다.</p>
+              <p>이 금액은 순이익도 아니다. 충전, 보험, 청소, 정비, 플랫폼 수수료, 감가상각과 실제 유상 운행 시간을 반영해야 한다. 그 비용과 가동률 없이 차량 가격이 크게 올라갈 것이라는 결론까지 연결하기는 어렵다.</p>
+            </section>
+
+            <section class="chapter" id="promises" aria-labelledby="promises-title">
+              <p class="section-no">06 / THE PROMISE</p>
+              <h2 id="promises-title">사이버캡이 달리는 것과<br>내가 살 수 있는 것은 다르다</h2>
+              <p>영상이 소개하는 MKBHD의 삭발 내기는 이 차이를 겨냥한다. 노트에 따르면 그는 2024년 발표를 “운전대와 페달이 없는 2인승 Cybercab을 일반인이 3만 달러에, 2026년 말까지 살 수 있다”는 약속으로 받아들였다.</p>
+
+              <figure class="evidence">
+                <img src="assets/vs5vrnkpoiw-ts-00-06-21.jpg" alt="MKBHD의 Tesla 내기 영상과 Cybercab의 기술·판매 및 운행 허용·가격 조건을 정리한 화면" width="1920" height="1080" loading="lazy" decoding="async">
+                <figcaption><a class="stamp">00:06:21 ↗</a>서비스 차량의 운행과 일반 소비자의 구매 가능성을 구분하는 내기.</figcaption>
+              </figure>
+
+              <p>판단할 조건은 세 가지다. 차량이 약속한 기능을 수행하는가, 일반 소비자에게 판매하고 운행할 수 있는가, 약속된 가격에 공급되는가. 이 구분은 법적 요건의 전수 목록이나 반드시 순서대로 거쳐야 하는 절차도는 아니다. 다만 <strong>제한된 서비스 구역에 몇 대를 투입한 사건을 소비자 판매 약속의 완료로 볼 수 없는 이유</strong>는 분명하게 보여 준다.</p>
+
+              <blockquote class="pullquote">
+                <p>“오스틴에서 Cybercab이 승객을 태우는 것과 일반인이 $30,000에 그 차를 사는 것은 다른 사건이다.”</p>
+                <cite>제공된 영상 노트의 정리</cite>
+              </blockquote>
+
+              <h3>기술 성취와 일정 이행은 따로 평가해야 한다</h3>
+              <figure class="evidence">
+                <img src="assets/vs5vrnkpoiw-ts-00-24-41.jpg" alt="2015년부터 2026년까지 일론 머스크의 자율주행·로봇·컴퓨팅 관련 약속과 이행 상태를 비교한 간트형 연표" width="1920" height="1080" loading="lazy" decoding="async">
+                <figcaption><a class="stamp">00:24:41 ↗</a>약속 이행 간트. 아래 상태 표시는 영상 제작자의 분류를 옮긴 것으로 독립적인 판정이 아니다.</figcaption>
+              </figure>
+
+              <div class="table-wrap">
+                <table class="table-wide">
+                  <caption>영상 제작자가 정리한 약속과 결과 · 2026년 9월 기준 서술</caption>
+                  <thead><tr><th scope="col">약속·발표 시점</th><th scope="col">영상의 분류</th><th scope="col">슬라이드가 든 결과</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">약 2년 안에 완전 자율주행 · 2015.12</th><td><span class="status unmet">미이행</span></td><td>소유자용 FSD는 여전히 Supervised.</td></tr>
+                    <tr><th scope="row">LA에서 NY의 차를 호출 · 2016.01</th><td><span class="status unmet">미이행</span></td><td>2024년 ASS는 주차장 범위.</td></tr>
+                    <tr><th scope="row">생산 차량의 FSD 하드웨어 완비 · 2016.10</th><td><span class="status unmet">미이행</span></td><td>HW2 → HW3 교체, HW3도 무인화 불가로 서술.</td></tr>
+                    <tr><th scope="row">LA → NY 무개입 횡단 시연 · 2016.10</th><td><span class="status unmet">미이행</span></td><td>해당 시연이 없었다고 정리.</td></tr>
+                    <tr><th scope="row">로보택시 100만 대 · 2019.04</th><td><span class="status partial">부분</span></td><td>2025년 Austin 약 10대, 2026년 9월 Cybercab 45대로 기재.</td></tr>
+                    <tr><th scope="row">“올해 FSD 해결” 반복 · 2019–2023</th><td><span class="status unmet">미이행</span></td><td>2024년 v12도 Supervised.</td></tr>
+                    <tr><th scope="row">이듬해 Tesla Bot 시제품 · 2021.08</th><td><span class="status met">이행</span></td><td>2022년 9월 AI Day 2 보행 시연.</td></tr>
+                    <tr><th scope="row">Dojo, 세계 5위권 슈퍼컴퓨터 · 2023.06</th><td><span class="status unmet">미이행</span></td><td>2025년 8월 종료로 정리. 다른 연표에는 2026년 Dojo 3 재개도 등장.</td></tr>
+                    <tr><th scope="row">AI5 차량 탑재, 2025년 하반기 · 2024.06</th><td><span class="status unmet">미이행</span></td><td>2026년 tape-out, 2027년 양산 일정.</td></tr>
+                    <tr><th scope="row">Cybercab 2026년 생산, 3만 달러 미만 · 2024.10</th><td><span class="status partial">부분</span></td><td>Austin 유료 운행. 개인 판매·가격 미확정.</td></tr>
+                    <tr><th scope="row">연말 미국 인구 절반 커버 · 2025.07</th><td><span class="status unmet">미이행</span></td><td>Austin·SF 약 4.5%로 제시.</td></tr>
+                    <tr><th scope="row">연말 8–10개 대도시권 · 2025.10</th><td><span class="status unmet">미이행</span></td><td>연말 2곳, 2026년 9월 6개 도시로 기재.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <p>이 표에서 곧바로 하나의 “약속 이행률”을 계산하는 것은 적절하지 않다. 반복 발언을 묶은 행이 있고, 부분 이행의 기준도 균일하지 않으며, 원래 기한을 넘긴 진전과 기한 내 달성을 혼합한다. 예를 들어 로보택시 소수 운영을 100만 대 약속의 “부분”으로 분류한 것은 제작자의 평가다.</p>
+              <p>진행자들은 반복된 일정 미준수를 강하게 비판하면서도 Tesla와 SpaceX가 이룬 성취 자체는 인정한다. 독자가 가져갈 구분도 여기에 있다. <strong>어려운 기술을 진전시켰는가와 구체적인 약속을 제때 지켰는가는 서로 다른 질문</strong>이다.</p>
+              <p class="source-line">슬라이드의 후속 관찰 목록에는 Cybercab 개인 판매·3만 달러 미만 가격, Optimus 외부 판매 2027년 하반기, AI5 양산 2027년, Starship 화성 관련 2026년 11월 약속이 제시된다. 이 중 자율주행 밖의 항목은 이 글의 분석 범위에 포함하지 않는다.</p>
+            </section>
+
+            <section class="chapter" id="implications" aria-labelledby="implications-title">
+              <p class="section-no">07 / WHAT TO WATCH NEXT</p>
+              <h2 id="implications-title">다음 뉴스에서 확인할 것은<br>더 큰 숫자보다 더 명확한 조건</h2>
+              <p>영상은 “정반대의 기술 철학도 작동할 수 있다”는 감상으로 두 회사를 바라본다. 다만 작동한다는 말의 범위는 나눠야 한다. 감독형 운전 보조, 제한 구역 무인 승차, 개인이 소유한 차량의 광범위한 무인 운행은 같은 성취가 아니다.</p>
+
+              <h3>소유에서 서비스로, 그러나 운행 범위가 관건</h3>
+              <p>차량을 소유하는 대신 필요할 때 이동 서비스를 이용하는 방식이 더 대중화될 수 있다는 전망이 나온다. 이를 가르는 것은 차체 가격만이 아니다. 호출 가능한 장소와 시간, 대기시간, 운임, 실제 이용 가능성이 중요하다.</p>
+              <p>영상 채팅의 “3만 달러에 사더라도 텍사스에서만 운행할 수 있으면 누가 살까”라는 질문은 개인 판매의 실용성을 짚는다. 다만 특정 지역에 묶인 운행이 규제 때문인지, 기술·지도·운영 준비 때문인지는 제공 자료로 분리되지 않는다. 영상의 규제 관련 대화는 법적 검토가 아닌 논의로 읽어야 한다.</p>
+              <p>운전 학습 부담과 주차 자동화에 관한 대화도 같은 맥락이다. 소비자가 원하는 가치는 종종 거대한 자율주행 선언보다 “내린 뒤 알아서 주차하고, 부르면 오는 차”처럼 구체적이다. 중국 업체와 다른 사업자에 관한 언급은 경쟁 구도가 넓어질 가능성을 제기하지만, 해당 업체의 현황과 성능을 비교할 자료는 이 노트에 충분하지 않다.</p>
+
+              <h3>독자를 위한 확인 체크리스트</h3>
+              <ul class="checklist">
+                <li><span><strong>무인이라는 말의 조건:</strong> 운전자·안전요원 탑승 여부, 원격 지원의 역할, 운행 가능 구역과 시간을 확인한다.</span></li>
+                <li><span><strong>주행 거리의 정의:</strong> 감독형·무인·유료 승차·시뮬레이션을 구분하고, 집계 종료일을 함께 적는다.</span></li>
+                <li><span><strong>안전 수치의 비교 기준:</strong> 사고 정의, 심각도, 주행 환경, 비교군과 통계적 불확실성을 확인한다.</span></li>
+                <li><span><strong>요금과 수익의 차이:</strong> 같은 도시·경로·시간 조건의 가격인지 확인하고, 저렴한 요금을 낮은 원가나 흑자의 증거로 쓰지 않는다.</span></li>
+                <li><span><strong>출시의 완료 조건:</strong> 시연, 서비스 투입, 양산, 일반 판매, 가격 확정을 별개의 사건으로 기록한다.</span></li>
+              </ul>
+
+              <div class="ending">
+                <p class="small-label">The Takeaway</p>
+                <h3>누가 더 많이 달렸는가.<br>그 전에, 어떤 조건에서 달렸는가.</h3>
+                <p>자율주행 경쟁을 읽는 가장 좋은 출발점은 숫자의 단위를 되찾는 일이다. 운전석을 비운 범위, 승객이 지불한 가격, 소비자가 실제로 살 수 있는 상품을 구분하면 발표의 크기와 현실의 진전이 함께 보인다.</p>
+              </div>
+            </section>
+
+            <section class="sources" id="sources" aria-labelledby="sources-title">
+              <p class="section-no">08 / SOURCE NOTES</p>
+              <h2 id="sources-title">출처, 자료의 성격, 남은 확인</h2>
+              <p>이 글은 제공된 Obsidian 노트를 바탕으로 구성한 영상 분석 기사다. 수치와 기업 현황을 독립적으로 조사한 보고서가 아니며, 이미지 역시 제공된 프레임 경로를 유지했다.</p>
+              <ol>
+                <li>
+                  <strong>기본 자료</strong> <span class="source-tag">영상·자막 기반</span><br>
+                  sudoremove, <a>「자율주행 근황, 테슬라 사이버 캡 출시 vs 웨이모」</a>, 2026년 9월 10일 게시, 29분 6초. 제공 노트는 수동 자막 801개 큐, 메타데이터·설명란·26개 챕터를 활용했다고 명시한다. 출연자 실명은 확인되지 않아 특정하지 않았다.
+                </li>
+                <li>
+                  <strong>프레임과 슬라이드</strong> <span class="source-tag">화면 전사</span><br>
+                  노트 작성자는 화면 공유 구간 23곳에서 중복되지 않는 14개 프레임을 선별했다고 설명한다. 화면 자료는 진행자가 Obsidian으로 만든 자체 슬라이드다. 이 글의 기업별 수치·일정·상태 표시는 그 슬라이드를 옮긴 노트에 근거한다.
+                </li>
+                <li>
+                  <strong>기업 이력·기술·안전 관련 각주</strong> <span class="source-tag">원문 미대조</span><br>
+                  슬라이드는 Waymo blog(2018·2020), TechCrunch(2024-10-10), CNBC(2025-06-20), Waymo의 <em>10 AI Lessons</em>(2026-08), EMMA 논문, Ken Goldberg의 2026년 강연 등을 인용한다. 정확한 기사·발표 제목과 통계 정의를 원문에서 확인해야 한다. Goldberg 강연의 Waymo 20M 마일과 영상의 220.6M 마일은 기준 시점이 다르다.
+                </li>
+                <li>
+                  <strong>후속 기술 독서</strong> <span class="source-tag">노트에 제시된 논문 식별자</span><br>
+                  <a>LSS · arXiv:2008.05711</a>,
+                  <a>BEVFormer · arXiv:2203.17270</a>,
+                  <a>UniAD · arXiv:2212.10156</a>.
+                  링크는 제공 노트의 식별자를 따른다. 이 글에서는 논문 본문을 대조해 개별 기술 주장을 검증하지 않았다.
+                </li>
+                <li>
+                  <strong>가격·약속 연표의 근거</strong> <span class="source-tag">2차 인용</span><br>
+                  Obi/TechCrunch 요금 분석, robotaxiprice.com 스냅샷, Jalopnik 연표, 실적콜 전문, Electrek 등이 슬라이드 각주로 소개된다. 요금의 지역·시간 조건, 약속의 정확한 발언과 기한, 하드웨어 적용 범위를 추가 확인해야 한다. Waymo의 2026년 2월 조달 관련 기업가치도 노트에서 $110B와 $126B 보도가 갈린다고 명시한다.
+                </li>
+              </ol>
+
+              <aside class="note warm">
+                <strong class="note-title">편집상 정리한 부분</strong>
+                <p>원영상의 흐름을 상품 → 데이터 → 기술 → 가격 → 약속으로 재배치했다. 주행 거리 배수는 제공된 값으로 다시 계산했고, 수익 예시의 산술과 요금 격차의 설명을 보완했다. 검증되지 않은 발언은 영상의 주장·해석으로 표시했으며, 약속 이행률과 두 회사의 안전 우열은 산��하지 않았다.</p>
+              </aside>
+
+              <aside class="share" aria-labelledby="share-title">
+                <p class="small-label">Share This Perspective</p>
+                <h3 id="share-title">함께 읽을 때 건넬 한 문장</h3>
+                <p class="copy">테슬라와 웨이모를 비교할 때는 주행 거리보다 주행 조건을 먼저 보자. 서비스에 투입된 차와 내가 살 수 있는 차도 구분해야 한다.</p>
+                <div class="share-links">
+                  <a href="#findings-title">핵심 발견 다시 읽기 ↑</a>
+                  <a>원영상에서 맥락 확인 ↗</a>
+                </div>
+              </aside>
+            </section>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <footer>
+      <p>Mobility / Research Notes · 영상 기반 편집 리포트<br>자료 기준: 원영상 및 제공 노트 · 정리일 2026.09.12</p>
+      <p>영상·슬라이드·프레임의 권리는 각 권리자에게 있습니다.<br><a href="#top">기사 처음으로 ↑</a></p>
+    </footer>
+  </div>
+</body>
+</html>
