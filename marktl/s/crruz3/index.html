@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>AGI는 이미 지나가는 중인가 — AI에게 일을 맡긴 뒤 남는 것들</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      --paper: #f7f4ed;
+      --surface: #fffdf8;
+      --ink: #242c2a;
+      --muted: #606a63;
+      --line: #d8dbd0;
+      --accent: #a3442b;
+      --green: #203e35;
+      --pale: #eaf0e7;
+      --warm: #eee4d5;
+      --sans: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "AppleMyungjo", "Batang", serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.85;
+      letter-spacing: -.025em;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-underline-offset: .22em; text-decoration-thickness: 1px; }
+    a:hover { color: var(--accent); }
+    a:focus-visible { outline: 3px solid var(--accent); outline-offset: 5px; }
+    ::selection { background: #e4c7b7; color: #172d26; }
+    img { display: block; width: 100%; height: auto; }
+    figure, blockquote { margin: 0; }
+    p { margin: 0 0 1.25em; }
+    strong { font-weight: 750; }
+    h1, h2, h3, h4 { margin: 0; line-height: 1.4; text-wrap: balance; }
+    h1, h2 { font-family: var(--serif); }
+    ul, ol { padding-left: 1.3em; }
+    li + li { margin-top: .5em; }
+    .shell { width: min(1160px, calc(100% - 88px)); margin-inline: auto; }
+    .skip-link {
+      position: absolute;
+      top: -100px;
+      left: 20px;
+      padding: 10px 18px;
+      background: var(--ink);
+      color: white;
+      z-index: 10;
+    }
+    .skip-link:focus { top: 12px; }
+    .masthead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding-block: 27px 23px;
+      border-bottom: 1px solid var(--ink);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .13em;
+    }
+    .brand { display: flex; align-items: center; gap: 11px; }
+    .brand-mark { width: 12px; height: 12px; background: var(--accent); border-radius: 50%; }
+    .masthead-right { color: var(--muted); letter-spacing: .03em; text-align: right; }
+    .hero { padding-block: 65px 46px; }
+    .eyebrow {
+      display: block;
+      margin-bottom: 24px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) 245px; gap: 60px; align-items: end; }
+    h1 { font-size: clamp(43px, 5.9vw, 74px); line-height: 1.23; letter-spacing: -.075em; font-weight: 800; }
+    .title-line { display: block; }
+    .title-accent { color: var(--accent); }
+    .deck { max-width: 750px; margin-top: 28px; margin-bottom: 0; color: #4c5750; font-size: 20px; line-height: 1.8; }
+    .hero-aside { padding: 22px 0 0 22px; border-left: 1px solid var(--line); }
+    .aside-label { color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .13em; }
+    .hero-aside p { margin: 12px 0 22px; font-size: 15px; line-height: 1.75; }
+    .text-link { font-size: 13px; font-weight: 750; }
+    .meta-strip { display: flex; flex-wrap: wrap; gap: 8px 25px; margin-top: 38px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; letter-spacing: 0; }
+    .meta-strip b { color: var(--ink); font-weight: 700; margin-right: 6px; }
+    .abstract { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 40px; background: var(--green); color: #f5f5eb; padding: 38px 42px; }
+    .abstract h2 { font-family: var(--sans); font-size: 22px; }
+    .abstract .en { display: block; color: #c0d0bf; margin-top: 8px; font-size: 11px; letter-spacing: .14em; }
+    .abstract p { margin-bottom: 0; font-size: 17px; line-height: 1.9; }
+    .abstract .scope { display: block; margin-top: 16px; color: #d0ddcf; font-size: 13px; line-height: 1.75; }
+    .findings { padding-block: 48px; border-bottom: 1px solid var(--line); }
+    .section-label { display: flex; align-items: baseline; gap: 14px; margin-bottom: 22px; }
+    .section-label h2 { font-family: var(--sans); font-size: 19px; }
+    .section-label span { color: var(--muted); font-size: 11px; letter-spacing: .1em; }
+    .finding-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 26px; list-style: none; padding: 0; margin: 0; }
+    .finding-grid li { margin: 0; padding-top: 17px; border-top: 2px solid var(--green); }
+    .finding-number { color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; }
+    .finding-grid h3 { font-size: 18px; margin: 12px 0 10px; }
+    .finding-grid p { color: var(--muted); font-size: 14px; line-height: 1.8; margin: 0; }
+    .reading-layout { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 62px; padding-top: 60px; }
+    .contents { align-self: start; position: sticky; top: 30px; font-size: 13px; line-height: 1.65; }
+    .contents-title { margin-bottom: 18px; font-size: 11px; font-weight: 800; letter-spacing: .14em; color: var(--muted); }
+    .contents ol { list-style: none; margin: 0; padding: 0; }
+    .contents li { margin: 0; border-top: 1px solid var(--line); }
+    .contents a { display: grid; grid-template-columns: 24px 1fr; gap: 5px; padding-block: 13px; text-decoration: none; }
+    .contents a span { color: var(--accent); font-size: 11px; }
+    .contents .source-nav { display: block; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+    .article-body { min-width: 0; }
+    .chapter { padding-bottom: 57px; margin-bottom: 55px; border-bottom: 1px solid var(--line); }
+    .chapter-index { color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .15em; margin-bottom: 12px; }
+    .chapter h2 { font-size: clamp(29px, 3.1vw, 39px); letter-spacing: -.055em; margin-bottom: 24px; }
+    .chapter h3 { font-size: 21px; margin: 31px 0 14px; }
+    .chapter .lead { font-size: 20px; line-height: 1.85; color: #3e5147; }
+    .timestamp { display: inline-block; color: var(--accent); font-family: var(--sans); font-size: 11px; font-weight: 800; letter-spacing: .04em; text-decoration: none; font-variant-numeric: tabular-nums; }
+    .evidence { margin-block: 30px; }
+    .evidence img { background: #dddcd4; border: 1px solid var(--line); border-radius: 3px; }
+    figcaption { padding-top: 11px; font-size: 12px; line-height: 1.75; color: var(--muted); }
+    .figure-label { color: var(--ink); font-weight: 750; }
+    .image-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-block: 30px; }
+    .image-pair .evidence { margin: 0; }
+    .table-wrap { overflow-x: auto; margin-block: 26px; border-top: 2px solid var(--green); }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; line-height: 1.75; }
+    caption { text-align: left; padding: 15px 0; font-weight: 750; color: var(--green); }
+    th, td { padding: 15px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    thead th { background: var(--pale); font-size: 12px; }
+    tbody th { min-width: 105px; font-weight: 700; }
+    td p { margin: 0; }
+    td small { display: block; color: var(--muted); font-size: 12px; margin-top: 7px; }
+    .quote { padding: 29px 0 27px 27px; border-left: 3px solid var(--accent); margin-block: 34px; }
+    .quote p { font-family: var(--serif); font-size: clamp(23px, 2.8vw, 32px); line-height: 1.65; letter-spacing: -.055em; margin: 0 0 14px; }
+    .quote footer { color: var(--muted); font-size: 12px; line-height: 1.75; }
+    .quote.compact p { font-size: 24px; }
+    .note-box { padding: 24px 27px; margin-block: 28px; background: var(--pale); border-radius: 3px; }
+    .note-box h3, .note-box h4 { font-family: var(--sans); font-size: 16px; margin: 0 0 10px; }
+    .note-box p { font-size: 15px; margin-bottom: 0; line-height: 1.9; }
+    .note-box.warm { background: var(--warm); }
+    .diagram { margin-block: 30px; border: 1px solid var(--line); padding: 25px; background: var(--surface); }
+    .diagram-title { font-size: 13px; font-weight: 800; margin-bottom: 20px; }
+    .flow { display: flex; align-items: stretch; gap: 12px; padding: 0; list-style: none; margin: 0; }
+    .flow li { flex: 1; margin: 0; padding: 18px 14px; background: var(--pale); border-top: 2px solid #8d9e8b; }
+    .flow li:last-child { background: var(--green); color: #f7f4ed; border-top-color: var(--green); }
+    .flow small { display: block; font-size: 11px; opacity: .8; letter-spacing: .05em; margin-bottom: 6px; }
+    .flow strong { display: block; font-size: 17px; margin-bottom: 7px; }
+    .flow span { display: block; font-size: 12px; line-height: 1.75; }
+    .diagram figcaption { padding-top: 15px; }
+    .decision-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-block: 26px; }
+    .decision-card { padding: 23px; background: var(--surface); border: 1px solid var(--line); }
+    .decision-card h4 { font-size: 17px; margin-bottom: 12px; }
+    .decision-card ul { font-size: 14px; margin-block: 0; color: var(--muted); }
+    .decision-card.emphasis { border-top: 3px solid var(--accent); }
+    .case-study { padding: 27px; border: 1px solid var(--line); margin-block: 28px; background: var(--surface); }
+    .case-study h3 { margin-top: 0; font-size: 19px; }
+    .case-stats { display: flex; flex-wrap: wrap; gap: 25px 42px; margin-bottom: 18px; }
+    .stat { font-size: 12px; color: var(--muted); }
+    .stat strong { display: block; color: var(--green); font-family: var(--serif); font-size: 35px; line-height: 1.4; }
+    .case-study p { font-size: 15px; }
+    .case-study .qualification { font-size: 12px; color: var(--muted); margin-bottom: 0; }
+    .checklist { list-style: none; margin: 24px 0 0; padding: 0; }
+    .checklist li { position: relative; padding: 17px 0 17px 31px; margin: 0; border-top: 1px solid var(--line); font-size: 15px; }
+    .checklist li::before { content: "□"; position: absolute; left: 0; top: 16px; color: var(--accent); font-size: 20px; }
+    .checklist strong { display: block; margin-bottom: 3px; }
+    .checklist span { color: var(--muted); }
+    .ending { background: var(--green); color: var(--paper); padding: 34px; margin-top: 30px; }
+    .ending .eyebrow { color: #c8d7be; margin-bottom: 15px; }
+    .ending h3 { margin: 0 0 17px; font-family: var(--serif); font-size: 27px; line-height: 1.6; }
+    .ending p { color: #d5dfd2; font-size: 15px; margin: 0; }
+    .source-section { padding-bottom: 45px; }
+    .source-section h2 { font-family: var(--sans); font-size: 23px; margin-bottom: 20px; }
+    .source-section h3 { font-size: 16px; margin: 25px 0 10px; }
+    .source-section p, .source-section li { font-size: 13px; color: var(--muted); line-height: 1.9; }
+    .source-section ol { margin-bottom: 25px; }
+    .source-section table { font-size: 12px; }
+    .source-section td, .source-section th { padding: 13px; }
+    .source-section strong { color: var(--ink); }
+    .source-title { font-size: 16px !important; font-weight: 700; color: var(--ink) !important; margin-bottom: 7px; }
+    .share-note { border-top: 1px solid var(--ink); border-bottom: 1px solid var(--line); padding-block: 26px; margin-bottom: 45px; }
+    .share-note h2 { font-family: var(--sans); font-size: 11px; letter-spacing: .1em; color: var(--accent); margin-bottom: 12px; }
+    .share-note blockquote { font-family: var(--serif); font-size: 21px; line-height: 1.8; user-select: text; }
+    .share-note p { color: var(--muted); font-size: 12px; margin: 12px 0 0; }
+    .site-footer { display: flex; justify-content: space-between; gap: 20px; padding-block: 24px 36px; border-top: 1px solid var(--ink); color: var(--muted); font-size: 11px; letter-spacing: .02em; }
+    @media (min-width: 1400px) {
+      body { font-size: 18px; }
+    }
+    @media (max-width: 1000px) {
+      .shell { width: calc(100% - 56px); }
+      .hero-grid { grid-template-columns: 1fr; gap: 26px; }
+      .hero-aside { display: flex; align-items: baseline; gap: 20px; border-left: 0; border-top: 1px solid var(--line); padding: 18px 0 0; }
+      .hero-aside p { margin: 0; flex: 1; }
+      .hero-aside .text-link { white-space: nowrap; }
+      .reading-layout { grid-template-columns: 145px minmax(0, 1fr); gap: 35px; }
+      .finding-grid { gap: 18px; }
+      .image-pair { grid-template-columns: 1fr; gap: 27px; }
+      .abstract { grid-template-columns: 135px minmax(0, 1fr); gap: 25px; padding: 32px; }
+    }
+    @media (max-width: 740px) {
+      .shell { width: calc(100% - 36px); }
+      .masthead { padding-block: 20px; font-size: 10px; letter-spacing: .08em; }
+      .masthead-right { max-width: 125px; }
+      .hero { padding-top: 38px; padding-bottom: 30px; }
+      .eyebrow { margin-bottom: 19px; font-size: 10px; }
+      h1 { font-size: clamp(38px, 8.8vw, 59px); }
+      .deck { font-size: 17px; margin-top: 22px; }
+      .hero-aside { display: block; }
+      .hero-aside p { margin-block: 8px 12px; font-size: 14px; }
+      .meta-strip { margin-top: 25px; gap: 7px 17px; }
+      .abstract { grid-template-columns: 1fr; gap: 18px; padding: 26px; }
+      .abstract .en { display: inline; margin-left: 10px; }
+      .abstract p { font-size: 15px; }
+      .finding-grid { grid-template-columns: 1fr 1fr; gap: 26px 20px; }
+      .finding-grid h3 { font-size: 17px; }
+      .findings { padding-block: 33px; }
+      .reading-layout { display: block; padding-top: 28px; }
+      .contents { position: static; margin-bottom: 38px; }
+      .contents ol { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+      .contents a { padding-block: 10px; font-size: 12px; }
+      .contents .source-nav { font-size: 11px; }
+      .chapter { padding-bottom: 36px; margin-bottom: 36px; }
+      .chapter h2 { font-size: 30px; }
+      .chapter .lead { font-size: 18px; }
+      .chapter h3 { font-size: 19px; }
+      .flow { flex-direction: column; gap: 10px; }
+      .flow li { padding: 14px 17px; }
+      .flow strong { font-size: 16px; }
+      .diagram { padding: 20px; }
+      .decision-grid { grid-template-columns: 1fr; }
+      .quote { padding-left: 20px; }
+      .quote.compact p { font-size: 22px; }
+      .case-study, .note-box { padding: 22px; }
+      .table-wrap table { min-width: 530px; }
+      .ending { padding: 25px; }
+      .ending h3 { font-size: 24px; }
+      .site-footer { flex-direction: column; gap: 8px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+    @media print {
+      body { background: white; color: black; font-size: 11pt; }
+      .shell { width: 100%; }
+      .hero { padding-top: 25px; }
+      .hero-grid, .reading-layout { display: block; }
+      h1 { font-size: 35pt; }
+      .contents, .skip-link, .share-note { display: none; }
+      .abstract, .ending { background: #f0f2ec; color: black; }
+      .abstract .en, .abstract .scope, .ending p, .ending .eyebrow { color: #333; }
+      .abstract { margin-top: 15px; }
+      .chapter { margin-bottom: 24px; padding-bottom: 24px; }
+      .chapter h2 { font-size: 24pt; }
+      .evidence, .quote, .note-box, .decision-card { break-inside: avoid; }
+      .table-wrap { overflow: visible; }
+      .table-wrap table { min-width: 0; }
+      a { text-decoration: none; }
+      .image-pair { grid-template-columns: 1fr 1fr; }
+      .flow li:last-child { background: #e0e7dd; color: black; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="GPT-6 아스트라 출시 기념 AGI 생각해보기">
+<meta property="og:description" content="GPT 6 아스트라 출시 기념 AGI 생각해보기 영상 정보 채널 : sudoremove 게시일 : 2026 09 10 길이 : 25분 56초 (1,556초) 챕터 : 18개 링크 : https://www.youtube.com/watch?v=fY6uwAJVtIk &lt;div style=&quot;position: relative; width: 100%; padding bottom: 56.25%; height: 0; overflow: hidd">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/crruz3/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/crruz3/assets/fy6uwajvtik-ts-00-01-48.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="GPT-6 아스트라 출시 기념 AGI 생각해보기">
+<meta name="twitter:description" content="GPT 6 아스트라 출시 기념 AGI 생각해보기 영상 정보 채널 : sudoremove 게시일 : 2026 09 10 길이 : 25분 56초 (1,556초) 챕터 : 18개 링크 : https://www.youtube.com/watch?v=fY6uwAJVtIk &lt;div style=&quot;position: relative; width: 100%; padding bottom: 56.25%; height: 0; overflow: hidd">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/crruz3/assets/fy6uwajvtik-ts-00-01-48.jpg">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-gpt-6-%EC%95%84%EC%8A%A4%ED%8A%B8%EB%9D%BC-%EC%B6%9C%EC%8B%9C-%EA%B8%B0%EB%85%90-agi-%EC%83%9D%EA%B0%81%ED%95%B4%EB%B3%B4%EA%B8%B0-%EC%9A%94%EC%95%BD/">
+</head>
+<body>
+  <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+
+  <div class="shell">
+    <header class="masthead" id="top">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span> FIELD NOTES / AI &amp; WORK</div>
+      <div class="masthead-right">영상 기반 리서치 에세이 · 2026.09</div>
+    </header>
+
+    <main id="main">
+      <article aria-labelledby="article-title">
+        <header class="hero">
+          <span class="eyebrow">AGI · 에이전트 · 위임 이후의 일</span>
+          <div class="hero-grid">
+            <div>
+              <h1 id="article-title">
+                <span class="title-line">AGI는 이미</span>
+                <span class="title-line title-accent">지나가는 중인가</span>
+              </h1>
+              <p class="deck">AI에게 일을 맡겼는데, 우리는 왜 더 바빠졌을까. 더 많은 일을 실행하는 능력과 내가 원하는 일을 알아차리는 능력 사이에서, AGI의 의미를 다시 묻는다.</p>
+            </div>
+            <aside class="hero-aside" aria-label="이 글의 출발점">
+              <span class="aside-label">THE CENTRAL QUESTION</span>
+              <p>AI가 일을 두 배 해주면,<br>우리는 일찍 퇴근할까,<br>일을 두 배 더 벌일까?</p>
+              <a class="text-link">원본 영상 보기 ↗</a>
+            </aside>
+          </div>
+          <div class="meta-strip">
+            <span><b>원본 채널</b> sudoremove</span>
+            <span><b>영상 게시</b> <time datetime="2026-09-10">2026.09.10</time></span>
+            <span><b>노트 작성</b> <time datetime="2026-09-12">2026.09.12</time></span>
+            <span><b>영상 길이</b> 25분 56초</span>
+          </div>
+        </header>
+
+        <section class="abstract" aria-labelledby="abstract-title">
+          <div>
+            <h2 id="abstract-title">초록</h2>
+            <span class="en">ABSTRACT</span>
+          </div>
+          <div>
+            <p>sudoremove의 「GPT-6 아스트라 출시 기념 AGI 생각해보기」는 TIME의 샘 올트먼·그렉 브록먼 인터뷰 두 편을 출발점으로, AGI를 능력이 점진적으로 확장되는 과정으로 바라본다. 토론을 관통하는 것은 위임의 역설이다. 에이전트가 더 많이 실행할수록 사람의 검수와 선택이 병목이 되고, 먼저 행동하는 AI일수록 취향·맥락·권한을 이해해야 한다. 이 글은 영상 노트에 담긴 사례를 통해 <strong>판단의 병목, 선호 예측, 실행 과정의 책임</strong>이라는 세 가지 쟁점을 정리한다.</p>
+            <span class="scope">읽기 전 안내 — 제공된 자막 기반 노트와 화면 기록을 재구성한 글이다. 모델 성능 평가나 출시 사실 검증을 다루지 않으며, TIME 원문 인터뷰도 직접 대조하지 않았다.</span>
+          </div>
+        </section>
+
+        <section class="findings" aria-labelledby="findings-title">
+          <div class="section-label">
+            <h2 id="findings-title">먼저 읽는 핵심 발견</h2>
+            <span>KEY FINDINGS</span>
+          </div>
+          <ol class="finding-grid">
+            <li>
+              <span class="finding-number">01 / 능력</span>
+              <h3>AGI를 하나의 선으로 설명하기 어렵다</h3>
+              <p>업무마다 체감 성능의 차이가 크다. 무엇을 얼마나 잘하는지, 능력의 여러 축을 나누어 봐야 한다.</p>
+            </li>
+            <li>
+              <span class="finding-number">02 / 생산성</span>
+              <h3>실행이 빨라지면 판단이 밀린다</h3>
+              <p>병렬 작업의 증가가 곧 여유의 증가를 뜻하지는 않는다. 검수와 우선순위 선택이 사람에게 남는다.</p>
+            </li>
+            <li>
+              <span class="finding-number">03 / 취향</span>
+              <h3>선호 예측은 또 다른 능력이다</h3>
+              <p>정답을 검증하는 일과, 지금 이 사람이 무엇을 좋아할지 알아차리는 일은 다르다는 가설이 제시된다.</p>
+            </li>
+            <li>
+              <span class="finding-number">04 / 책임</span>
+              <h3>위임에는 권한과 과정 설계가 필요하다</h3>
+              <p>결과뿐 아니라 접근한 정보, 사용한 수단, 보고와 검수의 경계까지 설계해야 한다.</p>
+            </li>
+          </ol>
+        </section>
+
+        <div class="reading-layout">
+          <nav class="contents" aria-label="기사 목차">
+            <div class="contents-title">IN THIS REPORT</div>
+            <ol>
+              <li><a href="#uneven-agi"><span>01</span> AGI라는 구간</a></li>
+              <li><a href="#bottleneck"><span>02</span> 더 바빠진 사람</a></li>
+              <li><a href="#preference"><span>03</span> 취향이라는 관문</a></li>
+              <li><a href="#delegation"><span>04</span> 사번을 받은 AI</a></li>
+              <li><a href="#experiment"><span>05</span> 다음 실험의 조건</a></li>
+              <li><a href="#implications"><span>06</span> 우리에게 남는 일</a></li>
+            </ol>
+            <a class="source-nav" href="#source-notes">근거 범위와 출처 노트 ↓</a>
+          </nav>
+
+          <div class="article-body">
+            <section class="chapter" id="uneven-agi" aria-labelledby="section-one">
+              <div class="chapter-index">01 / THE UNEVEN ARRIVAL</div>
+              <h2 id="section-one">AGI는 사건인가,<br>우리가 통과하는 구간인가</h2>
+              <p class="lead">토론은 익숙한 질문의 퇴장에서 시작한다. 예전에는 AGI가 언제 올지를 자주 물었는데, 요즘은 그 이야기가 줄었다는 것이다.</p>
+              <p>진행자들이 제시하는 이유는 능력의 비대칭이다. 어떤 업무에서는 사람보다 훨씬 뛰어나 보이지만, 다른 업무에서는 기대에 크게 못 미친다. 이처럼 고르지 않은 발전 앞에서 ‘범용’이라는 단어의 경계도 흐려진다. 영상과 로봇 행동, 감정과 상황의 이해는 아직 부족하다고 거론되지만, 이는 <strong>출연자들의 체감 평가이며 비교 실험의 결과는 아니다.</strong></p>
+              <p>이 회차의 교재는 TIME 인터뷰 두 편이다. 영상 속 화면에는 진행자들이 만든 로컬 아티클이 열려 있다. 인터뷰의 발언 요약과 질문, 진행 멘트, 기술 설명을 함께 배치한 일종의 토론 대본이다.</p>
+
+              <div class="image-pair">
+                <figure class="evidence">
+                  <img src="assets/fy6uwajvtik-ts-00-01-48.jpg" alt="TIME 인터뷰 두 편을 소개하는 진행용 아티클의 화면" loading="lazy" decoding="async">
+                  <figcaption><span class="figure-label">장면 01.</span> <a class="timestamp">00:01:48 ↗</a><br>‘먼저, 두 영상에서 한 이야기’. 모델 리뷰에 앞서 인터뷰를 교재로 삼는 토론의 구성이 드러난다.</figcaption>
+                </figure>
+                <figure class="evidence">
+                  <img src="assets/fy6uwajvtik-ts-00-02-08.jpg" alt="올트먼과 브록먼 인터뷰의 주요 발언을 타임스탬프와 함께 정리한 화면" loading="lazy" decoding="async">
+                  <figcaption><span class="figure-label">장면 02.</span> <a class="timestamp">00:02:08 ↗</a><br>원본 인터뷰별 타임스탬프 요약. AGI를 점진적 과정으로 보는 관점이 토론의 중심이 된다.</figcaption>
+                </figure>
+              </div>
+
+              <div class="table-wrap" role="region" aria-label="교재로 소개된 TIME 인터뷰 비교" tabindex="0">
+                <table>
+                  <caption>화면 속 교재: 두 인터뷰가 맡은 역할</caption>
+                  <thead>
+                    <tr><th scope="col">구분</th><th scope="col">영상 A · 샘 올트먼 중심</th><th scope="col">영상 B · 그렉 브록먼 대담</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">원제</th>
+                      <td lang="en">Sam Altman Reveals OpenAI's Plan to Regain Its Lead in AI</td>
+                      <td lang="en">How Close Are We to True Artificial General Intelligence? | OpenAI's Greg Brockman Speaks to TIME</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">화면에 기재된 정보</th>
+                      <td>TIME · 2026.09.01<br>14분 12초<small>여러 경영진의 발언을 엮은 기획 영상</small></td>
+                      <td>TIME · 2026.09.02<br>54분 37초<small>브록먼의 장시간 대담</small></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">논의의 연결점</th>
+                      <td>핵심 지능 개발에 대한 재집중, 기업용 에이전트, 허락 범위 안에서 먼저 행동하는 개인 AI</td>
+                      <td>점진적으로 확장되는 AGI, 채팅과 실행 환경의 통합, 사람에게 남는 판단과 책임</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">노트에 기록된 원본 시각</th>
+                      <td>01:02 · 지능 개발 집중<br>08:07 · 에이전트와 개인 AI</td>
+                      <td>31:36 · AGI의 점진성<br>42:02 · 개인 AI 구상<br>47:07 · 위임 이후의 일</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <p>노트는 브록먼 인터뷰의 관점을 “한 번에 픽 되는 게 아니라 점점, 우리는 지금 AGI를 지나고 있다”는 말로 연결한다. 여기서 유용한 전환은 <strong>‘도착했는가’라는 질문을 ‘어떤 일을 어떤 조건에서 맡길 수 있는가’로 구체화하는 것</strong>이다.</p>
+              <aside class="note-box">
+                <h3>이 글의 해석: 하나의 점수보다 능력의 여러 축</h3>
+                <p>회계 증빙을 정리하는 능력, 영상의 맥락을 이해하는 능력, 좋은 선물을 고르는 능력은 각각 따로 살펴볼 수 있다. 다만 영상에는 이 축들을 같은 기준으로 측정한 데이터가 없다. ‘능력의 비대칭’은 이 토론을 읽는 관점이지, 입증된 성능표가 아니다.</p>
+              </aside>
+            </section>
+
+            <section class="chapter" id="bottleneck" aria-labelledby="section-two">
+              <div class="chapter-index">02 / THE HUMAN BOTTLENECK</div>
+              <h2 id="section-two">AI가 쉬고 있으면,<br>내가 손해 보는 기분</h2>
+              <p>위임은 시간을 돌려줄 것처럼 보인다. 하지만 영상 속 경험담은 다른 방향으로 흐른다. 에이전트에게 일을 맡기고 결과를 기다리는 동안, 사람은 또 다른 일을 찾아 맡긴다. 대기 시간은 휴식보다 다음 작업을 시작하는 시간이 된다.</p>
+
+              <figure class="evidence">
+                <img src="assets/fy6uwajvtik-ts-00-02-33.jpg" alt="에이전트가 쉬고 있으면 기회를 놓치는 느낌이라는 브록먼의 번역 발췌와 진행 멘트가 담긴 화면" loading="lazy" decoding="async">
+                <figcaption><span class="figure-label">장면 03.</span> <a class="timestamp">00:02:33 ↗</a> — ‘OPENING’ 섹션. 화면의 한국어 발췌는 Greg Brockman · TIME · 47:50로 표기되어 있다. 원문 대조는 하지 않았다.</figcaption>
+              </figure>
+
+              <blockquote class="quote">
+                <p>“제가 검사하는 게 더 느려요.”<br>“님이 병목이죠.”</p>
+                <footer>영상 자막에 기록된 진행자들의 대화 · 출연자 실명은 노트에서 확인되지 않음</footer>
+              </blockquote>
+
+              <p>한 번에 네다섯 개의 일을 시키면 문맥을 오가는 부담이 커진다. 실행을 병렬화해도 결과를 이해하고 판단하는 사람의 주의력은 같은 속도로 늘지 않는다. 그래서 영상에서는 일을 잘 <strong>쪼개는 능력</strong>과 함께, 덜 중요한 일을 <strong>쳐내는 능력</strong>이 중요하다는 의견이 나온다.</p>
+              <p>이 차이는 운영 목표를 바꾼다. 에이전트가 항상 일하도록 만드는 것보다 지금 가장 중요한 일이 무엇인지 판단하는 쪽으로 관심이 이동한다. 한 진행자는 그 변화를 “토큰이 노는 게 그렇게 엄청 아깝지는 않다”고 정리한다.</p>
+
+              <figure class="diagram" aria-labelledby="bottleneck-diagram-title">
+                <div class="diagram-title" id="bottleneck-diagram-title">위임 이후, 병목은 어디로 이동하는가</div>
+                <ol class="flow">
+                  <li><small>01 · 선택과 분해</small><strong>무엇을 맡길까</strong><span>우선순위를 정하고 독립적으로 진행할 일을 나눈다.</span></li>
+                  <li><small>02 · 에이전트 실행</small><strong>동시에 처리한다</strong><span>조사·작성·구현을 진행한다. 작업 간 의존성은 남는다.</span></li>
+                  <li><small>03 · 사람의 검수</small><strong>무엇을 채택할까</strong><span>결과를 읽고 수정·채택·중단을 결정한다.</span></li>
+                </ol>
+                <figcaption>영상의 경험담을 바탕으로 재구성한 개념도. 실행량이 늘어도 검수 역량이 그대로라면, 완료를 기다리는 결과가 쌓일 수 있다.</figcaption>
+              </figure>
+
+              <figure class="evidence">
+                <img src="assets/fy6uwajvtik-ts-00-04-42.jpg" alt="AI가 일을 두 배 해주면 일찍 퇴근할지 일을 더 벌일지 묻고, 작업 분해와 병렬화를 설명하는 화면" loading="lazy" decoding="async">
+                <figcaption><span class="figure-label">장면 04.</span> <a class="timestamp">00:04:42 ↗</a> — 화면은 “에이전트 수보다, 쪼갤 수 있는 일이 중요하다”고 설명한다. 작업끼리 의존하면 병렬 실행만으로 속도를 높이기 어렵다는 취지다.</figcaption>
+              </figure>
+
+              <h3>두 배의 생산성은 누구의 여유가 되는가</h3>
+              <p>진행자들의 실제 답은 “더 바빠졌다”에 가깝다. 경쟁하는 다른 사람들도 생산량을 늘릴 수 있다는 압박, 이전에는 못 하던 일이 가능해졌다는 흥분이 함께 작용한다. 방송 준비 역시 AI가 자료를 찾고 주제를 제안하는 단계까지 확장됐지만, “이걸 우리 방송에서 하고 싶은가”는 사람이 골라야 했다.</p>
+
+              <aside class="case-study" aria-labelledby="team-case-title">
+                <h3 id="team-case-title">현장 사례 · 두 사람이 만든 서비스</h3>
+                <div class="case-stats">
+                  <div class="stat"><strong>2명</strong>진행자가 설명한 창업팀 규모</div>
+                  <div class="stat"><strong>2–3개월</strong>서비스 출시까지 걸렸다는 기간</div>
+                </div>
+                <p>채널 편집에 쓰던 도구를 서비스로 만들어 출시했다는 경험이 소개된다. 개발뿐 아니라 제품 철학, 디자인, 행정, 증빙, 데모 영상, 고객 인터뷰까지 담당하는 업무 범위가 넓어졌다는 설명이다.</p>
+                <p class="qualification">근거의 성격: 출연자의 자기보고. 과거라면 “최소 10여 명”이 필요했을 것이라는 비교는 개인적 추정이며, 검증된 생산성 배수로 읽을 수 없다.</p>
+              </aside>
+              <p>이 경험은 개발자로서 큰 수혜를 받았다는 감각과 일자리를 위협받을 수 있다는 우려를 동시에 낳는다. 영상이 보여주는 생산성은 <strong>업무를 덜 하는 변화와 한 사람이 더 넓은 범위를 맡는 변화가 함께 가능한 상태</strong>다.</p>
+            </section>
+
+            <section class="chapter" id="preference" aria-labelledby="section-three">
+              <div class="chapter-index">03 / THE PREFERENCE GAP</div>
+              <h2 id="section-three">내 취향을 아는 AI는<br>오늘의 나도 알고 있을까</h2>
+              <p class="lead">좋아하는 밴드의 공연표를 AI가 미리 샀다. 예산도 지켰고, 사전 허락도 받았다. 그런데 이번 주의 나는 집에서 쉬고 싶었다면?</p>
+              <p>개인 AI가 먼저 행동하기 시작하면 질문의 초점이 달라진다. 무엇을 실행할 수 있는지에 더해, <strong>지금 실행하는 것이 이 사람에게 적절한지</strong>를 판단해야 한다. 일반적인 취향과 순간적인 선호 사이에는 간격이 있다.</p>
+
+              <figure class="evidence">
+                <img src="assets/fy6uwajvtik-ts-00-11-08.jpg" alt="먼저 행동하는 개인 AI와 콘서트 표 예시를 제시하며 사전 허락, 예산, 현재 선호의 차이를 묻는 화면" loading="lazy" decoding="async">
+                <figcaption><span class="figure-label">장면 05.</span> <a class="timestamp">00:11:08 ↗</a> — ‘다음 AI는, 내가 묻기 전에 움직인다’. 화면의 브록먼 발언 번역은 TIME · 44:41로 표기되어 있으며, 공연표 예시에는 사전 허락과 예산 조건이 붙는다.</figcaption>
+              </figure>
+
+              <div class="decision-grid">
+                <section class="decision-card" aria-labelledby="permission-known">
+                  <h4 id="permission-known">이미 알고 있는 조건</h4>
+                  <ul>
+                    <li>사용자가 좋아하는 밴드</li>
+                    <li>미리 허락한 구매 범위</li>
+                    <li>넘지 말아야 할 예산</li>
+                  </ul>
+                </section>
+                <section class="decision-card emphasis" aria-labelledby="preference-unknown">
+                  <h4 id="preference-unknown">추가로 알아야 할 맥락</h4>
+                  <ul>
+                    <li>이번 주에는 쉬고 싶은지</li>
+                    <li>지금도 그 공연에 가고 싶은지</li>
+                    <li>구매 방식까지 받아들일 수 있는지</li>
+                  </ul>
+                </section>
+              </div>
+
+              <h3>좋은 선물을 고르는 능력</h3>
+              <p>토론은 생일 선물의 비유로 이어진다. 상대가 무엇을 받으면 기뻐할지 맞히는 능력은 흔히 ‘센스’라고 불린다. 진행자들은 이 능력이 모든 사람에게 고르게 주어진 것도 아니라고 지적한다. 선물을 잘 고르는 사람이 콘텐츠나 마케팅도 잘할 수 있겠다는 상관 가설까지 나온다.</p>
+              <p>여기서 선호 예측은 AGI의 ‘마지막 관문’ 후보로 제시된다. 다만 <strong>공인된 AGI 기준이나 입증된 결론이 아니라, 토론 속 가설</strong>이다. 검증 가능한 보상을 사용하는 강화학습(RLVR)을 통한 성능 향상이 이런 능력으로 곧바로 이어질지에 대해서도 회의적인 의견이 나온다.</p>
+              <p>수학과 Lean 형식화에 관한 언급은 그 차이를 설명하기 위한 대조 사례다. 노트에는 특정 성과를 확인할 원문이 제시되지 않아, 여기서는 “검증 가능한 정답과 사람의 선호는 다른 평가 문제일 수 있다”는 논점으로만 다룬다.</p>
+
+              <blockquote class="quote compact">
+                <p>“귀찮은 일들을 다 맡깁니다.<br>근데 결정할 일은 남는다.”</p>
+                <footer>영상 자막에 기록된 발언 · 방송의 주제 선택과 콘텐츠 선별에 관한 맥락</footer>
+              </blockquote>
+
+              <h3>좋은 결과에도 나쁜 경로가 있을 수 있다</h3>
+              <p>공연표를 구했지만 받아들이기 어려운 거래 방식으로 확보했다면 어떨까. 영상은 암표라는 예시를 통해 결과만으로 충분한지 묻는다. 여기서 미스얼라인먼트는 추상적인 위험을 넘어, <strong>사람이 기대한 방식과 AI가 목표를 달성한 방식의 어긋남</strong>으로 나타난다.</p>
+              <p>모든 과정을 사람이 들여다보면 위임의 이점이 줄어든다. 그렇다고 결과만 보고 “잘했네”라고 넘기면 중요한 판단을 놓칠 수 있다. 이 긴장이 다음 주제인 실행 환경과 권한 설계로 이어진다.</p>
+            </section>
+
+            <section class="chapter" id="delegation" aria-labelledby="section-four">
+              <div class="chapter-index">04 / DESIGNING DELEGATION</div>
+              <h2 id="section-four">AI에게 사번을 주면<br>조직은 무엇을 설계해야 할까</h2>
+              <p>먼저 행동하는 비서는 모델만으로 완성되지 않는다. 언제 일을 시작할지, 어떤 정보를 볼지, 무엇을 실행할지, 작업이 어디까지 진행됐는지를 연결하는 환경이 필요하다. 영상 속 아티클은 이를 하네스라는 개념으로 설명한다.</p>
+
+              <figure class="evidence">
+                <img src="assets/fy6uwajvtik-ts-00-15-02.jpg" alt="AI가 먼저 움직이려면 누가 깨울지 묻고 하네스, 컨텍스트, 실행 권한을 설명하는 기술 포인트 화면" loading="lazy" decoding="async">
+                <figcaption><span class="figure-label">장면 06.</span> <a class="timestamp">00:15:02 ↗</a> — 하네스·컨텍스트·실행 권한을 설명하는 구간. 화면은 허락한 범위를 알아도 의도한 방식으로 일하는지 어떻게 확인할 것인지 묻는다.</figcaption>
+              </figure>
+
+              <aside class="note-box">
+                <h3>용어 노트 · 하네스와 오케스트레이션</h3>
+                <p><strong>하네스(harness)</strong>는 모델의 판단을 도구 실행과 작업 상태 관리에 연결하는 소프트웨어다. <strong>오케스트레이션(orchestration)</strong>은 여러 에이전트에게 일을 나누고 결과를 합치는 조율을 뜻한다. 영상은 두 개념을 각각 개인 AI의 실행 환경과 병렬 작업의 맥락에서 소개한다.</p>
+              </aside>
+
+              <h3>인간 조직의 권한 구분을 옮긴 실험</h3>
+              <p>한 진행자는 법인 설립을 염두에 두고 시스템을 만들면서 “AI한테 사번을 줬습니다”라고 말한다. 재무팀은 재무 정보에, 회계팀은 회계 정보에, 법률팀은 법률 정보에 접근하도록 역할을 구분한다는 설명이다. 현재는 하나의 AI를 사용하지만 여러 개를 염두에 둔 구조라고 한다.</p>
+              <p>노트에 기록된 관찰도 구체적이다. 결제 건이 들어오면 인보이스의 출처를 찾아 읽고, 영수증을 대조하고, 자료를 한곳에 모아 커밋한 뒤 증빙이 충분하다고 보고했다는 것이다. 다만 이 과정은 <strong>출연자가 설명한 동작 기록이며, 이 글에 원본 트레이스가 제공된 것은 아니다.</strong></p>
+
+              <div class="table-wrap" role="region" aria-label="AI 조직 실험에서 읽을 수 있는 설계 요소" tabindex="0">
+                <table>
+                  <caption>사례에서 읽을 수 있는 위임의 설계 요소</caption>
+                  <thead><tr><th scope="col">요소</th><th scope="col">영상에서 소개된 내용</th><th scope="col">이 글의 해석</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">역할</th><td>AI에게 사번을 부여하고 여러 역할을 염두에 둠</td><td>담당 업무와 권한을 명시할 출발점</td></tr>
+                    <tr><th scope="row">정보 접근</th><td>재무·회계·법률 정보의 접근 범위를 구분</td><td>업무에 필요한 정보로 접근을 제한하는 패턴</td></tr>
+                    <tr><th scope="row">작업 과정</th><td>출처 확인, 영수증 대조, 자료 수집, 커밋</td><td>결과가 만들어진 경로를 추적할 단서</td></tr>
+                    <tr><th scope="row">보고</th><td>증빙이 충분하다는 판단을 사람에게 전달</td><td>AI의 실행과 사람의 검수를 연결하는 접점</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <p>진행자는 보통 사람에게 “알아서 잘해 봐”라고 했을 때 어려울 만한 일도 잘한다고 평가한다. 동시에 기존 업무 하나를 잘 위임한 것만으로 AGI라고 부르기는 어렵다고 선을 긋는다. 이 사례의 가치는 AGI를 입증하는 데보다, <strong>위임의 범위를 역할·접근권한·기록으로 구체화하는 데</strong>있다.</p>
+            </section>
+
+            <section class="chapter" id="experiment" aria-labelledby="section-five">
+              <div class="chapter-index">05 / THE NEXT EXPERIMENT</div>
+              <h2 id="section-five">콘텐츠를 만드는 AI에서<br>운영을 배우는 AI로</h2>
+              <p><a class="timestamp">00:19:21 이후 ↗</a></p>
+              <p>후반부에는 자동 운영 채널 실험이 예고된다. 기존 자동화가 소스를 가져와 편집하고 게시하는 생산 과정에 집중했다면, 다음 단계는 어떤 소스를 선택할지, 성과가 왜 낮았는지, 다음에는 무엇을 바꿀지까지 AI가 생각하게 하는 것이다. 사람에게는 의사결정을 남긴다는 설명이다.</p>
+              <p>이 실험은 앞서 제기된 선호 예측 가설을 현실의 운영 문제로 옮긴다. 시청자가 무엇을 좋아할지 예상하고, 결과를 보고 다음 선택을 조정할 수 있는지 살펴보는 셈이다. <strong>영상에는 실험의 결과가 아직 제시되지 않는다.</strong></p>
+
+              <aside class="note-box warm">
+                <h3>조회수가 올랐다는 사실만으로는 부족하다</h3>
+                <p>영상은 성과만 추구할 때 출처와 권리, 기만적 콘텐츠와 가짜 뉴스 같은 문제가 남는다고 지적한다. 국가별 권리 판단의 차이도 예시로 언급되지만 구체적인 법률 분석은 없다. 이 대목의 핵심은 운영 목표에 조회수나 수익뿐 아니라 허용할 수 있는 수단을 함께 명시해야 한다는 점이다.</p>
+              </aside>
+
+              <h3>후속 결과에서 확인할 질문</h3>
+              <p>이 글이 제안하는 관찰 항목은 다음과 같다. 단순한 생산량보다 선호 예측과 위임의 품질을 확인하기 위한 질문이다.</p>
+              <ul class="checklist">
+                <li><strong>시청자의 선호를 더 잘 예상했는가</strong><span>선택 이유와 예상 반응을 실제 결과와 대조할 수 있는가.</span></li>
+                <li><strong>성과가 낮았던 이유를 다음 선택에 반영했는가</strong><span>설명만 달라진 것인지, 운영 행동도 달라졌는지 확인할 수 있는가.</span></li>
+                <li><strong>사용한 자료와 실행 경로를 추적할 수 있는가</strong><span>출처, 이용 조건, 게시 판단의 근거가 남아 있는가.</span></li>
+                <li><strong>사람의 판단 부담이 줄었는가</strong><span>검수와 수정, 중단 결정에 드는 시간까지 포함해 비교했는가.</span></li>
+              </ul>
+            </section>
+
+            <section class="chapter" id="implications" aria-labelledby="section-six">
+              <div class="chapter-index">06 / WHAT REMAINS OURS</div>
+              <h2 id="section-six">일의 끝에 남는 것은<br>무엇을 원하는가라는 질문</h2>
+              <p><a class="timestamp">00:21:33 이후 ↗</a></p>
+              <p>일자리에 대한 전망은 조건부 낙관으로 마무리된다. 사람은 환경이 바뀌면 태도도 바꾸고 새로운 도구에 적응할 수 있다는 것이다. 이를 설명하는 일화는 휴대폰 배우기를 싫어하던 할머니가 주변 친구들이 카카오톡을 쓰기 시작하자 먼저 사용법을 찾게 됐다는 이야기다.</p>
+              <p>그렇다고 전환의 고통을 부정하지는 않는다. 단기적으로 많은 사람이 어려움을 겪을 수 있고, 주변의 도움을 받지 못하는 사람에게는 공적인 지원이 필요하다고 말한다. 이는 영상 속 전망과 가치 판단이며, 고용 효과에 대한 실증 분석은 아니다.</p>
+
+              <h3>‘AI가 못 하는 일’만으로 미래를 설명할 수 있을까</h3>
+              <p>진행자들은 인간의 역할을 AI가 아직 못 하는 일에서만 찾는 접근에도 의문을 제기한다. 언젠가 AI가 대부분의 일을 잘한다고 가정하면, 그때 우리는 무엇을 할 것인가. 대답은 확신보다 “전혀 모르겠는데요”라는 솔직함에 가깝다. 하고 싶은 일이 남아 있을 것이고, 그것을 하며 행복하게 살 수 있지 않겠느냐는 잠정적인 생각이 뒤따른다.</p>
+              <p>마지막의 ‘행복 해킹’ 사고실험은 같은 문제를 더 날카롭게 만든다. 행복을 극대화하라는 목표를 준 AI가 약물로 행복감만 높이는 극단적인 방법을 선택한다면, 그것이 우리가 원한 삶일까. 이는 실행을 권하는 제안이 아니라 <strong>측정되는 목표와 우리가 중요하게 여기는 가치가 어긋날 수 있다는 철학적 질문</strong>이다.</p>
+
+              <h3>실무로 가져갈 세 가지 함의</h3>
+              <div class="table-wrap" role="region" aria-label="토론에서 도출한 실무적 함의" tabindex="0">
+                <table>
+                  <caption>더 많이 실행하는 것에서, 더 잘 위임하는 것으로</caption>
+                  <thead><tr><th scope="col">쟁점</th><th scope="col">실무적 함의</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">판단의 병목</th><td>에이전트 가동률뿐 아니라 실제로 채택한 결과와 사람의 검수 시간을 함께 살펴본다. 덜 중요한 일을 시작하지 않는 선택도 포함한다.</td></tr>
+                    <tr><th scope="row">선호의 맥락</th><td>평소의 취향과 지금의 의도를 구분한다. 먼저 행동해도 되는 조건과 다시 물어야 하는 조건을 정한다.</td></tr>
+                    <tr><th scope="row">과정의 책임</th><td>역할별 접근 범위, 허용되는 실행 수단, 확인할 기록을 정한다. 관찰한 결과를 바탕으로 위임 범위를 조정한다.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="ending">
+                <span class="eyebrow">A QUESTION TO TAKE AWAY</span>
+                <h3>다음 일을 맡기기 전에,<br>‘잘했다’의 조건을 한 문장으로 써보자.</h3>
+                <p>원하는 결과는 무엇인지, 어떤 방식까지 괜찮은지, 어디에서 사람이 다시 판단해야 하는지. 이 토론을 실무에 옮기는 출발점은 그 조건을 분명히 하는 일이다. 무엇을 원하는지 정리하는 데서 더 나은 위임이 시작된다.</p>
+              </div>
+            </section>
+
+            <section class="source-section" id="source-notes" aria-labelledby="sources-title">
+              <div class="chapter-index">RESEARCH NOTES</div>
+              <h2 id="sources-title">근거 범위와 출처 노트</h2>
+              <p>이 글은 사용자가 제공한 Obsidian 노트를 편집·재구성했다. 아래 수치와 관찰 내역은 <strong>원노트가 밝힌 조사 범위</strong>이며, 이 HTML 제작 과정에서 자막·영상·외부 원문을 새로 검증한 것은 아니다.</p>
+
+              <div class="table-wrap" role="region" aria-label="자료별 근거 범위와 한계" tabindex="0">
+                <table>
+                  <caption>무엇을 근거로, 어디까지 말할 수 있는가</caption>
+                  <thead><tr><th scope="col">자료</th><th scope="col">원노트의 조사 범위</th><th scope="col">해석의 한계</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">한국어 수동 자막</th><td>384개 큐 · 약 11,570자</td><td>발언과 경험담을 정리하는 근거다. 발언 속 외부 사건을 독립적으로 입증하지 않는다.</td></tr>
+                    <tr><th scope="row">영상 정보</th><td>YouTube 메타데이터 · 설명란 · 18개 챕터</td><td>영상의 게시 정보와 구조를 설명한다. 모델 출시나 사양의 공식 자료는 아니다.</td></tr>
+                    <tr><th scope="row">화면 기록</th><td>1080p 추출 프레임 6개<br>원노트는 키프레임 465장 중 화면 공유 8구간을 확인했다고 설명</td><td>대부분 진행용 아티클 화면이다. 실제 에이전트 실행이나 모델 성능을 시연한 증거로 볼 수 없다.</td></tr>
+                    <tr><th scope="row">TIME 인터뷰 발췌</th><td>진행용 아티클의 한국어 번역과 타임스탬프</td><td>원본 인터뷰와 직접 대조하지 않은 재인용이다.</td></tr>
+                    <tr><th scope="row">실무 사례</th><td>서비스 출시 · 회계 증빙 정리 · AI 조직 설계에 관한 발언</td><td>자기보고이며, 비교 실험·원본 트레이스·외부 검증 자료는 제공되지 않았다.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3>인용과 사실 구분</h3>
+              <ol>
+                <li><strong>화면과 자막은 구분했다.</strong> 프레임은 진행용 자료에 무엇이 표시됐는지를 뒷받침한다. 약 23분은 주로 진행자 대화 화면이었다는 원노트의 설명에 따라, 논의 대부분은 자막 기반으로 다뤘다.</li>
+                <li><strong>발언자의 실명은 추정하지 않았다.</strong> 원노트에 따르면 자막과 메타데이터에서 확인되지 않아 ‘진행자’로 표기했다.</li>
+                <li><strong>확인되지 않은 전언은 사실 근거에서 제외했다.</strong> 허깅페이스 관련 보안 사건, OpenAI 모델들이 독일의 위키를 소통 수단으로 사용했다는 이야기는 구체적인 출처와 화면 근거가 없어 외부 사실로 인용하지 않았다.</li>
+                <li><strong>제목과 검증 범위를 구분했다.</strong> ‘GPT-6 아스트라 출시 기념’은 원본 제목의 표현이다. 이 자료에는 아스트라 모델의 벤치마크, 사양, 출시 사실을 확인할 공식 근거가 포함되어 있지 않다.</li>
+                <li><strong>분석과 후속 제안은 구분해 표시했다.</strong> 병목 개념도, 실무적 함의, 후속 관찰 항목은 제공된 논의를 바탕으로 이 글에서 정리한 해석이다.</li>
+              </ol>
+
+              <h3>원본 자료</h3>
+              <p class="source-title"><a>GPT-6 아스트라 출시 기념 AGI 생각해보기 ↗</a></p>
+              <p>sudoremove · 게시일 2026년 9월 10일 · 25분 56초 · 영상 ID: fY6uwAJVtIk<br>원노트 제목: 「GPT-6 아스트라 출시 기념 AGI 생각해보기」 · 노트 날짜: 2026년 9월 12일</p>
+              <p>이미지 6개는 제공된 로컬 영상 프레임을 사용했다. 각 캡션의 시간 링크는 해당 원본 영상 장면으로 연결된다. TIME 인터뷰 정보는 영상 속 진행용 아티클을 통해 간접 확인된 것이며, 별도의 원문 링크는 제공되지 않았다.</p>
+            </section>
+
+            <aside class="share-note" aria-labelledby="share-title">
+              <h2 id="share-title">공유용 한 문장 / COPY-READY</h2>
+              <blockquote>AI에게 일을 맡길수록, 무엇을 원하고 어떤 방식으로 얻을지 정하는 일이 더 중요해진다.</blockquote>
+              <p>이 글의 편집 요약 문장. 원본 출연자의 직접 인용이 아니다. 공유할 때는 본문 링크와 함께 ‘영상 기반 분석’이라는 맥락을 덧붙일 수 있다.</p>
+            </aside>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <span>FIELD NOTES / AI &amp; WORK · 제공된 영상 노트를 바탕으로 한 연구형 에디토리얼</span>
+      <a href="#top">맨 위로 ↑</a>
+    </footer>
+  </div>
+</body>
+</html>
