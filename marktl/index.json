@@ -1,7 +1,22 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-12T05:43:32.500Z",
+  "updatedAt": "2026-09-12T05:54:19.876Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-ep-112-ai-%EB%B0%98%EB%8F%84%EC%B2%B4-%EC%95%88%EC%97%90%EC%84%9C-%EC%9D%BC%EC%96%B4%EB%82%98%EB%8A%94-%EC%9D%BC%EB%93%A4-kv-cache%EB%B6%80%ED%84%B0-roofline%EA%B9%8C%EC%A7%80-%EC%9A%94%EC%95%BD/",
+      "excerpt": "EP 112. AI 반도체 안에서 일어나는 일들: KV Cache부터 Roofline까지 영상 정보 채널 : AI Frontier Korea (노정석) 게시일 : 2026 09 01 길이 : 1시간 44분 10초 (6,250초) 출연 : 노정석, 최승준, 박종현 / 초대손님 : 이진원 (HyperAccel CTO) 녹화 시점 : 2026년 8월 30일 일요일 아침 (영상 도입부 발언 기준) 링크 : https://www.you",
+      "shortId": "b5zjn6",
+      "slug": "yt-ep-112-ai-반도체-안에서-일어나는-일들-kv-cache부터-roofline까지-요약",
+      "sourcePath": "02_research/AI/yt_EP 112. AI 반도체 안에서 일어나는 일들 - KV Cache부터 Roofline까지_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료"
+      ],
+      "title": "EP 112. AI 반도체 안에서 일어나는 일들: KV Cache부터 Roofline까지",
+      "updatedAt": "2026-09-12T05:54:19.876Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/b5zjn6/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-ep-113-gpt-6-astra-%EC%9D%B4%ED%9B%84-ai%EC%9D%98-%EC%83%9D%EA%B0%81%EC%9D%84-%EC%96%B4%EB%94%94%EA%B9%8C%EC%A7%80-%EB%B3%BC-%EC%88%98-%EC%9E%88%EC%9D%84%EA%B9%8C-%EC%9A%94%EC%95%BD/",
