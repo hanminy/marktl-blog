@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>세상을 바꾼 제품은 무엇으로 평가받는가 — 지난 10년 IT 제품 티어리스트 읽기</title>
+  <style>
+    :root {
+      --paper: #f7f5ef;
+      --surface: #fffefa;
+      --ink: #202b29;
+      --muted: #626d66;
+      --line: #d7ddd2;
+      --green: #22584a;
+      --green-soft: #e7eee4;
+      --orange: #b95132;
+      --orange-soft: #f5e7dc;
+      --serif: "Iowan Old Style", "Palatino Linotype", "Noto Serif KR", "Nanum Myeongjo", Batang, serif;
+      --sans: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 28px; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 17px; line-height: 1.85; word-break: keep-all; overflow-wrap: break-word; }
+    a { color: var(--green); text-underline-offset: 5px; text-decoration-thickness: 1px; }
+    a:hover { color: var(--orange); }
+    a:focus-visible { outline: 3px solid var(--orange); outline-offset: 5px; }
+    ::selection { background: #d5e4c4; color: var(--ink); }
+    h1, h2, h3, p, figure, blockquote { margin: 0; }
+    h1, h2, h3 { text-wrap: balance; }
+    h2 { font-size: clamp(28px, 4vw, 39px); line-height: 1.4; letter-spacing: -.045em; margin-bottom: 26px; }
+    h3 { font-size: 23px; line-height: 1.5; letter-spacing: -.035em; margin-bottom: 16px; }
+    p + p { margin-top: 20px; }
+    strong { font-weight: 750; }
+    code { font-size: .9em; background: #eceee7; padding: 2px 6px; border-radius: 4px; overflow-wrap: anywhere; }
+    img { display: block; width: 100%; height: auto; }
+    .shell { width: min(1120px, calc(100% - 64px)); margin-inline: auto; }
+    .reading { max-width: 760px; margin-inline: auto; }
+    .masthead { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 25px 0 20px; border-bottom: 1px solid var(--ink); font-size: 12px; font-weight: 700; letter-spacing: .12em; }
+    .masthead a { text-decoration: none; color: var(--ink); }
+    .masthead span:last-child { color: var(--muted); font-weight: 500; letter-spacing: .03em; }
+    .hero { padding: 70px 0 55px; }
+    .eyebrow { display: flex; align-items: center; gap: 12px; color: var(--green); font-size: 12px; font-weight: 750; letter-spacing: .12em; margin-bottom: 25px; }
+    .eyebrow::before { content: ""; height: 9px; width: 9px; background: var(--orange); border-radius: 50%; flex: 0 0 auto; }
+    h1 { max-width: 940px; font-family: var(--serif); font-size: clamp(38px, 6.2vw, 70px); font-weight: 700; line-height: 1.28; letter-spacing: -.06em; }
+    .hero-deck { max-width: 790px; margin-top: 30px; font-size: clamp(18px, 2.2vw, 23px); line-height: 1.75; color: #505e56; letter-spacing: -.025em; }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 10px 25px; margin-top: 34px; color: var(--muted); font-size: 13px; }
+    .hero-meta b { color: var(--ink); font-weight: 650; }
+    .hero-band { display: grid; grid-template-columns: 1.35fr 1fr; border: 1px solid var(--line); background: var(--surface); margin-bottom: 65px; }
+    .band-copy { padding: 30px 34px; border-right: 1px solid var(--line); }
+    .small-label { display: block; font-size: 11px; letter-spacing: .14em; font-weight: 750; color: var(--green); margin-bottom: 12px; }
+    .band-copy p { font-size: 16px; line-height: 1.8; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); align-items: center; padding: 24px 14px; }
+    .stat { text-align: center; padding: 8px; }
+    .stat + .stat { border-left: 1px solid var(--line); }
+    .stat strong { display: block; font-family: var(--serif); font-size: 42px; font-weight: 500; line-height: 1.2; color: var(--green); }
+    .stat span { display: block; margin-top: 9px; font-size: 12px; color: var(--muted); }
+    .abstract { padding-bottom: 44px; border-bottom: 1px solid var(--line); }
+    .abstract h2 { font-size: 26px; margin-bottom: 18px; }
+    .abstract p { font-size: 18px; }
+    .toc { margin-top: 30px; margin-bottom: 65px; display: flex; flex-wrap: wrap; gap: 10px 22px; font-size: 13px; }
+    .toc a { text-decoration: none; border-bottom: 1px solid var(--line); padding: 4px 0; }
+    .section { margin-top: 82px; }
+    .section-head { border-top: 1px solid var(--ink); padding-top: 20px; margin-bottom: 30px; }
+    .section-number { font-size: 12px; font-weight: 700; color: var(--orange); letter-spacing: .12em; display: block; margin-bottom: 13px; }
+    .findings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .finding { padding: 27px; background: var(--surface); border: 1px solid var(--line); }
+    .finding .index { color: var(--orange); font-family: var(--serif); font-size: 34px; display: block; line-height: 1; margin-bottom: 22px; }
+    .finding h3 { font-size: 20px; }
+    .finding p { font-size: 15px; color: var(--muted); line-height: 1.85; }
+    .note { background: var(--green-soft); border-left: 3px solid var(--green); padding: 22px 26px; margin: 30px 0; font-size: 15px; }
+    .note strong:first-child { display: block; margin-bottom: 7px; color: var(--green); }
+    .note.warm { background: var(--orange-soft); border-color: var(--orange); }
+    .note.warm strong:first-child { color: #934125; }
+    .tier-board { border: 1px solid var(--line); background: var(--surface); margin-top: 32px; }
+    .tier-row { display: grid; grid-template-columns: 100px 1fr; }
+    .tier-row + .tier-row { border-top: 1px solid var(--line); }
+    .tier-label { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 19px 8px; background: var(--row); }
+    .tier-label b { font-family: var(--serif); font-size: 35px; line-height: 1; }
+    .tier-label span { font-size: 11px; margin-top: 8px; }
+    .tier-products { display: flex; flex-wrap: wrap; align-content: center; gap: 9px; list-style: none; padding: 21px 23px; margin: 0; }
+    .tier-products li { padding: 5px 11px; border: 1px solid #e0e3d9; border-radius: 4px; background: #fafbf6; font-size: 14px; line-height: 1.6; }
+    .tier-s { --row: #d7e6cf; }
+    .tier-a { --row: #e1ead7; }
+    .tier-b { --row: #e8e9d5; }
+    .tier-c { --row: #f0e9d7; }
+    .tier-d { --row: #f0e1d3; }
+    .tier-f { --row: #ead4c8; }
+    .caption-note { font-size: 13px; color: var(--muted); line-height: 1.8; margin-top: 15px; }
+    figure { margin-top: 32px; margin-bottom: 32px; }
+    .image-wrap { border: 1px solid var(--line); background: #e8e9e0; overflow: hidden; }
+    figcaption { display: flex; align-items: flex-start; gap: 14px; margin-top: 12px; font-size: 13px; line-height: 1.7; color: var(--muted); }
+    .time { flex-shrink: 0; font-variant-numeric: tabular-nums; font-weight: 700; color: var(--green); text-decoration: none; }
+    .legend { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 12px; color: var(--muted); margin-top: 22px; }
+    .legend span::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--green); margin-right: 7px; }
+    .legend span:nth-child(2)::before { background: var(--orange); }
+    .legend span:nth-child(3)::before { background: #8b8a77; }
+    .pullquote { margin: 48px auto; padding: 28px 0 28px 28px; border-left: 3px solid var(--orange); max-width: 760px; }
+    .pullquote p { font-family: var(--serif); font-size: clamp(24px, 3.5vw, 33px); line-height: 1.6; letter-spacing: -.035em; }
+    .pullquote cite { display: block; font-family: var(--sans); font-size: 12px; font-style: normal; color: var(--muted); margin-top: 17px; }
+    .evidence-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 30px; }
+    .evidence-grid figure { margin: 0; }
+    .evidence-grid figcaption { display: block; }
+    .evidence-grid .time { display: block; margin-bottom: 5px; }
+    .subsection { margin-top: 50px; }
+    .criteria { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); margin: 32px 0; }
+    .criteria div { padding: 25px; background: var(--surface); }
+    .criteria span { display: block; color: var(--orange); font-size: 11px; letter-spacing: .1em; margin-bottom: 10px; }
+    .criteria strong { display: block; font-size: 20px; margin-bottom: 7px; }
+    .criteria p { font-size: 14px; color: var(--muted); }
+    .table-wrap { margin: 28px 0; overflow-x: auto; border: 1px solid var(--line); background: var(--surface); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.75; text-align: left; }
+    caption { text-align: left; padding: 18px 20px; font-weight: 700; font-size: 15px; background: #edf0e7; }
+    th, td { padding: 16px 20px; vertical-align: top; border-top: 1px solid var(--line); }
+    thead th { color: var(--green); font-size: 12px; }
+    tbody th { width: 24%; font-weight: 650; }
+    .debate { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 30px 0; }
+    .position { border: 1px solid var(--line); padding: 28px; background: var(--surface); }
+    .position .small-label { color: var(--orange); }
+    .position:last-child .small-label { color: var(--green); }
+    .position h3 { font-size: 21px; }
+    .position p { font-size: 15px; }
+    .verdict { padding: 24px 28px; border-top: 1px solid var(--green); border-bottom: 1px solid var(--green); margin-top: 25px; color: var(--green); font-size: 18px; line-height: 1.8; }
+    .implications { counter-reset: implication; padding: 0; margin: 28px 0; list-style: none; }
+    .implications li { position: relative; padding: 23px 0 23px 54px; border-top: 1px solid var(--line); counter-increment: implication; }
+    .implications li::before { content: "0" counter(implication); position: absolute; top: 24px; left: 0; font-family: var(--serif); font-size: 25px; color: var(--orange); }
+    .implications strong { display: block; font-size: 19px; margin-bottom: 8px; }
+    .implications p { font-size: 16px; }
+    .source-section { margin-top: 75px; padding: 35px; background: #eeeee6; border: 1px solid var(--line); }
+    .source-section h2 { font-size: 27px; }
+    .source-section h3 { font-size: 18px; margin: 26px 0 10px; }
+    .source-section p, .source-section li { font-size: 14px; line-height: 1.85; color: #556159; }
+    .source-section ol { padding-left: 22px; margin-bottom: 0; }
+    .source-section li + li { margin-top: 12px; }
+    .source-section a { overflow-wrap: anywhere; }
+    .closing { margin: 75px 0 0; padding: 46px; background: var(--green); color: #f5f6eb; }
+    .closing .small-label { color: #c6d8b9; }
+    .closing h2 { font-family: var(--serif); max-width: 720px; margin-bottom: 20px; }
+    .closing p { max-width: 750px; color: #e3ebdd; }
+    .share-copy { margin-top: 28px; padding-top: 24px; border-top: 1px solid #698777; }
+    .share-copy p { font-size: 16px; }
+    footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 28px 0 40px; font-size: 12px; color: var(--muted); }
+    .skip-link { position: absolute; left: 20px; top: -100px; padding: 10px 16px; background: var(--surface); z-index: 1; }
+    .skip-link:focus { top: 12px; }
+    @media (max-width: 800px) {
+      .hero-band { grid-template-columns: 1fr; }
+      .band-copy { border-right: 0; border-bottom: 1px solid var(--line); }
+      .findings { grid-template-columns: 1fr; }
+      .finding { display: grid; grid-template-columns: 42px 1fr; gap: 0 15px; padding: 24px; }
+      .finding .index { grid-row: 1 / 3; font-size: 29px; margin-top: 4px; }
+      .finding h3 { margin-bottom: 10px; }
+      .finding p { grid-column: 2; }
+      .criteria { grid-template-columns: 1fr; }
+      .evidence-grid, .debate { grid-template-columns: 1fr; }
+      .evidence-grid { gap: 30px; }
+      .evidence-grid figcaption { display: flex; }
+      .evidence-grid .time { margin-bottom: 0; }
+    }
+    @media (max-width: 540px) {
+      body { font-size: 16px; }
+      .shell { width: calc(100% - 36px); }
+      .masthead { font-size: 10px; letter-spacing: .07em; }
+      .hero { padding-top: 45px; padding-bottom: 36px; }
+      .hero-meta { gap: 8px 17px; }
+      .band-copy { padding: 24px; }
+      .hero-band { margin-bottom: 46px; }
+      .section { margin-top: 60px; }
+      .tier-row { grid-template-columns: 60px 1fr; }
+      .tier-products { padding: 15px 12px; gap: 7px; }
+      .tier-products li { font-size: 12px; padding: 5px 8px; }
+      .tier-label b { font-size: 29px; }
+      .tier-label span { font-size: 10px; }
+      .note, .position { padding: 20px; }
+      .pullquote { padding-left: 20px; margin-block: 35px; }
+      .source-section { padding: 24px 20px; }
+      .closing { padding: 30px 23px; }
+      th, td { padding: 13px; }
+      tbody th { min-width: 100px; }
+      figcaption, .evidence-grid figcaption { display: block; }
+      .time, .evidence-grid .time { display: inline-block; margin-right: 10px; margin-bottom: 4px; }
+      .toc { gap: 10px 18px; margin-bottom: 45px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+    @media print {
+      body { background: white; color: black; font-size: 11pt; }
+      .shell { width: 100%; }
+      .hero { padding-top: 25px; }
+      h1 { font-size: 32pt; }
+      h2 { font-size: 22pt; }
+      .section { margin-top: 35px; }
+      .toc, .skip-link, footer a { display: none; }
+      figure, .finding, .position, .tier-row { break-inside: avoid; }
+      h2, h3 { break-after: avoid; }
+      .closing { background: #eef1e9; color: black; }
+      .closing p, .closing .small-label { color: black; }
+      a { color: inherit; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="지난 10년 최고의 IT 제품 티어리스트 (에어팟, 비전프로, 챗지피티, 클로드코드) [제품 티어리스트]">
+<meta property="og:description" content="지난 10년 최고의 IT 제품 티어리스트 (에어팟, 비전프로, 챗지피티, 클로드코드) 영상 정보 채널 : sudoremove 게시일 : 2026 09 10 길이 : 29분 37초 (1,777초) 챕터 : 27개 링크 : https://www.youtube.com/watch?v=vUxt3LUo8iY &lt;div style=&quot;position: relative; width: 100%; padding bottom: 56.25%; heig">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/13g2ruo/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/13g2ruo/assets/vuxt3luo8iy-ts-00-01-38.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="지난 10년 최고의 IT 제품 티어리스트 (에어팟, 비전프로, 챗지피티, 클로드코드) [제품 티어리스트]">
+<meta name="twitter:description" content="지난 10년 최고의 IT 제품 티어리스트 (에어팟, 비전프로, 챗지피티, 클로드코드) 영상 정보 채널 : sudoremove 게시일 : 2026 09 10 길이 : 29분 37초 (1,777초) 챕터 : 27개 링크 : https://www.youtube.com/watch?v=vUxt3LUo8iY &lt;div style=&quot;position: relative; width: 100%; padding bottom: 56.25%; heig">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/13g2ruo/assets/vuxt3luo8iy-ts-00-01-38.jpg">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-%EC%A7%80%EB%82%9C-10%EB%85%84-%EC%B5%9C%EA%B3%A0%EC%9D%98-it-%EC%A0%9C%ED%92%88-%ED%8B%B0%EC%96%B4%EB%A6%AC%EC%8A%A4%ED%8A%B8-%EC%97%90%EC%96%B4%ED%8C%9F-%EB%B9%84%EC%A0%84%ED%94%84%EB%A1%9C-%EC%B1%97%EC%A7%80%ED%94%BC%ED%8B%B0-%ED%81%B4%EB%A1%9C%EB%93%9C%EC%BD%94%EB%93%9C-%EC%9A%94%EC%95%BD/">
+</head>
+<body>
+  <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+  <div class="shell">
+    <header class="masthead" id="top">
+      <a href="#top" aria-label="기사 처음으로">PRODUCTS / CULTURE / IMPACT</a>
+      <span>영상 기반 리서치 · 2026.09.12</span>
+    </header>
+
+    <main id="main">
+      <article>
+        <header class="hero">
+          <div class="eyebrow">THE PRODUCT DECADE · 2016–2026</div>
+          <h1>세상을 바꾼 제품은<br>무엇으로 평가받는가</h1>
+          <p class="hero-deck">에어팟은 S, ASML EUV는 B. ChatGPT부터 틱톡, Claude Code까지—지난 10년의 제품을 줄 세우는 동안 드러난 것은 기술의 순위만이 아니라, 혁신을 바라보는 가치관이었다.</p>
+          <div class="hero-meta">
+            <span>원본 채널 <b>sudoremove</b></span>
+            <span>영상 게시 <time datetime="2026-09-10">2026.09.10</time></span>
+            <span>29분 37초 · 27개 챕터</span>
+            <a>원본 영상 보기 ↗</a>
+          </div>
+        </header>
+
+        <div class="hero-band">
+          <div class="band-copy">
+            <span class="small-label">THE QUESTION</span>
+            <p>새로운 기술을 만들었는가, 사람들의 생활을 바꿨는가, 사업으로 살아남았는가. 같은 제품도 무엇을 먼저 묻느냐에 따라 전혀 다른 등급을 받는다.</p>
+          </div>
+          <div class="stats" aria-label="최종 화면과 분석 자료의 주요 수치">
+            <div class="stat"><strong>35</strong><span>최종 등급 배치</span></div>
+            <div class="stat"><strong>5</strong><span>S 티어 제품</span></div>
+            <div class="stat"><strong>10</strong><span>노트에 수록된 프레임</span></div>
+          </div>
+        </div>
+
+        <section class="abstract reading" aria-labelledby="abstract-title">
+          <span class="small-label">ABSTRACT</span>
+          <h2 id="abstract-title">순위표보다 흥미로운 판단의 기준</h2>
+          <p>이 영상은 두 진행자가 2016년 이후 출시된 제품을 웹 티어리스트에 배치하는 토론이다. 최종 S 티어에는 ChatGPT, 테슬라 Model 3/Y + FSD, 에어팟, 틱톡, Ozempic/Wegovy가 오른다. 소비자 기기와 AI 서비스, 반도체 장비, 의약품까지 한 보드에 놓이면서 ‘IT 제품’의 경계도 넓어진다.</p>
+          <p>토론의 중심에는 <strong>혁신성과 실제 영향력</strong>이 있다. 그러나 수익성, 개방성, 사회적 해악, 기반 기술의 기여도가 개입하면서 기준은 흔들린다. 이 글은 제공된 노트의 화면 판독과 자막 기록을 바탕으로, 최종 배치와 그 배치를 만든 논리를 구분해 읽는다. 독립적인 제품 성능 평가나 시장 통계 검증을 수행한 보고서는 아니다.</p>
+        </section>
+
+        <nav class="toc reading" aria-label="기사 목차">
+          <a href="#findings">01 핵심 발견</a>
+          <a href="#ranking">02 최종 티어</a>
+          <a href="#method">03 평가의 구조</a>
+          <a href="#debates">04 핵심 논쟁</a>
+          <a href="#implications">05 시사점</a>
+          <a href="#sources">06 근거와 한계</a>
+        </nav>
+
+        <section id="findings" class="section" aria-labelledby="findings-title">
+          <div class="section-head">
+            <span class="section-number">01 / KEY FINDINGS</span>
+            <h2 id="findings-title">이 티어리스트를 읽는 세 가지 열쇠</h2>
+          </div>
+          <div class="findings">
+            <div class="finding">
+              <span class="index">01</span>
+              <h3>완성도보다 생활의 변화</h3>
+              <p>에어팟과 ChatGPT의 S 배치는 일상의 사용 방식이 달라졌다는 판단에 가깝다. 개별 기능의 개선보다 새로운 시장과 습관을 만든 힘이 강조된다.</p>
+            </div>
+            <div class="finding">
+              <span class="index">02</span>
+              <h3>영향력은 선함과 다르다</h3>
+              <p>틱톡의 부정적 영향은 S 등급과 공존한다. 이 보드에서 높은 등급은 사회적 권장이나 윤리적 지지를 뜻하지 않는다.</p>
+            </div>
+            <div class="finding">
+              <span class="index">03</span>
+              <h3>기반 기술의 가치는 논쟁적이다</h3>
+              <p>H100은 AI 생태계의 상징으로 A에, EUV는 긴 논쟁 끝에 B에 놓인다. 최종 제품의 영향력을 그 기반 기술에 얼마나 돌릴지가 쟁점이다.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="ranking" class="section" aria-labelledby="ranking-title">
+          <div class="section-head">
+            <span class="section-number">02 / THE FINAL BOARD</span>
+            <h2 id="ranking-title">35개 배치, 17개 미배치</h2>
+          </div>
+          <div class="reading">
+            <p>마지막으로 확인된 화면의 카운터는 <strong>52 products · 35 ranked</strong>다. 시작 화면의 후보 65개에서 13개가 줄었고, 남은 52개 중 35개에 등급이 매겨졌다. 따라서 ‘52개 제품 모두의 최종 순위’로 읽으면 안 된다.</p>
+          </div>
+
+          <div class="tier-board" aria-label="00:28:43 화면 기준 최종 티어리스트">
+            <div class="tier-row tier-s">
+              <div class="tier-label"><b>S</b><span>5개</span></div>
+              <ul class="tier-products">
+                <li>ChatGPT</li><li>Model 3 / Y + FSD</li><li>AirPods</li><li>TikTok</li><li>Ozempic / Wegovy</li>
+              </ul>
+            </div>
+            <div class="tier-row tier-a">
+              <div class="tier-label"><b>A</b><span>6개</span></div>
+              <ul class="tier-products">
+                <li>Claude Code</li><li>Waymo One (Alphabet)</li><li>Nvidia H100</li><li>MacBook Air M1</li><li>Unitree Go2 · G1</li><li>DJI Mavic</li>
+              </ul>
+            </div>
+            <div class="tier-row tier-b">
+              <div class="tier-label"><b>B</b><span>8개</span></div>
+              <ul class="tier-products">
+                <li>로봇청소기 (Roborock)</li><li>Galaxy Z Fold / Flip</li><li>Apple Vision Pro</li><li>Starlink</li><li>Blue Origin New Shepard</li><li>Virgin Galactic</li><li>Neuralink</li><li>ASML EUV</li>
+              </ul>
+            </div>
+            <div class="tier-row tier-c">
+              <div class="tier-label"><b>C</b><span>4개</span></div>
+              <ul class="tier-products">
+                <li>Meta Quest</li><li>Ray-Ban Meta</li><li>Nintendo Switch</li><li>Midjourney</li>
+              </ul>
+            </div>
+            <div class="tier-row tier-d">
+              <div class="tier-label"><b>D</b><span>6개</span></div>
+              <ul class="tier-products">
+                <li>iPhone X</li><li>Echo / Google Home</li><li>PUBG</li><li>Llama</li><li>Stable Diffusion</li><li>Zoom</li>
+              </ul>
+            </div>
+            <div class="tier-row tier-f">
+              <div class="tier-label"><b>F</b><span>6개</span></div>
+              <ul class="tier-products">
+                <li>Insta360</li><li>LG 스탠바이미</li><li>Steam Deck</li><li>Rabbit r1</li><li>카카오뱅크</li><li>Boeing 737 MAX</li>
+              </ul>
+            </div>
+          </div>
+          <p class="caption-note">제공된 노트의 최종 화면 판독 기준. 노트에 명시된 A 6개·D 6개 및 총 35개 집계에 맞춰 Unitree Go2·G1과 Echo·Google Home은 각각 하나의 묶음으로 표기했다. 등급은 진행자들의 의견이며 업계 합의가 아니다.</p>
+
+          <figure>
+            <div class="image-wrap"><img src="assets/vuxt3luo8iy-ts-00-28-43.jpg" alt="영상 28분 43초의 최종 티어리스트. S부터 F까지 제품이 배치되고 상단에 52 products, 35 ranked가 표시된 화면." loading="eager"></div>
+            <figcaption><a class="time">00:28:43 ↗</a><span>최종 보드. UNRANKED에는 GM Cruise, Xiaomi SU7, Character.AI, Flipper Zero, John Deere 소프트웨어 락 등 17개 항목이 남는다.</span></figcaption>
+          </figure>
+          <div class="reading note">
+            <strong>평가하지 않은 것과 낮게 평가한 것은 다르다</strong>
+            다이슨 에어랩·라부부·GeForce RTX 등은 토론 중 스킵되어 후보에서 제거됐다. 다이슨에는 사용 경험 부족이, RTX에는 GTX와 구분한 제품 평가가 언급된다. 삭제된 13개 모두에 동일한 이유를 적용할 수는 없다.
+          </div>
+        </section>
+
+        <section id="method" class="section" aria-labelledby="method-title">
+          <div class="section-head">
+            <span class="section-number">03 / HOW THE JUDGMENT WORKS</span>
+            <h2 id="method-title">즉흥 토론 아래에는 데이터 카드가 있다</h2>
+          </div>
+          <div class="reading">
+            <p>이 영상은 모델 편, AGI를 가져올 회사들 편에 이은 시리즈의 세 번째 편이다. 이번에는 그 회사들이 만든 제품으로 시선을 옮긴다. 범위는 2016년 이후 약 10년. 시작부터 정교한 채점표를 고정하지는 않지만, 제품별 자료는 미리 준비돼 있다.</p>
+            <p>초반 화면에는 Safari에서 연 로컬 웹앱이 보인다. 주소창은 <code>127.0.0.1</code>, 상단 탭은 Companies·Models·Products, 보드 제목은 <strong>“Products that changed the world · 2016–2026”</strong>다. 제품 카드는 이름과 출시 연도에 더해 세 가지 질문을 담는다.</p>
+          </div>
+
+          <div class="criteria" aria-label="제품 데이터 카드의 세 가지 질문">
+            <div><span>01 / PROMISE</span><strong>무엇을 약속했나</strong><p>새로운 폼팩터, 사용 경험, 해결하려던 문제.</p></div>
+            <div><span>02 / ADOPTION</span><strong>얼마나 퍼졌나</strong><p>판매량, 이용자 수, 시장 점유율로 드러나는 보급.</p></div>
+            <div><span>03 / IMITATION</span><strong>누가 따라 했나</strong><p>경쟁자의 진입과 모방에서 읽는 산업의 변화.</p></div>
+          </div>
+
+          <figure>
+            <div class="image-wrap"><img src="assets/vuxt3luo8iy-ts-00-01-38.jpg" alt="로컬 티어리스트 웹앱의 Products 탭과 Galaxy Z Fold 및 Flip 데이터 카드가 열린 초기 화면." loading="lazy"></div>
+            <figcaption><a class="time">00:01:38 ↗</a><span>65 products · 2 ranked. 폴더블 카드에는 제품의 약속, 출하량·점유율, 후발 경쟁자가 함께 적혀 있다.</span></figcaption>
+          </figure>
+
+          <blockquote class="pullquote">
+            <p>“어떤 기술적인 혁신성, 새로운 무언가를 만들어냈는가. 그리고 그게 진짜로 임팩트를 내서 사람들에게 얼마나 많이 영향을 끼쳤는가.”</p>
+            <cite>제공된 자막 기록 · 00:09:15 · 평가 기준을 설명하는 발언</cite>
+          </blockquote>
+
+          <div class="reading">
+            <p>이 발언을 정리하면 <strong>혁신성 × 영향력</strong>이다. 다만 실제 계산식이나 배점은 없다. 토론이 이어지며 수익성과 사용 경험이 추가되고, 개방성과 사회적 피해에 관한 가치 판단도 끼어든다.</p>
+            <p>경계도 유동적이다. “제품을 만들기 위한 제품”이라는 이유로 PyTorch 같은 프레임워크는 제외하지만, H100과 ASML EUV는 평가한다. 소비자가 직접 만지는 제품과 다른 기술을 가능하게 하는 기반 장비가 같은 척도에 놓이면서 뒤의 논쟁이 시작된다.</p>
+          </div>
+        </section>
+
+        <section id="debates" class="section" aria-labelledby="debates-title">
+          <div class="section-head">
+            <span class="section-number">04 / EVIDENCE &amp; DEBATES</span>
+            <h2 id="debates-title">등급을 갈라놓은 네 가지 논쟁</h2>
+          </div>
+
+          <section class="subsection" aria-labelledby="everyday-title">
+            <div class="reading">
+              <span class="small-label">A / EVERYDAY CHANGE</span>
+              <h3 id="everyday-title">에어팟과 ChatGPT: 생활이 바뀌었다는 확신</h3>
+              <p>초반 S 자리를 차지하는 제품은 에어팟이다. 이유는 “제 편견을 깨뜨린 제품”이라는 경험과, 무선 이어폰 시장을 만들었다는 평가다. 반면 iPhone X는 D에 놓인다. “아이폰이 대단한 거지 아이폰 X가 대단할 건 없잖아요”라는 말은 <strong>제품군 전체의 성취와 특정 세대의 기여를 구분하겠다</strong>는 뜻으로 읽힌다.</p>
+              <p>ChatGPT에는 빠르게 합의가 모인다. “전 세계 사람들의 생활상을 바꾸고 있다”는 발언은 기능의 우열보다 사용의 확산을 겨냥한다. 이 보드에서 S는 기술적으로 가장 정교한 제품이라는 뜻보다, 사람들이 이전과 다르게 행동하게 만든 제품이라는 의미에 가깝다.</p>
+            </div>
+            <div class="evidence-grid">
+              <figure>
+                <div class="image-wrap"><img src="assets/vuxt3luo8iy-ts-00-04-33.jpg" alt="초기 보드에서 AirPods가 S, MacBook Air M1이 A, iPhone X가 D에 놓인 화면." loading="lazy"></div>
+                <figcaption><a class="time">00:04:33 ↗</a><span>에어팟만 S. M1은 A, 폴더블은 B, Ray-Ban Meta는 C, iPhone X는 D에 배치된다.</span></figcaption>
+              </figure>
+              <figure>
+                <div class="image-wrap"><img src="assets/vuxt3luo8iy-ts-00-08-43.jpg" alt="ChatGPT 제품 카드를 S 행으로 드래그하는 순간의 티어리스트 화면." loading="lazy"></div>
+                <figcaption><a class="time">00:08:43 ↗</a><span>ChatGPT가 S로 이동한다. 대중의 생활을 바꿨다는 평가가 빠르게 받아들여진다.</span></figcaption>
+              </figure>
+            </div>
+            <div class="reading subsection">
+              <h3>M1의 A, 비전 프로의 B가 보여주는 간극</h3>
+              <p>M1에는 ARM 기반 컴퓨팅의 전환을 이끌었다는 의미가 부여된다. 팬 소음과 배터리 사용 시간에 대한 체감이 근거로 등장하고, ARM의 명령어 집합과 애플의 실제 구현을 구분하는 대화가 뒤따른다. 다만 ARM 데스크톱·서버의 시대를 열었다는 인과적 평가는 진행자의 주장이다.</p>
+              <p>비전 프로와 폴더블은 새로운 폼팩터로 인정받지만 B에 머문다. 비전 프로의 경우 무게와 가격이 실제 사용을 제한한다는 평가다. 이후 세대에서 가벼워지면 재평가할 여지를 남긴다. <strong>새로움이 곧 보급을 뜻하지는 않는다.</strong></p>
+            </div>
+          </section>
+
+          <section class="subsection" aria-labelledby="business-title">
+            <div class="reading">
+              <span class="small-label">B / BUSINESS &amp; ECOSYSTEM</span>
+              <h3 id="business-title">개방의 기여와 사업의 성과는 어떻게 비교할까</h3>
+              <p>Midjourney는 C, Stable Diffusion과 Llama는 D다. 자막에서 반복되는 구분은 개방형 생태계의 기여와 사업적 성과 사이에 있다. 연구와 창작의 기반을 제공했다는 점은 인정하면서도, 돈을 버는 모델을 만들었는지를 묻는다.</p>
+              <p>이는 기술적 성능 비교라기보다 <strong>지속 가능한 사업을 제품 성공의 일부로 보는 가치관</strong>이다. 노트가 전하는 Stable Diffusion 관련 회사의 실패 발언 역시 토론 속 평가이며, 이 글에서 기업의 재무 상태나 존속 여부를 확인한 것은 아니다.</p>
+            </div>
+            <figure>
+              <div class="image-wrap"><img src="assets/vuxt3luo8iy-ts-00-12-53.jpg" alt="Midjourney가 C 티어에 놓이고 Stable Diffusion 카드가 미배치 영역에서 드래그되는 화면." loading="lazy"></div>
+              <figcaption><a class="time">00:12:53 ↗</a><span>Midjourney는 C에 놓여 있다. 생성 이미지의 초기 기여를 함께 논하면서도, 대중화와 사업 모델을 기준으로 순서를 가른다.</span></figcaption>
+            </figure>
+
+            <div class="reading subsection">
+              <h3>Claude Code는 A의 맨 앞, H100은 생태계의 상징</h3>
+              <p>Claude Code에는 “챗지피티 다음”, “에이 탑 정도”라는 평가가 붙고, 최종적으로 A 행의 맨 앞에 놓인다. H100은 개별 칩의 사양보다 CUDA 생태계와 AI 학습·운영을 대표하는 제품으로 취급돼 M1보다 앞에 배치된다.</p>
+              <p>평가 단위가 넓어지는 순간이다. 하나의 제품 이름에 플랫폼이나 생태계 전체의 영향력을 담으면 높은 평가가 가능해진다. 이 방식은 뒤에서 틱톡을 ‘숏폼 전체’로 읽는 논리와도 맞닿는다.</p>
+            </div>
+            <figure>
+              <div class="image-wrap"><img src="assets/vuxt3luo8iy-ts-00-21-13.jpg" alt="Claude Code 카드가 미배치 영역에서 드래그되고 A 행에 Waymo One과 Nvidia H100 등이 보이는 화면." loading="lazy"></div>
+              <figcaption><a class="time">00:21:13 ↗</a><span>Claude Code 배치 직전. 이 프레임은 이동 중인 상태이며, A 행 맨 앞이라는 최종 위치는 마지막 보드에서 확인된다.</span></figcaption>
+            </figure>
+          </section>
+
+          <section class="subsection" aria-labelledby="impact-title">
+            <div class="reading">
+              <span class="small-label">C / SCALE &amp; CONSEQUENCES</span>
+              <h3 id="impact-title">자율주행의 범위, 숏폼의 해악, 건강의 기대</h3>
+              <p>테슬라 Model 3/Y + FSD는 S, Waymo One은 A다. 자율주행이라는 기술 범주로 묶자는 의견과, 실제 도시에서 운행하는 서비스의 체감이 다르다는 의견이 맞선다. 정리 과정에서는 “지구 영향력 / 미국 한정 영향력”이라는 대비가 등장한다.</p>
+              <p>이 배치는 자율주행의 안전성이나 운행 성능을 비교 검증한 결과가 아니다. 토론에서는 <strong>제품의 도달 범위와 눈앞에서 확인되는 변화</strong>가 서로 다른 근거로 쓰인다. Waymo가 목록에 들어온 계기로는 Claude Code 제품 담당자가 최고의 제품으로 꼽았다는 일화도 언급된다.</p>
+            </div>
+            <figure>
+              <div class="image-wrap"><img src="assets/vuxt3luo8iy-ts-00-16-39.jpg" alt="ChatGPT, Model 3 및 Y와 FSD, AirPods가 S에 있고 Waymo One이 A에 놓인 화면. 하단에는 DJI Mavic 데이터 카드가 열려 있다." loading="lazy"></div>
+              <figcaption><a class="time">00:16:39 ↗</a><span>65 products · 19 ranked. 자율주행 제품의 배치와 함께 DJI Mavic 카드의 시장·규제 관련 설명이 보인다.</span></figcaption>
+            </figure>
+
+            <div class="reading">
+              <p>틱톡은 플랫폼 하나가 아니라 숏폼이라는 형식으로 평가된다. 릴스와 쇼츠로 이어진 영향, 인간의 시간을 점유하는 규모가 S의 근거다. 동시에 중독성과 인지적 악영향을 비판하는 강한 표현이 나온다. <strong>피해를 끼쳤다는 판단이 영향력을 부정하지는 않는다</strong>는 평가 방식이다.</p>
+              <p>Ozempic/Wegovy에는 건강에 미칠 파급력이 부여되며 S로 올라간다. 체중 감소가 항공사 연료비 절감으로 이어졌다는 이야기도 등장하지만, 발언 자체에 “궤변 같았지만”이라는 단서가 붙는다. 이는 영상의 파급효과 상상으로 읽어야 하며, 검증된 의학·경제적 근거로 사용해서는 안 된다.</p>
+            </div>
+
+            <blockquote class="pullquote">
+              <p>“틱톡을 틱톡이라고 보지 말고 숏폼이라고 보죠.”</p>
+              <cite>제공된 자막 기록 · 틱톡 평가 구간 · 단일 제품에서 카테고리 전체로 넓어지는 평가 단위</cite>
+            </blockquote>
+
+            <figure>
+              <div class="image-wrap"><img src="assets/vuxt3luo8iy-ts-00-19-58.jpg" alt="틱톡과 Ozempic 및 Wegovy가 추가돼 S 행이 다섯 개 제품으로 채워진 화면. 왼쪽 아래에는 Dyson Airwrap 카드가 보인다." loading="lazy"></div>
+              <figcaption><a class="time">00:19:58 ↗</a><span>S 티어의 다섯 제품이 모인다. 하단에 보이는 Dyson Airwrap은 사용 경험이 부족하다는 이유로 이후 평가 대상에서 빠진다.</span></figcaption>
+            </figure>
+          </section>
+
+          <section class="subsection" aria-labelledby="euv-title">
+            <div class="reading">
+              <span class="small-label">D / THE INFRASTRUCTURE QUESTION</span>
+              <h3 id="euv-title">ASML EUV: 공정의 개선인가, 진보의 병목을 푼 기술인가</h3>
+              <p>가장 긴 논쟁은 소비자가 직접 쓰지 않는 장비에서 발생한다. EUV의 가치를 판단하려면 “얼마나 팔렸는가”만으로는 부족하다. <strong>이 기술이 없었어도 다음 단계의 반도체가 가능했을까</strong>라는 반사실적 질문이 필요해진다.</p>
+            </div>
+
+            <div class="debate">
+              <div class="position">
+                <span class="small-label">ARGUMENT 01 / 낮게 평가하는 논리</span>
+                <h3>이어지던 미세화의 한 단계</h3>
+                <p>공정 미세화는 원래 진행돼 왔고, EUV는 그 개선에 기여한 기술이라는 주장이다. 독보적인 회사가 있다는 사실만으로 기술 진보 전체의 공로를 돌리기는 어렵다고 본다.</p>
+              </div>
+              <div class="position">
+                <span class="small-label">ARGUMENT 02 / 높게 평가하는 논리</span>
+                <h3>물리적 한계를 넘긴 기반</h3>
+                <p>기존 방식으로는 미세화가 어려워졌으며, EUV가 없으면 그 다음 단계로 갈 수 없었다는 주장이다. 대체하기 어려운 병목을 해결했다는 데 가치를 둔다.</p>
+              </div>
+            </div>
+
+            <figure>
+              <div class="image-wrap"><img src="assets/vuxt3luo8iy-ts-00-22-53.jpg" alt="ASML EUV가 아직 미배치 영역에 남아 있고 오른쪽 실시간 채팅에서 관련 논의가 이어지는 화면." loading="lazy"></div>
+              <figcaption><a class="time">00:22:53 ↗</a><span>57 products · 32 ranked. EUV는 아직 UNRANKED에 남아 있으며 채팅에서도 옹호 논거가 제시된다.</span></figcaption>
+            </figure>
+
+            <div class="reading">
+              <p>채팅에서는 EUV가 없으면 다른 기술이나 HBM도 불가능했을 것이라는 주장이 인용된다. 이어 중국이 더 많은 전력을 투입해 공정 효율의 열세를 우회할 수 있다는 이야기가 젠슨 황의 발언으로 소개된다. 두 주장 모두 이 자료만으로 기술적 타당성이나 원발언을 확정할 수는 없다.</p>
+              <p>토론은 우회 가능성을 일부 인정한 채 남는다. 이후 화면에서 EUV는 B 행 마지막에 놓인다. 최종 위치는 확인되지만, 그 배치가 양쪽 논거의 완전한 합의를 의미하지는 않는다.</p>
+              <div class="verdict"><strong>최종 배치: B.</strong> 이 장면의 핵심은 등급보다 기여도를 계산하는 방식이다. 널리 쓰이는 완제품과, 그 제품을 가능하게 한 장비를 같은 자로 잴 수 있을까.</div>
+            </div>
+
+            <figure>
+              <div class="image-wrap"><img src="assets/vuxt3luo8iy-ts-00-27-28.jpg" alt="ASML EUV가 B 행 마지막에 배치되고 화면 아래에 Among Us의 상세 데이터 카드가 열린 화면." loading="lazy"></div>
+              <figcaption><a class="time">00:27:28 ↗</a><span>EUV의 B 배치가 확인된다. 동시에 열린 Among Us 카드에는 제작 규모, 이용자 수, 모방 사례가 상세하게 적혀 있다.</span></figcaption>
+            </figure>
+          </section>
+        </section>
+
+        <section class="section" aria-labelledby="cards-title">
+          <div class="section-head">
+            <span class="section-number">EVIDENCE NOTE / NUMBERS ON SCREEN</span>
+            <h2 id="cards-title">숫자가 있다는 것과 검증됐다는 것은 다르다</h2>
+          </div>
+          <div class="reading">
+            <p>데이터 카드는 가벼운 티어리스트에 구체적인 토론 재료를 제공한다. 다만 아래 내용은 <strong>노트가 옮긴 화면 카드의 표기</strong>다. 제작자가 입력한 수치와 해석을 재현한 것이며, 이 글에서 원통계를 대조한 결과는 아니다.</p>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <caption>화면 속 제품 카드: 기록된 값과 인용 시 확인할 점</caption>
+              <thead><tr><th scope="col">카드</th><th scope="col">화면에 기록된 내용</th><th scope="col">추가 확인 지점</th></tr></thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Galaxy Z Fold / Flip<br><span class="time">00:01:38</span></th>
+                  <td>Samsung, 2019 / 2020. 폴더블 2025년 출하 약 2,000만 대, 삼성 점유율 64%(2025 Q3), 전체 스마트폰의 2.5%. Flip 판매 대수가 Fold보다 많다고 표기.</td>
+                  <td>연간·분기 수치의 기간과 시장 분모. Huawei·Motorola·Google·Honor를 후발 사례로, Apple 폴더블을 2026년 예정으로 적은 내용도 카드 작성 시점의 주장이다.</td>
+                </tr>
+                <tr>
+                  <th scope="row">DJI Mavic<br><span class="time">00:16:39</span></th>
+                  <td>DJI, 2016. 소비자 드론 세계 점유율 약 70%. 2025년 12월 미국 FCC 신규 모델 인증 금지, 2026년 손실 추정 15억 달러라고 표기.</td>
+                  <td>점유율 원자료, 규제의 정확한 대상·범위, 손실 추정의 작성 주체. “경쟁이 아니라 규제로 막혔다”는 문장은 카드의 해석이다.</td>
+                </tr>
+                <tr>
+                  <th scope="row">Dyson Airwrap<br><span class="time">00:19:58</span></th>
+                  <td>판매량은 미공개이며 품절 사태가 있었다고 기재. Shark FlexStyle(2022) 등을 후발 사례로 제시.</td>
+                  <td>품절은 판매량 자체를 뜻하지 않는다. 이 제품은 최종 평가 대상에서 제외됐다.</td>
+                </tr>
+                <tr>
+                  <th scope="row">Among Us<br><span class="time">00:27:28</span></th>
+                  <td>Innersloth, 2018년 6월 출시·2020년 확산. 3명 팀, 프로그래머 1명. MAU 약 5억 명(2020년 11월, SuperData), 2020년 모바일 다운로드 2억 6,400만 회로 표기.</td>
+                  <td>이용자 추정치와 다운로드 집계의 원문. Fortnite “Impostors”의 유사성 및 이후 크레딧·협업 제안 경위도 별도 확인이 필요하다.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="reading">
+            <p>Among Us 카드는 평가 기준의 또 다른 면을 보여준다. 새로운 놀이를 발명했다기보다 기존 마피아 게임을 온라인으로 옮겼지만, Epic 같은 대형 기업이 뒤따랐다는 설명이다. <strong>카테고리의 발명과 성공적인 재구성은 다르지만, 둘 다 경쟁자의 행동을 바꿀 수 있다.</strong></p>
+          </div>
+        </section>
+
+        <section id="implications" class="section" aria-labelledby="implications-title">
+          <div class="section-head">
+            <span class="section-number">05 / IMPLICATIONS</span>
+            <h2 id="implications-title">제품을 평가하기 전에, 평가의 단위를 정해야 한다</h2>
+          </div>
+          <div class="reading">
+            <p>영상 말미에는 제품 평가가 가치관의 문제로 확장된다. 고가 제품이 먼저 등장한 뒤 대중화되는 경로를 어떻게 볼 것인지, 개방과 폐쇄 중 무엇을 중시할 것인지가 논의된다. 테슬라 초기 모델과 우주관광, Midjourney와 Stable Diffusion의 차이가 이런 축으로 다시 읽힌다.</p>
+            <blockquote class="pullquote">
+              <p>“이 분류를 일차원적으로 S·A·B·C·D에 맵핑하는 게 너무 힘들었다.”</p>
+              <cite>제공된 자막 기록 · 영상 말미의 가치관 논의</cite>
+            </blockquote>
+            <ol class="implications">
+              <li>
+                <strong>제품, 카테고리, 생태계를 구분하자</strong>
+                <p>iPhone X는 특정 세대로, 틱톡은 숏폼 전체로, H100은 CUDA 생태계로 평가된다. 비교 단위가 달라지면 순위도 달라진다. 하나의 제품에 어디까지 공로를 돌릴지 먼저 밝힐 필요가 있다.</p>
+              </li>
+              <li>
+                <strong>영향력과 바람직함을 따로 기록하자</strong>
+                <p>틱톡의 S는 이 둘을 합치면 생기는 혼란을 보여준다. 얼마나 많은 행동을 바꿨는지와 그 변화가 사회에 이로운지는 별도의 질문이다.</p>
+              </li>
+              <li>
+                <strong>사업 성과와 공동의 기여를 함께 보자</strong>
+                <p>수익성은 제품의 지속 가능성을 설명하지만, 연구와 후속 개발에 제공한 가치를 모두 담지는 못한다. 개방형 모델의 성과를 비교하려면 생태계 기여도 별도로 남겨야 한다.</p>
+              </li>
+              <li>
+                <strong>현재의 제품과 미래의 가능성을 나누자</strong>
+                <p>비전 프로에는 경량화 이후의 재평가 가능성이, Rabbit r1에는 음성 중심 인터페이스의 가능성이 언급된다. 현재 구현에 대한 등급과 그 방향에 대한 기대는 다른 판단이다.</p>
+              </li>
+            </ol>
+            <p>Unitree의 A 역시 하드웨어만이 아니라 내부 소프트웨어와 AI 개선으로 동작이 발전했다는 설명에 기대고 있다. 이처럼 제품의 변화를 이야기할 때에는 어느 구성 요소가 성과를 만들었다고 보는지까지 드러내야 비교가 선명해진다.</p>
+          </div>
+        </section>
+
+        <section id="sources" class="source-section" aria-labelledby="sources-title">
+          <span class="small-label">06 / SOURCES &amp; LIMITATIONS</span>
+          <h2 id="sources-title">근거와 편집 원칙</h2>
+          <p>이 글은 사용자가 제공한 Obsidian 연구 노트를 편집·재구성했다. 노트는 한국어 수동 자막 1,131개 큐(약 12,250자), YouTube 메타데이터·설명란·27개 챕터, 1080p 영상에서 추출해 육안 확인한 10개 프레임을 근거로 삼았다고 밝힌다. 이 글에서는 해당 조사 절차를 새로 수행하지 않았으며, 제공된 이미지 10개와 기록을 보존했다.</p>
+
+          <div class="legend" aria-label="근거의 구분">
+            <span>화면 기록: 배치·카운터·카드 표기</span>
+            <span>자막 기록: 발언·평가 이유</span>
+            <span>편집 해석: 기준의 비교·시사점</span>
+          </div>
+
+          <h3>원자료</h3>
+          <p><a>sudoremove, 「지난 10년 최고의 IT 제품 티어리스트 (에어팟, 비전프로, 챗지피티, 클로드코드) [제품 티어리스트]」</a><br>제공된 메타데이터 기준 게시일: 2026년 9월 10일 · 길이: 29분 37초 · 노트 작성일: 2026년 9월 12일. 각 이미지의 타임스탬프는 원본 영상의 해당 지점으로 연결된다.</p>
+
+          <h3>읽을 때 남겨두어야 할 한계</h3>
+          <ol>
+            <li><strong>주관적 토론이다.</strong> 진행자들은 기준을 토론 중 정하며, 사용하지 않은 제품도 평가한다고 밝힌다. 반대로 사용 경험 부족으로 제외한 항목도 있어 적용이 일관되지는 않는다.</li>
+            <li><strong>일부 등급에는 발언 근거가 없다.</strong> 약 00:22:00~00:22:30의 자막 공백이 기록돼 있다. Blue Origin New Shepard, Virgin Galactic, Neuralink, 카카오뱅크, Boeing 737 MAX는 최종 배치가 확인되지만 그 이유를 설명하는 발언은 노트에서 확보하지 못했다.</li>
+            <li><strong>프레임은 변화가 있는 시점을 골랐다.</strong> 10개 이미지는 균등 간격 표본이 아니다. 보드 상태가 유의미하게 달라지는 지점을 선별했으므로, 모든 배치 과정을 연속적으로 보여주지는 않는다.</li>
+            <li><strong>화면의 수치와 기술적 발언은 별도 검증 대상이다.</strong> 폴더블 시장 수치, DJI 규제·손실 추정, Among Us 이용자 수, EUV와 HBM의 관계, 중국 전력 전략 및 젠슨 황 인용은 원출처 확인이 필요하다.</li>
+            <li><strong>발언자를 임의로 특정하지 않았다.</strong> 출연자 실명이 자막·메타데이터에 없다는 노트의 원칙에 따라 인용은 발언 주체를 구분하지 않고 서술했다.</li>
+          </ol>
+        </section>
+
+        <section class="closing" aria-labelledby="closing-title">
+          <span class="small-label">A QUESTION TO TAKE AWAY</span>
+          <h2 id="closing-title">당신의 S 티어는<br>어떤 변화를 보상하는가</h2>
+          <p>내 생활을 바꾼 제품, 산업을 가능하게 한 기술, 많은 사람에게 이익을 준 서비스. 무엇을 중심에 두느냐에 따라 같은 보드는 전혀 다른 모습을 갖는다. 이 영상의 가장 생산적인 사용법은 순위를 받아들이는 데서 멈추지 않고, 자신의 기준을 한 문장으로 적어보는 것이다.</p>
+          <p>후속편은 가속과 제동, 개방과 폐쇄, 기술 주권과 시장 위임을 다루는 ‘기술 사상 검증’으로 예고된다. 제품을 줄 세우던 질문이 이제 기술이 향할 방향으로 이어진다.</p>
+          <div class="share-copy">
+            <span class="small-label">함께 나눌 문장 · 복사해 인용하기</span>
+            <p>에어팟은 S, EUV는 B. 제품 티어리스트는 혁신의 순위인 동시에, 우리가 어떤 변화를 가치 있게 보는지 드러내는 지도다.</p>
+          </div>
+        </section>
+      </article>
+    </main>
+
+    <footer>
+      <span>영상 기반 리서치 · 원본 채널 sudoremove · 편집 기준일 2026.09.12</span>
+      <a href="#top">처음으로 ↑</a>
+    </footer>
+  </div>
+</body>
+</html>

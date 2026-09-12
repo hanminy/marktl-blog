@@ -1,7 +1,22 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-12T05:54:19.876Z",
+  "updatedAt": "2026-09-12T06:10:19.700Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-%EC%A7%80%EB%82%9C-10%EB%85%84-%EC%B5%9C%EA%B3%A0%EC%9D%98-it-%EC%A0%9C%ED%92%88-%ED%8B%B0%EC%96%B4%EB%A6%AC%EC%8A%A4%ED%8A%B8-%EC%97%90%EC%96%B4%ED%8C%9F-%EB%B9%84%EC%A0%84%ED%94%84%EB%A1%9C-%EC%B1%97%EC%A7%80%ED%94%BC%ED%8B%B0-%ED%81%B4%EB%A1%9C%EB%93%9C%EC%BD%94%EB%93%9C-%EC%9A%94%EC%95%BD/",
+      "excerpt": "지난 10년 최고의 IT 제품 티어리스트 (에어팟, 비전프로, 챗지피티, 클로드코드) 영상 정보 채널 : sudoremove 게시일 : 2026 09 10 길이 : 29분 37초 (1,777초) 챕터 : 27개 링크 : https://www.youtube.com/watch?v=vUxt3LUo8iY <div style=\"position: relative; width: 100%; padding bottom: 56.25%; heig",
+      "shortId": "13g2ruo",
+      "slug": "yt-지난-10년-최고의-it-제품-티어리스트-에어팟-비전프로-챗지피티-클로드코드-요약",
+      "sourcePath": "02_research/AI/Sudoremove/yt_지난 10년 최고의 IT 제품 티어리스트 (에어팟, 비전프로, 챗지피티, 클로드코드)_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료"
+      ],
+      "title": "지난 10년 최고의 IT 제품 티어리스트 (에어팟, 비전프로, 챗지피티, 클로드코드) [제품 티어리스트]",
+      "updatedAt": "2026-09-12T06:10:19.700Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/13g2ruo/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-ep-112-ai-%EB%B0%98%EB%8F%84%EC%B2%B4-%EC%95%88%EC%97%90%EC%84%9C-%EC%9D%BC%EC%96%B4%EB%82%98%EB%8A%94-%EC%9D%BC%EB%93%A4-kv-cache%EB%B6%80%ED%84%B0-roofline%EA%B9%8C%EC%A7%80-%EC%9A%94%EC%95%BD/",
