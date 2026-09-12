@@ -1,7 +1,22 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-12T05:34:12.674Z",
+  "updatedAt": "2026-09-12T05:43:32.500Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-ep-113-gpt-6-astra-%EC%9D%B4%ED%9B%84-ai%EC%9D%98-%EC%83%9D%EA%B0%81%EC%9D%84-%EC%96%B4%EB%94%94%EA%B9%8C%EC%A7%80-%EB%B3%BC-%EC%88%98-%EC%9E%88%EC%9D%84%EA%B9%8C-%EC%9A%94%EC%95%BD/",
+      "excerpt": "EP 113. GPT 6 Astra 이후, AI의 생각을 어디까지 볼 수 있을까 영상 정보 채널 : AI Frontier Korea (노정석) 게시일 : 2026 09 08 길이 : 1시간 11분 10초 (4,270초) 출연 : 노정석, 최승준, 박종현 녹화 시점 : 2026년 9월 6일 일요일 아침 (영상 도입부 발언 기준) 링크 : https://www.youtube.com/watch?v=PMUIi 2Nhlo <div st",
+      "shortId": "1a0c8ts",
+      "slug": "yt-ep-113-gpt-6-astra-이후-ai의-생각을-어디까지-볼-수-있을까-요약",
+      "sourcePath": "02_research/AI/yt_EP 113. GPT-6 Astra 이후, AI의 생각을 어디까지 볼 수 있을까_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료"
+      ],
+      "title": "EP 113. GPT-6 Astra 이후, AI의 생각을 어디까지 볼 수 있을까",
+      "updatedAt": "2026-09-12T05:43:32.500Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/1a0c8ts/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-ep114-%EB%8F%84%EB%A7%9D%EC%B9%A0-%ED%8B%88%EC%9D%B4-%EC%97%86%EB%8B%A4-%EC%9A%94%EC%95%BD/",
