@@ -1,25 +1,372 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="ko">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Physical AI와 VLA</title>
+<title>백덤블링하는 로봇은 왜 '피지컬 AI'가 아닌가 — Physical AI와 VLA의 계보</title>
+
+
+
+
+
+
+
+
+
+
+
 <style>
-      body { margin: 0; font-family: Georgia, "Times New Roman", serif; color: #202124; background: #faf7f2; }
-      main { max-width: 900px; margin: 0 auto; padding: 56px 36px 80px; box-sizing: border-box; }
-      article { background: #fffdf8; border: 1px solid #e6ddcf; padding: 44px; }
-      h1 { font-size: 44px; line-height: 1.05; margin-top: 0; }
-      h2 { margin-top: 42px; border-top: 1px solid #dfd5c8; padding-top: 24px; }
-      p, li { font-size: 18px; line-height: 1.75; }
-      a { color: #8b3a2b; }
-      pre { overflow: auto; padding: 18px; background: #25211d; color: #f7efe4; border-radius: 6px; }
-      table { width: 100%; border-collapse: collapse; margin: 22px 0; background: #fff; }
-      th, td { border-bottom: 1px solid #e6ddcf; padding: 10px 12px; }
-      img { max-width: 100%; height: auto; display: block; margin: 24px auto; }
-      .frontmatter { white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: #f1eadf; padding: 14px; color: #5f574f; }
-      .callout { border: 1px solid #d8b98c; background: #fff6e5; padding: 16px 18px; margin: 24px 0; }
-      .callout-title { font-family: ui-sans-serif, system-ui, sans-serif; font-weight: 800; text-transform: uppercase; font-size: 12px; letter-spacing: .08em; }
-    </style>
+  :root{
+    --paper:#fbf9f5;
+    --card:#ffffff;
+    --ink:#15171c;
+    --ink-2:#3b414d;
+    --ink-3:#727a88;
+    --line:#e6e1d8;
+    --line-soft:#f0ece4;
+    --accent:#1d5b68;
+    --accent-2:#2c8496;
+    --accent-soft:#e7f1f2;
+    --warm:#b0522a;
+    --warm-soft:#fbeee5;
+    --gold:#9a7b28;
+    --radius:16px;
+    --shadow:0 1px 2px rgba(20,22,28,.04), 0 12px 32px -18px rgba(20,22,28,.28);
+    --sans:"Pretendard","Pretendard Variable",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic","맑은 고딕",system-ui,sans-serif;
+    --serif:"Nanum Myeongjo","Noto Serif KR","Apple SD Gothic Neo",Georgia,"Times New Roman",serif;
+    --mono:"SFMono-Regular",Menlo,Consolas,"D2Coding","Noto Sans Mono",monospace;
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:17px;
+    line-height:1.82;
+    letter-spacing:-.005em;
+    word-break:keep-all;
+    overflow-wrap:break-word;
+    -webkit-font-smoothing:antialiased;
+  }
+  img{max-width:100%;height:auto;display:block}
+  a{color:var(--accent);text-underline-offset:3px;text-decoration-thickness:1px}
+  a:hover{color:var(--accent-2)}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative;
+    background:
+      radial-gradient(1200px 500px at 12% -10%, rgba(44,132,150,.35), transparent 60%),
+      radial-gradient(900px 480px at 96% 8%, rgba(176,82,42,.28), transparent 62%),
+      linear-gradient(168deg,#11151a 0%,#171d24 48%,#0e1216 100%);
+    color:#f3efe8;
+    padding:clamp(56px,9vw,104px) 20px clamp(48px,7vw,80px);
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";position:absolute;inset:auto 0 0 0;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(243,239,232,.28),transparent);
+  }
+  .hero-inner{max-width:1040px;margin:0 auto}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:10px;
+    font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    color:#9fd4dd;font-weight:700;margin:0 0 22px;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:#9fd4dd;display:inline-block}
+  .hero h1{
+    font-family:var(--serif);
+    font-size:clamp(30px,5.4vw,56px);
+    line-height:1.28;
+    letter-spacing:-.02em;
+    margin:0 0 20px;
+    font-weight:700;
+    max-width:19ch;
+  }
+  .hero h1 em{font-style:normal;color:#8fd0db}
+  .dek{
+    font-size:clamp(16px,2.2vw,20px);
+    line-height:1.75;
+    color:#cfd4d8;
+    max-width:60ch;
+    margin:0 0 34px;
+  }
+  .byline{
+    display:flex;flex-wrap:wrap;gap:8px 28px;
+    padding-top:22px;border-top:1px solid rgba(243,239,232,.18);
+    font-size:13.5px;color:#a7b0b9;
+  }
+  .byline b{color:#e9e4dc;font-weight:600}
+  .byline a{color:#9fd4dd}
+  .tagrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+  .tag{
+    font-size:12px;letter-spacing:.04em;padding:5px 12px;border-radius:999px;
+    background:rgba(159,212,221,.12);color:#b9dde3;border:1px solid rgba(159,212,221,.24);
+  }
+
+  /* ---------- Layout ---------- */
+  .shell{max-width:1180px;margin:0 auto;padding:0 20px}
+  .grid{display:block}
+  main{max-width:760px;margin:0 auto;padding:clamp(40px,6vw,72px) 0 24px}
+
+  @media (min-width:1160px){
+    .grid{
+      display:grid;
+      grid-template-columns:230px minmax(0,1fr);
+      gap:56px;
+      align-items:start;
+    }
+    main{margin:0;max-width:760px;padding-top:72px}
+    .toc-rail{position:sticky;top:28px;padding-top:80px}
+  }
+  .toc-rail{display:none}
+  @media (min-width:1160px){.toc-rail{display:block}}
+
+  .toc-rail h2{
+    font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--ink-3);margin:0 0 14px;font-weight:700;
+  }
+  .toc-rail ol{list-style:none;margin:0;padding:0;border-left:2px solid var(--line);}
+  .toc-rail li{margin:0}
+  .toc-rail a{
+    display:block;padding:7px 0 7px 16px;margin-left:-2px;
+    border-left:2px solid transparent;
+    font-size:13.5px;line-height:1.5;color:var(--ink-2);text-decoration:none;
+  }
+  .toc-rail a:hover{border-left-color:var(--accent);color:var(--accent);background:linear-gradient(90deg,var(--accent-soft),transparent)}
+
+  /* ---------- Typography ---------- */
+  h2.sec{
+    font-family:var(--serif);
+    font-size:clamp(23px,3.4vw,31px);
+    line-height:1.38;letter-spacing:-.02em;
+    margin:72px 0 6px;font-weight:700;scroll-margin-top:24px;
+  }
+  h2.sec .num{
+    display:block;font-family:var(--sans);font-size:12px;font-weight:700;
+    letter-spacing:.18em;color:var(--accent-2);margin-bottom:10px;
+  }
+  h3{
+    font-size:19px;font-weight:700;line-height:1.5;letter-spacing:-.015em;
+    margin:44px 0 10px;scroll-margin-top:24px;
+  }
+  h4{font-size:15.5px;font-weight:700;margin:28px 0 6px;color:var(--ink-2)}
+  p{margin:0 0 20px}
+  .lead{font-size:18.5px;line-height:1.8;color:var(--ink-2)}
+  .rule{height:1px;background:linear-gradient(90deg,var(--line),transparent);border:0;margin:56px 0}
+  strong{font-weight:700;color:var(--ink)}
+  code{
+    font-family:var(--mono);font-size:.86em;background:var(--line-soft);
+    padding:2px 6px;border-radius:5px;color:#33404a;border:1px solid var(--line);
+  }
+
+  ul,ol{padding-left:1.15em;margin:0 0 22px}
+  li{margin:0 0 10px}
+  li::marker{color:var(--accent-2)}
+
+  /* ---------- Abstract ---------- */
+  .abstract{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:clamp(24px,4vw,36px);box-shadow:var(--shadow);margin:0 0 8px;
+  }
+  .abstract .label{
+    font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;
+    color:var(--warm);margin:0 0 14px;
+  }
+  .abstract p{font-family:var(--serif);font-size:18px;line-height:1.85;color:var(--ink-2);margin-bottom:0}
+  .abstract p + p{margin-top:16px}
+
+  /* ---------- Findings ---------- */
+  .findings{display:grid;gap:14px;margin:28px 0 8px}
+  @media (min-width:640px){.findings{grid-template-columns:1fr 1fr}}
+  .finding{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:20px 22px;position:relative;
+  }
+  .finding::before{
+    content:attr(data-n);
+    position:absolute;top:18px;right:20px;
+    font-family:var(--serif);font-size:30px;line-height:1;color:var(--line);font-weight:700;
+  }
+  .finding h4{margin:0 0 8px;font-size:15px;color:var(--ink);padding-right:38px}
+  .finding p{margin:0;font-size:14.5px;line-height:1.7;color:var(--ink-2)}
+
+  /* ---------- Figures ---------- */
+  figure{
+    margin:34px 0;background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);
+  }
+  figure img{width:100%;background:#0e1216}
+  figcaption{
+    padding:16px 20px 18px;font-size:14px;line-height:1.72;color:var(--ink-2);
+    border-top:1px solid var(--line-soft);
+  }
+  .ts{
+    display:inline-block;font-family:var(--mono);font-size:11.5px;letter-spacing:.02em;
+    background:var(--accent-soft);color:var(--accent);border:1px solid #cfe2e4;
+    padding:2px 8px;border-radius:6px;margin-right:10px;text-decoration:none;font-weight:600;
+    white-space:nowrap;
+  }
+  .ts:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+  /* ---------- Callouts ---------- */
+  .callout{
+    border-radius:12px;padding:20px 22px;margin:30px 0;font-size:15.5px;line-height:1.74;
+  }
+  .callout .ct{
+    display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;
+    letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;
+  }
+  .callout p{margin:0}
+  .callout p + p{margin-top:12px}
+  .note{background:var(--accent-soft);border:1px solid #cfe2e4;color:#1c4650}
+  .note .ct{color:var(--accent)}
+  .warn{background:var(--warm-soft);border:1px solid #f0d8c8;color:#6d3617}
+  .warn .ct{color:var(--warm)}
+
+  /* ---------- Pull quote ---------- */
+  .pull{
+    margin:48px 0;padding:6px 0 6px 26px;border-left:3px solid var(--warm);
+  }
+  .pull blockquote{
+    margin:0;font-family:var(--serif);font-size:clamp(20px,2.8vw,25px);
+    line-height:1.6;letter-spacing:-.02em;color:var(--ink);font-weight:700;
+  }
+  .pull cite{display:block;margin-top:14px;font-style:normal;font-size:13.5px;color:var(--ink-3);font-family:var(--sans)}
+
+  /* ---------- Tables ---------- */
+  .tw{
+    overflow-x:auto;margin:30px 0;border:1px solid var(--line);border-radius:12px;background:var(--card);
+    -webkit-overflow-scrolling:touch;
+  }
+  table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:520px}
+  caption{
+    caption-side:top;text-align:left;padding:16px 18px 6px;
+    font-size:12.5px;font-weight:700;letter-spacing:.06em;color:var(--ink-3);text-transform:uppercase;
+  }
+  th,td{padding:13px 18px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line-soft);line-height:1.62}
+  thead th{
+    background:#f6f3ec;font-size:12.5px;letter-spacing:.05em;color:var(--ink-2);
+    font-weight:700;border-bottom:1px solid var(--line);white-space:nowrap;
+  }
+  tbody tr:last-child td{border-bottom:0}
+  tbody th{font-weight:700;color:var(--ink);white-space:nowrap}
+  td code{background:#f6f3ec}
+
+  /* ---------- Lineage diagram ---------- */
+  .lineage{
+    display:grid;gap:12px;margin:32px 0;
+  }
+  @media (min-width:700px){.lineage{grid-template-columns:repeat(3,1fr);gap:16px}}
+  .stage{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;position:relative;
+  }
+  .stage .yr{font-family:var(--mono);font-size:11.5px;color:var(--warm);font-weight:700;letter-spacing:.04em}
+  .stage .nm{font-size:17px;font-weight:700;margin:6px 0 8px}
+  .stage .io{font-family:var(--mono);font-size:12.5px;color:var(--ink-2);line-height:1.6;background:#f6f3ec;border-radius:6px;padding:8px 10px}
+  .stage:last-child{border-color:var(--accent-2);box-shadow:0 0 0 3px var(--accent-soft)}
+  @media (min-width:700px){
+    .stage:not(:last-child)::after{
+      content:"→";position:absolute;right:-13px;top:50%;transform:translateY(-50%);
+      color:var(--ink-3);font-size:17px;z-index:2;
+    }
+  }
+
+  /* ---------- Frequency bars ---------- */
+  .freq{margin:28px 0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px 24px}
+  .freq h4{margin:0 0 16px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+  .frow{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;margin-bottom:12px;font-size:13.5px}
+  .frow:last-child{margin-bottom:0}
+  .frow .fl{color:var(--ink-2);font-weight:600}
+  .bar{height:12px;border-radius:999px;background:var(--line-soft);position:relative;overflow:hidden}
+  .bar span{display:block;height:100%;border-radius:999px}
+  .b1 span{width:12%;background:#8a94a3}
+  .b2 span{width:32%;background:var(--accent)}
+  .b3 span{width:100%;background:linear-gradient(90deg,var(--accent-2),var(--warm))}
+  .fv{font-family:var(--mono);font-size:12px;color:var(--ink-3);margin-left:8px}
+
+  /* ---------- Six directions ---------- */
+  .dir{
+    border-top:2px solid var(--line);padding-top:22px;margin-top:42px;
+  }
+  .dir-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;margin-bottom:4px}
+  .dir-n{
+    font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:var(--accent);
+    border-radius:6px;padding:3px 9px;letter-spacing:.04em;
+  }
+  .dir-head h3{margin:0;font-size:20px}
+  .chip{
+    display:inline-block;font-size:12px;padding:3px 10px;border-radius:999px;
+    background:var(--warm-soft);color:var(--warm);border:1px solid #f0d8c8;font-weight:600;
+  }
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 18px}
+
+  /* ---------- Checklist ---------- */
+  .check{list-style:none;padding:0;margin:22px 0}
+  .check li{
+    position:relative;padding-left:32px;margin-bottom:12px;font-size:15.5px;line-height:1.72;color:var(--ink-2);
+  }
+  .check li::before{
+    content:"";position:absolute;left:0;top:7px;width:17px;height:17px;border-radius:5px;
+    border:1.5px solid var(--accent);background:var(--accent-soft);
+  }
+  .check li::after{
+    content:"";position:absolute;left:5.5px;top:11px;width:5px;height:9px;
+    border-right:2px solid var(--accent);border-bottom:2px solid var(--accent);transform:rotate(42deg);
+  }
+
+  /* ---------- Share block ---------- */
+  .share{
+    background:linear-gradient(160deg,#15191f,#1d252c);color:#e8e3da;border-radius:var(--radius);
+    padding:clamp(26px,4.5vw,38px);margin:56px 0 0;
+  }
+  .share h2{font-family:var(--serif);font-size:24px;margin:0 0 8px;color:#fff;letter-spacing:-.02em}
+  .share p{color:#b6bdc5;font-size:15px;margin:0 0 20px}
+  .copyblock{
+    background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.14);
+    border-radius:10px;padding:16px 18px;font-size:14.5px;line-height:1.75;color:#e6e1d8;
+    margin-bottom:12px;white-space:pre-wrap;font-family:var(--sans);
+  }
+  .copyblock .lbl{
+    display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:#8fb9c1;margin-bottom:8px;font-weight:700;
+  }
+
+  /* ---------- Source notes ---------- */
+  .sources{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:clamp(22px,4vw,32px);margin:30px 0;
+  }
+  .sources h3{margin-top:0}
+  .sources ul{font-size:14.5px;color:var(--ink-2)}
+  .meta-dl{display:grid;grid-template-columns:auto 1fr;gap:8px 18px;font-size:14.5px;margin:0}
+  .meta-dl dt{color:var(--ink-3);font-weight:600;white-space:nowrap}
+  .meta-dl dd{margin:0;color:var(--ink-2)}
+
+  /* ---------- Ending ---------- */
+  .kicker{
+    font-family:var(--serif);font-size:clamp(19px,2.6vw,23px);line-height:1.68;
+    color:var(--ink);border-top:2px solid var(--ink);padding-top:26px;margin-top:56px;font-weight:700;
+    letter-spacing:-.015em;
+  }
+
+  footer{
+    border-top:1px solid var(--line);margin-top:64px;padding:34px 0 72px;
+    font-size:13.5px;color:var(--ink-3);line-height:1.8;
+  }
+  footer a{color:var(--ink-2)}
+
+  @media print{
+    .hero{background:#fff;color:#000;padding:24px 0}
+    .hero h1,.byline b{color:#000}
+    .dek,.byline{color:#333}
+    .toc-rail,.share{display:none}
+    figure{break-inside:avoid;box-shadow:none}
+  }
+</style>
 <meta property="og:type" content="article">
 <meta property="og:title" content="Physical AI와 VLA">
 <meta property="og:description" content="Physical AI와 VLA 영상 정보 채널 : AIN Lab 게시일 : 2026 09 15 길이 : 24분 1초 링크 : https://www.youtube.com/watch?v= RIGcHPUQsQ 발표자 : 이상호 (고려대학교 전자정보공학과, 지능형 신경공학 연구실 저널 미팅) &lt;div style=&quot;position: relative; width: 100%; padding bottom: 56.25%; height: 0; ">
@@ -32,81 +379,910 @@
 <link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-physical-ai%EC%99%80-vla-%EC%9A%94%EC%95%BD/">
 </head>
 <body>
-<main data-template="editorial">
-<article>
-<pre class="frontmatter">title: &quot;Physical AI와 VLA&quot;
-tags:
-  - youtube
-  - 연구자료
-source: &quot;https://www.youtube.com/watch?v=-RIGcHPUQsQ&quot;
-channel: &quot;AIN Lab&quot;
-video_id: &quot;-RIGcHPUQsQ&quot;
-date: 2026-09-16</pre>
-<h1>Physical AI와 VLA</h1>
-<h2>영상 정보</h2>
-<ul><li><strong>채널</strong>: AIN Lab</li><li><strong>게시일</strong>: 2026-09-15</li><li><strong>길이</strong>: 24분 1초</li><li><strong>링크</strong>: https://www.youtube.com/watch?v=-RIGcHPUQsQ</li><li><strong>발표자</strong>: 이상호 (고려대학교 전자정보공학과, 지능형 신경공학 연구실 저널 미팅)</li></ul>
-<p>&lt;div relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden;&quot;&gt; &lt;iframe absolute; top: 0; left: 0; width: 100%; height: 100%;&quot; src=&quot;https://www.youtube.com/embed/-RIGcHPUQsQ&quot; frameborder=&quot;0&quot; allowfullscreen&gt;&lt;/iframe&gt; &lt;/div&gt;</p>
-<h2>한줄 요약</h2>
-<p>화제가 된 휴머노이드 데모는 대부분 보상함수로 학습된 강화학습 결과일 뿐 &quot;상황 이해&quot;가 없다는 문제의식에서 출발해, LLM·VLM의 지능을 로봇에 이식하려는 VLA(Vision-Language-Action) 연구가 SayCan → Open X-Embodiment → RT-2/OpenVLA를 거쳐 어떻게 등장했는지, 그리고 OpenVLA의 네 가지 한계를 극복하기 위한 최신 여섯 갈래 연구 방향을 정리한 저널 미팅 발표다.</p>
-<h2>핵심 장면 분석</h2>
-<h3>00:00:10 — 발표 표지</h3>
-<p><img src="assets/rigchpuqsq-ts-00-00-10.jpg" alt="-RIGcHPUQsQ_ts_00-00-10.jpg"> 고려대학교 전자정보공학과 이상호 발표자의 &quot;Physical AI, VLA&quot; 표지 슬라이드. 발표자는 이 자료가 개별 논문 리뷰가 아니라 부산 차세대 융합기술 세미나 발표를 기반으로 피지컬 AI와 VLA의 발전 과정을 순차적으로 정리한 것이라고 밝힌다.</p>
-<h3>00:00:37 — 바이럴 휴머노이드 데모</h3>
-<p><img src="assets/rigchpuqsq-ts-00-00-37.jpg" alt="-RIGcHPUQsQ_ts_00-00-37.jpg"> Boston Dynamics의 Atlas가 관절을 사람과 다른 방향으로 꺾으며 움직이는 장면과, Unitree H2가 발차기를 하는 장면이 나란히 배치되어 있다. 발표자는 이런 화려한 데모들이 &quot;진정한 의미의 피지컬 AI로 보기는 어렵다&quot;는 문제 제기로 발표를 연다.</p>
-<h3>00:01:30 — 화려한 데모의 정체는 강화학습</h3>
-<p><img src="assets/rigchpuqsq-ts-00-01-30.jpg" alt="-RIGcHPUQsQ_ts_00-01-30.jpg"> 왼쪽은 실제 Atlas가 냉장고를 옮기는 영상, 오른쪽은 시뮬레이션 안에 Atlas와 냉장고를 대량으로 복제해 놓은 병렬 학습 환경이다. 아래에는 보상함수가 명시되어 있다 — 냉장고를 성공적으로 옮기면 +100, 제한시간 내 성공하지 못하면 −100, 냉장고를 떨어뜨리거나 손상시키면 −200. 오른쪽에는 PPO(Proximal Policy Optimization) 알고리즘 도식이 붙어 있다. 슬라이드 하단 결론은 &quot;강화학습 알고리즘에 의해 점차 보상값이 큰 쪽으로 학습하기 위한 행동 = 냉장고를 옮기는 올바른 행동으로 수렴한다&quot;이다. 백덤블링이나 발차기도 성공 +100 / 실패 −1 형태로 학습 방식은 동일하다.</p>
-<h3>00:02:58 — 대비되는 예시: Helix의 정리 작업</h3>
-<p><img src="assets/rigchpuqsq-ts-00-02-58.jpg" alt="-RIGcHPUQsQ_ts_00-02-58.jpg"> &quot;Vision Language Action Model (VLA), Imitation Learning&quot;이라는 부제 아래 Figure의 Helix 로봇이 물건을 정리하는 장면들이 배치되어 있고, 슬라이드에 인용된 명령은 &quot;I&#39;d like you to use your new Helix AI and try to reason through <strong>where you think they belong in the scene</strong>. And then work together to put them away.&quot;이다. 처음 보는 물건이 냉장고·서랍·바구니 중 어디에 들어가야 할지 판단하고, 옆 로봇의 행동에 맞춰 자기 행동을 실시간으로 조정한다. 느리고 덜 화려하지만 상황 이해가 개입한다는 점에서 앞의 강화학습 데모와 대비된다.</p>
-<h3>00:03:44 — 피지컬 AI의 두 갈래</h3>
-<p><img src="assets/rigchpuqsq-ts-00-03-44.jpg" alt="-RIGcHPUQsQ_ts_00-03-44.jpg"> &quot;로봇을 어떻게 움직이고 생각하게 할 것인가?&quot;에 대한 두 방향이 좌우로 나뉘어 있다. 왼쪽 <strong>1. 월드모델 + 강화학습 RL</strong>은 Cosmos 3 논문의 장면 생성 결과(Emergency Vehicle + Night, Jaywalking, Lane Change, Police Cars, Weather Change)를 보여주며, 정교한 월드모델 시뮬레이션 안에 로봇을 수십만 대 올려놓고 <code>r(s)</code> = 살아남으면 시간당 +1 / 부품이 손상되거나 파손되면 −1 / 치명적인 손상으로 작동불능이 되면 −100 의 보상을 주면 &quot;세상에서 살아남는 법&quot;을 배울 것이라는 논리다. 오른쪽 <strong>2. VLA, 모방학습</strong>은 Open X-Embodiment 데이터셋 모자이크와 함께 입출력 계보를 정리한다 — LLM: Language → Language, VLM: Vision + Language → Language, VLA: Vision + Language → Action.</p>
-<aside class="callout callout-note"><div class="callout-title">발표자의 평가</div><div class="callout-body"><p>세상을 정교하게 시뮬레이션하는 월드모델을 만든다는 것은 사실상 AGI를 개발하겠다는 말과 거의 같아서 매우 어려운 방향이고, 현재 연구들도 성능이 뛰어나다기보다 &quot;이런 방식이 가능함을 보여주는 정도&quot;에 그친다.</p></div></aside>
-<h3>00:05:25 — 진영을 대표하는 기업</h3>
-<p><img src="assets/rigchpuqsq-ts-00-05-25.jpg" alt="-RIGcHPUQsQ_ts_00-05-25.jpg"> 같은 슬라이드 위에 기업 로고가 덧씌워진다. 월드모델·강화학습 방향에는 <strong>NVIDIA</strong>, VLA 방향에는 <strong>Google DeepMind</strong>와 <strong>Physical Intelligence(π)</strong>가 대표로 배치되어 있다.</p>
-<h3>00:05:41 — LLM에서 VLM으로</h3>
-<p><img src="assets/rigchpuqsq-ts-00-05-41.jpg" alt="-RIGcHPUQsQ_ts_00-05-41.jpg"> &quot;LLM to VLA&quot; 슬라이드. 2020년 GPT-3(Brown et al., <em>Language models are few-shot learners</em>)가 Text → Text의 Large Language Model로, 2021년 CLIP(Radford et al.)이 Text/Video → Text/Video의 Vision Language Model로 이어지는 흐름이 도식과 함께 정리되어 있다. 왼쪽 하단에는 CLIP의 contrastive pre-training 구조도가 붙어 있다.</p>
-<h3>00:06:10 — VLA 개념의 출현</h3>
-<p><img src="assets/rigchpuqsq-ts-00-06-10.jpg" alt="-RIGcHPUQsQ_ts_00-06-10.jpg"> 같은 슬라이드의 다음 단계로, 우상단 출력이 <code>-&gt; Action</code>으로 바뀌고 로봇 팔 그림이 추가된다. 슬라이드에 적힌 문제의식은 &quot;이미 우리는 볼 수 있고 생각할 수 있는 능력을 가진 모델을 만들었는데, 이걸로 로봇을 동작시키는 것도 되는 게 아니냐? 챗GPT의 지능을 로봇에 이식할 수 있는 게 아니냐?&quot;이며, 결론은 <strong>&quot;Vision Language Action Model&quot; 개념의 출현</strong>이다.</p>
-<h3>00:06:39 — SayCan: 언어모델과 실행 가능성의 결합</h3>
-<p><img src="assets/rigchpuqsq-ts-00-06-39.jpg" alt="-RIGcHPUQsQ_ts_00-06-39.jpg"> 2022년 <em>Do as I can, not as I say</em>(Ahn et al.) 슬라이드. 언어모델이 &quot;말만 되면 아무 답이나 내놓는&quot; 구조적 문제를 Task-grounding / World-grounding으로 구분해 설명한다. &quot;음료수를 쏟았는데 도와줘&quot;라는 입력에 GPT-3는 &quot;진공청소기를 써보면?&quot;, LaMDA는 &quot;청소부를 불러드릴까요?&quot;처럼 로봇 입장에서 실행 불가능한 답을 낸다. 해법은 LLM이 제시한 선택지 확률과 로봇이 실제로 해당 행동을 수행할 수 있는지를 나타내는 <strong>Value Function(실행가능성)</strong> 값을 곱해, 실행 가능하면서 맥락상 해야 할 행동을 고르게 하는 것이다. 우측 표에는 LLM 단독 점수, Combined 점수, Value Function 점수가 나란히 비교되어 있다.</p>
-<h3>00:08:04 — Scaling Laws와 Emergent Abilities</h3>
-<p><img src="assets/rigchpuqsq-ts-00-08-04.jpg" alt="-RIGcHPUQsQ_ts_00-08-04.jpg"> 왼쪽은 Kaplan et al.의 스케일링 법칙 그래프(Compute / Dataset Size / Parameters 대비 Test Loss가 멱법칙으로 감소), 오른쪽은 Wei et al.의 창발 능력 그래프들(Mod. arithmetic, IPA transliterate, Word unscramble, Persian QA, TruthfulQA, Grounded mappings, Multi-task NLU, Word in context)로 일정 규모 이상에서 성능이 급격히 꺾여 올라가는 형태를 보여준다. 슬라이드 결론은 &quot;LLM류는 데이터셋 규모와 모델 사이즈를 키울수록 성능이 올라간다&quot;, &quot;일정 수준 이상의 규모에 도달하면 가르친 적 없는 새로운 능력이 발현된다&quot;이다. 이 두 성질이 VLA 연구에도 그대로 가설로 이식된다.</p>
-<h3>00:08:34 — 대규모 로봇 데이터셋과 첫 VLA 모델들</h3>
-<p><img src="assets/rigchpuqsq-ts-00-08-34.jpg" alt="-RIGcHPUQsQ_ts_00-08-34.jpg"> Open X-Embodiment 데이터셋 모자이크(여러 기관의 로봇 데이터가 합쳐진 대형 컬렉션)와 참여 기관 로고들이 상단을 채우고, 오른쪽에는 &quot;그럼 로봇 데이터를 아주 많이 모아서 VLM에 직접 넣어보자 → 대규모 로봇 데이터셋 등장 → 사람의 내면 동작 영상 + 로봇 모방 행동 + 카메라 데이터로 구성 → 23년부터 이 대규모 로봇 데이터셋으로 학습시킨, 실제로 동작하는 VLA 모델들이 공개되기 시작&quot;이라는 흐름이 적혀 있다. 하단에는 <strong>RT-2</strong>(Zitkovich et al., 2023)와 <strong>OpenVLA</strong>(Kim et al., 2024)의 구조도가 나란히 배치된다. 슬라이드의 핵심 문장은 &quot;발전된 VLM 모델 + 아주 많은 로봇 데이터를 통해 &#39;범용 action 출력&#39;이라는 Emergent Abilities를 발현시키자&quot;이다.</p>
-<h3>00:09:45 — OpenVLA의 내부 구조</h3>
-<p><img src="assets/rigchpuqsq-ts-00-09-45.jpg" alt="-RIGcHPUQsQ_ts_00-09-45.jpg"> OpenVLA의 사양이 항목별로 정리되어 있다 — Total model size: 7B parameters, Language backbone: LLaMA 2 (7B), Vision encoder parameters: ~600M, Vision encoders: SigLIP + DinoV2 (feature concatenation), Projector: 2-layer MLP, Action dimensionality: 7-D, Action representation: Δx, Δθ, ΔGrip, Tokenizer modification: 256 least-used tokens overwritten. 구조도는 입력 이미지와 언어 지시(&quot;Put eggplant in bowl&quot;)가 DinoV2/SigLIP → MLP Projector → Llama 2 7B로 들어가고, 출력이 단어 대신 Action De-Tokenizer를 거쳐 엔드이펙터의 x·y·z, roll·pitch·yaw, grab on/off로 나오는 흐름을 보여준다. 우측 표는 어휘 토큰 자리에 0~255 값이 배정되는 방식을 시각화한 것이다.</p>
-<h3>00:10:43 — OpenVLA의 네 가지 한계</h3>
-<p><img src="assets/rigchpuqsq-ts-00-10-43.jpg" alt="-RIGcHPUQsQ_ts_00-10-43.jpg"> 슬라이드에 번호로 정리된 네 가지 문제와, 하단에 버튼을 누르는 로봇 실패 장면 두 컷이 붙어 있다.</p>
-<ol><li><strong>느리다</strong> — 2번째 행동 토큰을 예측하려면 이전 행동 토큰이 먼저 나와야 하는 autoregressive 방식의 구조적 한계.</li><li><strong>정밀도가 낮다</strong> — 동작을 토큰으로 뽑아야 하고 0~255 사이 이산 값으로만 표현된다.</li><li><strong>맥락 기억이 없다</strong> — 방금 버튼을 눌렀다는 사실을 잊고 다시 내려가 또 누른다. 누르려고 내려갈 때 찍힌 사진과 누르고 올라갈 때 찍힌 사진이 비슷하기 때문에, 별도의 기억 능력이 없으면 필연적으로 생기는 오류다.</li><li><strong>시야가 가려지면 못 하고, 손끝 힘을 모르니 물건을 손상시킨다</strong> — 카메라 이외의 센서 데이터를 사용할 수 없다.</li></ol>
-<h3>00:12:10 — OpenVLA 이후 여섯 갈래</h3>
-<p><img src="assets/rigchpuqsq-ts-00-12-10.jpg" alt="-RIGcHPUQsQ_ts_00-12-10.jpg"> &quot;Evolution of VLA Models — after openVLA…&quot; 슬라이드에서 OpenVLA 구조로부터 여섯 개의 화살표가 뻗어 나온다. 1. Dual Process Theory, System 1 &amp; System 2, Action expert / 2. Chain-Of-Thought (CoT) / 3. Memory Module / 4. VLA + RL / 5. VLA + Tactile / Force / 6. More data. 이후 발표는 이 여섯 가지를 순서대로 다룬다.</p>
-<h3>00:12:28 — 방향 1: 이중 처리 이론</h3>
-<p><img src="assets/rigchpuqsq-ts-00-12-28.jpg" alt="-RIGcHPUQsQ_ts_00-12-28.jpg"> 카너먼의 <em>Thinking, Fast and Slow</em> 표지와 System 1(Fast thinking = Action) / System 2(Slow thinking = Inference, Reasoning) 대비도가 놓이고, 아래에는 Helix가 System 1과 System 2를 분리한 구조도(&quot;Pick up the butter and hand it over to the robot on your left&quot;)가 있다. 슬라이드 메모는 &quot;특정 논문·모델에 국한된 개념이 아니라 VLA 모델 설계 철학으로 기능하며, 이 Dual process theory를 구현한 모델 구조 중 가장 표준에 가깝게 쓰이는 것이 Action expert&quot;라는 점을 강조한다.</p>
-<h3>00:13:04 — Action Expert와 Action Chunk (π0)</h3>
-<p><img src="assets/rigchpuqsq-ts-00-13-04.jpg" alt="-RIGcHPUQsQ_ts_00-13-04.jpg"> 2024년 π0(Black et al., <em>A Vision-Language-Action Flow Model for General Robot Control</em>) 구조도. 사전학습 VLM 옆에 별도의 <strong>action expert</strong> 블록이 붙고, 우측에는 Joint No. × Time(t) 격자가 &quot;Random&quot;에서 &quot;Answer&quot;로 수렴하는 그림이 있다 — 시간에 따른 연속 관절값을 2차원 표로 그리면 이미지 형태가 되고, 이를 한 번에 예측하면 일정 구간의 액션을 통째로 뽑는 <strong>action chunk</strong>가 된다. 하단 도식은 Decoder Block과 Masked Self-Attention을 거쳐 <code>if diffusion step = 10</code>, <code>x1 (KV caching)</code> / <code>x10</code>으로 갈라지는 흐름을 보여준다. 트랜스포머 내부 MLP층을 분리해 전체 모델보다 빠른 주파수로 돌리는 것이 action expert의 핵심이다.</p>
-<h3>00:13:59 — 방향 2: CoT-VLA</h3>
-<p><img src="assets/rigchpuqsq-ts-00-13-59.jpg" alt="-RIGcHPUQsQ_ts_00-13-59.jpg"> 2025년 CoT-VLA(Zhao et al., CVPR) 슬라이드. 왼쪽은 일반 LLM의 사고 과정 예시(해운대 맛집 검색을 단계적으로 개선하는 화면), 오른쪽은 Vanilla VLA (causal)와 Ours: CoT-VLA (causal &amp; full-attention) 구조 비교다. 핵심 차이는 obs image + text에서 바로 action으로 가지 않고 중간에 <strong>goal image</strong>를 예측한다는 점이다. 슬라이드 메모는 &quot;LLM은 추론 과정을 자연어로 적어도 되지만, 로봇은 출력이 액션이므로 중간 과정을 자연어로 적으면 정보 손실이 생긴다 → 로봇은 추론 과정을 &#39;이미지&#39;로 생각해야 한다&quot;이다. 하단 Closed-loop control example은 생성된 goal state를 기준으로 새 관측을 받아 반복하는 폐루프를 보여준다.</p>
-<h3>00:15:02 — 방향 3: 메모리 모듈 (MEM)</h3>
-<p><img src="assets/rigchpuqsq-ts-00-15-02.jpg" alt="-RIGcHPUQsQ_ts_00-15-02.jpg"> 2026년 MEM(Torne et al., <em>Multi-Scale Embodied Memory</em>) 구조도. 상단 경로는 <strong>Long-Term Text Memory</strong>로, VLM이 매 사이클마다 자신이 어디까지 했는지 기록하는 Memory Summary를 생성하고 다음 사이클 입력으로 되먹인 뒤 지금 해야 할 Subtask를 텍스트로 VLA에 내려보낸다. 하단 경로는 <strong>Short-Term Video Memory</strong>로, 최근 구간의 비디오를 압축한 피처를 VLA 입력에 함께 넣는다. 오른쪽에는 이 구조로 가능해진 과제들이 세 묶음으로 제시된다 — Long-Horizon Tasks with Memory(recipe set up, make grilled cheese, clean kitchen), Solve Tasks w/ Partial Observability, Perform In-Context Adaptation. 슬라이드 결론은 &quot;장기 기억은 텍스트로 저장하고, 단기 기억은 이미지로 저장하자&quot;이다.</p>
-<h3>00:16:37 — 방향 4: VLA + 강화학습 (π*0.6)</h3>
-<p><img src="assets/rigchpuqsq-ts-00-16-37.jpg" alt="-RIGcHPUQsQ_ts_00-16-37.jpg"> 2026년 π<em>0.6(Physical Intelligence, </em>a VLA That Learns From Experience*) 슬라이드. 상단은 LLM → VLM → pre-trained VLA → VLA로 이어지는 학습 단계와 success/fail 갈림길을, 하단은 로봇 데이터가 <strong>value function</strong>을 담당하는 VLM을 먼저 통과해 advantage 신호를 만들고 그것이 태그로 붙어 VLA에 들어가는 흐름을 보여준다. 슬라이드 메모는 &quot;VLA는 기본적으로 모방학습·지도학습(supervised learning)이라 정답 데이터만을 전부 넣어서 비슷한 행동을 잘 하게끔 하는 방식이며, 빠지는 것은 &#39;실패 데이터&#39;다 → 실패 데이터와 성공 데이터를 구분하는 라벨을 만들고 해당 라벨을 이용해 성공 데이터와 실패 데이터의 격차를 더 벌어지게 해서 출력 행동의 품질을 높인다&quot;이다.</p>
-<h3>00:17:46 — 방향 5: 촉각·힘 모달리티 (ForceVLA2)</h3>
-<p><img src="assets/rigchpuqsq-ts-00-17-46.jpg" alt="-RIGcHPUQsQ_ts_00-17-46.jpg"> 2026년 ForceVLA2(Li et al., CVPR) 구조도. 출력이 <code>Position (x,y,z) + Force(xyz force) + progress (ex&gt; 0.8, 0.9…)</code>로 정의되고, Vision Language Model 아래 Action Experts 안에 <strong>Multimodal Encoder</strong>와 <strong>Cross-scale MoE</strong>가 배치되어 Force Token/Force Prompt를 함께 처리한다. 오른쪽에는 같은 action chunk 격자가 &quot;position control&quot;용과 &quot;force control&quot;용 두 벌로 그려져, joint torque + force까지 출력하는 구조임을 보여준다. 슬라이드 정리는 &quot;VLA의 출력(action chunk)은 대부분 &#39;위치 기반 제어&#39;다 → 위치 기반 제어는 정밀하지만 힘을 고려하지 못해 물체가 손상되거나 할 위험이 있다 → 힘이라는 모달리티를 VLA의 input으로 넣어야 하고, 출력에도 &#39;힘&#39;이 포함되어야 힘 기반 제어를 할 수 있다&quot;이다.</p>
-<aside class="callout callout-warning"><div class="callout-title">이 방향만의 트레이드오프</div><div class="callout-body"><p>VLA의 목표는 어떤 로봇 하드웨어에도 적용 가능한 범용 액션을 뽑는 파운데이션 모델인데, 새로운 모달리티를 추가하면 센서 종류와 데이터 형태마다 모델을 따로 학습시켜야 해서 범용성이라는 장점과 모순된다. 게다가 기존 산업용 로봇은 설계 단계부터 위치 기반 제어를 중시하고 힘 기반 제어를 제공하지 않는 하드웨어도 많다.</p></div></aside>
-<h3>00:20:13 — 촉각 전문가의 비대칭 주파수 (T-Rex)</h3>
-<p><img src="assets/rigchpuqsq-ts-00-20-13.jpg" alt="-RIGcHPUQsQ_ts_00-20-13.jpg"> 2026년 T-Rex(Niu et al., <em>Tactile-reactive dexterous manipulation</em>) 아키텍처. <strong>Multimodal Shared Attention</strong>을 공유하면서 Latent Expert(Predict Future Visual Latent), Action Expert(Low-Frequency Denoising), <strong>Tactile Expert(High-Frequency Denoising)</strong> 세 전문가가 갈라지고, 우측의 손 모양 히트맵이 촉각 센서 입력(&quot;Apply toothpaste&quot;)을 나타낸다. 하단 Asynchronous Reactive Execution 도식에는 Action Expert ~5Hz와 <strong>Tactile Expert ~20Hz</strong>가 t+1…t+5에 걸쳐 비동기로 실행되는 타임라인이 그려져 있다. 슬라이드 메모는 &quot;Tactile은 시각보다 더 빠르고 정교한 피드백을 줄 수 있어야 한다 / 판단은 느리게(system 2), 동작 생성은 빠르게(system 1), 촉각은 그보다 더 빠르게&quot;이다. 촉각 전문가도 어텐션 레이어 자체는 공유하기 때문에 큰 행동 생성부터 미세 보정까지 촉각이 반영된다.</p>
-<h3>00:21:14 — 방향 6: 데이터 합성과 증강 (RLDX-1)</h3>
-<p><img src="assets/rigchpuqsq-ts-00-21-14.jpg" alt="-RIGcHPUQsQ_ts_00-21-14.jpg"> 2026년 RLDX-1 테크니컬 리포트(Kim et al.)에서 가져온 파이프라인. 발표자는 이를 &quot;한국의 리얼드라는 기업&quot;이 낸 모델로 소개한다. <strong>1. Data Generation</strong>은 Source Data → Scene &amp; Task Augmentation → Action Labelling으로, 비디오 생성 모델을 백본으로 써서 원본 비디오의 태스크를 바꾸거나 물체 종류 같은 장면을 바꿔 증강한다. <strong>2. Data Filtering</strong>은 IDM-predicted Actions와 Motion-Consistency Classifier, Video Consistency Check를 거쳐 Consistency Score가 높으면 Keep for Training, 낮으면 Discard로 분기한다. 오른쪽에는 (a) Original Video, (b) Task Augmented Video, (c) Scene Augmented Video 비교 컷이 있다. 슬라이드 마지막 줄은 &quot;즉, world model + RL 진영과 VLA 진영의 구분이 점점 없어지고 상호보완적인 관계로 발전 중임&quot;이다.</p>
-<h3>00:22:37 — 결론: 인조 인간을 설계하는 일</h3>
-<p><img src="assets/rigchpuqsq-ts-00-22-37.jpg" alt="-RIGcHPUQsQ_ts_00-22-37.jpg"> &quot;Physical AI 연구는 인조 인간을 설계하는 것과 비슷하다&quot;는 문장과 함께 뇌 단면도에 VLA 구성요소를 대응시킨 그림이 놓인다 — VLA = 뇌, CoT VLA = 전전두엽에 해당하는 영역, Action expert = 소뇌, Memory module = 해마. 오른쪽에는 Vision sensor = 눈, Tactile sensor = 손이 실제 센서 사진과 함께 대응되어 있다. 하단 결론은 &quot;VLA 모델을 비롯한 소프트웨어 이론의 발전은 예정된 수순이다. 병목은 배터리, 내구성, 가격, 센서, 하드웨어, 그리고 데이터이다&quot;이며, 누워 있는 휴머노이드·로봇 핸드·작업 현장 사진이 배치되어 있다.</p>
-<h2>주요 내용 요약</h2>
-<h3>핵심 포인트</h3>
-<ul><li>화제가 된 Atlas의 백덤블링이나 Unitree H2의 발차기는 모두 시뮬레이션 안에서 보상함수를 최대화하도록 학습된 강화학습 결과다. 로봇은 그 행동을 왜 해야 하는지 이해하지 못하며, 발표자는 이를 &quot;진정한 의미의 피지컬 AI&quot;와 구분한다.</li><li>피지컬 AI는 크게 두 갈래로 나뉜다. <strong>월드모델 + 강화학습</strong>(NVIDIA)은 세상 자체를 정교하게 시뮬레이션한 뒤 생존 보상을 주는 방향이고, <strong>VLA + 모방학습</strong>(Google DeepMind, Physical Intelligence)은 방대한 로봇 데이터를 언어모델에 밀어 넣어 챗GPT의 지능을 로봇에 이식하는 방향이다.</li><li>VLA는 LLM(Language→Language) → VLM(Vision+Language→Language) → VLA(Vision+Language→Action)라는 계보의 자연스러운 귀결이다.</li><li>언어모델을 로봇에 붙일 때의 최초 장벽은 &quot;말만 되면 아무 답이나 내놓는&quot; 문제였고, SayCan(2022)이 실행가능성 value function을 곱하는 방식으로 이를 해결하면서 VLA 연구가 본격화됐다.</li><li>스케일링 법칙과 창발 능력이라는 LLM의 두 성질이 VLA에도 가설로 이식되어 &quot;로봇 데이터를 잔뜩 모으면 가르치지 않은 행동도 하게 될 것&quot;이라는 방향이 세워졌고, Open X-Embodiment 같은 대규모 공유 데이터셋과 RT-2·OpenVLA가 등장했다.</li><li>특히 OpenVLA는 구조와 가중치가 모두 공개되고 변형·응용이 쉬운 오픈소스 기반이어서, 이 모델을 기점으로 VLA 연구 물량이 폭발적으로 늘었다.</li></ul>
-<h3>기술적 내용</h3>
-<ul><li><strong>로봇 데이터의 형태</strong>: 명령을 올바르게 수행하는 로봇을 촬영한 동영상 + 그때 녹화된 관절값. VLA는 매 순간의 이미지 프레임과 사용자 명령을 받아 바로 다음 순간의 정답 행동을 출력하며, 명령을 완수할 때까지 이 추론을 계속 반복한다.</li><li><strong>OpenVLA 구조</strong>: LLaMA 2 7B 백본 + SigLIP·DinoV2 비전 인코더(~600M) + 2-layer MLP projector. 출력 어휘 토큰 중 가장 덜 쓰이는 256개를 덮어써서 단어 대신 숫자를 뱉게 하고, 이를 De-Tokenizer로 풀어 7-D 엔드이펙터 행동(Δx, Δθ, ΔGrip)을 만든다.</li><li><strong>OpenVLA의 네 가지 한계</strong>: (1) autoregressive 직렬 출력이라 느림 (2) 0~255 이산 토큰이라 정밀도가 낮음 (3) 작업 맥락 기억이 없어 방금 한 행동을 반복 (4) 시야 가림에 취약하고 힘을 모름.</li><li><strong>Action chunk + Action expert (π0, 2024)</strong>: 시간축 관절값을 2차원 표로 보고 이미지처럼 한 번에 예측해 일정 구간 액션을 통째로 뽑고(action chunk), 트랜스포머 내부 MLP층을 분리해 전체 모델보다 빠른 주파수로 돌린다(action expert). 결과적으로 지연 없이 더 높은 제어 주파수를 얻는다.</li><li><strong>CoT-VLA (2025)</strong>: 복잡한 작업을 서브태스크로 쪼개 순서대로 출력하되, 중간 추론을 자연어가 아니라 <strong>목표 이미지</strong>로 예측해 정보 손실을 피한다.</li><li><strong>MEM (2026)</strong>: 장기 기억은 별도 VLM이 매 사이클 갱신하는 텍스트 Memory Summary로, 단기 기억은 최근 3초 비디오를 시공간 컨볼루션으로 압축한 피처로 구현한다. 개수를 세며 물건을 꺼내거나 주방 전체를 정리하는 장기 과제가 가능해진다.</li><li>*<em>π</em>0.6 (2026)**: 로봇 데이터를 VLA에 넣기 전에 value function VLM에 통과시켜 방금 행동이 성공에 도움이 되었는지 판단하고, 이를 이진 advantage 신호로 만들어 태그로 붙인다. Action expert가 실패 행동의 분포에서 멀어지도록 학습되어, 버려지던 실패 데이터까지 활용된다.</li><li><strong>ForceVLA2 / T-Rex (2026)</strong>: 힘·촉각 센서를 별도 인코더로 받고 출력에 목표 토크까지 포함해 힘 기반 제어를 가능하게 한다. T-Rex는 여기서 한 발 더 나아가 Action Expert ~5Hz보다 빠른 <strong>Tactile Expert ~20Hz</strong>를 두어 실시간 보정을 수행하며, 두 전문가는 MLP만 분리하고 어텐션 레이어는 공유한다.</li><li><strong>RLDX-1 (2026)</strong>: 비디오 생성 모델을 백본으로 태스크·장면을 바꿔 데이터를 증강하고, 증강 결과를 시뮬레이션에서 동작시켜 consistency로 자동 필터링한다. 비디오 생성 모델이 곧 월드모델이라는 점에서 두 진영의 경계가 흐려지는 사례다.</li></ul>
-<h2>시사점과 한계</h2>
-<ul><li>발표자는 VLA의 구조 발전이 <strong>인간의 뇌를 부품별로 재구성하는 방향</strong>으로 수렴한다고 본다. Action expert는 소뇌, CoT는 전전두엽, 메모리 모듈은 해마, 촉각 센서는 손, 카메라는 눈에 대응한다는 정리다.</li><li>촉각·힘 모달리티 추가는 다른 방향들과 달리 명확한 트레이드오프를 안는다. 센서 종류마다 모델을 따로 학습시켜야 해서 &quot;어떤 하드웨어에도 적용 가능한 파운데이션 모델&quot;이라는 VLA의 근본 목표와 충돌한다. 다만 로봇이 산업 현장에서 일상으로 넘어오려면 반드시 거쳐야 할 과정이라는 것이 발표자의 판단이다.</li><li>소프트웨어의 발전 속도를 하드웨어가 따라가지 못하고 있다. 사람 동작을 정교하게 재현하는 로봇 핸드와 휴머노이드가 이제야 활발히 출시되는 단계이고, 배터리·내구성·센서 신뢰도 등 물리적으로 검증해야 할 부분이 많이 남아 있다.</li><li>월드모델이든 VLA든 결국 데이터 주도 방식이므로, 향후 몇 년간은 기존 AI 산업과 마찬가지로 자본과 데이터를 가진 기업이 연구를 선도할 것이라는 전망으로 발표가 마무리된다.</li><li><strong>자료의 한계</strong>: 이 노트의 인용은 한국어 자동 생성 자막(수동 자막 없음)과 슬라이드 화면에 근거한다. 자동 자막 특성상 고유명사 표기 오류가 있었으며(예: &quot;채치T&quot;→ChatGPT, &quot;파이스타 0.6&quot;→π*0.6), 해당 부분은 슬라이드에 적힌 표기를 우선해 정정했다. 발표에서 언급된 논문 목록은 영상 설명란에 [1]~[16]으로 정리되어 있다.</li></ul>
-</article>
-</main>
+
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow"><span class="dot"></span>연구 노트 · Physical AI</p>
+    <h1>백덤블링하는 로봇은 왜 <em>‘피지컬 AI’</em>가 아닌가</h1>
+    <p class="dek">
+      Atlas의 공중제비와 Unitree H2의 발차기에는 ‘왜’가 없다. 보상함수가 시킨 대로 수렴한 궤적일 뿐이다.
+      챗GPT의 지능을 로봇 몸에 이식하려는 VLA(Vision-Language-Action) 연구가 SayCan에서 OpenVLA를 거쳐
+      2026년 여섯 갈래로 갈라지기까지 — 그 계보와, 남아 있는 진짜 병목에 대한 기록.
+    </p>
+    <div class="byline">
+      <span><b>발표</b> 이상호 · 고려대학교 전자정보공학과 지능형 신경공학 연구실</span>
+      <span><b>채널</b> AIN Lab</span>
+      <span><b>길이</b> 24분 1초</span>
+      <span><b>정리</b> 2026년 9월 16일</span>
+      <span><b>원본</b> <a rel="noopener">YouTube에서 보기 ↗</a></span>
+    </div>
+    <div class="tagrow">
+      <span class="tag">Physical AI</span>
+      <span class="tag">VLA</span>
+      <span class="tag">OpenVLA</span>
+      <span class="tag">World Model</span>
+      <span class="tag">Robot Learning</span>
+      <span class="tag">저널 미팅</span>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+<div class="grid">
+
+  <nav class="toc-rail" aria-label="목차">
+    <h2>목차</h2>
+    <ol>
+      <li><a href="#abstract">초록</a></li>
+      <li><a href="#findings">핵심 발견</a></li>
+      <li><a href="#s1">1. 화려한 데모의 정체</a></li>
+      <li><a href="#s2">2. 두 갈래의 길</a></li>
+      <li><a href="#s3">3. LLM에서 VLA까지</a></li>
+      <li><a href="#s4">4. OpenVLA 해부</a></li>
+      <li><a href="#s5">5. 여섯 갈래의 진화</a></li>
+      <li><a href="#s6">6. 인조 인간 설계도</a></li>
+      <li><a href="#implications">시사점</a></li>
+      <li><a href="#sources">자료 노트</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <!-- ABSTRACT -->
+    <section id="abstract" class="abstract" aria-labelledby="abstract-h">
+      <p class="label" id="abstract-h">초록 · Abstract</p>
+      <p>
+        인터넷을 휩쓴 휴머노이드 영상 대부분은 시뮬레이션 안에서 보상함수를 최대화하도록 학습된 강화학습의 결과물이다.
+        로봇은 냉장고를 옮기지만, 그것이 <strong>냉장고</strong>인지도 <strong>왜 옮겨야 하는지</strong>도 모른다.
+        이 발표는 바로 그 지점 — ‘상황 이해의 부재’ — 에서 출발한다.
+      </p>
+      <p>
+        대안으로 제시되는 것이 VLA(Vision-Language-Action) 모델이다.
+        LLM(Language→Language)과 VLM(Vision+Language→Language)이 확보한 지능을 로봇의 몸에 이식해,
+        출력만 단어에서 관절값으로 바꾸자는 발상이다.
+        본 노트는 SayCan(2022)의 실행가능성 결합, 스케일링 법칙과 창발 능력의 가설 이식,
+        Open X-Embodiment라는 대규모 공유 데이터셋, 그리고 오픈소스 기점이 된 OpenVLA(2024)까지의 계보를 정리한다.
+      </p>
+      <p>
+        이어서 OpenVLA가 드러낸 네 가지 구조적 한계(속도·정밀도·기억·감각)와,
+        이를 각각 공략하는 2024–2026년의 여섯 갈래 연구 방향(Action Expert, CoT, Memory, RL, Tactile/Force, Data Synthesis)을 검토한다.
+        결론은 두 가지다. 첫째, VLA의 구조 진화는 <strong>인간의 뇌를 부품별로 재구성하는 방향</strong>으로 수렴하고 있다.
+        둘째, 소프트웨어 이론의 발전은 예정된 수순이며 <strong>진짜 병목은 배터리·내구성·가격·센서·하드웨어, 그리고 데이터</strong>다.
+      </p>
+    </section>
+
+    <!-- KEY FINDINGS -->
+    <h2 class="sec" id="findings"><span class="num">Key Findings</span>다섯 문장으로 요약하면</h2>
+    <div class="findings">
+      <article class="finding" data-n="01">
+        <h4>화려한 데모 ≠ 지능</h4>
+        <p>백덤블링도 발차기도 성공 +100 / 실패 −1 형태의 보상 설계로 수렴한 행동이다. 이해가 아니라 최적화의 산물이다.</p>
+      </article>
+      <article class="finding" data-n="02">
+        <h4>피지컬 AI는 두 진영</h4>
+        <p>세상 자체를 시뮬레이션하는 <strong>월드모델+RL</strong>(NVIDIA)과, 로봇 데이터를 언어모델에 밀어 넣는 <strong>VLA+모방학습</strong>(DeepMind, Physical Intelligence).</p>
+      </article>
+      <article class="finding" data-n="03">
+        <h4>VLA는 계보의 귀결</h4>
+        <p>LLM → VLM → VLA. 입력에 시각을 더하고, 출력을 언어에서 행동으로 바꾼 자연스러운 다음 칸이다.</p>
+      </article>
+      <article class="finding" data-n="04">
+        <h4>OpenVLA가 기폭제</h4>
+        <p>구조와 가중치가 모두 공개되어 변형이 쉬웠다. 이 모델의 네 가지 한계가 곧 이후 연구의 좌표계가 됐다.</p>
+      </article>
+      <article class="finding" data-n="05">
+        <h4>두 진영의 경계가 흐려진다</h4>
+        <p>RLDX-1은 비디오 생성 모델로 로봇 데이터를 증강한다. 비디오 생성 모델은 곧 월드모델이다.</p>
+      </article>
+      <article class="finding" data-n="06">
+        <h4>병목은 소프트웨어가 아니다</h4>
+        <p>배터리, 내구성, 가격, 센서, 하드웨어, 그리고 데이터. 발표자가 꼽은 실제 제약 목록이다.</p>
+      </article>
+    </div>
+
+    <figure>
+      <img src="assets/rigchpuqsq-ts-00-00-10.jpg" alt="‘Physical AI, VLA’라고 적힌 발표 표지 슬라이드" loading="lazy">
+      <figcaption>
+        <a class="ts" rel="noopener">00:00:10</a>
+        발표 표지. 개별 논문 리뷰가 아니라, 부산 차세대 융합기술 세미나 발표를 토대로 피지컬 AI와 VLA의 발전 과정을 순차적으로 재구성한 자료라고 발표자는 밝힌다.
+      </figcaption>
+    </figure>
+
+    <hr class="rule">
+
+    <!-- SECTION 1 -->
+    <h2 class="sec" id="s1"><span class="num">Part 01 · 문제 제기</span>화려한 데모의 정체는 보상함수였다</h2>
+
+    <p class="lead">
+      발표는 두 장의 영상으로 시작한다. 사람과 다른 방향으로 관절을 꺾으며 움직이는 Boston Dynamics의 Atlas,
+      그리고 발차기를 선보이는 Unitree H2. 타임라인을 점령했던 바로 그 장면들이다.
+      발표자의 첫 문장은 냉정하다 — “이런 데모들을 진정한 의미의 피지컬 AI로 보기는 어렵다.”
+    </p>
+
+    <figure>
+      <img src="assets/rigchpuqsq-ts-00-00-37.jpg" alt="Boston Dynamics Atlas와 Unitree H2의 바이럴 데모 장면이 나란히 배치된 슬라이드" loading="lazy">
+      <figcaption>
+        <a class="ts" rel="noopener">00:00:37</a>
+        관절을 사람과 다른 방향으로 꺾는 Atlas와 발차기하는 Unitree H2. 놀랍지만, 놀라움의 종류가 다르다는 것이 발표의 출발점이다.
+      </figcaption>
+    </figure>
+
+    <p>
+      실제로 무슨 일이 벌어지고 있는가. 다음 슬라이드가 답한다.
+      왼쪽은 Atlas가 냉장고를 옮기는 실제 영상, 오른쪽은 같은 로봇과 냉장고를 시뮬레이션 안에 대량 복제해 놓은 병렬 학습 환경이다.
+      아래에는 보상함수가 그대로 적혀 있다.
+    </p>
+
+    <div class="tw">
+      <table>
+        <caption>냉장고 운반 과제의 보상 설계</caption>
+        <thead>
+          <tr><th scope="col">조건</th><th scope="col">보상</th><th scope="col">의미</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">냉장고를 성공적으로 옮김</th><td><code>+100</code></td><td>목표 달성</td></tr>
+          <tr><th scope="row">제한시간 내 실패</th><td><code>−100</code></td><td>시간 제약 학습</td></tr>
+          <tr><th scope="row">냉장고를 떨어뜨리거나 손상</th><td><code>−200</code></td><td>가장 강한 페널티</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>
+      여기에 PPO(Proximal Policy Optimization)를 붙이면 끝이다.
+      정책은 보상값이 큰 쪽으로 점진적으로 이동하고, 결국 “냉장고를 옮기는 올바른 행동”으로 수렴한다.
+      백덤블링도 발차기도 다르지 않다. 성공 +100, 실패 −1. 설계만 바꿨을 뿐 메커니즘은 동일하다.
+    </p>
+
+    <figure>
+      <img src="assets/rigchpuqsq-ts-00-01-30.jpg" alt="실제 Atlas 영상과 시뮬레이션 병렬 학습 환경, 보상함수와 PPO 도식이 함께 표시된 슬라이드" loading="lazy">
+      <figcaption>
+        <a class="ts" rel="noopener">00:01:30</a>
+        시뮬레이션 안에 Atlas와 냉장고를 수없이 복제해 병렬로 학습시킨다. 오른쪽에 붙은 PPO 도식이 나머지를 설명한다.
+      </figcaption>
+    </figure>
+
+    <div class="pull">
+      <blockquote>
+        로봇은 냉장고를 옮기지만, 그것이 냉장고라는 사실도 왜 옮겨야 하는지도 모른다.
+        보상이 가리키는 방향으로 수렴했을 뿐이다.
+      </blockquote>
+      <cite>— 발표의 문제의식을 한 문장으로</cite>
+    </div>
+
+    <h3>대비: Helix는 느리지만, 생각한다</h3>
+
+    <p>
+      대조군으로 제시되는 것이 Figure의 Helix다. 슬라이드에 인용된 명령은 이렇다 —
+      <em>“I’d like you to use your new Helix AI and try to reason through <strong>where you think they belong in the scene</strong>.
+      And then work together to put them away.”</em>
+    </p>
+
+    <p>
+      처음 보는 물건이 냉장고에 들어가야 할지, 서랍에 들어가야 할지, 바구니에 담겨야 할지를 판단한다.
+      옆에 있는 다른 로봇이 무엇을 집었는지 보고 자기 행동을 실시간으로 조정한다.
+      동작은 느리고 영상은 덜 화려하다. 그러나 여기에는 <strong>상황 이해</strong>가 개입한다.
+    </p>
+
+    <figure>
+      <img src="assets/rigchpuqsq-ts-00-02-58.jpg" alt="Figure의 Helix 로봇 두 대가 물건을 정리하는 장면과 VLA·모방학습 부제가 적힌 슬라이드" loading="lazy">
+      <figcaption>
+        <a class="ts" rel="noopener">00:02:58</a>
+        “Vision Language Action Model (VLA), Imitation Learning”. 강화학습 데모와 나란히 놓였을 때 비로소 차이가 보인다.
+      </figcaption>
+    </figure>
+
+    <hr class="rule">
+
+    <!-- SECTION 2 -->
+    <h2 class="sec" id="s2"><span class="num">Part 02 · 지형도</span>로봇을 어떻게 움직이고 생각하게 할 것인가</h2>
+
+    <p class="lead">
+      발표자는 피지컬 AI를 두 갈래로 정리한다. 슬라이드 한 장이 좌우로 갈라져 있고,
+      각각에 대표 기업의 로고가 붙는다.
+    </p>
+
+    <figure>
+      <img src="assets/rigchpuqsq-ts-00-03-44.jpg" alt="월드모델+강화학습과 VLA+모방학습을 좌우로 나눠 비교한 슬라이드" loading="lazy">
+      <figcaption>
+        <a class="ts" rel="noopener">00:03:44</a>
+        왼쪽은 Cosmos 3의 장면 생성 결과(Emergency Vehicle + Night, Jaywalking, Lane Change, Police Cars, Weather Change),
+        오른쪽은 Open X-Embodiment 데이터셋 모자이크와 LLM→VLM→VLA 입출력 계보.
+      </figcaption>
+    </figure>
+
+    <div class="tw">
+      <table>
+        <caption>피지컬 AI의 두 진영</caption>
+        <thead>
+          <tr><th scope="col"></th><th scope="col">① 월드모델 + 강화학습</th><th scope="col">② VLA + 모방학습</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">핵심 아이디어</th>
+            <td>세상을 정교하게 시뮬레이션한 뒤, 그 안에 로봇을 수십만 대 올려놓고 생존 보상을 준다</td>
+            <td>방대한 로봇 데이터를 VLM에 넣어, 언어모델의 지능을 그대로 행동 출력으로 전이시킨다</td>
+          </tr>
+          <tr>
+            <th scope="row">학습 신호</th>
+            <td><code>r(s)</code> = 살아남으면 시간당 +1 / 부품 손상·파손 −1 / 작동불능 −100</td>
+            <td>정답 시연(동영상 + 관절값)에 대한 지도학습</td>
+          </tr>
+          <tr>
+            <th scope="row">대표</th>
+            <td><strong>NVIDIA</strong></td>
+            <td><strong>Google DeepMind</strong>, <strong>Physical Intelligence (π)</strong></td>
+          </tr>
+          <tr>
+            <th scope="row">기대 효과</th>
+            <td>“세상에서 살아남는 법”을 스스로 습득</td>
+            <td>가르치지 않은 행동까지 수행하는 범용 정책</td>
+          </tr>
+          <tr>
+            <th scope="row">난점</th>
+            <td>정교한 월드모델 = 사실상 AGI. 현 연구는 “가능함을 보여주는 정도”</td>
+            <td>로봇 데이터의 절대량 부족, 하드웨어 다양성</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout note">
+      <p class="ct">발표자의 평가</p>
+      <p>
+        세상을 정교하게 시뮬레이션하는 월드모델을 만든다는 것은 사실상 AGI를 개발하겠다는 말과 거의 같다.
+        방향 자체가 매우 어렵고, 현재의 연구 결과들도 성능이 뛰어나다기보다 “이런 방식이 가능함을 보여주는 정도”에 그친다.
+      </p>
+    </div>
+
+    <figure>
+      <img src="assets/rigchpuqsq-ts-00-05-25.jpg" alt="월드모델 진영에 NVIDIA, VLA 진영에 Google DeepMind와 Physical Intelligence 로고가 배치된 슬라이드" loading="lazy">
+      <figcaption>
+        <a class="ts" rel="noopener">00:05:25</a>
+        같은 슬라이드 위에 기업 로고가 덧씌워지며 진영이 확정된다. 이후 발표는 오른쪽 진영, 즉 VLA를 따라간다.
+      </figcaption>
+    </figure>
+
+    <hr class="rule">
+
+    <!-- SECTION 3 -->
+    <h2 class="sec" id="s3"><span class="num">Part 03 · 계보</span>LLM에서 VLA까지, 네 번의 도약</h2>
+
+    <p class="lead">
+      VLA는 어느 날 등장한 아이디어가 아니다. 입력에 시각을 더하고, 출력을 언어에서 행동으로 바꾼
+      아주 단순한 확장의 연속이었다.
+    </p>
+
+    <div class="lineage">
+      <div class="stage">
+        <p class="yr">2020 · GPT-3</p>
+        <p class="nm">LLM</p>
+        <p class="io">Language → Language</p>
+      </div>
+      <div class="stage">
+        <p class="yr">2021 · CLIP</p>
+        <p class="nm">VLM</p>
+        <p class="io">Vision + Language → Language</p>
+      </div>
+      <div class="stage">
+        <p class="yr">2022– · SayCan, RT-2, OpenVLA</p>
+        <p class="nm">VLA</p>
+        <p class="io">Vision + Language → <strong>Action</strong></p>
+      </div>
+    </div>
+
+    <figure>
+      <img src="assets/rigchpuqsq-ts-00-05-41.jpg" alt="GPT-3와 CLIP으로 이어지는 LLM에서 VLM으로의 흐름을 정리한 슬라이드" loading="lazy">
+      <figcaption>
+        <a class="ts" rel="noopener">00:05:41</a>
+        2020년 GPT-3(Brown et al., <em>Language models are few-shot learners</em>)에서 2021년 CLIP(Radford et al.)으로.
+        왼쪽 하단에 CLIP의 contrastive pre-training 구조도가 붙어 있다.
+      </figcaption>
+    </figure>
+
+    <p>
+      다음 슬라이드에서 우상단의 출력이 <code>-&gt; Action</code>으로 바뀌고 로봇 팔 그림이 추가된다.
+      슬라이드에 적힌 문제의식은 놀랄 만큼 단순하다.
+    </p>
+
+    <div class="pull">
+      <blockquote>
+        이미 우리는 볼 수 있고 생각할 수 있는 모델을 만들었는데,
+        이걸로 로봇을 동작시키는 것도 되는 게 아닌가? 챗GPT의 지능을 로봇에 이식할 수 있는 게 아닌가?
+      </blockquote>
+      <cite>— “Vision Language Action Model” 개념의 출현</cite>
+    </div>
+
+    <figure>
+      <img src="assets/rigchpuqsq-ts-00-06-10.jpg" alt="출력이 Action으로 바뀌고 로봇 팔이 추가되며 VLA 개념이 등장하는 슬라이드" loading="lazy">
+      <figcaption>
+        <a class="ts" rel="noopener">00:06:10</a>
+        출력 한 칸을 바꾸는 것으로 새로운 모델군이 정의된다.
+      </figcaption>
+    </figure>
+
+    <h3>장벽 ①: 말만 되면 아무 답이나 내놓는 문제 — SayCan (2022)</h3>
+
+    <p>
+      언어모델을 로봇에 붙이자마자 벽에 부딪힌다.
+      “음료수를 쏟았는데 도와줘”라는 입력에 GPT-3는 “진공청소기를 써보면?”이라 답하고,
+      LaMDA는 “청소부를 불러드릴까요?”라고 답한다.
+      언어적으로는 흠잡을 데 없지만, 로봇 입장에서는 <strong>실행할 수 없는 문장</strong>이다.
+    </p>
+
+    <p>
+      <em>Do as I can, not as I say</em>(Ahn et al., 2022)의 해법은 문제를 둘로 쪼개는 것이었다.
+      <strong>Task-grounding</strong>(맥락상 해야 할 일인가)과 <strong>World-grounding</strong>(물리적으로 할 수 있는 일인가).
+      LLM이 제시한 선택지의 확률에, 로봇이 실제로 그 행동을 수행할 수 있는지를 나타내는
+      <strong>Value Function(실행가능성)</strong> 값을 곱한다. 두 조건을 모두 만족하는 행동만 선택된다.
+    </p>
+
+    <figure>
+      <img src="assets/rigchpuqsq-ts-00-06-39.jpg" alt="SayCan 논문의 Task-grounding과 World-grounding, LLM 점수와 Value Function 점수 비교표 슬라이드" loading="lazy">
+      <figcaption>
+        <a class="ts" rel="noopener">00:06:39</a>
+        우측 표에 LLM 단독 점수, Combined 점수, Value Function 점수가 나란히 비교되어 있다. VLA 연구가 본격화된 분기점이다.
+      </figcaption>
+    </figure>
+
+    <h3>장벽 ②: 그래서 얼마나 키워야 하는가 — 스케일링과 창발</h3>
+
+    <p>
+      LLM 연구에서 얻은 두 가지 경험칙이 VLA에 그대로 가설로 이식된다.
+      하나는 Kaplan et al.의 스케일링 법칙 — 계산량·데이터셋 크기·파라미터 수에 대해 테스트 손실이 멱법칙으로 감소한다.
+      다른 하나는 Wei et al.의 창발 능력 — 일정 규모를 넘으면 가르친 적 없는 능력이 급격히 발현된다.
+    </p>
+
+    <figure>
+      <img src="assets/rigchpuqsq-ts-00-08-04.jpg" alt="스케일링 법칙 그래프와 창발 능력 그래프들이 나란히 배치된 슬라이드" loading="lazy">
+      <figcaption>
+        <a class="ts" rel="noopener">00:08:04</a>
+        오른쪽 창발 능력 그래프들(Mod. arithmetic, IPA transliterate, Word unscramble, Persian QA, TruthfulQA, Grounded mappings,
+        Multi-task NLU, Word in context)은 일정 규모 이상에서 성능 곡선이 꺾여 올라가는 형태를 보여준다.
+      </figcaption>
+    </figure>
+
+    <p>
+      결론은 단순한 삼단논법이 된다. LLM류는 규모를 키울수록 좋아진다 → 규모가 임계를 넘으면 새 능력이 나온다 →
+      그렇다면 <strong>로봇 데이터를 아주 많이 모아 VLM에 직접 넣어보자</strong>.
+    </p>
+
+    <h3>장벽 ③: 로봇 데이터가 없다 — Open X-Embodiment와 첫 VLA 모델들</h3>
+
+    <p>
+      여러 기관의 로봇 데이터를 합친 대형 컬렉션 Open X-Embodiment가 등장한다.
+      구성은 사람의 동작 영상, 로봇의 모방 행동, 그리고 카메라 데이터다.
+      2023년부터 이 데이터셋으로 학습한, 실제로 동작하는 VLA 모델들이 공개되기 시작한다 —
+      <strong>RT-2</strong>(Zitkovich et al., 2023)와 <strong>OpenVLA</strong>(Kim et al., 2024).
+    </p>
+
+    <figure>
+      <img src="assets/rigchpuqsq-ts-00-08-34.jpg" alt="Open X-Embodiment 데이터셋 모자이크와 RT-2, OpenVLA 구조도가 배치된 슬라이드" loading="lazy">
+      <figcaption>
+        <a class="ts" rel="noopener">00:08:34</a>
+        슬라이드의 핵심 문장 — “발전된 VLM 모델 + 아주 많은 로봇 데이터를 통해 ‘범용 action 출력’이라는 Emergent Abilities를 발현시키자.”
+      </figcaption>
+    </figure>
+
+    <div class="callout note">
+      <p class="ct">로봇 데이터란 무엇인가</p>
+      <p>
+        명령을 올바르게 수행하는 로봇을 촬영한 동영상 + 그때 녹화된 관절값의 쌍이다.
+        VLA는 매 순간의 이미지 프레임과 사용자 명령을 받아 <strong>바로 다음 순간의 정답 행동</strong>을 출력하며,
+        명령을 완수할 때까지 이 추론을 계속 반복한다.
+      </p>
+    </div>
+
+    <hr class="rule">
+
+    <!-- SECTION 4 -->
+    <h2 class="sec" id="s4"><span class="num">Part 04 · 해부</span>OpenVLA: 단어 자리에 숫자를 넣다</h2>
+
+    <p class="lead">
+      OpenVLA가 특별한 이유는 성능만이 아니다. 구조와 가중치가 모두 공개되어 변형과 응용이 쉬웠다.
+      이 모델을 기점으로 VLA 연구 물량이 폭발적으로 늘었다.
+    </p>
+
+    <figure>
+      <img src="assets/rigchpuqsq-ts-00-09-45.jpg" alt="OpenVLA의 사양과 내부 구조도, 토큰 배정 방식을 보여주는 슬라이드" loading="lazy">
+      <figcaption>
+        <a class="ts" rel="noopener">00:09:45</a>
+        입력 이미지와 “Put eggplant in bowl”이라는 지시가 DinoV2/SigLIP → MLP Projector → Llama 2 7B로 들어가고,
+        출력은 단어 대신 Action De-Tokenizer를 거쳐 엔드이펙터의 x·y·z, roll·pitch·yaw, grab on/off로 나온다.
+      </figcaption>
+    </figure>
+
+    <div class="tw">
+      <table>
+        <caption>OpenVLA 사양</caption>
+        <thead><tr><th scope="col">항목</th><th scope="col">값</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Total model size</th><td>7B parameters</td></tr>
+          <tr><th scope="row">Language backbone</th><td>LLaMA 2 (7B)</td></tr>
+          <tr><th scope="row">Vision encoders</th><td>SigLIP + DinoV2 (feature concatenation)</td></tr>
+          <tr><th scope="row">Vision encoder parameters</th><td>~600M</td></tr>
+          <tr><th scope="row">Projector</th><td>2-layer MLP</td></tr>
+          <tr><th scope="row">Action dimensionality</th><td>7-D</td></tr>
+          <tr><th scope="row">Action representation</th><td>Δx, Δθ, ΔGrip</td></tr>
+          <tr><th scope="row">Tokenizer modification</th><td>256 least-used tokens overwritten</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>
+      마지막 항목이 이 모델의 트릭이다. 어휘 토큰 중 <strong>가장 덜 쓰이는 256개를 덮어써서</strong>
+      단어 대신 0~255 사이의 숫자를 뱉게 만든다. 그 숫자를 De-Tokenizer로 풀면 7차원 엔드이펙터 행동이 된다.
+      언어모델의 몸통은 그대로 두고, 출력 어휘만 바꿔치기한 셈이다.
+    </p>
+
+    <h3>그리고 네 가지 한계</h3>
+
+    <figure>
+      <img src="assets/rigchpuqsq-ts-00-10-43.jpg" alt="OpenVLA의 네 가지 한계와 버튼을 반복해서 누르는 로봇 실패 장면이 담긴 슬라이드" loading="lazy">
+      <figcaption>
+        <a class="ts" rel="noopener">00:10:43</a>
+        하단의 실패 장면 두 컷 — 방금 버튼을 눌렀다는 사실을 잊고 다시 내려가 또 누른다.
+      </figcaption>
+    </figure>
+
+    <div class="tw">
+      <table>
+        <caption>OpenVLA의 네 가지 구조적 한계</caption>
+        <thead>
+          <tr><th scope="col">#</th><th scope="col">한계</th><th scope="col">원인</th><th scope="col">대응 방향</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">1</th>
+            <td><strong>느리다</strong></td>
+            <td>autoregressive — 두 번째 행동 토큰을 예측하려면 첫 번째 토큰이 먼저 나와야 한다</td>
+            <td>Action Expert / Action Chunk</td>
+          </tr>
+          <tr>
+            <th scope="row">2</th>
+            <td><strong>정밀도가 낮다</strong></td>
+            <td>동작을 토큰으로 뽑아야 하고, 0~255의 이산 값으로만 표현된다</td>
+            <td>Action Expert (연속값 예측)</td>
+          </tr>
+          <tr>
+            <th scope="row">3</th>
+            <td><strong>맥락 기억이 없다</strong></td>
+            <td>누르러 내려갈 때와 누르고 올라갈 때의 사진이 비슷하다 — 기억이 없으면 필연적 오류</td>
+            <td>Memory Module / CoT</td>
+          </tr>
+          <tr>
+            <th scope="row">4</th>
+            <td><strong>보이지 않으면 못 하고, 힘을 모른다</strong></td>
+            <td>카메라 이외의 센서 데이터를 사용할 수 없다</td>
+            <td>Tactile / Force 모달리티</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="rule">
+
+    <!-- SECTION 5 -->
+    <h2 class="sec" id="s5"><span class="num">Part 05 · 진화</span>OpenVLA 이후, 여섯 갈래로 갈라지다</h2>
+
+    <p class="lead">
+      “Evolution of VLA Models — after openVLA…” 슬라이드에서 OpenVLA 구조로부터 여섯 개의 화살표가 뻗어 나온다.
+      각 화살표는 위 표의 한계 하나씩을 겨냥한다.
+    </p>
+
+    <figure>
+      <img src="assets/rigchpuqsq-ts-00-12-10.jpg" alt="OpenVLA 구조에서 여섯 개의 연구 방향으로 화살표가 뻗어 나가는 슬라이드" loading="lazy">
+      <figcaption>
+        <a class="ts" rel="noopener">00:12:10</a>
+        1. Dual Process Theory / Action expert · 2. Chain-of-Thought · 3. Memory Module · 4. VLA + RL · 5. VLA + Tactile/Force · 6. More data.
+      </figcaption>
+    </figure>
+
+    <!-- DIR 1 -->
+    <div class="dir">
+      <div class="dir-head"><span class="dir-n">01</span><h3 id="d1">이중 처리 이론과 Action Expert</h3></div>
+      <div class="chips"><span class="chip">한계 ① 속도</span><span class="chip">한계 ② 정밀도</span></div>
+
+      <p>
+        카너먼의 <em>Thinking, Fast and Slow</em>가 로봇 설계 철학으로 들어온다.
+        System 1(Fast thinking = Action)과 System 2(Slow thinking = Inference, Reasoning)를 분리하는 것.
+        Helix가 두 시스템을 실제로 분리한 구조를 보여준다 —
+        “Pick up the butter and hand it over to the robot on your left.”
+      </p>
+
+      <figure>
+        <img src="assets/rigchpuqsq-ts-00-12-28.jpg" alt="Thinking Fast and Slow 표지와 System 1·System 2 대비도, Helix의 분리 구조도가 담긴 슬라이드" loading="lazy">
+        <figcaption>
+          <a class="ts" rel="noopener">00:12:28</a>
+          특정 논문이나 모델에 국한된 개념이 아니라 VLA 모델 <strong>설계 철학</strong>으로 기능한다.
+          이를 구현한 구조 중 가장 표준에 가까운 것이 Action Expert다.
+        </figcaption>
+      </figure>
+
+      <p>
+        π0(Black et al., 2024, <em>A Vision-Language-Action Flow Model for General Robot Control</em>)은 이를 구체화한다.
+        사전학습 VLM 옆에 별도의 <strong>action expert</strong> 블록이 붙는다.
+        핵심 통찰은 이것이다 — 시간에 따른 연속 관절값을 <em>Joint No. × Time</em>의 2차원 표로 그리면 <strong>이미지 형태</strong>가 된다.
+        이미지라면 한 번에 예측할 수 있다. 그렇게 일정 구간의 액션을 통째로 뽑는 것이 <strong>action chunk</strong>다.
+      </p>
+
+      <figure>
+        <img src="assets/rigchpuqsq-ts-00-13-04.jpg" alt="π0의 action expert 구조도와 Joint No. × Time 격자가 Random에서 Answer로 수렴하는 그림" loading="lazy">
+        <figcaption>
+          <a class="ts" rel="noopener">00:13:04</a>
+          하단 도식은 Decoder Block과 Masked Self-Attention을 거쳐 <code>if diffusion step = 10</code>, <code>x1 (KV caching)</code> / <code>x10</code>으로 갈라지는 흐름을 보여준다.
+          트랜스포머 내부 MLP층을 분리해 전체 모델보다 빠른 주파수로 돌리는 것이 action expert의 핵심이다.
+        </figcaption>
+      </figure>
+    </div>
+
+    <!-- DIR 2 -->
+    <div class="dir">
+      <div class="dir-head"><span class="dir-n">02</span><h3 id="d2">CoT-VLA: 로봇은 이미지로 생각해야 한다</h3></div>
+      <div class="chips"><span class="chip">한계 ③ 맥락</span><span class="chip">장기 과제</span></div>
+
+      <p>
+        CoT-VLA(Zhao et al., CVPR 2025)의 출발점은 LLM의 사고 사슬이다.
+        그런데 그대로 옮길 수 없다. LLM은 추론 과정을 자연어로 적어도 되지만,
+        로봇의 출력은 액션이다. 중간 과정을 자연어로 적는 순간 정보 손실이 생긴다.
+      </p>
+
+      <div class="pull">
+        <blockquote>로봇은 추론 과정을 ‘이미지’로 생각해야 한다.</blockquote>
+        <cite>— CoT-VLA 슬라이드 메모</cite>
+      </div>
+
+      <p>
+        구조적 차이는 명확하다. Vanilla VLA는 obs image + text에서 바로 action으로 간다.
+        CoT-VLA는 중간에 <strong>goal image</strong>를 먼저 예측한다.
+        생성된 목표 상태를 기준으로 새 관측을 받아 반복하는 폐루프가 완성된다.
+      </p>
+
+      <figure>
+        <img src="assets/rigchpuqsq-ts-00-13-59.jpg" alt="Vanilla VLA와 CoT-VLA 구조를 비교하고 closed-loop control 예시를 보여주는 슬라이드" loading="lazy">
+        <figcaption>
+          <a class="ts" rel="noopener">00:13:59</a>
+          왼쪽은 일반 LLM의 단계적 사고 과정 예시, 오른쪽은 Vanilla VLA (causal)와 Ours: CoT-VLA (causal &amp; full-attention)의 비교.
+        </figcaption>
+      </figure>
+    </div>
+
+    <!-- DIR 3 -->
+    <div class="dir">
+      <div class="dir-head"><span class="dir-n">03</span><h3 id="d3">MEM: 장기 기억은 텍스트로, 단기 기억은 이미지로</h3></div>
+      <div class="chips"><span class="chip">한계 ③ 맥락</span><span class="chip">부분 관측</span></div>
+
+      <p>
+        MEM(Torne et al., 2026, <em>Multi-Scale Embodied Memory</em>)은 기억을 두 종류로 나눈다.
+      </p>
+
+      <ul>
+        <li><strong>Long-Term Text Memory</strong> — 별도의 VLM이 매 사이클마다 “내가 어디까지 했는지”를 Memory Summary로 기록하고,
+        다음 사이클 입력으로 되먹인 뒤 지금 해야 할 Subtask를 텍스트로 VLA에 내려보낸다.</li>
+        <li><strong>Short-Term Video Memory</strong> — 최근 구간(약 3초)의 비디오를 시공간 컨볼루션으로 압축한 피처를 VLA 입력에 함께 넣는다.</li>
+      </ul>
+
+      <p>
+        이 구조로 가능해진 과제는 세 묶음이다 —
+        Long-Horizon Tasks with Memory(recipe set up, make grilled cheese, clean kitchen),
+        Solve Tasks w/ Partial Observability, Perform In-Context Adaptation.
+        개수를 세며 물건을 꺼내거나, 주방 전체를 정리하는 일이 여기 들어간다.
+      </p>
+
+      <figure>
+        <img src="assets/rigchpuqsq-ts-00-15-02.jpg" alt="MEM의 Long-Term Text Memory와 Short-Term Video Memory 구조도 및 가능해진 과제 목록" loading="lazy">
+        <figcaption>
+          <a class="ts" rel="noopener">00:15:02</a>
+          슬라이드 결론 — “장기 기억은 텍스트로 저장하고, 단기 기억은 이미지로 저장하자.”
+        </figcaption>
+      </figure>
+    </div>
+
+    <!-- DIR 4 -->
+    <div class="dir">
+      <div class="dir-head"><span class="dir-n">04</span><h3 id="d4">π*0.6: 버려지던 실패 데이터를 되살리다</h3></div>
+      <div class="chips"><span class="chip">품질</span><span class="chip">경험 학습</span></div>
+
+      <p>
+        VLA는 기본적으로 모방학습이자 지도학습이다. 정답 데이터만 전부 넣어서 비슷한 행동을 잘 하게 만든다.
+        여기서 빠지는 것이 <strong>실패 데이터</strong>다. 로봇이 수없이 만들어내는데도 학습에 쓰이지 않는 자원이다.
+      </p>
+
+      <p>
+        π*0.6(Physical Intelligence, 2026, <em>a VLA That Learns From Experience</em>)의 해법은
+        로봇 데이터를 VLA에 넣기 전에 <strong>value function 역할의 VLM</strong>에 먼저 통과시키는 것이다.
+        방금 그 행동이 성공에 도움이 되었는지 판단해 이진 advantage 신호를 만들고, 태그로 붙여 VLA에 넣는다.
+        Action expert는 실패 행동의 분포에서 멀어지도록 학습되고, 성공과 실패의 격차가 벌어지면서 출력 품질이 올라간다.
+      </p>
+
+      <figure>
+        <img src="assets/rigchpuqsq-ts-00-16-37.jpg" alt="π*0.6의 학습 단계 도식과 value function VLM을 통과해 advantage 태그가 붙는 흐름도" loading="lazy">
+        <figcaption>
+          <a class="ts" rel="noopener">00:16:37</a>
+          상단은 LLM → VLM → pre-trained VLA → VLA로 이어지는 학습 단계와 success/fail 갈림길을,
+          하단은 로봇 데이터가 value function VLM을 거쳐 advantage 태그를 달고 VLA로 들어가는 경로를 보여준다.
+        </figcaption>
+      </figure>
+    </div>
+
+    <!-- DIR 5 -->
+    <div class="dir">
+      <div class="dir-head"><span class="dir-n">05</span><h3 id="d5">ForceVLA2와 T-Rex: 손끝의 감각을 넣다</h3></div>
+      <div class="chips"><span class="chip">한계 ④ 감각</span><span class="chip">힘 기반 제어</span></div>
+
+      <p>
+        VLA의 출력인 action chunk는 대부분 <strong>위치 기반 제어</strong>다. 정밀하지만 힘을 고려하지 못한다.
+        계란을 집으면 깨고, 문고리를 돌리면 망가뜨린다.
+        힘이라는 모달리티를 입력에 넣어야 하고, 출력에도 힘이 포함되어야 힘 기반 제어가 가능해진다.
+      </p>
+
+      <p>
+        ForceVLA2(Li et al., CVPR 2026)의 출력은 이렇게 정의된다 —
+        <code>Position (x,y,z) + Force(xyz force) + progress (ex&gt; 0.8, 0.9…)</code>.
+        Vision Language Model 아래 Action Experts 안에 <strong>Multimodal Encoder</strong>와 <strong>Cross-scale MoE</strong>가 배치되어
+        Force Token / Force Prompt를 함께 처리하고, action chunk 격자가 “position control”용과 “force control”용 두 벌로 그려진다.
+      </p>
+
+      <figure>
+        <img src="assets/rigchpuqsq-ts-00-17-46.jpg" alt="ForceVLA2 구조도와 position control·force control용 action chunk 격자가 나란히 그려진 슬라이드" loading="lazy">
+        <figcaption>
+          <a class="ts" rel="noopener">00:17:46</a>
+          joint torque + force까지 출력하는 구조. 위치만 맞히는 제어에서 “얼마나 세게”까지 결정하는 제어로 넘어간다.
+        </figcaption>
+      </figure>
+
+      <div class="callout warn">
+        <p class="ct">이 방향만의 트레이드오프</p>
+        <p>
+          VLA의 목표는 어떤 로봇 하드웨어에도 적용 가능한 <strong>범용 액션 파운데이션 모델</strong>이다.
+          그런데 새로운 모달리티를 추가하면 센서 종류와 데이터 형태마다 모델을 따로 학습시켜야 한다.
+          범용성이라는 장점과 정면으로 모순된다.
+        </p>
+        <p>
+          게다가 기존 산업용 로봇은 설계 단계부터 위치 기반 제어를 중시해, 힘 기반 제어를 아예 제공하지 않는 하드웨어도 많다.
+        </p>
+      </div>
+
+      <h4>T-Rex: 촉각은 동작보다 빨라야 한다</h4>
+
+      <p>
+        T-Rex(Niu et al., 2026, <em>Tactile-reactive dexterous manipulation</em>)는 여기서 한 발 더 나간다.
+        <strong>Multimodal Shared Attention</strong>을 공유하면서 세 전문가가 갈라진다 —
+        Latent Expert(Predict Future Visual Latent), Action Expert(Low-Frequency Denoising),
+        그리고 <strong>Tactile Expert(High-Frequency Denoising)</strong>.
+      </p>
+
+      <div class="freq">
+        <h4>비대칭 실행 주파수 (Asynchronous Reactive Execution)</h4>
+        <div class="frow"><span class="fl">System 2 — 판단</span><div class="bar b1"><span></span></div></div>
+        <div class="frow"><span class="fl">Action Expert</span><div class="bar b2"><span></span></div></div>
+        <div class="frow"><span class="fl">Tactile Expert</span><div class="bar b3"><span></span></div></div>
+        <p>
+          Action Expert ~5Hz, Tactile Expert ~20Hz가 t+1…t+5에 걸쳐 비동기로 실행된다.
+          판단은 느리게(System 2), 동작 생성은 빠르게(System 1), 촉각은 그보다 더 빠르게.
+        </p>
+      </div>
+
+      <p>
+        중요한 점은 촉각 전문가도 <strong>어텐션 레이어 자체는 공유</strong>한다는 것이다.
+        분리되는 것은 MLP뿐이다. 덕분에 큰 행동 생성부터 미세 보정까지 촉각이 일관되게 반영된다.
+      </p>
+
+      <figure>
+        <img src="assets/rigchpuqsq-ts-00-20-13.jpg" alt="T-Rex의 세 전문가 구조와 손 모양 촉각 히트맵, 비동기 실행 타임라인이 담긴 슬라이드" loading="lazy">
+        <figcaption>
+          <a class="ts" rel="noopener">00:20:13</a>
+          우측의 손 모양 히트맵이 촉각 센서 입력(“Apply toothpaste”)을 나타낸다.
+        </figcaption>
+      </figure>
+    </div>
+
+    <!-- DIR 6 -->
+    <div class="dir">
+      <div class="dir-head"><span class="dir-n">06</span><h3 id="d6">RLDX-1: 데이터가 없으면 만들어낸다</h3></div>
+      <div class="chips"><span class="chip">데이터 병목</span><span class="chip">진영 융합</span></div>
+
+      <p>
+        마지막 방향은 데이터 그 자체다. RLDX-1 테크니컬 리포트(Kim et al., 2026)에서 가져온 파이프라인으로,
+        발표자는 이를 “한국의 리얼드라는 기업”이 낸 모델로 소개한다.
+      </p>
+
+      <ol>
+        <li>
+          <strong>Data Generation</strong> — Source Data → Scene &amp; Task Augmentation → Action Labelling.
+          비디오 생성 모델을 백본으로 써서 원본 비디오의 태스크를 바꾸거나, 물체 종류 같은 장면 요소를 바꿔 증강한다.
+        </li>
+        <li>
+          <strong>Data Filtering</strong> — IDM-predicted Actions와 Motion-Consistency Classifier, Video Consistency Check를 거쳐
+          Consistency Score가 높으면 Keep for Training, 낮으면 Discard.
+        </li>
+      </ol>
+
+      <figure>
+        <img src="assets/rigchpuqsq-ts-00-21-14.jpg" alt="RLDX-1의 데이터 생성·필터링 파이프라인과 원본·태스크 증강·장면 증강 비디오 비교 컷" loading="lazy">
+        <figcaption>
+          <a class="ts" rel="noopener">00:21:14</a>
+          오른쪽 비교 컷 — (a) Original Video, (b) Task Augmented Video, (c) Scene Augmented Video.
+        </figcaption>
+      </figure>
+
+      <div class="pull">
+        <blockquote>
+          즉, world model + RL 진영과 VLA 진영의 구분이 점점 없어지고 상호보완적인 관계로 발전 중이다.
+        </blockquote>
+        <cite>— 슬라이드 마지막 줄. 비디오 생성 모델은 결국 월드모델이다.</cite>
+      </div>
+    </div>
+
+    <h3>여섯 갈래 한눈에</h3>
+
+    <div class="tw">
+      <table>
+        <caption>OpenVLA 이후의 연구 지형</caption>
+        <thead>
+          <tr><th scope="col">방향</th><th scope="col">대표 연구</th><th scope="col">겨냥한 한계</th><th scope="col">핵심 아이디어</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Action Expert</th><td>π0 (2024)</td><td>속도 · 정밀도</td><td>관절값 시계열을 이미지처럼 한 번에 예측(chunk), MLP만 분리해 고주파 실행</td></tr>
+          <tr><th scope="row">Chain-of-Thought</th><td>CoT-VLA (2025)</td><td>맥락 · 장기 과제</td><td>중간 추론을 자연어가 아닌 <strong>목표 이미지</strong>로 예측</td></tr>
+          <tr><th scope="row">Memory Module</th><td>MEM (2026)</td><td>맥락 · 부분 관측</td><td>장기=텍스트 요약, 단기=압축 비디오 피처</td></tr>
+          <tr><th scope="row">VLA + RL</th><td>π*0.6 (2026)</td><td>출력 품질</td><td>value function VLM으로 advantage 태그 부여, 실패 데이터 활용</td></tr>
+          <tr><th scope="row">Tactile / Force</th><td>ForceVLA2, T-Rex (2026)</td><td>감각 결여</td><td>힘을 입출력 모두에 포함, 촉각 전문가를 ~20Hz로 비동기 실행</td></tr>
+          <tr><th scope="row">More Data</th><td>RLDX-1 (2026)</td><td>데이터 부족</td><td>비디오 생성 모델로 증강 후 consistency 자동 필터링</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="rule">
+
+    <!-- SECTION 6 -->
+    <h2 class="sec" id="s6"><span class="num">Part 06 · 결론</span>결국, 인조 인간을 설계하는 일</h2>
+
+    <p class="lead">
+      마지막 슬라이드에는 뇌 단면도가 놓이고, 그 위에 VLA의 구성요소가 하나씩 대응된다.
+      여섯 갈래의 연구가 각자 다른 논문에서 출발했는데, 모아놓고 보면 하나의 그림이 된다.
+    </p>
+
+    <div class="tw">
+      <table>
+        <caption>VLA 구성요소와 인체의 대응</caption>
+        <thead><tr><th scope="col">VLA 구성요소</th><th scope="col">대응</th><th scope="col">역할</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">VLA</th><td>뇌</td><td>전체 판단과 행동 생성</td></tr>
+          <tr><th scope="row">CoT VLA</th><td>전전두엽</td><td>계획, 단계적 추론</td></tr>
+          <tr><th scope="row">Action Expert</th><td>소뇌</td><td>빠른 운동 제어</td></tr>
+          <tr><th scope="row">Memory Module</th><td>해마</td><td>장·단기 기억</td></tr>
+          <tr><th scope="row">Vision sensor</th><td>눈</td><td>시각 입력</td></tr>
+          <tr><th scope="row">Tactile sensor</th><td>손</td><td>접촉·힘 피드백</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <figure>
+      <img src="assets/rigchpuqsq-ts-00-22-37.jpg" alt="뇌 단면도에 VLA 구성요소를 대응시킨 결론 슬라이드와 휴머노이드·로봇 핸드 사진" loading="lazy">
+      <figcaption>
+        <a class="ts" rel="noopener">00:22:37</a>
+        “Physical AI 연구는 인조 인간을 설계하는 것과 비슷하다.” 오른쪽에는 Vision sensor = 눈, Tactile sensor = 손이 실제 센서 사진과 함께 대응되어 있다.
+      </figcaption>
+    </figure>
+
+    <div class="pull">
+      <blockquote>
+        VLA 모델을 비롯한 소프트웨어 이론의 발전은 예정된 수순이다.
+        병목은 배터리, 내구성, 가격, 센서, 하드웨어, 그리고 데이터이다.
+      </blockquote>
+      <cite>— 발표 마지막 슬라이드</cite>
+    </div>
+
+    <hr class="rule">
+
+    <!-- IMPLICATIONS -->
+    <h2 class="sec" id="implications"><span class="num">Implications</span>이 정리에서 남는 것들</h2>
+
+    <ul class="check">
+      <li>
+        <strong>구조 진화의 방향은 이미 정해져 있다.</strong>
+        Action expert는 소뇌, CoT는 전전두엽, 메모리 모듈은 해마, 촉각 센서는 손, 카메라는 눈.
+        각 연구가 독립적으로 출발했음에도 인간의 뇌를 부품별로 재구성하는 방향으로 수렴한다는 것이 발표자의 관찰이다.
+      </li>
+      <li>
+        <strong>촉각·힘만은 값을 치러야 한다.</strong>
+        다른 다섯 방향이 순수한 개선인 것과 달리, 모달리티 추가는 “어떤 하드웨어에도 적용 가능한 파운데이션 모델”이라는
+        VLA의 근본 목표와 충돌한다. 다만 로봇이 산업 현장에서 일상으로 넘어오려면 반드시 거쳐야 할 과정이라는 것이 발표자의 판단이다.
+      </li>
+      <li>
+        <strong>소프트웨어가 하드웨어를 앞질렀다.</strong>
+        사람 동작을 정교하게 재현하는 로봇 핸드와 휴머노이드가 이제야 활발히 출시되는 단계다.
+        배터리, 내구성, 센서 신뢰도 등 물리적으로 검증해야 할 것이 많이 남아 있다.
+      </li>
+      <li>
+        <strong>두 진영의 벽은 무너지는 중이다.</strong>
+        RLDX-1이 비디오 생성 모델로 로봇 데이터를 증강하는 순간, 월드모델은 VLA의 경쟁자가 아니라 공급자가 된다.
+      </li>
+      <li>
+        <strong>결국 자본과 데이터의 싸움이다.</strong>
+        월드모델이든 VLA든 데이터 주도 방식이므로, 향후 몇 년간은 기존 AI 산업과 마찬가지로
+        자본과 데이터를 가진 기업이 연구를 선도할 것이라는 전망으로 발표가 마무리된다.
+      </li>
+    </ul>
+
+    <!-- SOURCES -->
+    <h2 class="sec" id="sources"><span class="num">Source Notes</span>자료와 한계</h2>
+
+    <div class="sources">
+      <h3>원본 정보</h3>
+      <dl class="meta-dl">
+        <dt>제목</dt><dd>Physical AI와 VLA</dd>
+        <dt>채널</dt><dd>AIN Lab</dd>
+        <dt>발표자</dt><dd>이상호 — 고려대학교 전자정보공학과, 지능형 신경공학 연구실 저널 미팅</dd>
+        <dt>게시일</dt><dd>2026년 9월 15일</dd>
+        <dt>길이</dt><dd>24분 1초</dd>
+        <dt>링크</dt><dd><a rel="noopener">youtube.com/watch?v=-RIGcHPUQsQ</a></dd>
+      </dl>
+
+      <h3>인용에 대하여</h3>
+      <ul>
+        <li>이 노트의 인용은 <strong>한국어 자동 생성 자막</strong>(수동 자막 없음)과 슬라이드 화면에 근거한다.</li>
+        <li>자동 자막 특성상 고유명사 표기 오류가 있었다. 예: “채치T” → ChatGPT, “파이스타 0.6” → π*0.6.
+        해당 부분은 <strong>슬라이드에 적힌 표기를 우선</strong>해 정정했다.</li>
+        <li>발표에서 언급된 논문 목록은 영상 설명란에 [1]~[16]으로 정리되어 있다.</li>
+        <li>슬라이드 이미지는 발표 화면 캡처이며, 캡션은 화면에 실제로 표시된 내용을 기술한 것이다.</li>
+      </ul>
+
+      <h3>본문에 등장한 주요 문헌</h3>
+      <ul>
+        <li>Brown et al. (2020), <em>Language Models are Few-Shot Learners</em> — GPT-3</li>
+        <li>Radford et al. (2021) — CLIP</li>
+        <li>Kaplan et al. — Scaling Laws / Wei et al. — Emergent Abilities</li>
+        <li>Ahn et al. (2022), <em>Do as I Can, Not as I Say</em> — SayCan</li>
+        <li>Zitkovich et al. (2023) — RT-2 / Kim et al. (2024) — OpenVLA</li>
+        <li>Black et al. (2024), <em>A Vision-Language-Action Flow Model for General Robot Control</em> — π0</li>
+        <li>Zhao et al. (CVPR 2025) — CoT-VLA</li>
+        <li>Torne et al. (2026), <em>Multi-Scale Embodied Memory</em> — MEM</li>
+        <li>Physical Intelligence (2026), <em>a VLA That Learns From Experience</em> — π*0.6</li>
+        <li>Li et al. (CVPR 2026) — ForceVLA2 / Niu et al. (2026) — T-Rex</li>
+        <li>Kim et al. (2026), RLDX-1 Technical Report</li>
+      </ul>
+    </div>
+
+    <!-- ENDING -->
+    <p class="kicker">
+      우리는 로봇에게 공중제비를 가르치는 법은 이미 안다.
+      남은 질문은 그 로봇이 왜 넘어야 하는지를 스스로 판단하게 만드는 일이고,
+      이 발표의 대답은 뇌를 한 부품씩 다시 만드는 중이라는 것이다.
+      그리고 그 작업이 끝나갈 즈음 우리를 기다리는 것은 알고리즘이 아니라 배터리와 손끝의 감각일 가능성이 크다.
+    </p>
+
+    <!-- SHARE -->
+    <section class="share" aria-labelledby="share-h">
+      <h2 id="share-h">공유하기</h2>
+      <p>아래 문구를 그대로 복사해 쓰셔도 됩니다.</p>
+
+      <div class="copyblock">
+<span class="lbl">한 줄 요약</span>백덤블링하는 Atlas에는 '왜'가 없다. 보상함수가 시킨 대로 수렴한 궤적일 뿐. 챗GPT의 지능을 로봇 몸에 이식하려는 VLA 연구가 SayCan → Open X-Embodiment → OpenVLA를 거쳐 2026년 여섯 갈래로 갈라지기까지의 계보 정리.</div>
+
+      <div class="copyblock">
+<span class="lbl">짧은 소개문</span>Physical AI와 VLA — OpenVLA의 네 가지 한계(느림 · 낮은 정밀도 · 기억 없음 · 감각 없음)와, 이를 각각 공략하는 여섯 갈래 최신 연구(Action Expert, CoT, Memory, RL, Tactile/Force, Data Synthesis)를 한 편으로 정리했습니다. 결론: 소프트웨어는 예정된 수순이고, 병목은 배터리·내구성·가격·센서·하드웨어, 그리고 데이터.</div>
+
+      <div class="copyblock">
+<span class="lbl">인용구</span>"Physical AI 연구는 인조 인간을 설계하는 것과 비슷하다. VLA = 뇌, CoT = 전전두엽, Action expert = 소뇌, Memory module = 해마." — 이상호, 고려대학교</div>
+
+      <div class="copyblock">
+<span class="lbl">출처</span>AIN Lab · 이상호(고려대학교 전자정보공학과) 저널 미팅 발표 (2026-09-15, 24분 1초)
+https://www.youtube.com/watch?v=-RIGcHPUQsQ</div>
+    </section>
+
+    <footer>
+      <p>
+        <strong>Physical AI와 VLA</strong> — 연구 노트 · 2026년 9월 16일 정리<br>
+        원본 발표: 이상호(고려대학교 전자정보공학과 지능형 신경공학 연구실), AIN Lab 채널 ·
+        <a rel="noopener">영상 보기 ↗</a><br>
+        본문의 모든 이미지는 발표 슬라이드 캡처이며, 저작권은 원 발표자 및 인용된 각 논문 저자에게 있습니다.
+      </p>
+    </footer>
+
+  </main>
+</div>
+</div>
 
 </body>
 </html>
