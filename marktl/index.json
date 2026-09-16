@@ -1,7 +1,22 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-12T09:43:31.479Z",
+  "updatedAt": "2026-09-16T12:33:11.749Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-physical-ai%EC%99%80-vla-%EC%9A%94%EC%95%BD/",
+      "excerpt": "Physical AI와 VLA 영상 정보 채널 : AIN Lab 게시일 : 2026 09 15 길이 : 24분 1초 링크 : https://www.youtube.com/watch?v= RIGcHPUQsQ 발표자 : 이상호 (고려대학교 전자정보공학과, 지능형 신경공학 연구실 저널 미팅) <div style=\"position: relative; width: 100%; padding bottom: 56.25%; height: 0; ",
+      "shortId": "800i3j",
+      "slug": "yt-physical-ai와-vla-요약",
+      "sourcePath": "clippings/yt_Physical_AI와_VLA_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료"
+      ],
+      "title": "Physical AI와 VLA",
+      "updatedAt": "2026-09-16T12:33:11.749Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/800i3j/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-%EC%9E%90%EC%9C%A8%EC%A3%BC%ED%96%89-%EA%B7%BC%ED%99%A9-%ED%85%8C%EC%8A%AC%EB%9D%BC-%EC%82%AC%EC%9D%B4%EB%B2%84-%EC%BA%A1-%EC%B6%9C%EC%8B%9C-vs-%EC%9B%A8%EC%9D%B4%EB%AA%A8-%EC%9A%94%EC%95%BD-%EC%BD%94%EB%8D%B1%EC%8A%A4/",
