@@ -1,7 +1,22 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-16T12:37:19.236Z",
+  "updatedAt": "2026-09-19T12:32:41.286Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-ai-%ED%99%95%EC%82%B0-%EC%9D%B4%ED%9B%84%EC%9D%98-%EC%82%AC%ED%9A%8C-%EC%9D%BC%EC%9E%90%EB%A6%AC%EC%99%80-%EC%95%88%EC%A0%84%EC%9D%80-%EC%96%B4%EB%96%BB%EA%B2%8C-%EB%8B%AC%EB%9D%BC%EC%A7%88%EA%B9%8C-%EC%9A%94%EC%95%BD/",
+      "excerpt": "AI 확산 이후의 사회, 일자리와 안전은 어떻게 달라질까 영상 정보 채널 : sudoremove (@sudoremove) 게시일 : 2026 09 15 길이 : 39분 56초 (2,396초) 챕터 : 17개 링크 : https://www.youtube.com/watch?v=LzuIRTBCf3E <div style=\"position: relative; width: 100%; padding bottom: 56.25%; height",
+      "shortId": "2m4dwg",
+      "slug": "yt-ai-확산-이후의-사회-일자리와-안전은-어떻게-달라질까-요약",
+      "sourcePath": "02_research/AI/Sudoremove/yt_AI 확산 이후의 사회, 일자리와 안전은 어떻게 달라질까_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료"
+      ],
+      "title": "AI 확산 이후의 사회, 일자리와 안전은 어떻게 달라질까",
+      "updatedAt": "2026-09-19T12:32:41.286Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/2m4dwg/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-physical-ai%EC%99%80-vla-%EC%9A%94%EC%95%BD/",
