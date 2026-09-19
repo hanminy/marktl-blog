@@ -1,7 +1,22 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-19T12:32:41.286Z",
+  "updatedAt": "2026-09-19T12:37:51.854Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-astra-%EC%BB%B4%ED%93%A8%ED%84%B0-%EC%97%90%EC%9D%B4%EC%A0%84%ED%8A%B8%EC%97%90%EC%84%9C-%EB%A1%9C%EB%B4%87-%EC%A0%9C%EC%96%B4%EA%B9%8C%EC%A7%80-%ED%99%95%EC%9E%A5%EB%90%98%EB%8A%94-%EB%B0%A9%EC%8B%9D-%EC%9A%94%EC%95%BD/",
+      "excerpt": "Astra, 컴퓨터 에이전트에서 로봇 제어까지 확장되는 방식 영상 정보 채널 : sudoremove (@sudoremove) 게시일 : 2026 09 16 길이 : 33분 26초 (2,006초) 챕터 : 12개 링크 : https://www.youtube.com/watch?v=wkec86Vnz A <div style=\"position: relative; width: 100%; padding bottom: 56.25%; heig",
+      "shortId": "16x1bnx",
+      "slug": "yt-astra-컴퓨터-에이전트에서-로봇-제어까지-확장되는-방식-요약",
+      "sourcePath": "02_research/AI/Sudoremove/yt_Astra, 컴퓨터 에이전트에서 로봇 제어까지 확장되는 방식_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료"
+      ],
+      "title": "Astra, 컴퓨터 에이전트에서 로봇 제어까지 확장되는 방식",
+      "updatedAt": "2026-09-19T12:37:51.854Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/16x1bnx/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-ai-%ED%99%95%EC%82%B0-%EC%9D%B4%ED%9B%84%EC%9D%98-%EC%82%AC%ED%9A%8C-%EC%9D%BC%EC%9E%90%EB%A6%AC%EC%99%80-%EC%95%88%EC%A0%84%EC%9D%80-%EC%96%B4%EB%96%BB%EA%B2%8C-%EB%8B%AC%EB%9D%BC%EC%A7%88%EA%B9%8C-%EC%9A%94%EC%95%BD/",

@@ -1,0 +1,1497 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>액션 디코더 없이 로봇을 이기다 — Astra가 컴퓨터 에이전트에서 로봇 제어로 넘어간 방식</title>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+  :root{
+    --paper:#fbf9f5;
+    --surface:#ffffff;
+    --surface-2:#f4f1ea;
+    --ink:#17191d;
+    --ink-soft:#3c4048;
+    --muted:#6c7178;
+    --line:#e2ddd2;
+    --line-strong:#cfc8b8;
+    --accent:#c1441f;
+    --accent-soft:#fbeee8;
+    --cool:#1f4e6b;
+    --cool-soft:#e8f0f5;
+    --warn:#8a6100;
+    --warn-soft:#fdf3dc;
+    --good:#1f6b43;
+    --good-soft:#e6f3ec;
+    --radius:14px;
+    --radius-lg:22px;
+    --shadow:0 1px 2px rgba(24,20,12,.05), 0 12px 32px -18px rgba(24,20,12,.28);
+    --shadow-lg:0 2px 4px rgba(24,20,12,.05), 0 28px 60px -34px rgba(24,20,12,.42);
+    --serif:"Iowan Old Style","Apple Garamond",Baskerville,"Times New Roman","Nanum Myeongjo","Apple SD Gothic Neo",serif;
+    --sans:"Pretendard","Pretendard Variable",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Segoe UI","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"D2Coding","Liberation Mono",monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#131418;
+      --surface:#191b20;
+      --surface-2:#20232a;
+      --ink:#eceae5;
+      --ink-soft:#c6c4bf;
+      --muted:#9298a0;
+      --line:#2b2f37;
+      --line-strong:#3a3f49;
+      --accent:#f07a4e;
+      --accent-soft:#2a1b15;
+      --cool:#7fb8d8;
+      --cool-soft:#15242e;
+      --warn:#e0b44d;
+      --warn-soft:#2a2213;
+      --good:#6fc394;
+      --good-soft:#15251c;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 32px -18px rgba(0,0,0,.8);
+      --shadow-lg:0 2px 4px rgba(0,0,0,.4), 0 28px 60px -34px rgba(0,0,0,.9);
+    }
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:17px;
+    line-height:1.85;
+    letter-spacing:-.005em;
+    word-break:keep-all;
+    overflow-wrap:break-word;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- layout grid : main column + full bleed ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:
+      [full-start] minmax(18px,1fr)
+      [wide-start] minmax(0,.5fr)
+      [main-start] minmax(0,68ch) [main-end]
+      minmax(0,.5fr) [wide-end]
+      minmax(18px,1fr) [full-end];
+  }
+  .grid > *{grid-column:main}
+  .wide{grid-column:wide}
+  .full{grid-column:full}
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;
+    padding:clamp(48px,9vw,110px) 0 clamp(36px,5vw,64px);
+    border-bottom:1px solid var(--line);
+    background:
+      radial-gradient(120% 80% at 8% 0%, var(--accent-soft) 0%, transparent 58%),
+      radial-gradient(100% 70% at 92% 6%, var(--cool-soft) 0%, transparent 60%);
+  }
+  .kicker{
+    display:inline-flex;align-items:center;gap:.6em;
+    font-size:12.5px;font-weight:700;letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 22px;
+  }
+  .kicker::before{
+    content:"";width:26px;height:2px;background:var(--accent);display:block;
+  }
+  h1.title{
+    font-family:var(--serif);
+    font-size:clamp(34px,6.2vw,62px);
+    line-height:1.18;
+    letter-spacing:-.025em;
+    font-weight:600;
+    margin:0 0 8px;
+    text-wrap:balance;
+  }
+  .subtitle{
+    font-family:var(--serif);
+    font-size:clamp(20px,3.1vw,29px);
+    line-height:1.4;
+    color:var(--accent);
+    font-weight:500;
+    margin:0 0 28px;
+    letter-spacing:-.02em;
+  }
+  .deck{
+    font-size:clamp(17px,2.2vw,20px);
+    line-height:1.78;
+    color:var(--ink-soft);
+    margin:0 0 34px;
+    max-width:60ch;
+  }
+  .deck strong{color:var(--ink);font-weight:650;background:linear-gradient(transparent 62%, var(--accent-soft) 62%)}
+
+  .byline{
+    display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;
+    padding-top:22px;border-top:1px solid var(--line);
+    font-size:14px;color:var(--muted);
+  }
+  .byline .who{display:flex;align-items:center;gap:10px;font-weight:600;color:var(--ink)}
+  .avatar{
+    width:34px;height:34px;border-radius:50%;
+    background:linear-gradient(140deg,var(--accent),var(--cool));
+    color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700;letter-spacing:.02em;
+    font-family:var(--mono);
+  }
+  .byline .dot{color:var(--line-strong)}
+
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin:26px 0 0}
+  .tag{
+    font-size:12.5px;font-weight:600;letter-spacing:.02em;
+    padding:5px 11px;border-radius:999px;
+    background:var(--surface);border:1px solid var(--line);color:var(--muted);
+  }
+
+  /* ---------- source card ---------- */
+  .sourcecard{
+    margin:36px 0 0;
+    display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;
+    padding:18px 20px;border-radius:var(--radius);
+    background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);
+  }
+  .playmark{
+    width:52px;height:52px;border-radius:14px;flex:none;
+    background:var(--accent);color:#fff;display:grid;place-items:center;
+  }
+  .playmark span{
+    display:block;width:0;height:0;margin-left:4px;
+    border-left:15px solid currentColor;
+    border-top:9px solid transparent;border-bottom:9px solid transparent;
+  }
+  .sourcecard .meta{min-width:0}
+  .sourcecard .t{font-weight:650;font-size:15.5px;margin:0 0 3px;line-height:1.5}
+  .sourcecard .s{font-size:13.5px;color:var(--muted);margin:0;font-family:var(--mono);overflow-wrap:anywhere}
+  .sourcecard a{color:var(--accent);text-decoration:none;border-bottom:1px solid currentColor}
+  .sourcecard a:hover{background:var(--accent-soft)}
+
+  /* ---------- toc ---------- */
+  nav.toc{
+    margin:clamp(40px,6vw,64px) 0 0;
+    padding:24px 26px 26px;
+    border:1px solid var(--line);border-radius:var(--radius-lg);
+    background:var(--surface-2);
+  }
+  nav.toc h2{
+    font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--muted);margin:0 0 14px;font-weight:700;
+  }
+  nav.toc ol{margin:0;padding:0;list-style:none;counter-reset:toc;
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:2px 26px}
+  nav.toc li{counter-increment:toc;border-bottom:1px dotted var(--line-strong)}
+  nav.toc li:last-child{border-bottom:0}
+  nav.toc a{
+    display:flex;gap:12px;align-items:baseline;
+    padding:9px 0;text-decoration:none;color:var(--ink-soft);font-size:15px;line-height:1.5;
+  }
+  nav.toc a::before{
+    content:counter(toc,decimal-leading-zero);
+    font-family:var(--mono);font-size:11.5px;color:var(--accent);font-weight:700;flex:none;
+  }
+  nav.toc a:hover{color:var(--accent)}
+
+  /* ---------- sections ---------- */
+  section{padding:clamp(44px,7vw,80px) 0 0}
+  .sec-head{margin:0 0 30px}
+  .eyebrow{
+    display:block;font-size:11.5px;font-weight:700;letter-spacing:.17em;
+    text-transform:uppercase;color:var(--muted);margin:0 0 10px;
+  }
+  h2.sec{
+    font-family:var(--serif);font-weight:600;
+    font-size:clamp(26px,4vw,38px);line-height:1.3;letter-spacing:-.02em;
+    margin:0;text-wrap:balance;
+  }
+  h2.sec .num{color:var(--accent);font-family:var(--mono);font-size:.6em;vertical-align:.32em;margin-right:.5em;font-weight:700}
+  h3{
+    font-size:clamp(19px,2.6vw,23px);line-height:1.45;letter-spacing:-.018em;
+    font-weight:650;margin:44px 0 14px;
+  }
+  h4{font-size:16.5px;font-weight:700;margin:28px 0 10px;letter-spacing:-.01em}
+  p{margin:0 0 18px}
+  a{color:var(--accent)}
+  strong{font-weight:680}
+  mark{background:linear-gradient(transparent 58%, var(--accent-soft) 58%);color:inherit;padding:0 1px}
+  code{
+    font-family:var(--mono);font-size:.87em;
+    background:var(--surface-2);border:1px solid var(--line);
+    padding:.1em .38em;border-radius:6px;overflow-wrap:anywhere;
+  }
+  .lead{font-size:19px;line-height:1.8;color:var(--ink-soft)}
+  .rule{border:0;border-top:1px solid var(--line);margin:clamp(44px,7vw,78px) 0 0}
+
+  /* ---------- abstract ---------- */
+  .abstract{
+    border-left:3px solid var(--accent);
+    padding:6px 0 6px 26px;
+    font-size:18.5px;line-height:1.82;color:var(--ink-soft);
+  }
+  .abstract strong{color:var(--ink)}
+
+  /* ---------- key findings cards ---------- */
+  .cards{
+    display:grid;gap:16px;
+    grid-template-columns:repeat(auto-fit,minmax(255px,1fr));
+    margin:0;padding:0;list-style:none;counter-reset:card;
+  }
+  .cards li{
+    counter-increment:card;
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:22px 22px 24px;box-shadow:var(--shadow);
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .cards li::before{
+    content:counter(card,decimal-leading-zero);
+    font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.1em;
+    color:var(--accent);
+  }
+  .cards h3{margin:0;font-size:17.5px;line-height:1.5;font-weight:700;letter-spacing:-.015em}
+  .cards p{margin:0;font-size:15px;line-height:1.72;color:var(--ink-soft)}
+
+  /* ---------- stat strip ---------- */
+  .stats{
+    display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    margin:30px 0 0;padding:0;list-style:none;
+  }
+  .stats li{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 18px 16px;text-align:left;
+  }
+  .stats .n{
+    display:block;font-family:var(--mono);font-weight:700;
+    font-size:clamp(25px,4.4vw,34px);line-height:1.1;letter-spacing:-.03em;color:var(--accent);
+  }
+  .stats .n.cool{color:var(--cool)}
+  .stats .l{display:block;margin-top:8px;font-size:13px;line-height:1.55;color:var(--muted)}
+
+  /* ---------- callouts ---------- */
+  .callout{
+    border-radius:var(--radius);padding:22px 24px;margin:28px 0;
+    border:1px solid var(--line);background:var(--surface);
+    border-left:4px solid var(--cool);
+  }
+  .callout .label{
+    display:flex;align-items:center;gap:8px;
+    font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--cool);margin:0 0 12px;
+  }
+  .callout p:last-child{margin-bottom:0}
+  .callout.info{border-left-color:var(--cool);background:var(--cool-soft)}
+  .callout.info .label{color:var(--cool)}
+  .callout.tip{border-left-color:var(--good);background:var(--good-soft)}
+  .callout.tip .label{color:var(--good)}
+  .callout.warn{border-left-color:var(--warn);background:var(--warn-soft)}
+  .callout.warn .label{color:var(--warn)}
+  .callout .label::before{
+    content:"";width:7px;height:7px;border-radius:2px;background:currentColor;display:block;
+  }
+
+  /* ---------- figures ---------- */
+  figure.shot{margin:34px 0;}
+  figure.shot img{
+    display:block;width:100%;height:auto;border-radius:var(--radius);
+    border:1px solid var(--line);background:var(--surface-2);
+    box-shadow:var(--shadow-lg);
+  }
+  figure.shot figcaption{
+    margin-top:12px;font-size:13.5px;line-height:1.65;color:var(--muted);
+    display:flex;gap:10px;align-items:flex-start;
+  }
+  .ts{
+    flex:none;font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.02em;
+    color:var(--accent);background:var(--accent-soft);
+    padding:3px 8px;border-radius:6px;white-space:nowrap;
+  }
+  .scene-head{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;
+    margin:52px 0 12px;
+  }
+  .scene-head h3{margin:0;flex:1 1 auto;min-width:220px}
+  .gallery{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin:34px 0}
+  .gallery figure{margin:0}
+
+  /* ---------- blockquote / pullquote ---------- */
+  blockquote.q{
+    margin:26px 0;padding:20px 24px;
+    background:var(--surface-2);border-radius:var(--radius);
+    border-left:3px solid var(--line-strong);
+    font-size:15.5px;line-height:1.78;color:var(--ink-soft);
+  }
+  blockquote.q p{margin:0 0 12px}
+  blockquote.q p:last-child{margin:0}
+  blockquote.q cite{display:block;margin-top:12px;font-style:normal;font-size:13px;color:var(--muted)}
+  .prompt{
+    font-family:var(--mono);font-size:13.5px;line-height:1.78;
+    background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--cool);
+    border-radius:var(--radius);padding:20px 22px;margin:24px 0;
+    color:var(--ink-soft);overflow-wrap:anywhere;
+  }
+  .prompt p{margin:0 0 14px}
+  .prompt p:last-child{margin:0}
+  .prompt strong{color:var(--ink)}
+
+  .pullquote{
+    margin:clamp(38px,6vw,58px) 0;
+    padding:0 0 0 clamp(20px,4vw,40px);
+    border-left:4px solid var(--accent);
+  }
+  .pullquote p{
+    font-family:var(--serif);
+    font-size:clamp(21px,3.4vw,30px);line-height:1.46;letter-spacing:-.022em;
+    color:var(--ink);margin:0;font-weight:500;text-wrap:balance;
+  }
+  .pullquote footer{margin-top:14px;font-size:13.5px;color:var(--muted);font-family:var(--sans)}
+
+  /* ---------- tables ---------- */
+  .tablewrap{
+    margin:28px 0;overflow-x:auto;
+    border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);
+    box-shadow:var(--shadow);
+  }
+  table{border-collapse:collapse;width:100%;min-width:560px;font-size:14.5px;line-height:1.65}
+  caption{
+    caption-side:top;text-align:left;padding:18px 20px 4px;
+    font-size:13px;color:var(--muted);font-weight:600;letter-spacing:.01em;
+  }
+  th,td{padding:13px 18px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+  thead th{
+    font-size:11.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);
+    background:var(--surface-2);font-weight:700;white-space:nowrap;
+  }
+  tbody tr:last-child td,tbody tr:last-child th{border-bottom:0}
+  tbody th{font-weight:650;color:var(--ink);white-space:nowrap}
+  td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}
+  td.up{color:var(--good)}
+  td.down{color:var(--muted)}
+  .table-note{font-size:13px;color:var(--muted);margin:-14px 0 28px;line-height:1.6}
+
+  /* ---------- versus panel ---------- */
+  .versus{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));margin:30px 0}
+  .vs-card{
+    border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);
+    padding:24px 24px 26px;box-shadow:var(--shadow);
+  }
+  .vs-card.a{border-top:4px solid var(--cool)}
+  .vs-card.b{border-top:4px solid var(--accent)}
+  .vs-card h4{margin:0 0 4px;font-size:17px}
+  .vs-card .tagline{font-size:13px;color:var(--muted);margin:0 0 16px;line-height:1.6}
+  .vs-card ol,.vs-card ul{margin:0;padding-left:1.15em;font-size:14.5px;line-height:1.72;color:var(--ink-soft)}
+  .vs-card li{margin-bottom:10px}
+  .vs-card li:last-child{margin-bottom:0}
+  .flow{list-style:none;padding:0;margin:0;counter-reset:flow}
+  .flow li{
+    counter-increment:flow;position:relative;padding-left:32px;margin-bottom:14px;
+    font-size:14.5px;line-height:1.7;color:var(--ink-soft);
+  }
+  .flow li::before{
+    content:counter(flow);position:absolute;left:0;top:2px;
+    width:21px;height:21px;border-radius:50%;
+    background:var(--surface-2);border:1px solid var(--line-strong);
+    font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent);
+    display:grid;place-items:center;
+  }
+  .vs-card.a .flow li::before{color:var(--cool)}
+
+  /* ---------- timeline diagram ---------- */
+  .diagram{
+    margin:30px 0;padding:26px 24px 22px;
+    border:1px solid var(--line);border-radius:var(--radius-lg);
+    background:var(--surface);box-shadow:var(--shadow);
+  }
+  .diagram .dtitle{
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+    font-weight:700;margin:0 0 20px;
+  }
+  .tl-row{display:grid;grid-template-columns:96px 1fr;gap:14px;align-items:center;margin-bottom:16px}
+  .tl-label{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.35}
+  .tl-label small{display:block;font-weight:500;color:var(--muted);font-size:11px;font-family:var(--mono)}
+  .tl-bar{display:flex;height:44px;border-radius:9px;overflow:hidden;border:1px solid var(--line-strong)}
+  .tl-vla{
+    background:repeating-linear-gradient(90deg,var(--cool) 0 3px,var(--cool-soft) 3px 7px);
+    position:relative;
+  }
+  .seg{
+    display:grid;place-items:center;
+    font-family:var(--mono);font-size:11px;font-weight:700;
+    border-right:1px solid var(--surface);overflow:hidden;white-space:nowrap;
+  }
+  .seg:last-child{border-right:0}
+  .seg.think{background:var(--cool);color:#fff}
+  .seg.play{background:var(--accent-soft);color:var(--accent)}
+  .seg.rest{background:var(--surface-2);color:var(--muted);font-size:11px}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:12.5px;color:var(--muted);margin-top:16px}
+  .legend span{display:flex;align-items:center;gap:7px}
+  .swatch{width:13px;height:13px;border-radius:3px;border:1px solid var(--line-strong);display:block}
+  .sw-think{background:var(--cool)}
+  .sw-play{background:var(--accent-soft)}
+  .sw-vla{background:repeating-linear-gradient(90deg,var(--cool) 0 3px,var(--cool-soft) 3px 7px)}
+
+  /* ---------- funnel ---------- */
+  .funnel{margin:0;padding:0;list-style:none}
+  .funnel li{margin-bottom:14px}
+  .funnel .flabel{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:6px;color:var(--ink-soft)}
+  .funnel .flabel b{font-family:var(--mono);color:var(--accent);font-size:13px}
+  .funnel .ftrack{height:14px;border-radius:7px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+  .funnel .ffill{height:100%;background:linear-gradient(90deg,var(--cool),var(--accent));border-radius:7px}
+
+  /* ---------- spec list ---------- */
+  .spec{
+    display:grid;grid-template-columns:minmax(120px,170px) 1fr;
+    border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+    background:var(--surface);margin:26px 0;box-shadow:var(--shadow);
+  }
+  .spec dt{
+    padding:14px 18px;font-size:13.5px;font-weight:700;color:var(--ink);
+    background:var(--surface-2);border-bottom:1px solid var(--line);
+  }
+  .spec dd{
+    margin:0;padding:14px 18px;font-size:14.5px;line-height:1.7;color:var(--ink-soft);
+    border-bottom:1px solid var(--line);
+  }
+  .spec dt:last-of-type,.spec dd:last-of-type{border-bottom:0}
+  @media (max-width:560px){
+    .spec{grid-template-columns:1fr}
+    .spec dt{border-bottom:0;padding-bottom:4px;background:transparent}
+    .spec dd{padding-top:4px}
+  }
+
+  /* ---------- checklist ---------- */
+  ul.check{list-style:none;padding:0;margin:24px 0}
+  ul.check li{
+    position:relative;padding-left:34px;margin-bottom:14px;
+    font-size:15.5px;line-height:1.75;color:var(--ink-soft);
+  }
+  ul.check li::before{
+    content:"";position:absolute;left:0;top:5px;
+    width:19px;height:19px;border-radius:5px;
+    border:1.5px solid var(--line-strong);background:var(--surface);
+  }
+  ul.check li::after{
+    content:"";position:absolute;left:6px;top:9px;
+    width:6px;height:10px;border:solid var(--accent);border-width:0 2px 2px 0;
+    transform:rotate(42deg);
+  }
+  ul.check li strong{color:var(--ink)}
+
+  ul.bullets{padding-left:1.15em;margin:20px 0}
+  ul.bullets li{margin-bottom:14px;line-height:1.78}
+  ul.bullets li::marker{color:var(--accent)}
+
+  /* ---------- limits ---------- */
+  .limits{display:grid;gap:14px;margin:26px 0;padding:0;list-style:none}
+  .limits li{
+    border:1px solid var(--line);border-left:4px solid var(--warn);
+    border-radius:var(--radius);background:var(--surface);padding:18px 22px;
+  }
+  .limits h4{margin:0 0 6px;font-size:16px;color:var(--warn)}
+  .limits p{margin:0;font-size:15px;line-height:1.72;color:var(--ink-soft)}
+
+  /* ---------- share ---------- */
+  .share{
+    margin:30px 0 0;padding:28px 28px 26px;
+    border-radius:var(--radius-lg);
+    background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);
+  }
+  .share h3{margin:0 0 18px;font-size:16px}
+  .copyblock{
+    font-family:var(--mono);font-size:13.5px;line-height:1.8;
+    background:var(--surface-2);border:1px dashed var(--line-strong);border-radius:10px;
+    padding:16px 18px;margin:0 0 14px;color:var(--ink-soft);
+    white-space:pre-wrap;overflow-wrap:anywhere;
+    -webkit-user-select:all;user-select:all;
+  }
+  .copyhint{font-size:12.5px;color:var(--muted);margin:0 0 20px}
+
+  /* ---------- ending ---------- */
+  .ending{
+    margin:clamp(44px,7vw,72px) 0 0;padding:clamp(30px,5vw,44px);
+    border-radius:var(--radius-lg);
+    background:linear-gradient(150deg,var(--surface-2),var(--surface));
+    border:1px solid var(--line);
+  }
+  .ending p{font-size:17.5px;line-height:1.8;color:var(--ink-soft)}
+  .ending p:last-child{margin-bottom:0}
+  .ending .big{
+    font-family:var(--serif);font-size:clamp(20px,3vw,26px);line-height:1.5;
+    color:var(--ink);letter-spacing:-.02em;margin-bottom:20px;
+  }
+
+  footer.page{
+    margin-top:clamp(48px,8vw,90px);
+    border-top:1px solid var(--line);
+    padding:38px 0 60px;
+    font-size:13.5px;color:var(--muted);line-height:1.8;
+  }
+  footer.page h3{font-size:12px;letter-spacing:.15em;text-transform:uppercase;margin:0 0 12px;color:var(--muted)}
+  footer.page ul{margin:0 0 22px;padding-left:1.1em}
+  footer.page li{margin-bottom:7px}
+  footer.page a{color:var(--muted)}
+  .backlink{
+    display:inline-block;margin-top:6px;font-size:13.5px;
+    color:var(--accent);text-decoration:none;border-bottom:1px solid currentColor;
+  }
+
+  @media (max-width:620px){
+    body{font-size:16px}
+    .tl-row{grid-template-columns:1fr;gap:8px}
+    .sourcecard{grid-template-columns:1fr}
+    .playmark{display:none}
+    .seg{font-size:9.5px}
+  }
+  @media print{
+    body{background:#fff;font-size:11pt}
+    .hero{background:none}
+    nav.toc,.share{display:none}
+    figure.shot img{box-shadow:none}
+    section{padding-top:24px}
+  }
+</style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Astra, 컴퓨터 에이전트에서 로봇 제어까지 확장되는 방식">
+<meta property="og:description" content="Astra, 컴퓨터 에이전트에서 로봇 제어까지 확장되는 방식 영상 정보 채널 : sudoremove (@sudoremove) 게시일 : 2026 09 16 길이 : 33분 26초 (2,006초) 챕터 : 12개 링크 : https://www.youtube.com/watch?v=wkec86Vnz A &lt;div style=&quot;position: relative; width: 100%; padding bottom: 56.25%; heig">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/16x1bnx/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/16x1bnx/assets/wkec86vnz-a-ts-00-00-57.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Astra, 컴퓨터 에이전트에서 로봇 제어까지 확장되는 방식">
+<meta name="twitter:description" content="Astra, 컴퓨터 에이전트에서 로봇 제어까지 확장되는 방식 영상 정보 채널 : sudoremove (@sudoremove) 게시일 : 2026 09 16 길이 : 33분 26초 (2,006초) 챕터 : 12개 링크 : https://www.youtube.com/watch?v=wkec86Vnz A &lt;div style=&quot;position: relative; width: 100%; padding bottom: 56.25%; heig">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/16x1bnx/assets/wkec86vnz-a-ts-00-00-57.jpg">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-astra-%EC%BB%B4%ED%93%A8%ED%84%B0-%EC%97%90%EC%9D%B4%EC%A0%84%ED%8A%B8%EC%97%90%EC%84%9C-%EB%A1%9C%EB%B4%87-%EC%A0%9C%EC%96%B4%EA%B9%8C%EC%A7%80-%ED%99%95%EC%9E%A5%EB%90%98%EB%8A%94-%EB%B0%A9%EC%8B%9D-%EC%9A%94%EC%95%BD/">
+</head>
+<body>
+
+<article class="grid">
+
+  <!-- ===================== HERO ===================== -->
+  <header class="hero full grid">
+    <div>
+      <p class="kicker">Research Report · Robot-Use Agents</p>
+      <h1 class="title">액션 디코더 없이 로봇을 이겼다</h1>
+      <p class="subtitle">그 자리에 있던 것은 더 좋은 모델이 아니라, 사람이 쓴 매뉴얼이었다</p>
+      <p class="deck">
+        로봇 데이터로 후속 학습하지 않은 범용 LLM이 <strong>툴 호출로 엔드이펙터 목표점 하나만 내놓고</strong> 나머지를 하네스가 보간하는 방식으로, 최신 VLA를 <strong>3.9배</strong> 앞섰다. 그런데 같은 모델에 하네스만 바꾼 게임 벤치마크에서는 점수가 <strong>37%p</strong> 갈린다. 그렇다면 그 3.9배 중 얼마가 모델의 몫인가 — 이 질문에 답할 대조 실험은 아직 로봇 쪽에 없다.
+      </p>
+
+      <div class="byline">
+        <span class="who"><span class="avatar">SR</span> sudoremove</span>
+        <span class="dot">·</span>
+        <span>영상 공개 2026-09-16</span>
+        <span class="dot">·</span>
+        <span>노트 정리 2026-09-19</span>
+        <span class="dot">·</span>
+        <span>원본 33분 26초 · 12개 챕터</span>
+        <span class="dot">·</span>
+        <span>읽는 데 약 18분</span>
+      </div>
+
+      <div class="tags">
+        <span class="tag">로보틱스</span>
+        <span class="tag">LLM 에이전트</span>
+        <span class="tag">VLA</span>
+        <span class="tag">하네스 설계</span>
+        <span class="tag">벤치마크 해석</span>
+      </div>
+
+      <div class="sourcecard">
+        <div class="playmark" aria-hidden="true"><span></span></div>
+        <div class="meta">
+          <p class="t">원본 영상 — “Astra, 컴퓨터 에이전트에서 로봇 제어까지 확장되는 방식”</p>
+          <p class="s"><a>youtube.com/watch?v=wkec86Vnz_A</a> · 채널 <a>@sudoremove</a></p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== TOC ===================== -->
+  <nav class="toc" aria-label="목차">
+    <h2>이 글의 순서</h2>
+    <ol>
+      <li><a href="#abstract">요약 — 무엇이 뒤집혔나</a></li>
+      <li><a href="#findings">핵심 발견 7가지</a></li>
+      <li><a href="#method">근거와 방법</a></li>
+      <li><a href="#part1">1부 · 의심의 출발</a></li>
+      <li><a href="#part2">2부 · 숫자가 나오다</a></li>
+      <li><a href="#part3">3부 · 하네스 해부</a></li>
+      <li><a href="#part4">4부 · 같은 모델, 다른 하네스</a></li>
+      <li><a href="#part5">5부 · 하네스 없이 던져 준 사례들</a></li>
+      <li><a href="#part6">6부 · 학계의 정리</a></li>
+      <li><a href="#spec">기술 사양 한눈에</a></li>
+      <li><a href="#offscreen">화면 근거 없는 논의</a></li>
+      <li><a href="#implications">시사점</a></li>
+      <li><a href="#limits">한계 4가지</a></li>
+      <li><a href="#followup">후속 확인 거리</a></li>
+      <li><a href="#share">공유용 요약</a></li>
+    </ol>
+  </nav>
+
+  <!-- ===================== ABSTRACT ===================== -->
+  <section id="abstract">
+    <div class="sec-head">
+      <span class="eyebrow">Abstract</span>
+      <h2 class="sec"><span class="num">01</span>요약 — 무엇이 뒤집혔나</h2>
+    </div>
+
+    <div class="abstract">
+      <p>
+        액션 디코더도, 로봇 전용 후속 학습도 없는 범용 LLM(<strong>GPT-6 Astra</strong>)이 <strong>툴 호출로 엔드이펙터 목표점만 내놓고 나머지는 하네스가 보간하는 방식</strong>으로 VLA(<strong>MolmoAct2</strong>)를 이기기 시작했다. 이 보고서는 그 사례들을 트윗·벤치마크·시스템 프롬프트 원문까지 화면으로 따라가며 검증하고, 같은 모델이라도 하네스를 바꾸면 ARC-AGI-3 점수가 <strong>37%p</strong> 갈린다는 대조를 들어 <strong>“로봇 파운데이션 모델의 형태가 액션 디코더가 아니라 하네스 설계 문제일 수 있다”</strong>는 학계의 동요를 정리한다.
+      </p>
+    </div>
+
+    <ul class="stats">
+      <li><span class="n">46<small>%</small></span><span class="l">GPT-6 Astra · 5개 양팔 과제 200 trial</span></li>
+      <li><span class="n cool">12<small>%</small></span><span class="l">MolmoAct2 (SOTA VLA) · 동일 조건</span></li>
+      <li><span class="n">3.9<small>×</small></span><span class="l">두 값의 비 — 그런데 하네스도 다르다</span></li>
+      <li><span class="n">37<small>%p</small></span><span class="l">같은 모델, 하네스만 바꿨을 때의 격차</span></li>
+    </ul>
+
+    <p class="lead">
+      기존 질문은 “VLA냐, 월드 모델이냐, 행동 파운데이션 모델이냐”였다. 이 회차가 던지는 관찰은 그 질문의 축 자체를 옆으로 민다. 액션 디코더 없이, 텍스트 툴 호출만으로, 지금 당장 VLA를 이긴다. 영상 속 표현을 빌리면 <em>“아스트라가 갑자기 메기처럼 나타나서 ‘이래도 될 것 같은데?’ 하고 있는”</em> 상황이다.
+    </p>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ===================== KEY FINDINGS ===================== -->
+  <section id="findings">
+    <div class="sec-head">
+      <span class="eyebrow">Key Findings</span>
+      <h2 class="sec"><span class="num">02</span>핵심 발견 7가지</h2>
+    </div>
+
+    <ol class="cards">
+      <li>
+        <h3>주장의 형태가 바뀌었다</h3>
+        <p>액션 디코더 없이 텍스트 툴 호출만으로 최신 VLA를 앞선다. 모델이 내놓는 것은 “목표 한 점”뿐이고, 관절 궤적은 하네스가 만든다.</p>
+      </li>
+      <li>
+        <h3>대가는 속도다</h3>
+        <p>콜당 2.4~6.5초를 생각하고 그동안 팔은 멈춰 있다. 12콜에 88스텝, 100초. VLA는 같은 시간에 1,200스텝을 낸다.</p>
+      </li>
+      <li>
+        <h3>얻는 것은 안정성과 해석 가능성</h3>
+        <p>지터링 없는 부드러운 이동은 하드웨어 내구성에 유리할 수 있고, <code>note</code> 필드 덕분에 모든 결정이 사람이 읽는 문장으로 남는다.</p>
+      </li>
+      <li>
+        <h3>성능의 상당 부분은 하네스에 있다</h3>
+        <p>시스템 프롬프트는 좌표계·링크 길이부터 파지 6단계 절차와 재시도 규칙까지 담은 매뉴얼이다. 거기에 승인기·보간기·청크 재생기·hindsight 루프가 얹힌다.</p>
+      </li>
+      <li>
+        <h3>인과를 분리한 대조는 ARC-AGI-3뿐</h3>
+        <p>같은 모델에 표준 하네스 vs 제공사 어댑터를 붙이면 37%p가 갈린다. 로봇 쪽엔 이런 대조가 아직 없다.</p>
+      </li>
+      <li>
+        <h3>로봇 데이터 학습 여부는 미결</h3>
+        <p>오픈루프 궤적 재현이라는 정황과 커뮤니티 투표 83.7%가 있지만 확증은 없다. 반증 설계는 제안됐으나 수행되지 않았다.</p>
+      </li>
+      <li>
+        <h3>가장 실용적인 기여는 ‘잡일 자동화’</h3>
+        <p>real2sim 시스템 식별, 시뮬 환경 구성, 코드형 정책 생성, 데이터셋 제작. 제어 자체보다 평가 인프라 쪽에서 당장의 가치가 크다.</p>
+      </li>
+    </ol>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ===================== METHOD ===================== -->
+  <section id="method">
+    <div class="sec-head">
+      <span class="eyebrow">Source Notes</span>
+      <h2 class="sec"><span class="num">03</span>근거와 방법</h2>
+    </div>
+
+    <p>
+      이 보고서는 <strong>영상의 한국어 수동 자막(1,094개 큐, 약 16,800자)</strong>, YouTube 메타데이터, 12개 챕터, 설명란, 그리고 <strong>1080p 원본에서 직접 추출해 픽셀 검사와 육안 확인을 모두 거친 22개 프레임</strong>을 근거로 한다.
+    </p>
+
+    <div class="callout info">
+      <p class="label">프레임 선정 절차</p>
+      <p>
+        전체 영상을 5초 간격 401장으로 전수 샘플링한 뒤, <strong>밝기가 아니라 레이아웃(우측 채팅 사이드바 유무)으로 화면 공유 구간을 판별</strong>했다. 이 영상의 공유 화면은 대부분 로봇 데모 영상이라 밝기 기준 분류가 듣지 않았기 때문이다.
+      </p>
+      <p>
+        그 결과 전체의 36%(약 715초)가 공유 구간으로 확인됐고, 각 구간에서 화면 영역(좌측 75%)만으로 계산한 퍼셉추얼 해시로 중복을 제거한 뒤, 검은 화면·전환·재생 중 흔들린 프레임을 밝기·표준편차·라플라시안 분산·전후 0.7초 차분으로 걸러 냈다. 중복으로 판정해 뺀 3장(동일 트윗 재촬영 1장, 같은 다이어그램 확대 1장, 같은 리더보드 확대 1장)을 제외한 22장은 모두 육안으로 내용을 확인했다.
+      </p>
+    </div>
+
+    <h4>화면 자료의 세 종류</h4>
+    <div class="tablewrap">
+      <table>
+        <caption>인용된 화면의 출처 계층</caption>
+        <thead>
+          <tr><th scope="col">유형</th><th scope="col">내용</th><th scope="col">검증 상태</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">① X 원문 게시물</th>
+            <td>연구자·개발자들의 데모 공유(작성자·게시일·조회수 확인 가능)</td>
+            <td class="down">1차 자료 · 단발 시연</td>
+          </tr>
+          <tr>
+            <th scope="row">② 진행자 정리 페이지</th>
+            <td>VLA vs LLM+하네스 대조 다이어그램, 벤치마크 재정리, Isola 글 번역</td>
+            <td class="down">2차 가공 · <strong>원문 미대조</strong></td>
+          </tr>
+          <tr>
+            <th scope="row">③ 원 출처 사이트</th>
+            <td>ARC Prize 리더보드·리플레이, Robocurve 발표</td>
+            <td class="up">1차 자료 · 제3자 평가</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-note">②의 수치는 ①·③을 진행자가 옮긴 것이며, <strong>이 노트는 원문 리포트를 직접 대조하지 않았다.</strong> 이하 모든 수치는 그 전제 위에서 읽어야 한다.</p>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ===================== PART 1 ===================== -->
+  <section id="part1">
+    <div class="sec-head">
+      <span class="eyebrow">Evidence · Part 1</span>
+      <h2 class="sec"><span class="num">04</span>의심의 출발 — 괄호 하나에 담긴 주장</h2>
+    </div>
+
+    <p>
+      시작은 OpenAI의 공식 티저였다. <em>“This is GPT-6 Astra. Anything you can do on a computer, Astra can do for you. Fast.”</em> 2026년 9월 4일, 좋아요 33.9만, 답글 8.9천. 진행자는 그 위에 자기 헤드라인을 하나 덧붙이는데, 이 회차의 주장 전체가 그 괄호 하나에 들어 있다.
+    </p>
+
+    <figure class="shot wide">
+      <img src="assets/wkec86vnz-a-ts-00-00-57.jpg" alt="OpenAI의 GPT-6 Astra 공식 발표 트윗 화면 위에 진행자가 덧붙인 헤드라인 “Anything you can do on a computer (+Robot), Astra can do for you.”">
+      <figcaption><span class="ts">00:00:57</span>공식 문구는 “컴퓨터로 할 수 있는 건 다”였지만, 진행자가 붙인 헤드라인에는 <strong>(+Robot)</strong>이 끼어 있다. 다만 티저의 속도감에는 먼저 선을 긋는다 — “마우스를 가져가서 툭 클릭하고 툭 하고 잘하거든요. 잘하는데 저렇게 배속이 빠르진 않아요.”</figcaption>
+    </figure>
+
+    <div class="scene-head"><h3>오픈루프로 VLA 궤적을 재현해 버렸다</h3></div>
+    <p>
+      의심에 불을 붙인 것은 Jiafei Duan(@DJiafei, NUS 조교수, 前 AI2 로보틱스 리드·NVIDIA)의 실험이다. <em>“Was GPT-6 Astra trained on robot data? Got me curious. Borrowed @chooi_jeq’s code, ran an open-loop rollout on a MolmoAct2 dataset trajectory to find out.”</em>
+    </p>
+
+    <figure class="shot wide">
+      <img src="assets/wkec86vnz-a-ts-00-02-47.jpg" alt="GPT-6 Astra의 오픈루프 롤아웃과 MolmoAct2 데이터셋 궤적을 관절별로 비교한 화면. 좌우 팔 관절 궤적 그래프와 시뮬레이션 렌더가 나란히 배치되어 있다.">
+      <figcaption><span class="ts">00:02:47</span><code>Pack + close box / Open-loop</code>, 13.07/55.33s, 30 FPS. 좌우에 <strong>JOINT TRAJECTORY COMPARISON</strong>(왼팔·오른팔 관절별 궤적), 아래에 <code>OLD-TASK REFERENCE / DIGITIZED</code> vs <code>GPT-6 ASTRA</code> 시뮬레이션 렌더.</figcaption>
+    </figure>
+
+    <p>
+      조건이 이 프레임의 의미를 규정한다. 태스크 지시문은 <em>“Pack green tape, white tape, highlighter, and pens. Close the cardboard box with both arms.”</em> 한 줄뿐이고, 출력은 관절값이 아니라 <strong>엔드이펙터의 카테시안 좌표</strong>다. 그리고 결정적으로 <strong>오픈 루프</strong> — 진행 중 카메라 프레임을 다시 받지 않고, “머릿속 상상만으로” 끝까지 밀어붙인 것이다.
+    </p>
+
+    <div class="pullquote">
+      <p>보여주지도 않았는데 이 정도로 맞힌다면, 프리트레이닝에 로봇 데이터가 섞여 있었다는 방증 아닌가.</p>
+      <footer>— 자막의 표현으로는 “킹리적 갓심”. 정황이지, 증거는 아니다.</footer>
+    </div>
+
+    <figure class="shot wide">
+      <img src="assets/wkec86vnz-a-ts-00-05-22.jpg" alt="“Do you think GPT-6 Astra has been trained with robot data?” 투표 결과 화면. Yes definitely 83.7%, No 16.3%, 786표.">
+      <figcaption><span class="ts">00:05:22</span>같은 계정의 투표 최종 결과 — <strong>Yes definitely 83.7% / No 16.3%</strong>, 786표(5.4만 조회). 답글도 같은 온도다 — “dude obviously”, 작성자 본인의 “Will be surprised many people don’t think so.” 자막은 이를 정황으로만 취급하면서, <strong>“몰모액트에 없는 데이터를 조금 변형해서 시켜보면 된다”</strong>는 반증 설계를 즉석에서 제안한다.</figcaption>
+    </figure>
+
+    <div class="scene-head"><h3>직전 세대의 기준선 — LLM 단독은 0~5.5%였다</h3></div>
+    <p>
+      뒤에 나올 숫자들의 의미는 이 프레임이 있어야 생긴다. 불과 한두 달 전, 같은 진행자들이 다룬 <strong>Claude Plays Robotics</strong> 계열 결과는 정반대 결론이었다.
+    </p>
+
+    <figure class="shot wide">
+      <img src="assets/wkec86vnz-a-ts-00-06-27.jpg" alt="모델별 로봇 과제 성공률 그래프와 VLA+LLM on 40-task LIBERO 성공률 그래프를 정리한 한국어 페이지.">
+      <figcaption><span class="ts">00:06:27</span>위쪽은 모델별 완수율, 아래쪽은 <strong>VLA+LLM on 40-task LIBERO</strong>. “이때만 해도 LLM이 할 수는 있는데 아직 잘하진 못한다”가 결론이었다.</figcaption>
+    </figure>
+
+    <div class="diagram">
+      <p class="dtitle">직전 세대 — 단계별 붕괴 지점</p>
+      <ul class="funnel">
+        <li>
+          <div class="flabel"><span>물체에 손을 댄다</span><b>60%대</b></div>
+          <div class="ftrack"><div class="ffill"></div></div>
+        </li>
+        <li>
+          <div class="flabel"><span>파지(집어 든다)</span><b>25%</b></div>
+          <div class="ftrack"><div class="ffill"></div></div>
+        </li>
+        <li>
+          <div class="flabel"><span>완수(유지·이송·놓기까지)</span><b>5%</b></div>
+          <div class="ftrack"><div class="ffill"></div></div>
+        </li>
+      </ul>
+      <p>
+        찾아가서 손대는 건 상당히 한다. <strong>쥔 다음의 유지·이송·놓기가 무너진다.</strong> 모델별 완수율은 Mythos Preview 5.5 · Opus 4.6 3.5 · Opus 4.7 1.5 · Gemini 3.1 1.0, GPT-5.4·Opus 4는 0. 200 trial이라 0.5%가 1건 — <strong>모델 간 1%p 차이는 노이즈다.</strong>
+      </p>
+    </div>
+
+    <p>
+      LIBERO 쪽은 더 분명했다. 기준선 <strong>VLA 단독 86%(±2.5pp)</strong>에 대해 Opus 4.5 58%, Opus 4.6 76%, Opus 4.7 51%, Mythos Preview 34%, GPT-5.1 25%, Kimi 2.6 30% — <strong>LLM을 얹어도 VLA 단독을 넘지 못했다.</strong> 이 기준선이 다음 장에서 무너진다.
+    </p>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ===================== PART 2 ===================== -->
+  <section id="part2">
+    <div class="sec-head">
+      <span class="eyebrow">Evidence · Part 2</span>
+      <h2 class="sec"><span class="num">05</span>숫자가 나오다 — 46% vs 12%</h2>
+    </div>
+
+    <p>
+      숫자의 신뢰도는 누가 쟀느냐에 달린다. 이 회차가 인용하는 수치들은 모델 제작사가 아니라 제3자 평가기관에서 나왔다.
+    </p>
+
+    <div class="gallery wide">
+      <figure class="shot">
+        <img src="assets/wkec86vnz-a-ts-00-08-57.jpg" alt="Robocurve 출범을 알리는 게시물. 프런티어 로보틱스 역량을 측정·보고하는 공익법인이며 ToyBench 항목이 소개되어 있다.">
+        <figcaption><span class="ts">00:08:57</span>Jay Chooi(@chooi_jeq)의 발표 — <strong>Robocurve</strong>, 프런티어 로보틱스 역량을 측정하고 결과를 중립적 제3자로서 공표하는 공익법인(PBC). <strong>ToyBench</strong> 항목은 Tower of Hanoi, Jenga, Shape sorting 등.</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="assets/wkec86vnz-a-ts-00-09-12.jpg" alt="Claude가 하노이탑을 푸는 화면. 좌·상·우 3개 카메라 뷰와 액션 플롯, move_to 메모 패널이 보인다.">
+        <figcaption><span class="ts">00:09:12</span><em>“Claude is not a robotics model but it can move the disks around successfully.”</em> <code>left_cam</code>/<code>top_cam</code>/<code>right_cam</code> 3분할과 액션 플롯(action/0…13).</figcaption>
+      </figure>
+    </div>
+
+    <blockquote class="q">
+      <p>“The yellow hexagon now sits between the two open jaws but about 1.5 cm to the arm’s left of centre, and I still can’t judge its height. I’m nudging the right gripper left/forward and swinging the left…”</p>
+      <cite><code>latest</code> 패널의 <code>move_to</code> 메모 — 이 텍스트가 곧 상황 인지 → 관절 목표 결정의 리즈닝이다. “왼쪽 카메라로 노란색이 안 보이네” 같은 관측 해석이 그대로 노출된다.</cite>
+    </blockquote>
+
+    <div class="scene-head"><h3>성능·비용 좌표와 결정적 막대그래프</h3></div>
+
+    <figure class="shot wide">
+      <img src="assets/wkec86vnz-a-ts-00-10-19.jpg" alt="가로축 API 비용, 세로축 완수율인 산점도. Astra가 왼쪽 위 높은 성공률·낮은 비용 영역에 위치한다.">
+      <figcaption><span class="ts">00:10:19</span><strong>“GPT-6 Astra is 2.4× better and 2.3× cheaper than Fable 5.1 on direct robot control”</strong> — Astra는 100% 근처, Fable 5.1은 40% 부근, Fable 5는 바닥. 우측 영상 하단의 <code>1:40 real time elapsed</code>, <code>20.7× · thinking pauses removed</code> 표기에 주목할 것. <strong>데모는 생각 시간을 잘라 낸 고배속이다.</strong></figcaption>
+    </figure>
+
+    <figure class="shot wide">
+      <img src="assets/wkec86vnz-a-ts-00-10-37.jpg" alt="MolmoAct2 12점과 GPT-6 Astra 46점을 잇는 3.9배 화살표 그래프, 그리고 같은 과제에서 Astra 성공·MolmoAct2 실패를 대비한 영상.">
+      <figcaption><span class="ts">00:10:37</span><strong>“GPT-6 Astra scores 46% vs 12% for MolmoAct2, a state-of-the-art robotics VLA, across 200 trials on five bimanual tasks. That’s 3.9x higher.”</strong> 각 100 trials, 우측은 성공/실패 대비 영상(<code>2.4× · thinking pauses removed</code>).</figcaption>
+    </figure>
+
+    <div class="tablewrap">
+      <table>
+        <caption>스코어보드 — 이 회차에 등장하는 모든 수치</caption>
+        <thead>
+          <tr><th scope="col">비교</th><th scope="col">수치</th><th scope="col">조건 / 출처</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">GPT-6 Astra vs MolmoAct2</th>
+            <td class="num up">46% vs 12% (3.9×)</td>
+            <td>5개 양팔 과제 · 각 100 trial(총 200) · Robocurve</td>
+          </tr>
+          <tr>
+            <th scope="row">Astra vs Fable 5.1</th>
+            <td class="num up">성공률 2.4× · 비용 2.3× 저렴</td>
+            <td>직접 로봇 제어 · 출력 토큰 6.2× 절감</td>
+          </tr>
+          <tr>
+            <th scope="row">Fable 5.1 vs Fable 5</th>
+            <td class="num up">성공률 8× · 1.3× 저렴</td>
+            <td>동일 과제</td>
+          </tr>
+          <tr>
+            <th scope="row">LLM 단독 (직전 세대)</th>
+            <td class="num down">완수 0~5.5%</td>
+            <td>200 trial · 모델 간 1%p는 노이즈</td>
+          </tr>
+          <tr>
+            <th scope="row">VLA 단독 vs VLA+LLM</th>
+            <td class="num down">86%(±2.5pp) vs 최고 76%</td>
+            <td>40-task LIBERO · LLM 조합이 넘지 못함</td>
+          </tr>
+          <tr>
+            <th scope="row">ARC-AGI-3 하네스 대조</th>
+            <td class="num up">18→63% vs ~100%</td>
+            <td><strong>같은 모델, 하네스만 교체</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-note">마지막 행이 이 표의 나머지 전부를 흔든다. 자세한 내용은 <a href="#part4">4부</a>.</p>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ===================== PART 3 ===================== -->
+  <section id="part3">
+    <div class="sec-head">
+      <span class="eyebrow">Evidence · Part 3</span>
+      <h2 class="sec"><span class="num">06</span>하네스 해부 — 46%는 어디에서 오는가</h2>
+    </div>
+
+    <p>
+      숫자만 보면 모델이 좋아진 이야기다. 그런데 진행자가 시스템 프롬프트 원문을 화면에 띄우는 순간, 이야기의 무게중심이 옮겨간다.
+    </p>
+
+    <figure class="shot wide">
+      <img src="assets/wkec86vnz-a-ts-00-11-09.jpg" alt="yam_arms 로봇을 툴 호출로 제어하라는 시스템 프롬프트 원문 화면. 관측 메시지, note 필수, 안전 승인기, 턴당 툴 호출 1개, 20콜 예산 등이 적혀 있다.">
+      <figcaption><span class="ts">00:11:09</span>자막에서 “시스템 프롬프트를 제가 봤거든요”라고 말한 그 원문.</figcaption>
+    </figure>
+
+    <div class="prompt">
+      <p>“You are controlling a real robot embodiment named <strong>‘yam_arms’</strong> through tool calls. Each observation message gives you the current proprioceptive state and camera images. Work toward the user’s goal in <strong>small, deliberate motions</strong>; re-check the observation after every motion. Every move tool call must include a <code>note</code>… Safety approvers clamp out-of-bounds and too-fast actions below you… <strong>Respond with exactly one tool call per turn.</strong> When the goal is achieved call <code>done</code>; if it cannot be achieved call <code>give_up</code>… <strong>You have a budget of 20 LLM calls for the whole trial.</strong>”</p>
+    </div>
+
+    <p>
+      Embodiment notes에는 <strong>6-DoF 양팔, 평행 죠 그리퍼, 카테시안 엔드이펙터 목표</strong>, 좌표계 정의(+x 전방, +y 좌, +z 상), <code>left_gripper</code>/<code>right_gripper</code> 0=완전 닫힘 / 1=완전 열림(약 9.5cm), <strong>상완 0.26m · 전완 0.25m · 손목~파지점 0.25m, 어깨 기준 리치 약 0.76m</strong>, 그리고 <strong>IK 레이어가 목표를 관절 운동으로 변환</strong>한다는 설명이 들어 있다.
+    </p>
+
+    <div class="scene-head"><h3>프롬프트에 박아 넣은 ‘파지 절차서’</h3></div>
+
+    <figure class="shot wide">
+      <img src="assets/wkec86vnz-a-ts-00-11-42.jpg" alt="같은 시스템 프롬프트의 이어지는 부분. 파지 6단계 절차, Placing, Two arms and the middle of the table 섹션이 수치와 함께 명시되어 있다.">
+      <figcaption><span class="ts">00:11:42</span>사실상 <strong>사람이 쓴 매뉴얼</strong>이다. 수치까지 명시된 파지 절차 6단계와 실패 시 재시도 규칙.</figcaption>
+    </figure>
+
+    <div class="diagram">
+      <p class="dtitle">시스템 프롬프트에 명시된 파지 6단계</p>
+      <ol class="flow">
+        <li>오버헤드 프레임에서 위치 파악 후 <strong>픽셀 → 미터 변환</strong>(경사 시야 보정 계수 포함).</li>
+        <li><code>z ≈ 0.15</code>로 약 10cm 위에 접근해 손목 카메라 확인(대상이 <code>x ≈ 110</code> 죠 컬럼에 놓여야 함). 완전히 보이면 <strong>2–3cm 반경 방향 전진</strong>.</li>
+        <li>물체 높이의 절반까지 하강(테이블 높이면 <code>z = 0 ~ −0.01</code>).</li>
+        <li>완전히 닫고, <strong>정착된 그리퍼 값이 0.04 미만이면 빈손</strong>으로 판정.</li>
+        <li><strong>5cm 들어 올려 오버헤드 뷰로 물체가 따라왔는지 확인한 뒤에만</strong> 이송.</li>
+        <li>빈손이면 열고 반경 2cm 조정 후 1회 재시도. 두 번째도 실패면 반복하지 말고 재측정하거나 반대 팔 사용.</li>
+      </ol>
+      <p>
+        이어지는 <code>## Placing</code>(운반은 <code>z ≥ 0.15</code>, 자중 처짐 때문에 필요 여유보다 2cm 높게 지령)과 <code>## Two arms and the middle of the table</code>(유휴 팔은 홈 포즈에 주차 — 떠 있으면 드리프트하고 오버헤드 뷰를 가린다)까지.
+      </p>
+    </div>
+
+    <div class="callout tip">
+      <p class="label">이 프레임이 이 영상의 실질적 결론</p>
+      <p>자막에서 한 진행자는 “이렇게까지 다 알려주면서 해야 된다니”라고 놀라고, 다른 쪽은 “툴 콜 프롬프트는 원래 이만큼 된다”고 받는다. <strong>성능의 상당 부분이 모델이 아니라 이 문서에 있다</strong>는 것이 뒤의 ARC-AGI-3 대조와 이어지는 지점이다.</p>
+    </div>
+
+    <div class="scene-head"><h3>한 장으로 본 VLA vs LLM+하네스</h3></div>
+
+    <figure class="shot wide">
+      <img src="assets/wkec86vnz-a-ts-00-12-22.jpg" alt="VLA와 LLM+하네스의 제어 파이프라인을 좌우로 대조한 한국어 다이어그램. 관측, 정책, 액션 청크, 로봇 제어 주기, 시간축 막대가 정리되어 있다.">
+      <figcaption><span class="ts">00:12:22</span>진행자들이 직접 만든 비교표. 이 노트에서 정보 밀도가 가장 높은 화면이다.</figcaption>
+    </figure>
+
+    <div class="versus">
+      <div class="vs-card a">
+        <h4>VLA — MolmoAct2</h4>
+        <p class="tagline">학습된 정책 · 닫힌 루프 · 생각 없음</p>
+        <ol class="flow">
+          <li><strong>관측</strong> — 카메라 3장 224×224 + 14-D 관절 상태 + 지시문</li>
+          <li><strong>VLA 신경망</strong>(<code>/act</code> 서버) — 이미지→동작 한 번의 forward pass <strong>~100ms</strong></li>
+          <li><strong>관절 청크 30스텝(14-D)</strong> — action_horizon 30 · 스텝당 0.1s</li>
+          <li><strong>로봇</strong>(YAM 양팔) @10Hz — 관절 위치 명령 그대로 PD 제어, 100ms마다 다시 관측</li>
+        </ol>
+      </div>
+      <div class="vs-card b">
+        <h4>LLM + 하네스 — Inspect Robots ‘agent’ 정책</h4>
+        <p class="tagline">로봇 데이터로 학습 안 함 · 콜당 청크 하나 · 생각하는 동안 팔은 정지</p>
+        <ol class="flow">
+          <li><strong>관측→프롬프트</strong> — 카메라 3장 224×224(<strong>최근 2관측만 유지</strong>), <code>state[eef_state]</code>는 라벨 텍스트, <code>joint_pos</code>·<code>joint_eff</code>는 라벨 없는 14개 숫자 배열, 지난 턴 전부 유지 + 운영자 피드백</li>
+          <li><strong>LLM</strong>(GPT-6 Astra · Opus 5) — 콜당 생각 <strong>2.4~6.5s</strong>(medium), 턴당 툴 호출 1개 + 사람용 note 1~2문장, <strong>예산 20콜</strong>, responses wire가 reasoning 상태를 콜 사이에 이어 줌</li>
+          <li><strong>툴 호출엔 “어디로”만 있고 “얼마 동안”은 없다</strong> — <code>move_to {"targets":{"left_x":0.35,…}, "note":"The red block is to the left of the bowl…"}</code></li>
+          <li><strong>하네스</strong> — 승인(범위 클램프·델타 5%·충돌 가드레일·pre_check) → IK 변환(0.2 rad/joint/step 백스톱) → 고정 속도 보간(<code>max_speed_frac 0.1~0.25</code>) → “executing over 20 steps (2.0 s)” · <strong>콜당 10s 캡</strong></li>
+          <li><strong>열린 루프 재생 @10Hz</strong> — “재생 중엔 아무도 안 본다 · 끝나면 마지막 관측 1장만 ①로”</li>
+          <li><strong>종료</strong> — <code>done</code>/<code>give_up</code> + <strong>hindsight</strong>를 필수 기록 → 다음 런의 system prompt에 <code>prior_learnings</code>로 주입</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="diagram">
+      <p class="dtitle">시간축 비교 — 100초 동안 무슨 일이 일어나는가</p>
+      <div class="tl-row">
+        <span class="tl-label">VLA<small>1,200 steps</small></span>
+        <div class="tl-bar tl-vla" role="img" aria-label="VLA는 100밀리초마다 끊김 없이 새 명령을 내는 연속적인 막대"></div>
+      </div>
+      <div class="tl-row">
+        <span class="tl-label">LLM+하네스<small>12 calls / 88 steps</small></span>
+        <div class="tl-bar" role="img" aria-label="LLM은 생각 4.5초, 재생 0.8초, 생각 6.5초, 재생 1.1초, 생각 6.3초, 생각 4.3초 순으로 이어지는 띄엄띄엄한 막대">
+          <span class="seg think">4.5s</span>
+          <span class="seg play">0.8</span>
+          <span class="seg think">6.5s</span>
+          <span class="seg play">1.1</span>
+          <span class="seg think">6.3s</span>
+          <span class="seg think">4.3s</span>
+          <span class="seg rest">… 100s까지</span>
+        </div>
+      </div>
+      <div class="legend">
+        <span><i class="swatch sw-think"></i> 모델이 생각 — 팔은 정지</span>
+        <span><i class="swatch sw-play"></i> 로봇이 청크 재생</span>
+        <span><i class="swatch sw-vla"></i> VLA — 100ms마다 새 명령</span>
+      </div>
+      <p>
+        실측 출처는 <code>9/4 Astra 그릇 런 rig-1_6b47f3c6</code>(생각 2.4~6.5s × 12콜, 청크 0.3~1.2s). <strong>리포트 영상은 파란 칸을 잘라 낸 것</strong>이라고 다이어그램에 명시돼 있다.
+      </p>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <caption>둘의 차이 한 줄씩 — 다이어그램 하단 표</caption>
+        <thead>
+          <tr><th scope="col">축</th><th scope="col">VLA (MolmoAct2)</th><th scope="col">LLM + 하네스 (Astra)</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">관절 숫자를 정하는 주체</th>
+            <td>신경망이 30스텝 전부</td>
+            <td><strong>“목표 한 점”만 모델이 정하고</strong>, 사이 스텝은 하네스가 보간</td>
+          </tr>
+          <tr>
+            <th scope="row">루프가 닫히는 주기</th>
+            <td class="num">100ms</td>
+            <td><strong>청크(2~10s)가 끝나야 관측 1장</strong> — 재생 중 물체가 움직여도 모른다</td>
+          </tr>
+          <tr>
+            <th scope="row">안전</th>
+            <td>하드 클램프</td>
+            <td>승인기 4개가 출력을 고치거나 거절, <strong>거절 사유가 모델에게 회신</strong>(= 학습 없는 교정 루프)</td>
+          </tr>
+          <tr>
+            <th scope="row">관절 vs EEF</th>
+            <td>—</td>
+            <td>관절 모드면 라디안 직접 호출(ClapboardBench), EEF 모드면 m 좌표+각도(Astra 리포트·StationeryBench)</td>
+          </tr>
+          <tr>
+            <th scope="row">기억</th>
+            <td>없음</td>
+            <td>대화 전체가 히스토리(단 <strong>이미지는 최근 2장만</strong>, 나머지는 텍스트 스텁), 종료 시 hindsight를 다음 런에 주입</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="scene-head"><h3>하네스의 다른 형태 — GUI를 만들어 주고 클릭하게 한다</h3></div>
+
+    <figure class="shot wide">
+      <img src="assets/wkec86vnz-a-ts-00-14-27.jpg" alt="GUMI(GUI Manipulation Interface) 화면. 상단에 손목·에고 카메라 뷰, 하단에 좌우 팔별 방향 버튼 패널과 COMMIT/START/STOP 버튼이 배치되어 있고 우측에 Claude의 클릭 로그가 쌓인다.">
+      <figcaption><span class="ts">00:14:27</span><code>[4/8] GUMI: GUI Manipulation Interface</code>. TASK는 “Open the green drawer, place the blue cup into the drawer and close it”. 우측 Claude 패널에 “Clicked”, “Captured page”, “Step 3 committed”, “Batch — 5 actions”가 쌓인다.</figcaption>
+    </figure>
+
+    <p>
+      즉 <strong>컴퓨터 사용 에이전트를 그대로 쓰기 위해 로봇 제어를 GUI 조작 문제로 바꿔 놓은 것</strong>이다. 방향 버튼(UP/FWD/DOWN/LEFT/BACK/RIGHT), 축(X/Y/Z), 회전(CCW/CW), 그리퍼(GRASP/RELEASE/STILL)을 눌러 <code>COMMIT</code>한다. 자막에서 “LLM들이 버튼을 누를 수 있도록 GUI를 만들어 준다거나, 컴퓨터 유저 에이전트처럼 쓸 수 있게끔 하는 연구가 요새 많다”고 말한 바로 그 사례다.
+    </p>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ===================== PART 4 ===================== -->
+  <section id="part4">
+    <div class="sec-head">
+      <span class="eyebrow">Evidence · Part 4</span>
+      <h2 class="sec"><span class="num">07</span>같은 모델, 다른 하네스 — 37%p의 의미</h2>
+    </div>
+
+    <p>
+      하네스가 성능을 좌우한다는 가설은, 모델을 고정하고 하네스만 바꿔야 검증된다. 로봇 벤치마크에는 그 대조가 없다. 게임 쪽에는 있다.
+    </p>
+
+    <figure class="shot wide">
+      <img src="assets/wkec86vnz-a-ts-00-14-42.jpg" alt="ARC-AGI 3 리더보드. 로그 스케일 비용 축과 점수 축 위에서 GPT-6 Astra Provider Adapter가 100% 근처, 표준 하네스 Astra가 18%에서 63%로 이어지는 곡선, 나머지 모델들이 바닥에 몰려 있다.">
+      <figcaption><span class="ts">00:14:42</span>진행자 페이지의 3절 “같은 모델, 다른 하네스 — ARC-AGI-3”. 우상단 <strong>Provider Adapter가 100% 근처</strong>, 그 아래 <strong>표준 하네스가 18%→63%</strong>. 바닥 근처에 Gemini 3.1 Pro (Preview), GPT-5.1 (High), GPT-5.6 Sai (Max/High), Claude Opus 5 (High)가 몰려 있다.</figcaption>
+    </figure>
+
+    <blockquote class="q">
+      <p>“GPT-6 Astra achieves state-of-the-art scores on ARC-AGI-3 with both the Standard and Provider Adapter harnesses. <strong>Higher reasoning levels generally cost less</strong> because Astra solves games in fewer actions, reducing the total number of model calls and tokens.”</p>
+      <cite>ARC Prize 공식 캡션</cite>
+    </blockquote>
+
+    <div class="pullquote">
+      <p>2절의 Astra 런은 OpenAI responses wire로 돌았다 — reasoning 상태를 콜 사이에 이어 주는 그 장치가, 게임 쪽에선 점수를 37%p 가른다.</p>
+      <footer>— 진행자 주석. 이어서: <strong>“로봇 쪽엔 모델을 고정하고 하네스만 바꾼 대조가 없다. 게임 쪽엔 있다.”</strong></footer>
+    </div>
+
+    <div class="callout warn">
+      <p class="label">방법론적 공백</p>
+      <p>로봇 벤치마크(46% vs 12%)는 <strong>모델이 다르고 하네스도 다른</strong> 비교다. 반면 ARC-AGI-3는 <strong>같은 모델에 하네스만 바꾼</strong> 대조를 제공한다. 후자에서 37%p가 갈린다면, 전자의 3.9배 중 얼마가 모델 덕이고 얼마가 하네스 덕인지는 <strong>이 자료만으로 분리되지 않는다.</strong></p>
+    </div>
+
+    <figure class="shot wide">
+      <img src="assets/wkec86vnz-a-ts-00-14-57.jpg" alt="ARC Prize 리플레이 화면. Astra가 게임 s5i5의 레벨 2를 풀며 남긴 대수적 약식 메모가 우측 패널에 표시되어 있다.">
+      <figcaption><span class="ts">00:14:57</span><code>ASTRA / s5i5</code>, LEVEL 2/8. 우측 <strong>Astra’s Notes</strong> — “Level 2: target (52,31). Plan to pass above the wall at y13: extend colors 12×8, 10×8, 11×4, then 14×6.” 하단 상태바는 <code>ACTION 033/242</code>, <code>CLICK (42,56)</code>, <code>FRAME 034/250</code>.</figcaption>
+    </figure>
+
+    <p>
+      캡션은 <em>“Astra playing s5i5, using its on-the-fly algebraic shorthand to track state and plan actions”</em>이고, 이어지는 절은 <strong>“Action Efficiency Compared to Humans”</strong> — ARC-AGI-3 출시 전 일반인 약 500명을 테스트해 행동 효율의 인간 기준선을 만들었다는 설명이다. 그리고 자막의 관찰 하나가 하네스 가설을 한 번 더 지지한다. <strong>Reasoning Effort를 늘려도 자체 하네스에서는 점수가 거의 변하지 않는다.</strong> 좋은 공략집이 있으면 오래 고민할 필요가 없다는 뜻이다.
+    </p>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ===================== PART 5 ===================== -->
+  <section id="part5">
+    <div class="sec-head">
+      <span class="eyebrow">Evidence · Part 5</span>
+      <h2 class="sec"><span class="num">08</span>하네스 없이 던져 준 사례들</h2>
+    </div>
+
+    <p>
+      정제된 벤치마크 바깥에서는, 연구자 개인들이 Astra에게 로봇을 통째로 던져 주고 있다. 재현 절차가 공개되지 않은 단발 시연이라는 점은 미리 접어 두고 읽어야 한다.
+    </p>
+
+    <div class="scene-head"><h3>사례 ① — 금문교를 그려 봐</h3></div>
+
+    <div class="gallery wide">
+      <figure class="shot">
+        <img src="assets/wkec86vnz-a-ts-00-17-22.jpg" alt="Astra에게 로봇 팔과 붓, 카메라를 주고 금문교를 그리게 했다는 게시물 화면.">
+        <figcaption><span class="ts">00:17:22</span>thijs(@cdngdev, 20세, 스탠퍼드·로보틱스, 現 OpenAI): <em>“i gave astra a robot, a paint brush, and a camera then asked it to paint the golden gate bridge in real life! it figured out how to control the robot, and progressively got better throughout its attempts.”</em> 샘 올트먼이 리트윗해 바이럴됐다.</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="assets/wkec86vnz-a-ts-00-17-47.jpg" alt="타임랩스 중 Attempt 03 장면. 파란 마스킹 테이프로 고정한 종이에 로봇 팔이 하늘을 칠하고 있고 왼쪽 위에 이전 시도 결과물이 놓여 있다.">
+        <figcaption><span class="ts">00:17:47</span><strong>Attempt 03</strong>(0:45/1:08). 자막의 평가는 냉정한 편이다 — “시작부터 이렇게 붓질을 하는 것 자체가 말이 안 된다고 생각은 해요.” 1분 플래닝을 준 흔적과 <strong>code-as-policy</strong> 방식으로 보인다는 해석, 그리고 “완전 오픈 루프는 아닌 것 같다”는 정정.</figcaption>
+      </figure>
+    </div>
+
+    <figure class="shot wide">
+      <img src="assets/wkec86vnz-a-ts-00-19-17.jpg" alt="Astra의 작업 로그 화면. 브라우저 사용, 파일 읽기, 이미지 보기, python3 실행 기록과 함께 붓질 진행 상황과 모터 온도를 보고하는 문장들이 이어진다.">
+      <figcaption><span class="ts">00:19:17</span>자가 교정의 실체 — 관측 → 파이썬 → 재지시.</figcaption>
+    </figure>
+
+    <blockquote class="q">
+      <p>“Stroke 88 is complete, and it’s approaching the deck. I’ve also prepared the video cut list from the recorded motion times so the cooling and recovery waits can be removed afterward.”</p>
+      <p><code>Used the browser, ran a command</code> / <code>Read files</code> / <code>Viewed an image</code> / <code>Ran python3 - &lt;&lt;'PY' from pathlib import Path import re,json,collections …</code></p>
+      <p>“The deck is being painted now. Its left section is visible as a narrow red line beneath the cable, with the white space between them preserved. <strong>Motor temperature is holding around 44–45°C.</strong>”</p>
+      <p>“Strokes 91 and 92 are complete. Four remain: three hangers in the main span and the tower’s lower crossbar. The deck has a lighter, dry-brush stretch; the larger white openings are staying clear.”</p>
+    </blockquote>
+
+    <p>
+      자막에서 “모터 템퍼러처까지 아네요”, “파이썬 스크립트를 돌리는 걸 봐서 코드에서 폴리시”라고 말한 근거가 이 화면이다. <strong>브라우저·파일·이미지·파이썬을 섞어 쓰는 컴퓨터 사용 에이전트의 루프가 그대로 로봇 제어 루프로 쓰이고 있다.</strong>
+    </p>
+
+    <figure class="shot wide">
+      <img src="assets/wkec86vnz-a-ts-00-19-43.jpg" alt="완성된 금문교 그림 6장이 나란히 놓인 사진. 왼쪽은 형태를 알아보기 어렵고 오른쪽으로 갈수록 붉은 주탑과 케이블, 파란 하늘이 분명해진다.">
+      <figcaption><span class="ts">00:19:43</span>후속 게시물 <em>“the progression is incredible”</em>(9월 9일, 좋아요 440 · 10만 조회). <strong>“점점 좋아진다”는 주장을 눈으로 확인할 수 있는 유일한 프레임</strong>이다.</figcaption>
+    </figure>
+
+    <div class="scene-head"><h3>사례 ② — real2sim을 통째로 자동화</h3></div>
+
+    <figure class="shot wide">
+      <img src="assets/wkec86vnz-a-ts-00-20-43.jpg" alt="DROID 데모의 원본 영상과 Blender 렌더링 결과를 EXTERIOR 1, EXTERIOR 2, WRIST 세 시점으로 나란히 비교한 6분할 화면.">
+      <figcaption><span class="ts">00:20:43</span>lingxiao guo(@Lingxiao234, CMU Robotics 석사): <em>“GPT-6 does real2sim end to end from robot demonstrations. I gave it only multi-view RGB and robot actions, and one simple prompt. It calibrated the cameras, built the object assets, performed physics system-ID, ran MuJoCo, and rendered in Blender.”</em></figcaption>
+    </figure>
+
+    <p>
+      자막에서 이 대목의 온도가 가장 높다. 시뮬과 실제를 맞추는 <strong>시스템 아이덴티피케이션</strong>은 “되게 고통스럽고 시간이 많이 들고 엔지니어들이 별로 안 좋아하는 잡”으로 알려져 있는데, 그걸 에이전트가 <strong>“잘 안 됐네, 다시” 루프로 스스로 수렴시킨다.</strong> 평가 인프라가 필요한 로봇 회사 입장에서는 제어 성능보다 이쪽이 더 직접적인 가치라는 지적이 함께 나온다.
+    </p>
+
+    <div class="scene-head"><h3>사례 ③ — 고자유도 손, 그리고 영상 두 개만으로</h3></div>
+
+    <div class="gallery wide">
+      <figure class="shot">
+        <img src="assets/wkec86vnz-a-ts-00-24-02.jpg" alt="Dexterous Cube Solving 뷰어. 로봇 손들이 루빅스 큐브를 다루고 있고 우측에 큐브 상태와 현재 액션, 하단에 시뮬레이션 시간이 표시된다.">
+        <figcaption><span class="ts">00:24:02</span>Yanjie Ze(@ZeYanjie) — <em>“GPT6 Astra solved Rubik’s Cube with robot hands”</em>(27.8만 조회). 공개 플레이그라운드 <code>dex-rubik-cube.yanjieze.com</code>, 뷰어에 <code>ACTION: Repositioning (Move 4/10)</code>, <code>Sim time 110.54 s</code>, <code>Contact-driven · MuJoCo</code>.</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="assets/wkec86vnz-a-ts-00-24-22.jpg" alt="원본 영상, 물리 리타깃 오버레이, 클로즈업, Wuji 손 시뮬레이션 재현을 4분할로 배치한 화면.">
+        <figcaption><span class="ts">00:24:22</span><em>“I just gave it two videos, without states or actions, and told it to do real2sim and physical retarget to Wuji hands.”</em> <code>Source video</code>(8.10s) / <code>Physical retarget overlay</code>(Event-aligned · Sim 9.73s) / 클로즈업 / <code>Sim physical replay; Wuji hand</code>.</figcaption>
+      </figure>
+    </div>
+
+    <p>
+      자막은 이를 <strong>IDM(사람 손 영상에서 액션을 뽑아내는 역동역학 모델)이 하던 일</strong>에 빗대면서, 겹쳐 놓고 차이를 보는 그 델타를 손실로 삼아 IDM 자체를 학습시킬 수도 있겠다는 아이디어로 확장한다. 동시에 한계도 명시한다 — <strong>“물론 완벽히 맞지는 않아요. 여기 보면 이상하게 잡고 있잖아요.”</strong>
+    </p>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ===================== PART 6 ===================== -->
+  <section id="part6">
+    <div class="sec-head">
+      <span class="eyebrow">Evidence · Part 6</span>
+      <h2 class="sec"><span class="num">09</span>학계의 정리 — “로봇도 도구 하나가 늘어난 것”</h2>
+    </div>
+
+    <figure class="shot wide">
+      <img src="assets/wkec86vnz-a-ts-00-27-02.jpg" alt="MIT Phillip Isola의 Robot-Use Agents 글을 한국어로 옮긴 페이지 화면.">
+      <figcaption><span class="ts">00:27:02</span>MIT Phillip Isola의 글(원 제목 뉘앙스는 <strong>Robot-Use Agents</strong>)을 진행자들이 한국어로 옮긴 페이지.</figcaption>
+    </figure>
+
+    <blockquote class="q">
+      <p>“올해 우리는 많은 LLM이 <strong>robot-use agent</strong>로 시험되는 것을 보게 될 것이다. LLM이 계산기, 웹 검색, 나아가 컴퓨터 전체(“computer-use agent”)를 도구로 쓸 수 있는 것과 같은 방식으로, LLM은 로봇도 도구로 쓸 수 있다. <strong>Claude가 로봇 몸체의 puppeteer 역할을 하는 것</strong>이라고 생각하면 된다.”</p>
+      <p>“이 능력은 수년간 연구되어 왔지만, LLM이 high-level planning에는 유용할지 몰라도 아직 완전한 제어에는 적합하지 않다는 견해가 일반적이었다. 연구자들은 <strong>LLM의 latency가 너무 높아서 현실 세계의 dynamics를 따라갈 수 없고, 모델의 spatial intelligence가 떨어지며, 충분히 강한 causal·physical understanding이 없다</strong>고 주장했다.”</p>
+      <p>“이런 한계들은 Fable과 Astra 같은 새 모델들과 함께 녹아 없어지기 시작하고 있다. … <strong>인터넷에 연결된 모든 로봇이 Fable, Astra, 그리고 다른 AI들에게 잠재적 도구가 된다.</strong>”</p>
+      <p>“현재 로봇 지능은 대부분 <strong>on device</strong>로 돌아가며, 모델은 로봇 종류마다 맞춤 제작된다. … 연구자들은 world model, behavior foundation model, continual learning 방법론 등으로 각기 다른 베팅을 하고 있다. <strong>이 접근들에는 LLM이 가진 만큼의 buildout이 없다.</strong>”</p>
+      <cite>Phillip Isola (MIT) — 진행자 번역본</cite>
+    </blockquote>
+
+    <p>
+      마지막 문장이 이 회차의 긴장을 한 단어로 압축한다. <strong>buildout</strong> — 자본, 인프라, 데이터, 인력이 이미 쌓여 있는 쪽으로 로봇 제어라는 문제가 빨려 들어가고 있다는 진단이다.
+    </p>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ===================== SPEC ===================== -->
+  <section id="spec">
+    <div class="sec-head">
+      <span class="eyebrow">Technical Appendix</span>
+      <h2 class="sec"><span class="num">10</span>기술 사양 한눈에</h2>
+    </div>
+
+    <h4>제어 인터페이스</h4>
+    <dl class="spec">
+      <dt>툴 3개</dt>
+      <dd><code>move_to</code> / <code>done</code> / <code>give_up</code>. 관절 모드면 <code>move_joints</code>.</dd>
+      <dt><code>move_to</code> 인자</dt>
+      <dd><strong>목표 좌표와 <code>note</code>만</strong> 받는다. 속도·소요 시간·경로는 지정하지 않는다. 지정하지 않은 차원은 현재값 유지, 차원별 bounds는 툴 설명에 명시(예: pitch ±0.6, roll ±π/2).</dd>
+      <dt>턴 규칙</dt>
+      <dd>턴당 정확히 툴 호출 1개 + 사람용 note 1~2문장.</dd>
+      <dt>예산</dt>
+      <dd>트라이얼당 <strong>LLM 콜 20회</strong>. 콜당 생각 2.4~6.5s(medium), 청크 0.3~1.2s.</dd>
+    </dl>
+
+    <h4>하네스 파이프라인</h4>
+    <dl class="spec">
+      <dt>① 승인</dt>
+      <dd>범위 클램프 · 스텝당 델타 5% · 충돌 가드레일 · <code>pre_check</code>. 거절 시 <strong>사유를 모델에 되돌리고, 3연속 거절이면 에러.</strong></dd>
+      <dt>② 보간</dt>
+      <dd><code>max_speed_frac 0.1~0.25</code>, 현재 상태→목표를 고정 속도로 보간. EEF면 IK로 관절각 변환(0.2 rad/joint/step 백스톱).</dd>
+      <dt>③ 청크화</dt>
+      <dd>스텝 수 산출 → “executing over 20 steps (2.0 s)”. <strong>콜당 10초 캡.</strong></dd>
+      <dt>④ 재생</dt>
+      <dd>10Hz <strong>열린 루프</strong> 재생. 재생 종료 후 마지막 관측 1장만 모델에 반환.</dd>
+      <dt>⑤ 런 간 학습</dt>
+      <dd>종료 시 hindsight(“시작 때 알았으면 좋았을 것”)를 강제 기록 → 다음 런의 시스템 프롬프트에 <code>prior_learnings</code>로 주입. <strong>가중치를 건드리지 않는 학습 루프.</strong></dd>
+    </dl>
+
+    <h4>관측 구성 · 로봇 사양</h4>
+    <dl class="spec">
+      <dt>이미지</dt>
+      <dd>카메라 3장 224×224. <strong>최근 2관측만 유지</strong>, 나머지는 텍스트 스텁으로 교체.</dd>
+      <dt>상태</dt>
+      <dd><code>eef_state</code>는 라벨 텍스트(<code>left_x=0.296 … right_gripper=0.999</code>), <code>joint_pos</code>·<code>joint_eff</code>는 라벨 없는 14개 숫자 배열.</dd>
+      <dt>컨텍스트</dt>
+      <dd>대화 히스토리 전체(note·툴콜·툴결과) + 운영자 피드백이 그대로 남는다.</dd>
+      <dt>암 구조</dt>
+      <dd>6-DoF 양팔, 평행 죠 그리퍼(0=닫힘, 1=열림 ≈ 9.5cm).</dd>
+      <dt>링크 길이</dt>
+      <dd>상완 0.26m / 전완 0.25m / 손목~파지점 0.25m. 어깨 기준 리치 ≈ 0.76m.</dd>
+      <dt>좌표계</dt>
+      <dd>+x 전방, +y 좌, +z 상. IK 레이어가 목표를 관절 운동으로 변환.</dd>
+    </dl>
+
+    <h4>real2sim 파이프라인</h4>
+    <p>
+      멀티뷰 RGB + 로봇 액션 + 프롬프트 하나로 <strong>카메라 캘리브레이션 → 오브젝트 애셋 생성 → 물리 시스템 식별 → MuJoCo 실행 → Blender 렌더</strong>까지. 덱스터리티 실험에서는 <strong>상태·액션 없이 영상 두 개만</strong> 주고 real2sim + Wuji 손으로 physical retarget을 수행했다.
+    </p>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ===================== OFFSCREEN ===================== -->
+  <section id="offscreen">
+    <div class="sec-head">
+      <span class="eyebrow">Unverified · 자막 전용</span>
+      <h2 class="sec"><span class="num">11</span>화면 근거 없는 논의</h2>
+    </div>
+
+    <div class="callout warn">
+      <p class="label">읽는 법</p>
+      <p>이 절의 내용은 <strong>자막에만 등장하고 화면 자료가 없다.</strong> 위의 근거 계층과 구분해서 읽어야 하며, 대부분 진행자들의 전망·경험담·추측이다.</p>
+    </div>
+
+    <ul class="bullets">
+      <li><strong>로봇 파운데이션 모델의 최종 형태</strong> — “어느 로봇에든 넣은 다음 스스로 좀 움직여 보면서 ‘내 관절 값이 이렇게 움직이네’라는 <strong>자기 인식</strong>이 되면 잘될 것 같다.” 이어서 <strong>하드웨어 회사가 SDK를 제공하듯 액션 디코더 단을 분리</strong>해(제미나이 로보틱스처럼) 로봇 제조사가 튜닝하고 LLM이 그 위에 얹히는 구조가 될 것이라는 예측.</li>
+      <li><strong>크기 논거</strong> — “VLA들이 지금 다 작은데 LLM은 10배·100배 크다. 100배 큰 친구들이 똑똑할 수밖에 없으니, 이런 애들을 적극적으로 쓰는 게 궁극적으로 좋은 답이 될 수도 있겠다.”</li>
+      <li><strong>Astra 실사용 경험</strong> — 컴퓨터 사용은 ChatGPT 앱과 Codex 데스크톱이 한 앱으로 통합돼 있고, 브라우저가 아니어도 화면 캡처 기반으로 동작한다(비디오 스트림이 아니라 캡처). 토큰이 모자라 아껴 쓰는 중이고 20배 요금제는 가입이 막힌 상태.</li>
+      <li><strong>채널 자동화 실험</strong> — 쇼츠 30개를 AI로 뽑아 API로 일괄 업로드(레이트 리밋에 걸려 일부 실패), API로 안 주는 지표는 Astra 컴퓨터 사용으로 수집. 목표는 “AI 네이티브 채널” — 성과 데이터를 다시 콘텐츠 생성에 되먹이는 루프.</li>
+      <li><strong>학계 반응</strong> — “지난 일주일 동안 학계에서 깊은 절망을 느끼고 있다”, “Astra·Fable·Muse 같은 모델들이 벤치마크를 제로샷으로 통과하고 있다”, “이것이 진보의 단계적 도약의 모습인 것 같다”. 다만 진행자들은 <strong>절망이 아니라 기회일 수도 있다</strong>고 정리한다 — 시뮬 구축·데이터셋 생성·코드형 정책을 다 해주므로.</li>
+      <li><strong>경쟁 구도의 재편</strong> — “로보틱스 파운데이션 모델 회사들끼리의 경쟁”인 줄 알았는데 프론티어 LLM 랩이 들어온다. 언급된 정황: OpenAI의 자체 휴머노이드 개발과 데이터 수집, 케이스케일 랩스 출신 인력의 OpenAI 로보틱스 합류, 앤트로픽의 Physical Intelligence 인수설, 이미 임바디드 리즈닝 모델을 팔고 있는 구글.</li>
+      <li><strong>다음 단계 전망</strong> — “컴퓨터에서 됐으니 사실상 사무직 대체고, 그다음은 육체노동 대체 아니냐”는 인식. 신약 개발·롱제비티 등에 대한 기대와 다리오 아모데이의 페이싱 관련 글 언급이 함께 나온다.</li>
+    </ul>
+
+    <div class="pullquote">
+      <p>서드파티는 수명 다한 별처럼, 먹을 수 있는 파이가 쭉 저물어 빨려나가는 것 같다.</p>
+      <footer>— 진행자의 경쟁 구도 요약</footer>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ===================== IMPLICATIONS ===================== -->
+  <section id="implications">
+    <div class="sec-head">
+      <span class="eyebrow">Implications</span>
+      <h2 class="sec"><span class="num">12</span>시사점 — 무엇을 가지고 갈 것인가</h2>
+    </div>
+
+    <h3>1. ‘하네스’라는 변수를 전면에 올린 것</h3>
+    <p>
+      모델 성능 비교로 읽히기 쉬운 수치들(46% vs 12%, 2.4×) 뒤에는 <strong>프롬프트 매뉴얼 + 승인기 + 보간기 + hindsight 루프</strong>라는 시스템이 있다. 진행자들이 그 시스템 프롬프트 원문과 파이프라인 다이어그램을 화면에 띄워 확인시켜 준 덕분에, 로보틱스에서 “무엇을 비교했는가”를 따질 때 쓸 수 있는 구체적 체크리스트가 생긴다.
+    </p>
+
+    <ul class="check">
+      <li>비교된 두 시스템의 <strong>시스템 프롬프트 분량과 내용</strong>이 공개되어 있는가</li>
+      <li>승인기·보간기 같은 <strong>하네스 구성요소가 성능에 기여한 몫</strong>이 분리되어 있는가</li>
+      <li>데모 영상에 <strong>“thinking pauses removed”나 배속 표기</strong>가 있는가</li>
+      <li>런 간 <strong>hindsight 주입 같은 암묵적 학습 루프</strong>가 있는가</li>
+      <li><strong>모델 고정 · 하네스 교체</strong> 대조가 함께 보고되었는가</li>
+    </ul>
+
+    <h3>2. 속도–안정성 트레이드오프가 명확하다</h3>
+    <p>
+      콜당 수 초의 정지 + 청크 단위 열린 루프 재생은 <strong>동적 과제(떨어지는 물체 잡기 등)에 부적합</strong>하다. 대신 느린 만큼 하드웨어에 부드럽고 — 한 진행자의 관찰대로 “생각하고 쭉 가고 움직이고 이렇게 하니까 <strong>로봇 하드웨어 내구성에는 더 좋을 수도 있겠다</strong>” — 모든 결정이 <code>note</code>로 남아 사람이 읽을 수 있다. VLA의 지터링·지그재그는 학습이 덜 된 징후라는 지적도 함께 나온다.
+    </p>
+    <p>
+      동시에 <strong>재생 중에는 아무도 보지 않는다</strong>는 설계상의 맹점이 다이어그램에 그대로 명시돼 있다. 청크가 재생되는 2~10초 사이에 물체가 움직이면, 시스템은 그것을 알지 못한다.
+    </p>
+
+    <h3>3. 당장의 가치는 제어보다 ‘잡일’에 있다</h3>
+    <p>
+      real2sim 시스템 식별, 시뮬 환경 구성, 코드형 정책 생성, 데이터셋 제작 — 자막에서 “궂은일을 다 해준다”고 표현한 영역이다. 평가 파이프라인이 필요한 로봇 회사에는 직접적인 가치이고, 로보틱스에 국한되지도 않는다(영상 편집·모션 그래픽 사례도 언급된다).
+    </p>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ===================== LIMITS ===================== -->
+  <section id="limits">
+    <div class="sec-head">
+      <span class="eyebrow">Limitations</span>
+      <h2 class="sec"><span class="num">13</span>한계 4가지</h2>
+    </div>
+
+    <ol class="limits">
+      <li>
+        <h4>한계 1 — 인과가 분리되지 않았다</h4>
+        <p>로봇 벤치마크에는 “모델 고정, 하네스만 교체” 대조가 없다. 진행자 스스로 이 공백을 지적한다. 따라서 <strong>3.9배를 “Astra가 그만큼 좋다”로 읽으면 과대 해석</strong>이다.</p>
+      </li>
+      <li>
+        <h4>한계 2 — 데모는 대부분 개인 트윗이다</h4>
+        <p>금문교·루빅스 큐브·real2sim 사례는 재현 절차나 실패율이 공개되지 않은 단발 시연이고, 성공 사례만 공유되는 선택 편향이 있다. 자막에서도 “정확하게 어떻게 돌렸는지 모르겠다”, “완벽히 맞지는 않는다”고 여러 차례 단서를 단다.</p>
+      </li>
+      <li>
+        <h4>한계 3 — 학습 데이터 문제는 열려 있다</h4>
+        <p>83.7% 투표는 여론이지 증거가 아니다. <strong>MolmoAct2에 없는 변형 과제로 재실험</strong>하자는 반증 설계가 자막에서 제안되지만 이 영상에서 수행되지는 않는다. 대안 가설로는 허깅페이스에 대량 공개된 <strong>SO-100/SO-ARM 계열 데이터</strong>가 프리트레이닝에 섞였을 가능성, 시뮬레이션 환경에서 컴퓨터 사용 에이전트처럼 로봇 학습을 했을 가능성이 제시된다. 자막의 표현 그대로 — <em>“어떻게 썼는지는 궁금해요. 그냥 next-token / next-joint projection으로 이게 될까? 잘 모르겠거든요.”</em></p>
+      </li>
+      <li>
+        <h4>한계 4 — 비용이 보고되지 않는 구간이 많다</h4>
+        <p>ARC-AGI-3 리더보드의 비용 축은 로그 스케일로 $10K~$100K 구간에 Astra가 위치한다. 반면 로봇 쪽 수치에는 “2.3× 저렴”이라는 상대값만 있고 절대 비용이 없다. 자막의 “토큰 얼마나 썼을까 궁금하긴 하네요”가 그대로 남는 질문이다.</p>
+      </li>
+    </ol>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ===================== FOLLOWUP ===================== -->
+  <section id="followup">
+    <div class="sec-head">
+      <span class="eyebrow">Open Questions</span>
+      <h2 class="sec"><span class="num">14</span>후속 확인 거리</h2>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <caption>다음에 직접 확인해야 할 것들</caption>
+        <thead>
+          <tr><th scope="col">#</th><th scope="col">확인 대상</th><th scope="col">왜</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">①</th>
+            <td>Robocurve 리포트 원문 — <code>run rig-1_6b47f3c6</code> wire 캡처, <code>inspect-robots-agent/-yam</code> README, ClapboardBench opus-1</td>
+            <td>이 노트의 수치는 모두 2차 가공본이다</td>
+          </tr>
+          <tr>
+            <th scope="row">②</th>
+            <td>ARC-AGI-3 표준 하네스 vs 제공사 어댑터의 구현 차이</td>
+            <td>37%p가 정확히 무엇에서 오는지</td>
+          </tr>
+          <tr>
+            <th scope="row">③</th>
+            <td><strong>로봇 과제에서 모델 고정 · 하네스 교체 대조 실험</strong></td>
+            <td>이 영상이 비워 둔 칸</td>
+          </tr>
+          <tr>
+            <th scope="row">④</th>
+            <td>GUMI 같은 GUI 매개 제어가 직접 툴 호출 대비 갖는 이득</td>
+            <td>하네스 설계 공간의 다른 축</td>
+          </tr>
+          <tr>
+            <th scope="row">⑤</th>
+            <td>앞 회차에서 앤트로픽 경제 모델이 <strong>명시적으로 제외한 “초고성능 로봇” 시나리오</strong></td>
+            <td>이 회차의 관찰과 어떻게 맞물리는지</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ===================== SHARE ===================== -->
+  <section id="share">
+    <div class="sec-head">
+      <span class="eyebrow">Share</span>
+      <h2 class="sec"><span class="num">15</span>공유용 요약</h2>
+    </div>
+
+    <p>아래 블록은 그대로 복사해 쓰도록 만들어 둔 것이다. 블록을 한 번 클릭하면 전체가 선택된다.</p>
+
+    <div class="share">
+      <h3>한 줄 버전</h3>
+      <p class="copyblock">범용 LLM이 로봇 데이터 후속 학습 없이 최신 VLA를 3.9배 앞섰다(46% vs 12%). 그런데 같은 모델에 하네스만 바꾼 벤치마크에서는 점수가 37%p 갈린다. 그 3.9배는 모델의 성과인가, 하네스의 성과인가.</p>
+
+      <h3>세 줄 버전</h3>
+      <p class="copyblock">① GPT-6 Astra는 액션 디코더 없이 툴 호출로 “엔드이펙터 목표점 한 개”만 내놓는다. 나머지 궤적은 하네스가 IK와 보간으로 만든다.
+② 그 하네스에는 좌표계·링크 길이·파지 6단계 절차·재시도 규칙이 적힌 사람 손 매뉴얼과, 승인기·hindsight 주입 루프가 들어 있다.
+③ 로봇 벤치마크에는 “모델 고정, 하네스만 교체” 대조가 없다. 인과는 아직 분리되지 않았다.</p>
+
+      <h3>출처 표기</h3>
+      <p class="copyblock">sudoremove, 「Astra, 컴퓨터 에이전트에서 로봇 제어까지 확장되는 방식」, 2026-09-16.
+https://www.youtube.com/watch?v=wkec86Vnz_A</p>
+      <p class="copyhint">본문의 모든 수치와 인용은 영상의 한국어 수동 자막과 22개 화면 프레임에서 옮긴 것이며, 원 리포트와 직접 대조하지 않았습니다.</p>
+    </div>
+  </section>
+
+  <!-- ===================== ENDING ===================== -->
+  <div class="ending">
+    <p class="big">이 회차가 남긴 것은 새로운 답이 아니라, 더 나은 질문이다.</p>
+    <p>
+      “로봇 파운데이션 모델은 어떤 형태여야 하는가”라는 물음에 지난 몇 년간 제출된 답들은 대체로 <em>모델의 형태</em>에 관한 것이었다. VLA냐, 월드 모델이냐, 행동 파운데이션 모델이냐. 이 회차는 그 목록에 답을 하나 더 얹지 않는다. 대신 목록 바깥을 가리킨다 — <strong>모델을 하나도 바꾸지 않고 주변 장치만 바꿨더니 37%p가 움직였다면, 우리는 지금 무엇을 측정하고 있는 것인가.</strong>
+    </p>
+    <p>
+      그래서 다음에 “새 모델이 로봇을 N배 잘한다”는 헤드라인을 만나면, 물어볼 것은 하나 더 늘어난다. 모델 말고, 그 옆에 무엇이 붙어 있었는가. 그 답이 공개돼 있지 않다면, 비교는 아직 끝난 게 아니다.
+    </p>
+  </div>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="page">
+    <h3>Source Notes</h3>
+    <ul>
+      <li><strong>원본</strong> — sudoremove, “Astra, 컴퓨터 에이전트에서 로봇 제어까지 확장되는 방식”, 2026-09-16 공개, 33분 26초(2,006초), 12개 챕터. <a>youtube.com/watch?v=wkec86Vnz_A</a> · <a>@sudoremove</a></li>
+      <li><strong>근거</strong> — 한국어 수동 자막 1,094큐(약 16,800자), YouTube 메타데이터·설명란, 1080p 원본에서 추출해 육안 확인한 22개 프레임(전수 샘플링 401장 → 레이아웃 기반 공유 구간 판별 → 퍼셉추얼 해시 중복 제거 → 품질 필터).</li>
+      <li><strong>인용된 1차 자료</strong> — Jiafei Duan(@DJiafei), Jay Chooi(@chooi_jeq) / Robocurve, thijs(@cdngdev), lingxiao guo(@Lingxiao234), Yanjie Ze(@ZeYanjie), ARC Prize 리더보드·리플레이, Phillip Isola(MIT) “Robot-Use Agents”.</li>
+      <li><strong>주의</strong> — 진행자 정리 페이지의 수치는 원 출처를 옮긴 2차 가공본이며, 이 노트는 원문 리포트를 직접 대조하지 않았다.</li>
+    </ul>
+    <h3>관련 노트</h3>
+    <ul>
+      <li>「AI 확산 이후의 사회, 일자리와 안전은 어떻게 달라질까」 — 앤트로픽 경제 모델이 명시적으로 제외한 “초고성능 로봇” 시나리오를 다룬 앞 회차.</li>
+    </ul>
+    <p>
+      태그: 로보틱스 · LLM 에이전트 · VLA · 하네스 설계 · 벤치마크 해석<br>
+      노트 정리 2026-09-19
+    </p>
+    <a class="backlink" href="#abstract">↑ 요약으로 돌아가기</a>
+  </footer>
+
+</article>
+
+</body>
+</html>
