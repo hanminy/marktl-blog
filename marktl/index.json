@@ -1,7 +1,22 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-23T12:19:49.392Z",
+  "updatedAt": "2026-09-23T12:37:42.334Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-anthropic-openai%EA%B0%80-%EB%A7%90%ED%95%98%EB%8A%94-ai-%EA%B0%9C%EB%B0%9C-%EC%86%8D%EB%8F%84%EB%A5%BC-%EB%8A%A6%EC%B6%B0%EC%95%BC-%ED%95%98%EB%8A%94-%EC%9D%B4%EC%9C%A0-%EC%9A%94%EC%95%BD/",
+      "excerpt": "Anthropic·OpenAI가 말하는 AI 개발 속도를 늦춰야 하는 이유 영상 정보 채널 : sudoremove (@sudoremove) 게시일 : 2026 09 22 길이 : 50분 34초 (3,034초) 챕터 : 22개 (이 영상은 챕터 타임스탬프가 실제와 일치함) 링크 : https://www.youtube.com/watch?v=2EGjVBXkbZ4 <div style=\"position: relative; width: ",
+      "shortId": "1cpv7ag",
+      "slug": "yt-anthropic-openai가-말하는-ai-개발-속도를-늦춰야-하는-이유-요약",
+      "sourcePath": "02_research/AI/Sudoremove/yt_Anthropic·OpenAI가 말하는 AI 개발 속도를 늦춰야 하는 이유_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료"
+      ],
+      "title": "Anthropic·OpenAI가 말하는 AI 개발 속도를 늦춰야 하는 이유",
+      "updatedAt": "2026-09-23T12:37:42.334Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/1cpv7ag/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-yc-%EC%8A%A4%ED%83%80%ED%8A%B8%EC%97%85-ai-%EC%8B%9C%EB%8C%80%EC%97%90-%EB%AC%B4%EC%97%87%EC%9D%B4-%EB%B0%94%EB%80%8C%EC%97%88%EB%82%98-%EC%9A%94%EC%95%BD/",
