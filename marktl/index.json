@@ -1,7 +1,22 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-19T12:37:51.854Z",
+  "updatedAt": "2026-09-23T12:19:49.392Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-yc-%EC%8A%A4%ED%83%80%ED%8A%B8%EC%97%85-ai-%EC%8B%9C%EB%8C%80%EC%97%90-%EB%AC%B4%EC%97%87%EC%9D%B4-%EB%B0%94%EB%80%8C%EC%97%88%EB%82%98-%EC%9A%94%EC%95%BD/",
+      "excerpt": "YC 스타트업, AI 시대에 무엇이 바뀌었나 영상 정보 채널 : sudoremove (@sudoremove) 게시일 : 2026 09 22 길이 : 44분 54초 (2,694초) 링크 : https://www.youtube.com/watch?v=ucWEsYbCDHc <div style=\"position: relative; width: 100%; padding bottom: 56.25%; height: 0; overflow: h",
+      "shortId": "1sk8gng",
+      "slug": "yt-yc-스타트업-ai-시대에-무엇이-바뀌었나-요약",
+      "sourcePath": "02_research/AI/Sudoremove/yt_YC 스타트업, AI 시대에 무엇이 바뀌었나_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료"
+      ],
+      "title": "YC 스타트업, AI 시대에 무엇이 바뀌었나",
+      "updatedAt": "2026-09-23T12:19:49.392Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/1sk8gng/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-astra-%EC%BB%B4%ED%93%A8%ED%84%B0-%EC%97%90%EC%9D%B4%EC%A0%84%ED%8A%B8%EC%97%90%EC%84%9C-%EB%A1%9C%EB%B4%87-%EC%A0%9C%EC%96%B4%EA%B9%8C%EC%A7%80-%ED%99%95%EC%9E%A5%EB%90%98%EB%8A%94-%EB%B0%A9%EC%8B%9D-%EC%9A%94%EC%95%BD/",
