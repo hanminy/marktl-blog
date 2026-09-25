@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T12:15:02.854Z",
+  "updatedAt": "2026-09-25T12:19:47.996Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/vision-pose-2023/",
+      "excerpt": "Vision based excavator pose estimation for automatic control 요약 한줄 요약 굴착기에 컴퓨터 비전을 쓴 논문 68편(2007 2023, Web of Science)을 계량·정성으로 정리한 리뷰. 대부분은 안전 감시·생산성 분석용이고, 팔 자세를 제어 피드백으로 쓴 논문은 넷뿐 이다. 자동 제어에 쓰려면 속도·정확도·신뢰성·비용 네 조건을 만족해야 하는데, 마커 기반(AprilTa",
+      "shortId": "3drt1x",
+      "slug": "vision-pose-2023",
+      "sourcePath": "02_research/필드로봇/시스템식별/vision-pose-2023.md",
+      "tags": [
+        "논문요약",
+        "문헌리뷰",
+        "굴착기",
+        "비전자세추정",
+        "마커",
+        "딥러닝"
+      ],
+      "title": "Vision-based excavator pose estimation for automatic control - 요약",
+      "updatedAt": "2026-09-25T12:19:47.996Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/3drt1x/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/janot2014-iv/",
