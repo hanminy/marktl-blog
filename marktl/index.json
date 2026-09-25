@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T05:18:43.574Z",
+  "updatedAt": "2026-09-25T05:25:04.714Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/mic2013-knuckle-crane-id/",
+      "excerpt": "Analysis of Offshore Knuckle Boom Crane — Part One: Modeling and Parameter Identification 요약 양식: paper summary 스킬 + B 필수 추출표(§S). 그림은 attachments/mic2013 knuckle crane id/ (캡션이 그림 아래·표 위 형식이라 스킬 스크립트를 그에 맞게 조정). 수식·표는 출판 PDF 10 16쪽을 직접 렌더링해",
+      "shortId": "6bfdf8",
+      "slug": "mic2013-knuckle-crane-id",
+      "sourcePath": "02_research/필드로봇/시스템식별/mic2013-knuckle-crane-id.md",
+      "tags": [
+        "논문요약",
+        "시스템식별",
+        "유압크레인",
+        "회색상자",
+        "체적탄성계수",
+        "카운터밸런스밸브"
+      ],
+      "title": "Analysis of Offshore Knuckle Boom Crane — Part One: Modeling and Parameter Identification - 요약",
+      "updatedAt": "2026-09-25T05:25:04.714Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/6bfdf8/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/werner2025-calibrated/",
