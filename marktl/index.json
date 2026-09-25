@@ -1,7 +1,27 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T09:47:14.232Z",
+  "updatedAt": "2026-09-25T09:55:30.074Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/wensing2018-lmi/",
+      "excerpt": "[!info] 관련 자료 공개 원문: https://arxiv.org/abs/1701.04395 (v3) 선행: Sousa & Cortesão 2014 (IJRR, 반일관성 LMI — 미확보), Traversaro et al. 2016 (IROS, 다양체 매개변수화), Ayusawa et al. 2011 (이산 근사), Gautier & Khalil 1990/1991 (기저 파라미터), Swevers 1997 (최적 자극 — ",
+      "shortId": "y8mqs6",
+      "slug": "wensing2018-lmi",
+      "sourcePath": "02_research/필드로봇/시스템식별/wensing2018-lmi.md",
+      "tags": [
+        "논문요약",
+        "시스템식별",
+        "관성파라미터",
+        "물리일관성",
+        "LMI",
+        "볼록최적화",
+        "반정부호계획"
+      ],
+      "title": "Linear Matrix Inequalities for Physically-Consistent Inertial Parameter Identification",
+      "updatedAt": "2026-09-25T09:55:30.074Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/y8mqs6/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/mic2013-knuckle-crane-id/",
@@ -41,25 +61,6 @@
       "title": "Calibrated Dynamic Modeling for Force and Payload Estimation in Hydraulic Machinery",
       "updatedAt": "2026-09-25T09:37:54.830Z",
       "url": "https://hanminy.github.io/marktl-blog/marktl/s/lm0m9n/"
-    },
-    {
-      "artifactType": "research-report",
-      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/wensing2018-lmi/",
-      "excerpt": "Linear Matrix Inequalities for Physically Consistent Inertial Parameter Identification 요약 양식: paper summary 스킬 + B 필수 추출표(§S). 그림은 attachments/wensing2018 lmi/ (figure3·4·6 사용; figure5 는 본문 문장 \"Figure 5 shows…\" 에 캡션 탐지가 걸려 영역이 어긋남, Fig.1·2·",
-      "shortId": "y8mqs6",
-      "slug": "wensing2018-lmi",
-      "sourcePath": "02_research/필드로봇/시스템식별/wensing2018-lmi.md",
-      "tags": [
-        "논문요약",
-        "시스템식별",
-        "관성파라미터",
-        "물리일관성",
-        "LMI",
-        "볼록최적화"
-      ],
-      "title": "Linear Matrix Inequalities for Physically-Consistent Inertial Parameter Identification - 요약",
-      "updatedAt": "2026-09-25T05:31:07.915Z",
-      "url": "https://hanminy.github.io/marktl-blog/marktl/s/y8mqs6/"
     },
     {
       "artifactType": "research-report",

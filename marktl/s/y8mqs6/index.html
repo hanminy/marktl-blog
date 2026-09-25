@@ -4,7 +4,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
-  <title>로봇의 관성에도 ‘물리적 자격’이 필요하다 — 4×4 LMI로 읽는 관성 파라미터 식별</title>
   
   
   
@@ -13,805 +12,897 @@
   
   
   
+  
+  
+  <title>잘 맞는 관성값은 실제 물체가 될 수 있을까? — 물리 일관성 LMI 연구 해설</title>
   <style>
     :root {
       --paper: #f7f5ef;
-      --surface: #fffefb;
-      --ink: #202e32;
-      --muted: #5f6c6d;
-      --line: #d9ddd4;
-      --teal: #15675e;
-      --teal-light: #e8efea;
-      --ochre: #99652b;
-      --ochre-light: #f5ecdd;
-      --dark: #193d39;
+      --surface: #fffefa;
+      --ink: #202b2a;
+      --muted: #65716c;
+      --line: #d9ded5;
+      --green: #244e43;
+      --green-soft: #e9efe7;
+      --accent: #b74d31;
+      --accent-soft: #f5e8dd;
+      --dark: #1c3430;
       --serif: "Noto Serif KR", "Nanum Myeongjo", "Batang", Georgia, serif;
-      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
       --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
     }
-
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; scroll-padding-top: 2rem; }
+    html { scroll-behavior: smooth; scroll-padding-top: 28px; }
     body {
       margin: 0;
-      background: var(--paper);
       color: var(--ink);
+      background: var(--paper);
       font-family: var(--sans);
       font-size: 17px;
       line-height: 1.9;
       word-break: keep-all;
-      overflow-wrap: break-word;
+      overflow-wrap: anywhere;
       -webkit-font-smoothing: antialiased;
     }
-    ::selection { background: #cfe1d5; color: #153e36; }
-    a { color: var(--teal); text-underline-offset: .22em; text-decoration-thickness: 1px; }
-    a:hover { color: #093f36; }
-    a:focus-visible { outline: 3px solid var(--ochre); outline-offset: 5px; border-radius: 2px; }
-    p { margin: 0 0 1.25em; }
+    a { color: var(--green); text-decoration-thickness: 1px; text-underline-offset: 4px; }
+    a:hover { color: var(--accent); }
+    a:focus-visible { outline: 3px solid var(--accent); outline-offset: 5px; }
+    ::selection { background: #d9e5cb; color: var(--ink); }
+    img { display: block; max-width: 100%; height: auto; }
+    figure { margin: 0; }
+    p { margin: 0 0 1.2em; }
+    ul, ol { margin: 1em 0 1.5em; padding-left: 1.4em; }
+    li { padding-left: .2em; margin: .45em 0; }
     strong { font-weight: 750; }
-    h1, h2, h3, h4 { line-height: 1.4; text-wrap: balance; }
-    h1, h2 { font-family: var(--serif); }
-    h1 { margin: 1.1rem 0 1.7rem; font-size: clamp(2.6rem, 5.3vw, 4.8rem); letter-spacing: -.055em; font-weight: 800; line-height: 1.22; }
-    h2 { margin: .4rem 0 1.5rem; font-size: clamp(1.8rem, 3.2vw, 2.65rem); letter-spacing: -.04em; }
-    h3 { margin: 2.3rem 0 .9rem; font-size: 1.25rem; letter-spacing: -.025em; }
-    h4 { margin: 0 0 .6rem; font-size: 1rem; }
-    ul, ol { margin: .7rem 0 1.6rem; padding-left: 1.4rem; }
-    li { padding-left: .2rem; margin: .45rem 0; }
     sub, sup { line-height: 0; }
-    small { font-size: .82em; }
-    .wrap { width: min(1200px, calc(100% - 64px)); margin-inline: auto; }
+    code { font-family: var(--mono); font-size: .85em; }
+    h1, h2, h3, h4 { line-height: 1.4; letter-spacing: -.035em; }
+    h1, h2 { text-wrap: balance; }
+    h2 { margin: 0 0 24px; font-size: clamp(29px, 3.1vw, 42px); font-weight: 750; }
+    h3 { margin: 42px 0 16px; font-size: 23px; }
+    h4 { margin: 0 0 10px; font-size: 19px; }
     .skip {
-      position: absolute; left: 1rem; top: -6rem; z-index: 10;
-      padding: .7rem 1rem; background: var(--surface);
+      position: absolute; left: 16px; top: -100px;
+      padding: 8px 18px; background: var(--surface); z-index: 10;
     }
-    .skip:focus { top: 1rem; }
+    .skip:focus { top: 16px; }
+    .shell { width: min(1240px, calc(100% - 88px)); margin: 0 auto; }
     .masthead {
-      display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
       padding: 25px 0 20px; border-bottom: 1px solid var(--ink);
-      font-size: .75rem; letter-spacing: .12em;
+      font-size: 12px; font-weight: 750; letter-spacing: .13em;
     }
-    .brand { font-weight: 800; color: var(--ink); text-decoration: none; }
-    .masthead span { color: var(--muted); }
-    .eyebrow, .section-number {
-      color: var(--teal); font-size: .72rem; letter-spacing: .13em;
-      text-transform: uppercase; font-weight: 800;
+    .masthead a { text-decoration: none; color: var(--ink); }
+    .masthead .mark { display: inline-block; width: 10px; height: 10px; background: var(--accent); margin-right: 10px; }
+    .masthead span:last-child { color: var(--muted); letter-spacing: .05em; }
+    .hero { padding: 65px 0 0; }
+    .eyebrow { color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    .hero h1 {
+      max-width: 1030px; font-family: var(--serif); font-weight: 800;
+      font-size: clamp(40px, 5.8vw, 76px); line-height: 1.24;
+      letter-spacing: -.06em; margin: 22px 0 28px;
     }
-    .hero { padding: 64px 0 44px; border-bottom: 1px solid var(--line); }
-    .hero-grid { display: grid; grid-template-columns: 1.65fr 1fr; gap: 60px; align-items: center; }
-    .hero h1 span { display: block; }
-    .dek { max-width: 650px; margin-bottom: 1.7rem; font-size: 1.13rem; line-height: 1.85; color: #465755; }
-    .meta { display: flex; flex-wrap: wrap; gap: .4rem 1.2rem; font-size: .76rem; color: var(--muted); }
-    .hero-panel { background: var(--dark); color: #f8f5e9; padding: 32px 28px; border-radius: 3px; position: relative; }
-    .hero-panel .eyebrow { color: #b7d6bb; }
-    .matrix-display { display: flex; align-items: center; justify-content: center; gap: .65rem; margin: 36px 0 30px; font-family: Georgia, serif; font-size: clamp(1.5rem, 2.8vw, 2.3rem); white-space: nowrap; }
-    .matrix { position: relative; display: grid; grid-template-columns: 1.2fr 1fr; gap: .15em .65em; padding: .1em .35em; text-align: center; }
-    .matrix::before, .matrix::after { content: ""; position: absolute; top: 0; bottom: 0; width: 7px; border-block: 1.5px solid currentColor; }
-    .matrix::before { left: 0; border-left: 1.5px solid currentColor; }
-    .matrix::after { right: 0; border-right: 1.5px solid currentColor; }
-    .hero-panel p { font-size: .86rem; color: #d1e0d7; margin-bottom: 0; }
-    .panel-footer { display: flex; justify-content: space-between; padding-top: 20px; margin-top: 25px; border-top: 1px solid #56716a; font-size: .7rem; letter-spacing: .06em; }
-    .key-findings { padding: 34px 0 44px; }
-    .findings-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; margin-top: 20px; }
-    .finding { border-top: 2px solid var(--teal); padding-top: 17px; }
-    .finding .index { display: block; font-family: Georgia, serif; color: var(--ochre); font-size: 1.25rem; margin-bottom: 8px; }
-    .finding h3 { margin: 0 0 .65rem; font-size: 1.05rem; }
-    .finding p { margin: 0; font-size: .88rem; color: var(--muted); line-height: 1.85; }
-    .article-layout { display: grid; grid-template-columns: 195px minmax(0, 1fr); gap: 65px; padding-top: 20px; }
-    .sidebar { font-size: .77rem; }
-    .sidebar-inner { position: sticky; top: 28px; }
-    .sidebar-label { font-size: .68rem; font-weight: 800; letter-spacing: .12em; color: var(--muted); }
-    .toc { list-style: none; padding: 0; margin: 13px 0 24px; }
-    .toc li { margin: 0; padding: 0; }
-    .toc a { display: block; padding: 8px 0; text-decoration: none; color: var(--muted); border-bottom: 1px solid var(--line); }
-    .toc a:hover { color: var(--teal); }
-    .toc b { color: var(--teal); font-size: .68rem; margin-right: 9px; }
-    .sidebar-note { color: var(--muted); font-size: .72rem; line-height: 1.8; }
+    .hero h1 em { font-style: normal; color: var(--green); }
+    .deck { max-width: 850px; color: #4c5b54; font-size: clamp(18px, 2vw, 23px); line-height: 1.85; }
+    .byline { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 30px 0 38px; font-size: 13px; color: var(--muted); }
+    .hero-grid { display: grid; grid-template-columns: 1.1fr 1fr; border: 1px solid var(--line); background: var(--surface); }
+    .abstract { padding: 36px 40px; }
+    .abstract h2 { font-size: 13px; letter-spacing: .12em; margin-bottom: 18px; color: var(--green); }
+    .abstract p { font-size: 17px; margin-bottom: 0; }
+    .hero-equation { background: var(--dark); color: #f3f5e8; padding: 35px 38px; display: flex; flex-direction: column; justify-content: center; }
+    .hero-equation .eyebrow { color: #bfd0b4; }
+    .hero-equation .big-math { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 28px 0; font: 28px Georgia, var(--serif); }
+    .hero-equation p { color: #c5d3cb; font-size: 14px; margin: 0; }
+    .matrix {
+      display: inline-grid; grid-template-columns: auto auto; gap: 10px 22px;
+      align-items: center; text-align: center; padding: 8px 15px;
+      border-left: 2px solid currentColor; border-right: 2px solid currentColor;
+      border-radius: 5px; vertical-align: middle;
+    }
+    .hero-foot { padding: 14px 0; color: var(--muted); font-size: 12px; border-bottom: 1px solid var(--line); }
+    .page-grid { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 60px; padding: 55px 0 0; }
+    .rail { align-self: start; position: sticky; top: 28px; }
+    .rail-title { color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .13em; margin-bottom: 16px; }
+    .rail ol { margin: 0; padding: 0; list-style: none; }
+    .rail li { padding: 0; margin: 0; border-bottom: 1px solid var(--line); }
+    .rail a { display: flex; gap: 12px; padding: 11px 0; text-decoration: none; color: var(--ink); font-size: 13px; line-height: 1.6; }
+    .rail a:hover { color: var(--accent); }
+    .rail a span { color: var(--accent); font-size: 11px; padding-top: 2px; font-family: var(--mono); }
+    .rail-note { font-size: 12px; color: var(--muted); padding-top: 20px; }
     .article-body { min-width: 0; }
-    .section { padding: 44px 0; border-top: 1px solid var(--line); }
-    .section:first-child { padding-top: 26px; }
-    .abstract { font-size: 1.05rem; }
-    .abstract p:last-child { margin-bottom: 0; }
-    .lead { font-size: 1.13rem; line-height: 1.95; }
-    .muted { color: var(--muted); }
-    .source-ref { color: var(--muted); font-size: .76rem; font-weight: 400; }
-    .note { margin: 25px 0; padding: 20px 23px; border-left: 3px solid var(--teal); background: var(--teal-light); font-size: .87rem; }
+    .section { padding: 0 0 60px; margin: 0 0 54px; border-bottom: 1px solid var(--line); }
+    .section-label { display: flex; gap: 12px; align-items: center; color: var(--accent); font-size: 12px; font-weight: 750; letter-spacing: .12em; margin: 0 0 16px; }
+    .section-label::after { content: ""; width: 44px; height: 1px; background: var(--accent); }
+    .lead { font-size: 20px; color: #42584d; }
+    .finding-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 30px 0; }
+    .finding { padding: 23px; background: var(--green-soft); border-top: 3px solid var(--green); }
+    .finding .number { color: var(--green); font-family: Georgia, serif; font-size: 34px; line-height: 1; display: block; margin-bottom: 18px; }
+    .finding h3 { font-size: 18px; margin: 0 0 12px; }
+    .finding p { font-size: 14px; margin-bottom: 0; line-height: 1.8; }
+    .note { padding: 23px 27px; background: var(--green-soft); border-left: 3px solid var(--green); margin: 28px 0; font-size: 15px; }
+    .note.warm { background: var(--accent-soft); border-color: var(--accent); }
+    .note .note-title { display: block; font-size: 12px; font-weight: 800; letter-spacing: .08em; margin-bottom: 9px; color: var(--green); }
+    .note.warm .note-title { color: var(--accent); }
     .note p:last-child { margin-bottom: 0; }
-    .note-label { display: block; margin-bottom: 7px; color: var(--teal); font-size: .72rem; font-weight: 800; letter-spacing: .04em; }
-    .caution { border-color: var(--ochre); background: var(--ochre-light); }
-    .caution .note-label { color: var(--ochre); }
-    .pullquote { margin: 38px 0; padding: 28px 0 28px 28px; border-left: 2px solid var(--ochre); }
-    .pullquote p { font-family: var(--serif); font-size: clamp(1.35rem, 2.5vw, 1.8rem); line-height: 1.7; letter-spacing: -.035em; margin: 0; }
-    .pullquote footer { margin-top: 12px; font-size: .73rem; color: var(--muted); }
-    .table-wrap { overflow-x: auto; margin: 24px 0 14px; border: 1px solid var(--line); background: var(--surface); border-radius: 3px; }
-    table { border-collapse: collapse; width: 100%; font-size: .82rem; line-height: 1.75; text-align: left; }
-    caption { padding: 15px 18px; text-align: left; font-weight: 750; color: var(--teal); border-bottom: 1px solid var(--line); }
-    th, td { padding: 14px 17px; border-bottom: 1px solid var(--line); vertical-align: top; }
-    thead th { background: #edf0e9; color: #3f5450; font-size: .74rem; }
-    tbody th { font-weight: 700; width: 24%; }
-    tbody tr:last-child > * { border-bottom: 0; }
-    .comparison { min-width: 600px; }
-    .comparison tbody th { width: 35%; }
-    .highlight-row { background: #edf4ee; }
-    .table-note { margin: 8px 0 25px; color: var(--muted); font-size: .76rem; }
-    .formula {
-      margin: 24px 0; padding: 22px 24px; background: var(--surface);
-      border: 1px solid var(--line); border-radius: 3px; overflow-x: auto;
+    .pullquote { margin: 40px 0; padding: 26px 0 26px 28px; border-left: 4px solid var(--accent); }
+    .pullquote p { font-family: var(--serif); font-size: clamp(24px, 2.5vw, 32px); font-weight: 700; line-height: 1.65; letter-spacing: -.035em; margin: 0; }
+    .pullquote small { display: block; color: var(--muted); font-size: 12px; margin-top: 12px; }
+    .equation {
+      padding: 22px 26px; background: var(--surface); border: 1px solid var(--line);
+      margin: 24px 0; overflow-x: auto; text-align: center;
     }
-    .formula-label { display: block; margin-bottom: 13px; font-size: .71rem; color: var(--muted); }
-    .math { font-family: "Cambria Math", "STIX Two Math", Georgia, serif; font-size: 1.13rem; line-height: 2; }
-    .math-line { display: block; min-width: max-content; }
-    .formula-note { margin: 12px 0 0; color: var(--muted); font-size: .78rem; }
-    .inline-math { font-family: "Cambria Math", Georgia, serif; white-space: nowrap; }
-    math { font-family: "Cambria Math", "STIX Two Math", serif; font-size: 1.14em; }
-    math[display="block"] { margin: 12px 0; min-width: max-content; }
-    .flow { background: #edf0e8; border: 1px solid var(--line); border-radius: 3px; padding: 25px; margin: 26px 0; }
-    .flow-title { margin-bottom: 18px; font-size: .76rem; font-weight: 800; color: var(--teal); }
-    .flow-track { display: grid; grid-template-columns: 1fr 24px 1fr 24px 1fr; align-items: stretch; gap: 5px; }
-    .flow-node { background: var(--surface); border: 1px solid var(--line); padding: 17px 13px; font-size: .81rem; text-align: center; }
-    .flow-node strong { display: block; margin-bottom: 5px; font-size: .88rem; }
-    .flow-node small { color: var(--muted); font-size: .76rem; }
-    .flow-node.active { background: var(--dark); color: white; border-color: var(--dark); }
-    .flow-node.active small { color: #cbded3; }
-    .flow-arrow { align-self: center; text-align: center; color: var(--teal); }
-    .constraint-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
-    .constraint-strip div { padding: 10px; border-top: 2px solid #91ad98; font-size: .73rem; text-align: center; color: #37584a; }
-    .flow figcaption { padding: 15px 0 0; }
-    figure { margin: 32px 0; }
-    .research-figure { padding: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 3px; }
-    .research-figure img { display: block; width: 100%; height: auto; object-fit: contain; background: white; }
-    figcaption { padding: 16px 7px 5px; font-size: .8rem; color: var(--muted); line-height: 1.8; }
-    .figure-label { display: block; margin-bottom: 5px; color: var(--teal); font-size: .68rem; font-weight: 800; letter-spacing: .1em; }
-    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 25px 0; }
-    .stat { background: var(--teal-light); padding: 22px 18px; }
-    .stat-value { display: block; font-family: Georgia, serif; font-size: 2.15rem; color: var(--teal); line-height: 1.3; }
-    .stat-label { display: block; margin-top: 10px; font-size: .74rem; color: var(--muted); }
-    .evidence-badge { display: inline-block; font-size: .67rem; padding: 2px 7px; margin-bottom: 7px; border: 1px solid #a9b9ac; border-radius: 2px; color: var(--teal); letter-spacing: .02em; }
-    .evidence-badge.unconfirmed { border-color: #d4bc95; color: var(--ochre); }
-    .limits { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin: 24px 0; }
-    .limit-card { padding: 21px; border: 1px solid var(--line); background: var(--surface); }
-    .limit-card p { font-size: .84rem; color: var(--muted); margin: 0; }
-    .limit-card .next { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--teal); font-size: .77rem; }
-    .checklist { list-style: none; padding: 0; counter-reset: action; }
-    .checklist li { counter-increment: action; padding: 18px 0 18px 47px; margin: 0; border-bottom: 1px solid var(--line); position: relative; }
-    .checklist li::before { content: counter(action, decimal-leading-zero); position: absolute; left: 0; top: 21px; font: .86rem Georgia, serif; color: var(--teal); }
-    .checklist strong { display: block; margin-bottom: 5px; }
-    .checklist p { margin: 0; color: var(--muted); font-size: .87rem; }
-    .appendix-table { min-width: 600px; }
-    .audit-table { min-width: 760px; }
-    .audit-table th { width: auto; }
-    .closing { padding: 38px; background: var(--dark); color: #f7f5ec; border-radius: 3px; margin: 12px 0 35px; }
-    .closing h2 { font-size: 1.8rem; }
-    .closing p { color: #dce6de; font-size: .99rem; }
-    .closing p:last-child { margin: 0; }
-    .share-copy { padding: 24px; border: 1px solid var(--line); background: var(--surface); }
-    .share-copy p { margin-bottom: 0; font-size: .96rem; }
-    .sources { font-size: .83rem; }
-    .source-title { font-family: Georgia, var(--sans); font-size: 1.06rem; line-height: 1.6; word-break: normal; overflow-wrap: anywhere; }
-    .source-list { padding-left: 1.2rem; }
-    .source-list li { margin-bottom: 12px; }
-    .tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 25px; }
-    .tags span { border: 1px solid var(--line); padding: 3px 9px; font-size: .68rem; color: var(--muted); border-radius: 2px; }
-    .page-footer { margin-top: 40px; padding: 23px 0 35px; border-top: 1px solid var(--ink); display: flex; justify-content: space-between; gap: 20px; color: var(--muted); font-size: .72rem; }
-
-    @media (min-width: 1350px) {
-      body { font-size: 18px; }
+    .equation .formula { display: block; font-family: Georgia, "Times New Roman", var(--serif); font-size: 21px; line-height: 2.1; min-width: max-content; }
+    .equation .eq-caption { display: block; font-family: var(--sans); font-size: 12px; color: var(--muted); line-height: 1.7; margin-top: 10px; text-align: left; }
+    .formula-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 15px; }
+    .table-wrap { margin: 26px 0; overflow-x: auto; border: 1px solid var(--line); background: var(--surface); }
+    .table-wrap:focus-visible, .equation:focus-visible, pre:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.75; }
+    caption { text-align: left; padding: 15px 19px; background: var(--green-soft); color: var(--green); font-weight: 750; font-size: 13px; }
+    th, td { padding: 14px 17px; vertical-align: top; text-align: left; border-bottom: 1px solid var(--line); }
+    thead th { background: #edf0e9; color: #3f554b; font-size: 12px; font-weight: 800; }
+    tbody th { width: 23%; font-weight: 700; }
+    tr:last-child td, tr:last-child th { border-bottom: 0; }
+    .comparison { min-width: 610px; }
+    .comparison tbody tr:last-child { background: #f0f4e9; }
+    .figure { background: var(--surface); border: 1px solid var(--line); margin: 32px 0; padding: 24px; }
+    .figure img { margin: 0 auto; max-height: 650px; object-fit: contain; }
+    .figure.compact img { max-width: min(100%, 570px); }
+    figcaption { margin-top: 19px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; line-height: 1.85; }
+    figcaption strong { color: var(--green); }
+    .figure-label { display: inline-block; color: var(--accent); font-weight: 800; margin-right: 8px; font-family: var(--mono); font-size: 11px; }
+    .workflow { background: var(--green-soft); padding: 26px; margin: 30px 0; }
+    .workflow .diagram-title { font-size: 12px; font-weight: 800; letter-spacing: .08em; color: var(--green); margin-bottom: 18px; }
+    .flow-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .flow-box { background: var(--surface); border: 1px solid #ccd6c8; padding: 17px 20px; font-size: 14px; }
+    .flow-box strong { display: block; margin-bottom: 5px; }
+    .flow-box small { font-size: 12px; color: var(--muted); }
+    .flow-arrow { text-align: center; font-size: 23px; color: var(--green); line-height: 1.5; padding: 5px; }
+    .flow-main { padding: 22px; text-align: center; background: var(--green); color: var(--surface); }
+    .flow-main strong { display: block; font-size: 19px; }
+    .flow-main p { margin: 6px 0 0; font-size: 13px; }
+    .flow-out { text-align: center; }
+    .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 28px 0; }
+    .mini-card { padding: 25px; background: var(--surface); border: 1px solid var(--line); }
+    .mini-card h3 { margin: 0 0 12px; font-size: 19px; }
+    .mini-card p, .mini-card li { font-size: 15px; }
+    .mini-card p:last-child, .mini-card ul:last-child { margin-bottom: 0; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); margin: 28px 0; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); }
+    .stat { padding: 24px 18px; border-right: 1px solid var(--line); }
+    .stat:first-child { padding-left: 0; }
+    .stat:last-child { border-right: 0; }
+    .stat b { display: block; font-family: Georgia, serif; font-size: 36px; color: var(--green); line-height: 1.3; }
+    .stat span { font-size: 12px; color: var(--muted); }
+    .small { font-size: 13px; color: var(--muted); }
+    .tag { display: inline-block; background: var(--green-soft); color: var(--green); padding: 2px 8px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .tag.pending { background: var(--accent-soft); color: #934026; }
+    .tasks { list-style: none; padding: 0; margin: 30px 0; counter-reset: task; }
+    .tasks > li { display: grid; grid-template-columns: 45px minmax(0, 1fr); gap: 18px; border-top: 1px solid var(--line); margin: 0; padding: 24px 0; counter-increment: task; }
+    .tasks > li::before { content: counter(task, decimal-leading-zero); color: var(--accent); font: 27px Georgia, serif; padding-top: 3px; }
+    .tasks h3 { margin: 0 0 8px; font-size: 21px; }
+    .tasks p { font-size: 15px; margin: 8px 0; }
+    .task-meta { color: var(--muted); font-size: 12px; }
+    pre {
+      margin: 25px 0; background: var(--dark); color: #e4eddf; border-radius: 3px;
+      padding: 26px; overflow-x: auto; font-size: 13px; line-height: 1.8; word-break: normal; overflow-wrap: normal;
     }
-    @media (max-width: 1000px) {
-      .hero-grid { grid-template-columns: 1.4fr 1fr; gap: 30px; }
-      .hero-panel { padding: 25px 18px; }
-      .article-layout { grid-template-columns: 150px minmax(0, 1fr); gap: 35px; }
-      .flow-track { grid-template-columns: 1fr; gap: 8px; }
-      .flow-arrow { transform: rotate(90deg); line-height: 1; }
-      .constraint-strip { grid-template-columns: 1fr; }
+    pre code { font-size: inherit; }
+    .source-list { padding-left: 1.4em; font-size: 14px; }
+    .source-list li { margin: 0 0 18px; }
+    .source-list .source-detail { display: block; font-size: 12px; color: var(--muted); }
+    .end-card { background: var(--dark); color: #eff2e8; padding: 40px; margin-top: 38px; }
+    .end-card .eyebrow { color: #c3d4b4; }
+    .end-card h2 { font-size: 31px; margin-top: 17px; }
+    .end-card p { color: #d1dcd3; }
+    .end-card p:last-child { margin-bottom: 0; }
+    .share-copy { background: var(--surface); border: 1px dashed #abb9aa; padding: 24px; margin: 30px 0; }
+    .share-copy .eyebrow { margin-bottom: 10px; }
+    .share-copy p { font-family: var(--serif); margin-bottom: 0; font-size: 18px; }
+    .keywords { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 25px; }
+    .keywords span { font: 11px var(--mono); padding: 7px 9px; border: 1px solid var(--line); color: var(--muted); }
+    .footer { display: flex; justify-content: space-between; gap: 20px; padding: 26px 0 40px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--ink); }
+    @media (min-width: 1400px) {
+      .article-body { max-width: 990px; }
     }
-    @media (max-width: 760px) {
-      body { font-size: 16px; }
-      .wrap { width: calc(100% - 38px); }
-      .masthead { font-size: .65rem; padding-top: 20px; letter-spacing: .06em; }
+    @media (max-width: 1050px) {
+      .shell { width: min(900px, calc(100% - 48px)); }
+      .page-grid { grid-template-columns: 1fr; gap: 38px; }
+      .rail { position: static; }
+      .rail ol { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0 22px; }
+      .rail-note { display: none; }
+      .hero-grid { grid-template-columns: 1fr 1fr; }
+      .abstract, .hero-equation { padding: 28px; }
+    }
+    @media (max-width: 680px) {
+      body { font-size: 16px; line-height: 1.85; }
+      .shell { width: calc(100% - 36px); }
+      .masthead { font-size: 10px; letter-spacing: .07em; }
+      .masthead span:last-child { max-width: 110px; text-align: right; }
       .hero { padding-top: 38px; }
-      .hero-grid { grid-template-columns: 1fr; gap: 28px; }
-      .hero h1 { max-width: 620px; }
-      .hero-panel { padding: 23px; }
-      .matrix-display { margin: 23px 0; font-size: 2rem; }
-      .panel-footer { margin-top: 19px; padding-top: 15px; }
-      .findings-grid { grid-template-columns: 1fr; gap: 23px; }
-      .finding { display: grid; grid-template-columns: 32px 1fr; column-gap: 13px; }
-      .finding .index { grid-row: 1 / 3; }
-      .finding h3, .finding p { grid-column: 2; }
-      .article-layout { grid-template-columns: 1fr; gap: 0; padding-top: 0; }
-      .sidebar-inner { position: static; }
-      .sidebar-note { display: none; }
-      .toc { display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 18px; margin-bottom: 30px; }
-      .section { padding: 34px 0; }
-      .stats { gap: 7px; }
-      .stat { padding: 16px 10px; }
-      .stat-value { font-size: 1.75rem; }
-      .stat-label { font-size: .68rem; }
-      .limits { grid-template-columns: 1fr; gap: 12px; }
-      .formula { padding: 17px; }
-      .math { font-size: 1rem; }
-      .research-figure { padding: 9px; }
-      .pullquote { padding-left: 21px; }
-      .closing { padding: 27px 23px; }
-      .page-footer { flex-direction: column; gap: 8px; }
+      .hero h1 { font-size: 41px; }
+      .hero-grid, .finding-grid, .two-column, .flow-inputs { grid-template-columns: 1fr; }
+      .hero-equation .big-math { font-size: 26px; }
+      .byline { gap: 6px 14px; }
+      .rail ol { grid-template-columns: 1fr 1fr; gap: 0 16px; }
+      .page-grid { padding-top: 32px; }
+      .section { margin-bottom: 36px; padding-bottom: 38px; }
+      h2 { font-size: 29px; }
+      h3 { font-size: 21px; }
+      .lead { font-size: 18px; }
+      .finding { padding: 21px; }
+      .finding .number { font-size: 26px; margin-bottom: 10px; }
+      .figure { padding: 14px; }
+      .note { padding: 20px; }
+      .equation { padding: 18px 16px; }
+      .equation .formula { font-size: 18px; }
+      .workflow { padding: 18px; }
+      .stats { grid-template-columns: 1fr; }
+      .stat, .stat:first-child { padding: 18px 0; border-right: 0; border-bottom: 1px solid var(--line); }
+      .stat:last-child { border-bottom: 0; }
+      .stat b { font-size: 31px; }
+      .tasks > li { grid-template-columns: 31px minmax(0, 1fr); gap: 12px; }
+      .end-card { padding: 27px; }
+      .end-card h2 { font-size: 28px; }
+      pre { padding: 18px; font-size: 12px; }
+      .footer { flex-direction: column; gap: 8px; }
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
     }
     @media print {
-      body { background: white; color: black; font-size: 10.5pt; line-height: 1.65; }
-      .wrap { width: 100%; }
-      .skip, .sidebar, .page-footer a { display: none; }
-      .hero { padding-top: 25px; }
-      .hero-grid { grid-template-columns: 1.5fr 1fr; gap: 25px; }
-      h1 { font-size: 30pt; }
-      h2 { font-size: 20pt; break-after: avoid; }
-      h3 { break-after: avoid; }
-      .article-layout { display: block; }
-      .hero-panel, .closing { background: #edf0eb; color: black; }
-      .hero-panel p, .hero-panel .eyebrow, .closing p { color: #333; }
-      .section { padding: 22px 0; }
-      figure, .formula, .note, .limit-card { break-inside: avoid; }
-      .table-wrap { overflow: visible; }
-      table, .comparison, .appendix-table, .audit-table { min-width: 0; font-size: 8pt; }
-      th, td { padding: 7px; }
-      a { color: black; }
-      .stats, .findings-grid { grid-template-columns: repeat(3, 1fr); }
-      .source-title { font-size: 11pt; }
+      body { background: white; color: black; font-size: 11pt; }
+      .shell { width: 100%; }
+      .rail, .skip, .share-copy { display: none; }
+      .page-grid { display: block; }
+      .hero { padding-top: 20px; }
+      .hero h1 { font-size: 34pt; }
+      .hero-grid { display: block; }
+      .hero-equation, .end-card, pre { background: #f1f1eb; color: black; }
+      .hero-equation p, .end-card p { color: #333; }
+      .section { padding-bottom: 20px; margin-bottom: 25px; }
+      .figure, .note, .equation, .finding { break-inside: avoid; }
+      .table-wrap, .equation, pre { overflow: visible; }
+      .comparison { min-width: 0; }
+      pre { white-space: pre-wrap; }
+      a { color: inherit; }
+      h2, h3 { break-after: avoid; }
     }
   </style>
 <meta property="og:type" content="article">
-<meta property="og:title" content="Linear Matrix Inequalities for Physically-Consistent Inertial Parameter Identification - 요약">
-<meta property="og:description" content="Linear Matrix Inequalities for Physically Consistent Inertial Parameter Identification 요약 양식: paper summary 스킬 + B 필수 추출표(§S). 그림은 attachments/wensing2018 lmi/ (figure3·4·6 사용; figure5 는 본문 문장 &quot;Figure 5 shows…&quot; 에 캡션 탐지가 걸려 영역이 어긋남, Fig.1·2·">
+<meta property="og:title" content="Linear Matrix Inequalities for Physically-Consistent Inertial Parameter Identification">
+<meta property="og:description" content="[!info] 관련 자료 공개 원문: https://arxiv.org/abs/1701.04395 (v3) 선행: Sousa &amp; Cortesão 2014 (IJRR, 반일관성 LMI — 미확보), Traversaro et al. 2016 (IROS, 다양체 매개변수화), Ayusawa et al. 2011 (이산 근사), Gautier &amp; Khalil 1990/1991 (기저 파라미터), Swevers 1997 (최적 자극 — ">
 <meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/y8mqs6/">
-<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/y8mqs6/assets/figure3.png">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/y8mqs6/assets/table1.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Linear Matrix Inequalities for Physically-Consistent Inertial Parameter Identification - 요약">
-<meta name="twitter:description" content="Linear Matrix Inequalities for Physically Consistent Inertial Parameter Identification 요약 양식: paper summary 스킬 + B 필수 추출표(§S). 그림은 attachments/wensing2018 lmi/ (figure3·4·6 사용; figure5 는 본문 문장 &quot;Figure 5 shows…&quot; 에 캡션 탐지가 걸려 영역이 어긋남, Fig.1·2·">
-<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/y8mqs6/assets/figure3.png">
+<meta name="twitter:title" content="Linear Matrix Inequalities for Physically-Consistent Inertial Parameter Identification">
+<meta name="twitter:description" content="[!info] 관련 자료 공개 원문: https://arxiv.org/abs/1701.04395 (v3) 선행: Sousa &amp; Cortesão 2014 (IJRR, 반일관성 LMI — 미확보), Traversaro et al. 2016 (IROS, 다양체 매개변수화), Ayusawa et al. 2011 (이산 근사), Gautier &amp; Khalil 1990/1991 (기저 파라미터), Swevers 1997 (최적 자극 — ">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/y8mqs6/assets/table1.png">
 <link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/wensing2018-lmi/">
 </head>
 <body>
-  <a class="skip" href="#abstract">본문으로 바로 가기</a>
+<a class="skip" href="#main">본문으로 바로가기</a>
 
-  <div class="wrap">
-    <header class="masthead">
-      <a class="brand" href="#top" aria-label="기사 처음으로">ROBOTICS / RESEARCH NOTES</a>
-      <span>논문 해설 · 시스템 식별</span>
-    </header>
+<div class="shell">
+  <header class="masthead">
+    <a href="#top"><span class="mark" aria-hidden="true"></span>ROBOTICS / RESEARCH NOTES</a>
+    <span>RESEARCH REPORT · 2018 PAPER</span>
+  </header>
 
-    <main id="top">
-      <article aria-labelledby="article-title">
-        <header class="hero">
-          <div class="hero-grid">
-            <div>
-              <div class="eyebrow">Inertial identification · Research report</div>
-              <h1 id="article-title"><span>로봇의 관성에도</span><span>‘물리적 자격’이</span><span>필요하다</span></h1>
-              <p class="dek">토크를 잘 맞추는 파라미터가 실제 물체를 뜻하지는 않는다. 링크당 10개의 관성 파라미터를 <strong>4×4 행렬 하나</strong>로 묶으면, 최소제곱 식별에 질량 분포의 물리 법칙을 함께 넣을 수 있다.</p>
-              <div class="meta">
-                <span>Wensing · Kim · Slotine, 2018</span>
-                <span>논문 해설·검산·적용 의견</span>
-                <time datetime="2026-09-25">노트 작성 2026.09.25</time>
-              </div>
+  <main id="main">
+    <article>
+      <header class="hero" id="top">
+        <div class="eyebrow">시스템 식별 · 물리 일관성 · 디지털 트윈</div>
+        <h1>잘 맞는 관성값은<br><em>실제 물체</em>가 될 수 있을까?</h1>
+        <p class="deck">측정 토크를 잘 설명하는 모델이 언제나 물리적으로 가능한 것은 아니다. 질량과 관성의 관계를 <strong>4×4 행렬 하나</strong>에 담은 Wensing·Kim·Slotine의 연구는, 최소제곱 식별에 “존재 가능한 물체”라는 조건을 더한다.</p>
+        <div class="byline">
+          <span>논문 · Patrick M. Wensing, Sangbae Kim, Jean-Jacques E. Slotine</span>
+          <span>IEEE RA-L · 2018</span>
+          <span>해설 갱신 · <time datetime="2026-09-25">2026.09.25</time></span>
+        </div>
+
+        <div class="hero-grid">
+          <section class="abstract" aria-labelledby="abstract-title">
+            <h2 id="abstract-title">ABSTRACT / 초록</h2>
+            <p>강체의 관성 파라미터는 역동역학에 선형으로 나타나지만, 제약 없는 회귀는 음의 질량이나 실현 불가능한 회전관성을 내놓을 수 있다. 이 연구는 질량 분포의 1·2차 모멘트로 만든 <strong>유사관성 행렬</strong>을 이용해 물리 일관성을 선형행렬부등식(LMI)으로 표현한다. CAD 경계 타원체까지 제약에 포함하면서 볼록 최적화를 유지한다. Cheetah 3 다리 실험은 예측 성능과 표본 효율의 가능성을 보여주지만, 개별 파라미터의 식별 가능성까지 해결하지는 않는다.</p>
+          </section>
+          <div class="hero-equation" aria-label="핵심 수식: 유사관성 행렬 J는 시그마, 일차 모멘트 h, 질량 m으로 구성되며 양의 정부호이다.">
+            <div class="eyebrow">The central idea</div>
+            <div class="big-math">
+              <span>J(π) =</span>
+              <span class="matrix">
+                <span>Σ</span><span>h</span>
+                <span>h<sup>T</sup></span><span>m</span>
+              </span>
+              <span>≻ 0</span>
             </div>
-            <aside class="hero-panel" aria-label="핵심 수식">
-              <div class="eyebrow">The central idea</div>
-              <div class="matrix-display" role="img" aria-label="유사관성 행렬 J는 시그마, 일차 모멘트 h, 그 전치, 질량 m으로 이루어진 4 곱하기 4 블록 행렬이며 양의 정부호이다">
-                <span><i>J</i> =</span>
-                <span class="matrix" aria-hidden="true">
-                  <span>Σ</span><span><i>h</i></span>
-                  <span><i>h</i><sup>T</sup></span><span><i>m</i></span>
-                </span>
-                <span>≻ 0</span>
-              </div>
-              <p>양의 질량과 비퇴화 질량 분포의 공분산 조건을 관성 파라미터에 선형인 행렬 부등식으로 표현한다.</p>
-              <div class="panel-footer">
-                <span>10 PARAMETERS</span>
-                <span>4 × 4 MATRIX</span>
-                <span>CONVEX</span>
-              </div>
-            </aside>
-          </div>
-        </header>
-
-        <section class="key-findings" aria-labelledby="findings-title">
-          <div class="eyebrow" id="findings-title">먼저 읽는 핵심 발견</div>
-          <div class="findings-grid">
-            <div class="finding">
-              <span class="index">01</span>
-              <h3>관성의 양의 정부호성만으로는 부족하다</h3>
-              <p>주관성에는 삼각부등식도 필요하다. 이 조건을 질량 분포의 2차 모멘트로 옮기면 볼록 제약이 된다.</p>
-            </div>
-            <div class="finding">
-              <span class="index">02</span>
-              <h3>CAD 형상을 식별의 제약으로 쓴다</h3>
-              <p>질량중심의 위치를 넘어, 링크를 감싸는 타원체 내부에서 질량 분포가 실현 가능한지 제한한다.</p>
-            </div>
-            <div class="finding">
-              <span class="index">03</span>
-              <h3>물리 일관성과 식별 가능성은 다르다</h3>
-              <p>제약은 가능한 해를 좁힌다. 데이터가 구분하지 못하는 개별 파라미터까지 유일하게 알아내지는 않는다.</p>
-            </div>
-          </div>
-        </section>
-
-        <div class="article-layout">
-          <aside class="sidebar" aria-label="기사 목차">
-            <div class="sidebar-inner">
-              <div class="sidebar-label">IN THIS REPORT</div>
-              <nav>
-                <ol class="toc">
-                  <li><a href="#abstract"><b>00</b>초록</a></li>
-                  <li><a href="#problem"><b>01</b>왜 제약이 필요한가</a></li>
-                  <li><a href="#method"><b>02</b>공분산에서 LMI로</a></li>
-                  <li><a href="#geometry"><b>03</b>형상을 아는 식별</a></li>
-                  <li><a href="#experiment"><b>04</b>Cheetah 3의 증거</a></li>
-                  <li><a href="#limits"><b>05</b>결과의 경계</a></li>
-                  <li><a href="#application"><b>06</b>HR35 적용 관점</a></li>
-                  <li><a href="#audit"><b>07</b>추출표와 검산</a></li>
-                  <li><a href="#takeaway"><b>08</b>독자를 위한 결론</a></li>
-                  <li><a href="#sources"><b>09</b>출처와 읽기 기준</a></li>
-                </ol>
-              </nav>
-              <p class="sidebar-note">식·정리·그림 번호는 arXiv:1701.04395v3 기준. 논문 보고값과 해설자의 추론을 구분해 읽는다.</p>
-            </div>
-          </aside>
-
-          <div class="article-body">
-            <section class="section abstract" id="abstract" aria-labelledby="abstract-title">
-              <div class="section-number">00 / Abstract</div>
-              <h2 id="abstract-title">오차를 줄이면서,<br>존재 가능한 물체를 찾기</h2>
-              <p>강체의 역동역학은 관성 파라미터에 선형이므로 최소제곱으로 식별하기 좋다. 하지만 제약이 없으면 음의 질량이나 실현 불가능한 회전관성이 나올 수 있다. Wensing, Kim, Slotine은 이 문제를 <strong>질량 분포의 모멘트</strong> 관점에서 다시 정식화한다.</p>
-              <p>핵심은 질량, 1차 모멘트, 2차 모멘트를 담은 <strong>유사관성 행렬 <span class="inline-math">J(π)</span></strong>이다. 이 행렬에 양의 정부호 조건을 부여하면, 비퇴화 질량 분포의 물리 일관성을 선형행렬부등식(LMI)으로 다룰 수 있다. 여기에 CAD 기반 경계 타원체 제약을 더해, 식별을 볼록 반정부호계획(SDP)으로 구성한다.</p>
-              <p>논문은 MIT Cheetah 3의 한쪽 다리에서 링크·로터 관성과 마찰을 함께 식별했다. 검증 토크 RMS는 관절별 약 <strong>1.2~1.5 N·m</strong>였다. 다만 이 결과가 개별 관성 파라미터의 유일성이나 다른 운전 조건에서의 정확도를 보장하지는 않는다.</p>
-            </section>
-
-            <section class="section" id="problem" aria-labelledby="problem-title">
-              <div class="section-number">01 / The problem</div>
-              <h2 id="problem-title">숫자가 맞아도,<br>물체가 될 수는 없다</h2>
-              <p class="lead">모델 기반 로봇 제어에는 정확한 관성 모델이 필요하다. 그러나 토크 잔차만 최소화한 모델은 실제로 만들 수 없는 강체를 제안할 수 있다.</p>
-              <p>링크 하나의 관성 파라미터는 질량 1개, 1차 질량 모멘트 3개, 대칭 회전관성 행렬의 독립 성분 6개로 구성된다. 역동역학의 회귀행렬을 <span class="inline-math">Y</span>라고 쓰면, 이 10개 성분은 토크 식에 선형으로 들어간다.</p>
-
-              <div class="formula">
-                <span class="formula-label">파라미터와 선형 역동역학 · 원문 p.2–3, 식 (2)</span>
-                <div class="math">
-                  <span class="math-line">π = [m, h<sub>x</sub>, h<sub>y</sub>, h<sub>z</sub>, I<sub>xx</sub>, I<sub>xy</sub>, I<sub>xz</sub>, I<sub>yy</sub>, I<sub>yz</sub>, I<sub>zz</sub>]<sup>T</sup></span>
-                  <span class="math-line">h = mc, &nbsp; τ = Y(q, ν, ν̇)π</span>
-                </div>
-                <p class="formula-note">c는 질량중심, h는 1차 질량 모멘트다. 여기서 회전관성 Ī는 링크 좌표 원점 기준이며, 질량중심 기준 Ī<sub>C</sub>와 구분해야 한다.</p>
-              </div>
-
-              <p>질량이 양수이고 질량중심 기준 회전관성이 양의 정부호라는 조건은 필요하지만 충분하지 않다. 주관성 <span class="inline-math">J<sub>1</sub>, J<sub>2</sub>, J<sub>3</sub></span>는 각각 나머지 두 값의 합보다 클 수 없다. 예를 들어 주관성 값이 1, 1, 3인 양의 정부호 행렬은 이 삼각부등식을 위반한다.</p>
-
-              <div class="table-wrap" tabindex="0" role="region" aria-label="기존 방법과 본 논문의 비교">
-                <table class="comparison">
-                  <caption>어떤 조건을, 어떤 최적화로 다루는가</caption>
-                  <thead>
-                    <tr><th scope="col">방법</th><th scope="col">물리 일관성</th><th scope="col">볼록</th><th scope="col">점질량 이산 근사</th><th scope="col">LMI</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr><th scope="row">Sousa &amp; Cortesão, 2014 [13]</th><td>반일관성</td><td>예</td><td>아니오</td><td>예</td></tr>
-                    <tr><th scope="row">Traversaro 외, 2016 [14]</th><td>완전 일관성</td><td>아니오</td><td>아니오</td><td>아니오</td></tr>
-                    <tr><th scope="row">Ayusawa 외, 2011 [23]</th><td>완전 일관성</td><td>예</td><td>예</td><td>아니오</td></tr>
-                    <tr class="highlight-row"><th scope="row">Wensing 외, 본 논문</th><td><strong>완전 일관성</strong></td><td><strong>예</strong></td><td><strong>아니오</strong></td><td><strong>예</strong></td></tr>
-                  </tbody>
-                </table>
-              </div>
-              <p class="table-note">원문 Table I, p.2를 제공 노트에 따라 재구성했다. 대괄호 번호는 원논문의 참고문헌 번호다.</p>
-
-              <p>이 연구의 기여는 물리 제약을 추가했다는 데서 끝나지 않는다. 삼각부등식까지 포함하는 조건을 관성 파라미터에 대한 LMI로 표현해, <strong>연속적인 질량 분포를 점질량 격자로 미리 근사하지 않고도 볼록성을 유지</strong>했다는 데 있다.</p>
-            </section>
-
-            <section class="section" id="method" aria-labelledby="method-title">
-              <div class="section-number">02 / The mechanism</div>
-              <h2 id="method-title">회전관성을 질량 분포의<br>공분산으로 읽다</h2>
-
-              <h3>삼각부등식은 행렬 하나의 양반정부호 조건이다</h3>
-              <p>주관성의 삼각부등식은 모든 <span class="inline-math">i</span>에 대해 <span class="inline-math">J<sub>1</sub> + J<sub>2</sub> + J<sub>3</sub> ≥ 2J<sub>i</sub></span>로 쓸 수 있다. 이를 고유값과 대각합으로 표현하면 다음과 같다.</p>
-
-              <div class="formula">
-                <span class="formula-label">삼각부등식의 행렬 표현 · 식 (10)–(13)</span>
-                <div class="math">
-                  <span class="math-line">½ Tr(Ī<sub>C</sub>) ≥ λ<sub>max</sub>(Ī<sub>C</sub>)</span>
-                  <span class="math-line">⇔ ½ Tr(Ī<sub>C</sub>)1<sub>3</sub> − Ī<sub>C</sub> ⪰ 0</span>
-                </div>
-                <p class="formula-note">1<sub>3</sub>는 3×3 단위행렬이다. ⪰ 0은 양반정부호, ≻ 0은 양의 정부호를 뜻한다.</p>
-              </div>
-
-              <h3>그 행렬의 정체는 밀도 가중 공분산이다</h3>
-              <p>질량중심에 대한 위치를 <span class="inline-math">x<sub>c</sub> = x − c</span>, 질량 밀도를 <span class="inline-math">ρ</span>라 하자. 논문은 <span class="inline-math">Σ<sub>C</sub></span>를 질량중심 기준 2차 모멘트, 즉 밀도 가중 공분산으로 정의한다.</p>
-
-              <div class="formula">
-                <span class="formula-label">회전관성과 밀도 가중 공분산의 관계 · 식 (14)–(18)</span>
-                <div class="math">
-                  <span class="math-line">Σ<sub>C</sub> = ∫ x<sub>c</sub>x<sub>c</sub><sup>T</sup>ρ(x) dx</span>
-                  <span class="math-line">Ī<sub>C</sub> = Tr(Σ<sub>C</sub>)1<sub>3</sub> − Σ<sub>C</sub></span>
-                  <span class="math-line">Σ<sub>C</sub> = ½ Tr(Ī<sub>C</sub>)1<sub>3</sub> − Ī<sub>C</sub></span>
-                  <span class="math-line">J<sub>1</sub> = μ<sub>2</sub> + μ<sub>3</sub>, &nbsp; J<sub>2</sub> = μ<sub>1</sub> + μ<sub>3</sub>, &nbsp; J<sub>3</sub> = μ<sub>1</sub> + μ<sub>2</sub></span>
-                </div>
-                <p class="formula-note">μ<sub>i</sub>는 Σ<sub>C</sub>의 고유값이다. 확률분포처럼 질량으로 정규화한 공분산은 Σ<sub>C</sub>/m이며, 논문의 Σ<sub>C</sub> 자체는 질량 가중량이다.</p>
-              </div>
-
-              <p>한 축에 대한 회전관성은 그 축에 수직인 두 방향의 질량 분포를 합한 값이다. 그래서 공분산의 고유값이 음수가 아니면 주관성의 삼각부등식이 자연스럽게 성립한다. 이상적인 평판은 한 방향의 분산이 0이므로 삼각부등식 하나가 등호에 도달한다.</p>
-
-              <blockquote class="pullquote">
-                <p>물리 일관성을 묻는 일은<br>“이 관성이 어떤 질량 분포에서<br>나올 수 있는가”를 묻는 일이다.</p>
-                <footer>Corollary 1의 의미를 풀어 쓴 해설</footer>
-              </blockquote>
-
-              <h3>질량중심을 없애면 파라미터에 선형이 된다</h3>
-              <p>질량중심 <span class="inline-math">c = h/m</span>를 직접 쓰면 비선형 항이 생긴다. 대신 원점 기준 2차 모멘트 <span class="inline-math">Σ</span>를 사용하면, 회전관성으로부터 선형 변환으로 계산할 수 있다.</p>
-
-              <div class="formula">
-                <span class="formula-label">유사관성 행렬 · 식 (19), (20), Theorem 3</span>
-                <div class="math">
-                  <span class="math-line">Σ = ∫ xx<sup>T</sup>ρ(x) dx = Σ<sub>C</sub> + mcc<sup>T</sup></span>
-                  <span class="math-line">Σ = ½ Tr(Ī)1<sub>3</sub> − Ī</span>
-                </div>
-                
-                <div class="math">
-                  <span class="math-line">J(π) ≻ 0 ⇔ m &gt; 0, &nbsp; Σ − hh<sup>T</sup>/m ≻ 0</span>
-                  <span class="math-line">⇔ m &gt; 0, &nbsp; Σ<sub>C</sub> ≻ 0</span>
-                </div>
-                <p class="formula-note">마지막 두 줄은 Schur 보수에 따른 동치다. J의 모든 성분은 π에 선형이므로 이 조건이 LMI가 된다.</p>
-              </div>
-
-              <div class="note caution">
-                <span class="note-label">수학적 경계 · ≻와 ⪰는 구분해야 한다</span>
-                <p><strong>J ≻ 0은 비퇴화 분포의 엄격한 조건</strong>이다. 이상적인 평판·막대처럼 공분산이 특이한 질량 분포는 경계에 놓인다. 이를 포함하려면 양반정부호 조건과 양의 질량 조건을 구분해 다뤄야 한다. 수치 구현에서도 엄격한 부등식을 어떤 허용 오차로 근사할지 정해야 한다.</p>
-              </div>
-
-              <div class="table-wrap" tabindex="0" role="region" aria-label="주요 기호 설명">
-                <table>
-                  <caption>기호를 읽는 기준</caption>
-                  <thead><tr><th scope="col">기호</th><th scope="col">뜻과 기준점</th></tr></thead>
-                  <tbody>
-                    <tr><th scope="row">Ī / Ī<sub>C</sub></th><td>좌표 원점 기준 / 질량중심 기준 회전관성. 평행축 정리로 연결된다.</td></tr>
-                    <tr><th scope="row">Σ / Σ<sub>C</sub></th><td>원점 기준 2차 모멘트 / 질량중심 기준 밀도 가중 공분산.</td></tr>
-                    <tr><th scope="row">c / h</th><td>질량중심 / 1차 질량 모멘트. h = mc.</td></tr>
-                    <tr><th scope="row">J(π)</th><td>4×4 유사관성 행렬. 6×6 공간 관성 행렬과 다르며, 주관성 J<sub>i</sub>와도 구분한다.</td></tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <p>6차원 공간 관성은 블록 행렬 <span class="inline-math">I = [Ī, S(h); S(h)<sup>T</sup>, m1<sub>3</sub>]</span>로 표현된다. 여기서 <span class="inline-math">S</span>는 벡터의 외적을 나타내는 반대칭 행렬이다. 이 공간 관성이 양의 정부호라는 조건은 반일관성에 해당한다. 유사관성 행렬은 여기에 빠진 질량 분포의 실현 가능성을 다루는 도구다. 원문은 운동에너지도 <span class="inline-math">½v<sup>T</sup>Iv = ½Tr(VJV<sup>T</sup>)</span>로 연결한다. <span class="source-ref">p.3, p.5</span></p>
-            </section>
-
-            <section class="section" id="geometry" aria-labelledby="geometry-title">
-              <div class="section-number">03 / Geometry as a constraint</div>
-              <h2 id="geometry-title">질량중심이 안에 있는 것과<br>질량이 안에 있는 것은 다르다</h2>
-              <p>CAD로 링크의 대략적인 외형을 안다면, 식별된 질량 분포가 그 형상과도 맞아야 한다. 논문은 링크를 감싸는 타원체를 이용해 이 사전 지식을 최적화에 넣는다.</p>
-
-              <div class="formula">
-                <span class="formula-label">경계 타원체 · §V</span>
-                <div class="math">
-                  <span class="math-line">𝒮 = {x : (x − x<sub>s</sub>)<sup>T</sup>Q<sub>s</sub><sup>−1</sup>(x − x<sub>s</sub>) ≤ 1}</span>
-                </div>
-                <p class="formula-note">x<sub>s</sub>는 타원체의 중심, Q<sub>s</sub>는 크기와 방향을 나타내는 양의 정부호 행렬이다.</p>
-              </div>
-
-              <h3>첫 번째 제약: 질량중심의 위치</h3>
-              <p>질량중심이 타원체 안에 있다는 조건은 다음 LMI로 표현된다. 이는 질량중심의 위치만 제한하므로, 질량 분포의 퍼짐까지 보장하지는 않는다.</p>
-              <div class="formula">
-                <span class="formula-label">질량중심 제약 · 식 (22)</span>
-                
-              </div>
-
-              <h3>두 번째 제약: 分布 전체의 실현 가능성</h3>
-              <p>더 강한 질문은 “이 관성 파라미터를 만드는 질량 분포가 타원체 내부에 존재하는가”이다. 고전 모멘트 문제와 연결하면, <span class="inline-math">J(π) ≻ 0</span>에 더해 <strong>하나의 스칼라 선형 부등식</strong>으로 이 조건을 표현할 수 있다.</p>
-
-              <div class="formula">
-                <span class="formula-label">타원체 내부 질량 분포의 실현 가능성 · 식 (23), Theorem 4</span>
-                <div class="math">
-                  <span class="math-line">J(π) ≻ 0, &nbsp; Tr(J(π)Q) ≥ 0</span>
-                </div>
-                <p class="formula-note">Q는 타원체의 이차식을 동차 좌표로 표현한 4×4 행렬이며, 위의 3×3 행렬 Q<sub>s</sub>와 다르다. 고정된 Q에 대해 Tr(JQ)는 π의 선형식이다.</p>
-              </div>
-
-              <figure class="research-figure">
-                <img src="assets/figure3.png" alt="경계 타원체 안에서 질량 분포를 실현할 수 있는 경우와 없는 경우를 비교한 원논문 Figure 3" loading="lazy" decoding="async">
-                <figcaption>
-                  <span class="figure-label">원논문 Figure 3 · 형상과 모멘트</span>
-                  질량중심의 위치만으로는 충분하지 않다. 논문은 질량 분포의 퍼짐을 포함한 모멘트가 경계 타원체와 양립하는지 판정한다. 실현 가능성의 정확한 기준은 그림의 시각적 겹침이 아니라 <span class="inline-math">Tr(JQ) ≥ 0</span> 조건이다.
-                </figcaption>
-              </figure>
-
-              <p>Theorem 4는 조건을 만족하는 관성 파라미터가 타원체 내부의 점질량 4개로도 표현될 수 있음을 보인다. 이는 <strong>유한한 표현의 존재에 관한 결과</strong>이며, 식별 전에 점질량 격자를 선택해야 한다는 뜻은 아니다. Corollary 2는 여러 타원체의 합집합으로도 확장한다. 각 부분의 파라미터를 합해 전체 링크를 표현하는 방식이다.</p>
-
-              <figure class="flow" aria-labelledby="flow-title">
-                <div class="flow-title" id="flow-title">측정값에서 물리적으로 일관된 모델까지</div>
-                <div class="flow-track">
-                  <div class="flow-node"><strong>운동·토크 데이터</strong><small>q, ν, ν̇, 토크 명령<br>수정 RNEA → 회귀행렬 Y</small></div>
-                  <div class="flow-arrow" aria-hidden="true">→</div>
-                  <div class="flow-node active"><strong>볼록 최적화</strong><small>토크 잔차 최소화<br>+ CAD 사전값 정규화</small></div>
-                  <div class="flow-arrow" aria-hidden="true">→</div>
-                  <div class="flow-node"><strong>식별 모델</strong><small>관성 파라미터 π<br>점성·쿨롱 마찰 B, B<sub>c</sub></small></div>
-                </div>
-                <div class="constraint-strip">
-                  <div><strong>C(π) ⪰ 0</strong><br>질량중심 위치</div>
-                  <div><strong>J(π) ≻ 0</strong><br>물리 일관성</div>
-                  <div><strong>Tr(JQ) ≥ 0</strong><br>타원체 내부 실현</div>
-                </div>
-                <figcaption>CAD는 사전 관성값과 경계 형상을 제공한다. 세 제약은 같은 식별 문제에 결합된다.</figcaption>
-              </figure>
-            </section>
-
-            <section class="section" id="experiment" aria-labelledby="experiment-title">
-              <div class="section-number">04 / Experimental evidence</div>
-              <h2 id="experiment-title">Cheetah 3 다리에서<br>관성·로터·마찰을 함께 식별하다</h2>
-              <p>실험 대상은 3자유도 다리 한 개다. 링크 3개와 로터 3개를 합쳐 강체 6개의 관성 파라미터 60개를 추정하고, 관절별 점성·쿨롱 마찰 계수 6개를 함께 식별했다.</p>
-
-              <div class="stats" aria-label="실험 규모">
-                <div class="stat"><span class="stat-value">3 DoF</span><span class="stat-label">한쪽 다리 · 강체 6개</span></div>
-                <div class="stat"><span class="stat-value">1 kHz</span><span class="stat-label">운동 데이터 표본율</span></div>
-                <div class="stat"><span class="stat-value">66</span><span class="stat-label">관성 60 + 마찰 6</span></div>
-              </div>
-
-              <div class="formula">
-                <span class="formula-label">마찰을 포함한 역동역학 · 식 (24)</span>
-                <div class="math">
-                  <span class="math-line">τ − Bν − B<sub>c</sub> sign(ν) = Y(q, ν, ν̇)π</span>
-                </div>
-                <p class="formula-note">B와 B<sub>c</sub>는 각각 점성 마찰과 쿨롱 마찰의 대각 계수 행렬이다.</p>
-              </div>
-
-              <div class="formula">
-                <span class="formula-label">최소제곱 + 사전값 정규화 + 물리 제약 · 식 (25), 표본 인덱스는 k로 표기</span>
-                <div class="math">
-                  <span class="math-line">min<sub>π, B, Bc</sub> &nbsp; (1/n<sub>s</sub>) Σ<sub>k</sub> ‖Y<sup>(k)</sup>π + Bν<sup>(k)</sup> + B<sub>c</sub> sign(ν<sup>(k)</sup>) − τ<sup>(k)</sup>‖²</span>
-                  <span class="math-line">　　　　　　　 + w<sub>π</sub>‖π − π̂‖²</span>
-                  <span class="math-line">subject to &nbsp; C<sub>i</sub>(π<sub>i</sub>) ⪰ 0, &nbsp; J(π<sub>i</sub>) ≻ 0, &nbsp; Tr(J(π<sub>i</sub>)Q<sub>i</sub>) ≥ 0</span>
-                </div>
-                <p class="formula-note">π̂는 CAD 사전값이다. 볼록 목적함수와 볼록 제약으로 구성되므로, 채택한 정식화에서 전역 최적해를 구할 수 있다. 이는 실제 파라미터의 복원 보장과는 구분된다.</p>
-              </div>
-
-              <div class="table-wrap" tabindex="0" role="region" aria-label="실험 조건과 보고 결과">
-                <table>
-                  <caption>실험 조건과 주요 보고값 · 원문 p.6–7</caption>
-                  <tbody>
-                    <tr><th scope="row">기구·운전 조건</th><td>MIT Cheetah 3 다리, 기어비 10.6:1. 접촉 없는 공중 운동에서 발끝을 가상 타원체 껍질 위로 구동.</td></tr>
-                    <tr><th scope="row">자극 궤적</th><td>구면각 정현파로 구성. 제공 노트의 주파수 설정은 1.63 / 0.265 rad/s. 최적 자극 설계는 수행하지 않음.</td></tr>
-                    <tr><th scope="row">학습·검증</th><td>앞 10,000개 표본으로 학습, 이어지는 10,000개로 검증. 같은 실험의 인접한 시간 구간.</td></tr>
-                    <tr><th scope="row">토크·운동 신호</th><td>모터 드라이버 명령에서 토크를 추정. 엔코더 기반 운동 데이터와 비인과 필터를 이용한 오프라인 미분.</td></tr>
-                    <tr><th scope="row">회귀·사전 정보</th><td>수정 RNEA로 회귀행렬의 열을 계산. CAD 관성값과 경계 타원체 사용. 정규화 가중치 w<sub>π</sub> = 10<sup>−6</sup>.</td></tr>
-                    <tr><th scope="row">솔버·시간</th><td>MATLAB + MOSEK. 2011년형 i5에서 1.67초로 보고.</td></tr>
-                    <tr><th scope="row">검증 토크 RMS</th><td><strong>1.48 / 1.16 / 1.16 N·m</strong> — ab/ad, hip, knee 순. 식별 결과의 물리 일관성 제약 만족을 확인했다고 보고.</td></tr>
-                    <tr><th scope="row">쿨롱 마찰</th><td>B<sub>c</sub> = diag(3.12, 1.25, 0.95) N·m.</td></tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <figure class="research-figure">
-                <img src="assets/figure4.png" alt="학습에 사용하지 않은 시간 구간에서 토크 데이터와 식별 모델의 예측을 비교한 원논문 Figure 4" loading="lazy" decoding="async">
-                <figcaption>
-                  <span class="figure-label">원논문 Figure 4 · 보류 구간의 토크 재현</span>
-                  파란색 토크 데이터와 빨간색 식별 모델의 비교. 본 실험의 토크는 직접 센서 측정이 아니라 모터 명령 기반 추정값이다. 그림에 보고된 RMS 1.46 N·m는 본문 관절별 RMS와 집계 방식이 일치하는지 확인되지 않았다.
-                </figcaption>
-              </figure>
-
-              <div class="note caution">
-                <span class="note-label">수치 검산 · RMS를 하나로 합쳐 말하지 않기</span>
-                <p>관절별 RMS의 제곱평균은 <span class="inline-math">√((1.48² + 1.16² + 1.16²)/3) ≈ 1.28 N·m</span>로, 그림의 1.46 N·m와 다르다. 단순평균도 약 1.27 N·m다. 따라서 이 기사에서는 관절별 수치를 우선 제시하며, 그림 수치와의 차이는 미확인으로 남긴다.</p>
-              </div>
-
-              <figure class="research-figure">
-                <img src="assets/figure6.png" alt="학습 표본 수에 따른 검증 오차를 무제약, 반일관성, 타원체 기반 제약으로 비교한 원논문 Figure 6" loading="lazy" decoding="async">
-                <figcaption>
-                  <span class="figure-label">원논문 Figure 6 · 표본 수와 물리 제약</span>
-                  더 강한 물리·형상 제약이 적은 학습 표본에서 검증 오차를 줄이는 경향을 보여준다. 제공 노트는 가로축의 1~100 표기에 대한 단위를 미확인으로 남겼다. 이 그림을 10,000개 표본 실험과 정량적으로 연결하거나 보편적인 표본 수 기준으로 읽지는 않는다.
-                </figcaption>
-              </figure>
-
-              <p>이 결과는 물리 제약이 제한된 데이터에서 과적합을 줄이는 역할도 할 수 있음을 시사한다. 다만 원자료를 통한 곡선 재현은 이루어지지 않았다. 또한 ab/ad 관절은 약 17.5초의 정지 구간에서 오차가 커진다. 속도가 0 근처일 때 단순한 쿨롱 모델만으로 마찰 방향을 정하기 어렵기 때문이다.</p>
-              <p>원문 Figure 5의 해석에 따르면 링크 관성, 로터 관성, 마찰이 모두 요구 토크에 기여한다. 이 기체와 변속기에서는 세 요소를 함께 식별하는 것이 중요하다. 해당 그림은 제공된 이미지의 추출 영역이 부정확해 싣지 않았다.</p>
-            </section>
-
-            <section class="section" id="limits" aria-labelledby="limits-title">
-              <div class="section-number">05 / What the evidence does not establish</div>
-              <h2 id="limits-title">전역 최적해가 곧<br>참 파라미터는 아니다</h2>
-              <p class="lead">이 방법은 잘 정의된 최적화 문제를 만든다. 그러나 데이터의 정보량, 센서 오차, 모델 누락까지 없애지는 않는다.</p>
-
-              <div class="limits">
-                <div class="limit-card">
-                  <span class="evidence-badge">식별 가능성</span>
-                  <h4>개별값은 사전값에 의존할 수 있다</h4>
-                  <p>회귀행렬이 구분하지 못하는 방향에서는 여러 파라미터가 같은 토크를 만든다. 물리 제약과 CAD 정규화는 그중 하나를 선택하지만, 유일한 실제값을 입증하지 않는다.</p>
-                  <p class="next">해석: 기저 파라미터와 개별 파라미터를 구분하고, 사전값 의존성을 기록한다.</p>
-                </div>
-                <div class="limit-card">
-                  <span class="evidence-badge">측정과 모델</span>
-                  <h4>명령 토크에는 구동기 오차가 섞인다</h4>
-                  <p>실측 토크 센서를 사용한 실험이 아니다. 구동기 모델 오차와 정지 구간의 마찰 모델 불완전성이 잔차에 남을 수 있다.</p>
-                  <p class="next">후속 검증: 직접 힘·토크 계측 또는 구동기 모델 보강, 정지 마찰 처리.</p>
-                </div>
-                <div class="limit-card">
-                  <span class="evidence-badge">통계 해석</span>
-                  <h4>공분산이라는 말이 확률 추론을 뜻하지는 않는다</h4>
-                  <p>통계적 관점은 질량 분포의 모멘트를 이해하는 해석이다. 파라미터의 사후분포나 신뢰구간을 계산한 연구는 아니다.</p>
-                  <p class="next">논문의 후속 방향: 측정 불확실성을 반영한 베이지안·집합 소속 추론과 결합.</p>
-                </div>
-                <div class="limit-card">
-                  <span class="evidence-badge">검증 범위</span>
-                  <h4>한쪽 다리, 같은 실험의 다음 구간</h4>
-                  <p>검증은 3자유도 다리에 한정된다. 인접 시간 구간의 검증은 다른 부하·접촉·제어 조건으로의 일반화를 입증하지 않는다.</p>
-                  <p class="next">후속 검증: 조건을 분리한 보류 실험과 고자유도·부동 기저 시스템 평가.</p>
-                </div>
-              </div>
-
-              <p>Remark 7은 강체당 4×4 LMI라는 작은 제약 구조가 고자유도 시스템으로 확장하기에 유리하다고 설명한다. 다만 Cheetah 실험의 1.67초라는 수치를 다른 로봇의 실행 시간으로 그대로 옮길 수는 없다. 폐루프 데이터의 편향, 센서 동기화, 파라미터 불확실성 역시 이 실험에서 충분히 평가된 항목은 아니다.</p>
-            </section>
-
-            <section class="section" id="application" aria-labelledby="application-title">
-              <div class="section-number">06 / Implications for a digital twin</div>
-              <h2 id="application-title">HR35에 필요한 것은<br>‘일관성 있는 한 해’다</h2>
-              <span class="evidence-badge">프로젝트 적용 의견 · 논문의 실험 결과와 구분</span>
-              <p>제공 노트의 HR35 디지털 트윈은 링크별 질량·질량중심·관성의 개별값을 요구한다. 반면 시스템 식별에서는 개별값 대신 여러 값의 조합만 관측될 수 있다. 이 논문의 정식화는 그 사이에서 <strong>데이터에 맞고, 물리적으로 가능하며, 사전 정보와도 양립하는 파라미터 집합</strong>을 고르는 도구가 된다.</p>
-
-              <div class="note">
-                <span class="note-label">적용의 전제</span>
-                <p>아래 내용은 원논문이 HR35에서 검증한 결과가 아니다. 질량 182·122·92 kg, 20 Hz 경사계, AGX·URDF 모델 및 압력 기반 토크 추정은 제공 노트의 프로젝트 맥락이다. 현재 파라미터의 오류 여부와 유압 모델의 적합성은 별도 검사 대상이다.</p>
-              </div>
-
-              <ol class="checklist">
-                <li>
-                  <strong>먼저 좌표계와 기준점을 맞추고, 기존 파라미터를 검사한다</strong>
-                  <p>링크별 질량·질량중심·관성을 동일한 좌표계와 기준점으로 변환해 J(π)를 구성한다. 질량중심 기준 관성과 원점 기준 관성의 혼동을 확인한 뒤, 양의 정부호성과 CAD 경계 타원체 조건을 검사한다. 이 단계는 새 운동 데이터 없이도 수행할 수 있다. 파라미터 지도의 <code>link_com_inertia</code> 항목에 검사 결과를 남긴다.</p>
-                </li>
-                <li>
-                  <strong>관측되는 묶음과 사전값으로 정해지는 개별값을 구분한다</strong>
-                  <p>제공 노트는 평면 3관절 굴착기에서 중력·관성의 묶음 파라미터가 중요하다고 본다. 실제 식별 가능 조합은 선택한 모델과 회귀행렬로 확인해야 한다. 개별값은 ‘복원된 참값’ 대신 ‘제약과 사전값을 만족하는 한 해’로 보고한다.</p>
-                </li>
-                <li>
-                  <strong>20 Hz 운동 신호와 압력 기반 토크의 품질을 확보한다</strong>
-                  <p>절대각을 상대 관절각으로 변환하고, 비인과 필터를 포함한 오프라인 미분 절차를 정한다. 압력에서 관절 토크로 변환하려면 압력 보정, 실린더 면적, 기구학적 변환계수 η가 선행한다. 저표본율 가속도 추정의 오차도 별도로 평가한다.</p>
-                </li>
-                <li>
-                  <strong>마찰 모델은 같은 데이터와 조건에서 비교한다</strong>
-                  <p>점성·쿨롱 모델을 관절과 실린더 좌표 사이의 힘·속도 변환에 맞춰 비교한다. 제공 노트가 언급한 토크 비례 마찰 모델도 같은 보류 데이터에서 평가한다. 유체 관성 등은 단순 마찰항에 자동으로 흡수된다고 가정하지 말고 모델 적합성을 확인한다.</p>
-                </li>
-                <li>
-                  <strong>유압·접촉·폐루프 조건은 별도 검증 문제로 남긴다</strong>
-                  <p>Cheetah의 1 kHz 공중 운동과 HR35의 저표본율 유압 운전은 다르다. 부하·접촉 조건을 분리해 검증하고, 폐루프 편향이나 계측변수 방법의 필요성은 별도 문헌과 데이터로 판단한다.</p>
-                </li>
-              </ol>
-
-              <p>여기서 가장 먼저 얻을 수 있는 가치는 더 낮은 토크 오차가 아닐 수도 있다. <strong>현재 트윈의 파라미터가 서로 모순되지 않는지 검사하는 기준</strong>을 확보하는 것만으로도, 이후 재식별의 출발점을 명확히 할 수 있다.</p>
-            </section>
-
-            <section class="section" id="audit" aria-labelledby="audit-title">
-              <div class="section-number">07 / Evidence ledger</div>
-              <h2 id="audit-title">무엇을 읽었고,<br>무엇을 확인했는가</h2>
-              <p>논문 보고, 제공 노트의 손계산, 적용 해석, 미확인 항목을 분리했다. 수식 검산은 대수적 관계의 확인이며, 실험 원자료를 이용한 재현을 뜻하지 않는다.</p>
-
-              <div class="table-wrap" tabindex="0" role="region" aria-label="시스템 식별 추출표">
-                <table class="appendix-table">
-                  <caption>시스템 식별 관점의 추출표</caption>
-                  <thead><tr><th scope="col">항목</th><th scope="col">추출 내용과 해석 범위</th></tr></thead>
-                  <tbody>
-                    <tr><th scope="row">문제·장비·운전 범위</th><td>강체 관성 식별의 물리 제약 정식화. 검증은 Cheetah 3 다리 1개, 3 DoF, 접촉 없는 공중 운동.</td></tr>
-                    <tr><th scope="row">입력 → 상태 → 출력</th><td>관절 토크 명령 → q, ν → 역동역학 토크 잔차. τ = Yπ에 점성·쿨롱 마찰을 더함. 식 (2), (24).</td></tr>
-                    <tr><th scope="row">추정 대상·고정 가정</th><td>관성 60개, 점성 3개, 쿨롱 3개. 기구학, 기어비, CAD 타원체의 중심·형상은 고정. 운동 신호는 엔코더와 오프라인 미분에 의존.</td></tr>
-                    <tr><th scope="row">단위·좌표·기준점</th><td>Ī는 링크 좌표 원점 기준. 질량중심 기준 관성으로 쓰려면 평행축 변환이 필요. 타원체도 링크 좌표계에서 표현. 식 (8).</td></tr>
-                    <tr><th scope="row">개별값·식별 가능성</th><td>개별 관성값을 최적화하지만, 데이터가 구분하지 못하는 방향은 사전값 정규화에 의존. 제약은 해 집합을 줄이며 식별 가능성을 자동으로 만들지 않음.</td></tr>
-                    <tr><th scope="row">센서·주기·동기화</th><td>1 kHz. 토크는 명령 기반 추정. 센서 정확도와 동기화의 상세는 제공 노트에서 확인되지 않음.</td></tr>
-                    <tr><th scope="row">자극·반복·제외 규칙</th><td>가상 타원체 껍질 위 구면각 정현파. 최적 자극 설계는 수행하지 않음. 정지 구간 제외 규칙은 제시되지 않았으며 해당 오차가 결과에 남음.</td></tr>
-                    <tr><th scope="row">추정식·최적화</th><td>최소제곱 + CAD 정규화, C<sub>i</sub> ⪰ 0, J<sub>i</sub> ≻ 0, Tr(J<sub>i</sub>Q<sub>i</sub>) ≥ 0. 볼록 SDP 정식화, MOSEK 사용. 식 (25).</td></tr>
-                    <tr><th scope="row">노이즈·폐루프 편향</th><td>비인과 필터로 미분 잡음을 완화. 임피던스 제어 하의 데이터이지만 폐루프 편향 평가나 계측변수(IV) 대책은 확인되지 않음.</td></tr>
-                    <tr><th scope="row">분할·오차·비교 기준</th><td>시간 순 앞 1만 / 뒤 1만 표본. RMS 토크 오차. 무제약·반일관성·타원체 제약 비교. 조건 분리 검증과 파라미터 불확실성 평가는 없음.</td></tr>
-                    <tr><th scope="row">코드·데이터 접근성</th><td>제공 노트에 따르면 본문에 공개 링크가 없고, p.7에 보충자료 수치 언급이 있음. 이 정보만으로 현재의 공개 여부까지 확정할 수는 없음.</td></tr>
-                    <tr><th scope="row">HR35 재사용과 비용</th><td>기존 파라미터의 물리·형상 일관성 검사를 우선 적용할 수 있음. 재식별에는 운동·압력 데이터 전처리와 구동기 모델 검증이 필요. 실행 시간은 별도 측정 대상.</td></tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <div class="table-wrap" tabindex="0" role="region" aria-label="논문 주장과 검산, 해석, 미확인 항목">
-                <table class="audit-table">
-                  <caption>주장 · 독립 검산 · 해석 · 미확인</caption>
-                  <thead>
-                    <tr><th scope="col">논문 주장</th><th scope="col">제공 노트의 검산</th><th scope="col">해석</th><th scope="col">미확인·경계</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <th scope="row">공분산 변환식 (17)</th>
-                      <td>式 (16)의 trace를 취하면 Tr(Ī<sub>C</sub>) = 2Tr(Σ<sub>C</sub>). 이를 대입해 역변환 확인.</td>
-                      <td>관성에서 질량 분포의 2차 모멘트로 선형 변환 가능.</td>
-                      <td>실험 재현이 아닌 대수 검산.</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">삼각부등식 ⇔ 식 (13)</th>
-                      <td>모든 J<sub>i</sub> ≤ ½ΣJ<sub>i</sub> ⇔ λ<sub>max</sub> ≤ ½Tr ⇔ 대응 행렬이 양반정부호.</td>
-                      <td>주관성 조건을 행렬 부등식으로 표현.</td>
-                      <td>엄격한 양의 정부호 조건과 경계는 구분.</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Theorem 3</th>
-                      <td>Schur 보수에서 Σ − hh<sup>T</sup>/m = Σ<sub>C</sub> 확인.</td>
-                      <td>질량 양수와 공분산 양의 정부호를 J ≻ 0으로 결합.</td>
-                      <td>퇴화 분포는 경계에 위치. 수치 허용 오차 별도 필요.</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">고유값 관계 (18)</th>
-                      <td>Ī<sub>C</sub> = Tr(Σ<sub>C</sub>)1 − Σ<sub>C</sub>에서 각 고유값은 전체 μ 합에서 μ<sub>i</sub>를 뺀 값.</td>
-                      <td>각 주관성은 나머지 두 분산 성분의 합.</td>
-                      <td>추가 실험 검증 항목은 아님.</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Figure 4 RMS 1.46 N·m</th>
-                      <td>본문 관절별 RMS의 제곱평균은 약 1.28, 단순평균은 약 1.27 N·m.</td>
-                      <td>그림과 본문 수치를 하나의 집계값으로 취급하지 않음.</td>
-                      <td><strong>집계 방식과 차이의 원인 미확인.</strong></td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Figure 6의 표본 수 효과</th>
-                      <td>원자료가 없어 곡선 재현 불가.</td>
-                      <td>강한 제약이 적은 데이터에서 유리한 경향.</td>
-                      <td>제공 노트상 x축 단위 확인 필요. 1만 표본 결과와 직접 연결하지 않음.</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">1.67초 풀이 시간</th>
-                      <td>재현하지 않음.</td>
-                      <td>강체별 4×4 LMI는 구조상 작은 제약.</td>
-                      <td>HR35·다른 하드웨어의 실행 시간은 보장되지 않음.</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </section>
-
-            <section class="section" id="takeaway" aria-labelledby="takeaway-title">
-              <div class="section-number">08 / Takeaway</div>
-              <div class="closing">
-                <h2 id="takeaway-title">좋은 식별은 오차뿐 아니라<br>가능한 물체의 범위도 다룬다</h2>
-                <p>이 논문은 물리 법칙을 식별 뒤의 검사 항목에서 식별 문제 안의 제약으로 옮긴다. 유사관성 행렬은 질량·질량중심·회전관성을 하나의 질량 분포로 묶고, 경계 타원체는 형상에 대한 지식을 더한다.</p>
-                <p>실무에서 기억할 것은 두 가지다. <strong>물리 일관성은 반드시 확인할 수 있는 조건이고, 개별 파라미터의 진실성은 추가 증거가 필요한 주장이다.</strong> 이 둘을 구분하면 디지털 트윈에 넣는 숫자의 의미도 선명해진다.</p>
-              </div>
-
-              <div class="share-copy" aria-label="복사해 공유하기 좋은 핵심 요약">
-                <span class="note-label">공유용 핵심 문장</span>
-                <p>토크를 잘 맞추는 모델이 실제로 존재 가능한 물체를 뜻하지는 않는다. Wensing·Kim·Slotine의 연구는 관성 파라미터의 물리 일관성을 4×4 LMI로 표현해, CAD 형상 제약과 함께 볼록 최적화로 식별한다. 다만 물리적으로 가능한 해와 유일한 참값은 구분해야 한다.</p>
-              </div>
-            </section>
-
-            <section class="section sources" id="sources" aria-labelledby="sources-title">
-              <div class="section-number">09 / Source notes</div>
-              <h2 id="sources-title">출처와 읽기 기준</h2>
-              <p class="source-title">Patrick M. Wensing, Sangbae Kim, Jean-Jacques E. Slotine. <cite>Linear Matrix Inequalities for Physically-Consistent Inertial Parameter Identification: A Statistical Perspective on the Mass Distribution.</cite></p>
-              <p>소속: University of Notre Dame · MIT<br>
-                <em>IEEE Robotics and Automation Letters</em>, 3(1), 2018.<br>
-                <a>공식 논문 DOI: 10.1109/LRA.2017.2729659</a> ·
-                <a>읽기 기준: arXiv:1701.04395v3</a>
-              </p>
-
-              <ol class="source-list">
-                <li><strong>버전 기준.</strong> 식·그림·정리·쪽 번호는 2017년 9월 18일의 arXiv v3, 8쪽 저자 공개본을 따른다. 제공 노트에는 공식판 참조 표기와 2026년 9월 25일 Crossref 서지 확인 기록이 있다.</li>
-                <li><strong>편집 범위.</strong> 이 기사는 제공된 심층 검토 노트를 공개용 해설로 재구성한 문서다. 원문의 실험값, 노트의 대수 검산, 프로젝트 적용 의견을 구분했으며 새 실험이나 원자료 재분석을 수행한 것으로 주장하지 않는다.</li>
-                <li><strong>그림.</strong> Figure 3·4·6은 제공된 로컬 추출 이미지를 사용했다. 캡션은 독자의 이해를 위한 한국어 설명이다. Figure 5는 추출 영역 오류로, Figure 1·2와 Table I 이미지는 자동 추출 실패로 포함하지 않았다. 비교표는 노트의 텍스트를 재구성했다.</li>
-                <li><strong>참고문헌 번호.</strong> [13], [14], [23], [26] 등은 원논문 내부 번호다. 타원체 실현 가능성은 원문이 인용한 모멘트 문제의 정리 [26, Theorem 4.7(b)]와 연결된다.</li>
-                <li><strong>프로젝트 참고.</strong> 제공 노트가 언급한 Werner 2025와 Janot 2014는 HR35 적용 논의를 위한 배경이다. 상세 서지와 해당 주장을 이 기사에서 독립 검증하지 않았으므로, 본 논문의 실험 증거와 구분한다.</li>
-                <li><strong>재현 범위.</strong> 공분산 변환, 고유값 관계, Schur 보수는 손계산 경로가 기록되어 있다. 저자의 RMS, 표본 수 곡선, 풀이 시간은 원자료로 재현하지 않았다.</li>
-              </ol>
-
-              <div class="tags" aria-label="주제어">
-                <span>관성 파라미터</span>
-                <span>물리 일관성</span>
-                <span>유사관성 행렬</span>
-                <span>LMI</span>
-                <span>SDP</span>
-                <span>밀도 가중 공분산</span>
-                <span>경계 타원체</span>
-                <span>모멘트 문제</span>
-                <span>디지털 트윈</span>
-              </div>
-            </section>
+            <p>질량이 양수이고, 질량 분포가 세 방향으로 퍼질 수 있는가? 비퇴화 강체의 물리 일관성을 이 작은 행렬로 검사한다.</p>
           </div>
         </div>
-      </article>
-    </main>
+        <div class="hero-foot">
+          독해 기준: arXiv:1701.04395v3, 2017-09-18, 8쪽. 아래 식·그림 번호는 이 판을 따른다. 논문 결과와 HR35 적용 판단은 구분해 기술한다.
+        </div>
+      </header>
 
-    <footer class="page-footer">
-      <span>RESEARCH NOTES · Wensing, Kim &amp; Slotine · 2018</span>
-      <span>제공 노트 기준 2026.09.25 · <a href="#top">기사 처음으로 ↑</a></span>
-    </footer>
-  </div>
+      <div class="page-grid">
+        <nav class="rail" aria-label="목차">
+          <div class="rail-title">IN THIS REPORT</div>
+          <ol>
+            <li><a href="#findings"><span>01</span>먼저 읽는 핵심</a></li>
+            <li><a href="#problem"><span>02</span>잘 맞아도 틀리는 모델</a></li>
+            <li><a href="#mechanism"><span>03</span>4×4 행렬의 원리</a></li>
+            <li><a href="#geometry"><span>04</span>형상 정보까지 제약하기</a></li>
+            <li><a href="#evidence"><span>05</span>Cheetah 3 실험</a></li>
+            <li><a href="#limits"><span>06</span>근거의 범위와 한계</a></li>
+            <li><a href="#hr35"><span>07</span>HR35 적용 로드맵</a></li>
+            <li><a href="#appendix"><span>08</span>구현·검산 노트</a></li>
+            <li><a href="#sources"><span>09</span>출처와 읽기 안내</a></li>
+            <li><a href="#ending"><span>10</span>다음에 할 일</a></li>
+          </ol>
+          <p class="rail-note">핵심은 물리적으로 가능한 해의 영역을 정하는 일이다. 그 영역 안에서 유일한 답을 얻는지는 별도의 문제다.</p>
+        </nav>
+
+        <div class="article-body">
+          <section class="section" id="findings" aria-labelledby="findings-title">
+            <div class="section-label">01 / KEY FINDINGS</div>
+            <h2 id="findings-title">이 논문에서 가져갈 세 가지</h2>
+            <div class="finding-grid">
+              <div class="finding">
+                <span class="number">01</span>
+                <h3>양의 관성만으로는 부족하다</h3>
+                <p>질량과 회전관성이 양수여도 관성 주값의 삼각부등식을 어기면 실제 질량 분포로 만들 수 없다.</p>
+              </div>
+              <div class="finding">
+                <span class="number">02</span>
+                <h3>물리 조건을 넣어도 볼록하다</h3>
+                <p>유사관성 J(π)는 파라미터에 선형이다. 완전 일관성과 타원체 제약을 포함한 식별을 SDP로 정식화할 수 있다.</p>
+              </div>
+              <div class="finding">
+                <span class="number">03</span>
+                <h3>가능한 해와 식별된 값은 다르다</h3>
+                <p>데이터가 구분하지 못하는 개별 질량·관성은 남는다. 그 방향에서는 형상 제약과 사전값이 해 선택에 관여한다.</p>
+              </div>
+            </div>
+            <p>이 구분은 디지털 트윈에서 특히 중요하다. 실제 로봇의 측정은 여러 파라미터가 섞인 조합만 알려줄 수 있지만, 시뮬레이터는 링크별 질량·질량중심·관성의 개별값을 요구한다. 이 논문은 그 간극에 <strong>물리적으로 가능한 값을 고르는 기준</strong>을 제공한다.</p>
+            <aside class="note">
+              <span class="note-title">독자를 위한 표기</span>
+              <p>LMI는 행렬의 양의 정부호·반정부호 조건을 변수에 선형으로 쓰는 제약이다. <strong>≻ 0</strong>은 모든 고유값이 양수, <strong>⪰ 0</strong>은 0도 허용한다. SDP는 이러한 행렬 제약을 다루는 볼록 최적화 형식이다.</p>
+            </aside>
+          </section>
+
+          <section class="section" id="problem" aria-labelledby="problem-title">
+            <div class="section-label">02 / THE PROBLEM</div>
+            <h2 id="problem-title">최소제곱은 물체의 존재까지 확인하지 않는다</h2>
+            <p class="lead">역동역학이 선형이라는 사실은 식별을 쉽게 만든다. 그러나 선형 회귀가 허용하는 모든 숫자 조합이 실제 강체는 아니다.</p>
+            <p>모델 기반 전신 제어에는 정확한 동역학 모델이 필요하다. 로봇의 운동방정식은 관성 파라미터 π에 대해 다음과 같이 쓸 수 있다. 잡음이나 부족한 자극이 있는 상태에서 잔차만 줄이면, 음의 질량이나 불가능한 관성값이 나올 수 있다.</p>
+
+            <div class="equation" tabindex="0" role="group" aria-label="운동방정식과 선형 회귀">
+              <span class="formula">H(q)ν̇ + C(q, ν)ν + g(q) = τ = Y(q, ν, ν̇)π</span>
+              <span class="formula">min<sub>π</sub> ∑<sub>k</sub> ‖Y<sup>(k)</sup>π − τ<sup>(k)</sup>‖²</span>
+              <span class="eq-caption">식 (1), (2), (4). q는 일반화 좌표, ν는 일반화 속도, Y는 회귀행렬이다. 일반화 힘 τ에는 관절 토크와 접촉 렌치가 포함될 수 있다.</span>
+            </div>
+
+            <h3>링크당 10개, 기준점은 좌표 원점</h3>
+            <div class="equation" tabindex="0" role="group" aria-label="관성 파라미터 벡터와 평행축 변환">
+              <span class="formula">π = [m, h<sub>x</sub>, h<sub>y</sub>, h<sub>z</sub>, I<sub>xx</sub>, I<sub>xy</sub>, I<sub>xz</sub>, I<sub>yy</sub>, I<sub>yz</sub>, I<sub>zz</sub>]<sup>T</sup></span>
+              <span class="formula">h = mc,　Ī = Ī<sub>C</sub> + m(‖c‖²1<sub>3</sub> − cc<sup>T</sup>)</span>
+              <span class="eq-caption">式 (8)의 평행축 정리. m은 질량, c는 질량중심, h는 1차 모멘트다. Ī는 원점 기준, Ī<sub>C</sub>는 질량중심 기준 회전관성이다. 1<sub>3</sub>은 3×3 단위행렬이다.</span>
+            </div>
+            <p>질량중심 c와 질량중심 기준 관성 Ī<sub>C</sub>를 직접 변수로 쓰면 mc나 mcc<sup>T</sup> 같은 곱이 나타난다. 대신 h와 원점 기준 Ī를 쓰면 파라미터에 대한 선형성을 유지할 수 있다. URDF 값을 가져올 때는 <strong>관성의 기준점뿐 아니라 관성 좌표계의 회전과 단위도 맞춰야 한다.</strong></p>
+
+            <h3>기존 접근에서 무엇을 더했나</h3>
+            <div class="table-wrap" tabindex="0" role="region" aria-label="선행 연구 비교표">
+              <table class="comparison">
+                <caption>논문 Table I의 비교를 재구성</caption>
+                <thead>
+                  <tr><th scope="col">접근</th><th scope="col">물리 일관성</th><th scope="col">볼록성</th><th scope="col">표현과 절충</th></tr>
+                </thead>
+                <tbody>
+                  <tr><th scope="row">Sousa &amp; Cortesão, 2014</th><td>반일관성</td><td>볼록</td><td>6×6 LMI. 삼각부등식을 포함하지 않는다.</td></tr>
+                  <tr><th scope="row">Traversaro 외, 2016</th><td>완전</td><td>비볼록</td><td>회전·주관성·질량중심·질량의 다양체 매개변수화.</td></tr>
+                  <tr><th scope="row">Ayusawa 외, 2011</th><td>완전</td><td>볼록</td><td>점질량 격자의 비음 가중치. 이산 근사와 변수 증가가 따른다.</td></tr>
+                  <tr><th scope="row">Wensing 외, 2018</th><td><strong>완전</strong></td><td><strong>볼록</strong></td><td><strong>4×4 LMI.</strong> 점질량 격자 근사가 필요 없다.</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <figure class="figure compact">
+              <img src="assets/table1.png" alt="원 논문의 Table I. 네 관성 식별 접근을 물리 일관성, 볼록성, 이산 근사, LMI 사용 여부로 비교한 표." loading="lazy" decoding="async">
+              <figcaption><span class="figure-label">TABLE I</span>원 논문의 비교표. 위 표는 이 내용을 독자를 위해 풀어 쓴 것이다. 선행 연구에 대한 평가는 이 논문의 비교와 제공된 독해 노트에 따른다.</figcaption>
+            </figure>
+            <p>유사관성 또는 모멘트 행렬 자체는 오래된 로봇 문헌에도 등장한다. 이 연구의 기여는 그 표현을 <strong>완전 물리 일관성, 질량 분포의 공분산, 경계 타원체 안의 실현 가능성</strong>과 연결해 식별 문제에 사용할 수 있게 만든 데 있다.</p>
+          </section>
+
+          <section class="section" id="mechanism" aria-labelledby="mechanism-title">
+            <div class="section-label">03 / THE MECHANISM</div>
+            <h2 id="mechanism-title">관성을 질량 분포의 모멘트로 다시 읽기</h2>
+            <p>질량 밀도 ρ(x)가 음수가 아니라면, 질량·1차 모멘트·회전관성은 같은 분포를 서로 다른 방식으로 적분한 값이다.</p>
+            <div class="equation" tabindex="0" role="group" aria-label="밀도로 정의한 관성 파라미터">
+              <span class="formula">m = ∫ ρ(x) dx,　h = ∫ xρ(x) dx</span>
+              <span class="formula">Ī = ∫ (‖x‖²1<sub>3</sub> − xx<sup>T</sup>)ρ(x) dx</span>
+              <span class="eq-caption">식 (5)–(7). 비음 질량 분포가 이 적분값들을 만들 수 있을 때 관성 파라미터는 밀도 실현 가능하다고 말한다.</span>
+            </div>
+
+            <h3>양의 운동에너지와 실제 질량 분포 사이</h3>
+            <p>질량 m이 양수이고 Ī<sub>C</sub>가 양의 정부호이면 6×6 공간 관성 I(π)도 양의 정부호다. 이 <strong>반일관성</strong> 조건은 운동에너지가 양수임을 보장한다. 하지만 관성의 주값에는 하나의 조건이 더 필요하다.</p>
+            <div class="equation" tabindex="0" role="group" aria-label="주관성의 삼각부등식">
+              <span class="formula">J<sub>1</sub> + J<sub>2</sub> ≥ J<sub>3</sub>,　J<sub>2</sub> + J<sub>3</sub> ≥ J<sub>1</sub>,　J<sub>1</sub> + J<sub>3</sub> ≥ J<sub>2</sub></span>
+              <span class="eq-caption">식 (9). 여기서 J<sub>1</sub>, J<sub>2</sub>, J<sub>3</sub>는 질량중심 기준 회전관성의 주값이며, 4×4 행렬 J(π)와 구분한다.</span>
+            </div>
+            <p>주축 방향의 2차 모멘트를 μ<sub>1</sub>, μ<sub>2</sub>, μ<sub>3</sub>라 하면 J<sub>1</sub> = μ<sub>2</sub> + μ<sub>3</sub>이다. 다른 두 주관성도 같은 방식으로 정해진다. 따라서 J<sub>1</sub> + J<sub>2</sub> − J<sub>3</sub> = 2μ<sub>3</sub> ≥ 0이다. <strong>삼각부등식은 각 방향의 2차 모멘트가 음수가 될 수 없다는 사실</strong>을 표현한다.</p>
+
+            <div class="table-wrap" tabindex="0" role="region" aria-label="삼각부등식 수치 예시">
+              <table>
+                <caption>작은 수치 예제로 보는 물리 일관성</caption>
+                <thead><tr><th scope="col">분포 또는 가정</th><th scope="col">주관성</th><th scope="col">해석</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">μ = (2, 5, 1)</th><td>(6, 3, 7)</td><td>삼각부등식이 모두 엄격하게 성립한다.</td></tr>
+                  <tr><th scope="row">이상적인 x축 막대</th><td>(0, μ<sub>1</sub>, μ<sub>1</sub>)</td><td>막대 축 둘레 관성이 0인 퇴화 경계 사례다.</td></tr>
+                  <tr><th scope="row">주관성 (1, 1, 3)</th><td>1 + 1 &lt; 3</td><td>μ<sub>3</sub> = −0.5가 필요하므로 비음 질량 분포로 만들 수 없다.</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>삼각부등식은 공분산의 양반정부호 조건이다</h3>
+            <p>x<sub>c</sub> = x − c라 두고 질량중심 기준 2차 모멘트 Σ<sub>C</sub>를 정의하면, 관성과 공분산의 관계가 드러난다.</p>
+            <div class="equation" tabindex="0" role="group" aria-label="밀도 가중 공분산과 관성 관계">
+              <span class="formula">Σ<sub>C</sub> = ∫ x<sub>c</sub>x<sub>c</sub><sup>T</sup>ρ(x) dx</span>
+              <span class="formula">Ī<sub>C</sub> = Tr(Σ<sub>C</sub>)1<sub>3</sub> − Σ<sub>C</sub></span>
+              <span class="formula">Σ<sub>C</sub> = ½Tr(Ī<sub>C</sub>)1<sub>3</sub> − Ī<sub>C</sub> ⪰ 0</span>
+              <span class="eq-caption">식 (15)–(17), Proposition 1. ρ/m을 확률분포로 보면 c는 평균, Σ<sub>C</sub>/m은 공분산이다. Σ<sub>C</sub> 자체는 질량으로 가중된 공분산이다.</span>
+            </div>
+            <p>두 번째 식의 양변에 trace를 취하면 Tr(Ī<sub>C</sub>) = 2Tr(Σ<sub>C</sub>)이고, 이를 다시 대입하면 세 번째 식을 얻는다. 관성과 공분산은 같은 고유벡터를 가지며, 고유값 사이에는 J<sub>i</sub> = Tr(Σ<sub>C</sub>) − μ<sub>i</sub>의 관계가 있다.</p>
+
+            <figure class="figure compact">
+              <img src="assets/figure2.png" alt="3차원 점질량 분포와 얇은 평면 분포의 공분산 타원체를 비교한 그림. 평면 분포에서는 한 방향 공분산 고유값이 0이다." loading="lazy" decoding="async">
+              <figcaption><span class="figure-label">FIG. 2</span><strong>관성이 큰 방향과 질량이 넓게 퍼진 방향은 같지 않다.</strong> 3차원 분포에서는 Σ<sub>C</sub> ≻ 0이다. 두께가 0인 판에서는 한 고유값이 0이 되어 삼각부등식 하나가 등호가 된다. Ī<sub>C</sub> = diag(5, 2, 7)인 판의 법선 방향 관성이 가장 큰 것은, 회전관성이 그 축에 수직인 두 방향의 모멘트를 더하기 때문이다.</figcaption>
+            </figure>
+
+            <h3>Schur 보수로 4×4 LMI를 얻는다</h3>
+            <div class="equation" tabindex="0" role="group" aria-label="유사관성의 정의와 Schur 보수">
+              <span class="formula">Σ = ½Tr(Ī)1<sub>3</sub> − Ī = Σ<sub>C</sub> + mcc<sup>T</sup></span>
+              <div class="formula formula-row">
+                <span>J(π) =</span>
+                <span class="matrix"><span>Σ</span><span>h</span><span>h<sup>T</sup></span><span>m</span></span>
+                <span>≻ 0</span>
+              </div>
+              <span class="formula">⇔ m &gt; 0,　Σ − hh<sup>T</sup>/m = Σ<sub>C</sub> ≻ 0</span>
+              <span class="eq-caption">식 (19), (20), Theorem 3. h = mc이므로 Schur 보수에서 평행축 항이 상쇄된다. J의 모든 원소는 π에 선형이다.</span>
+            </div>
+            <blockquote class="pullquote">
+              <p>“운동에너지가 양수인가”에서<br>“이 관성을 만들 질량 분포가 있는가”로.</p>
+              <small>연구의 핵심을 풀어 쓴 해설 문장 · 원문 직접 인용 아님</small>
+            </blockquote>
+            <p>6×6 공간 관성 I(π) ≻ 0은 반일관성을, 4×4 유사관성 J(π) ≻ 0은 비퇴화 분포의 완전 일관성을 표현한다. 더 작은 행렬로 더 강한 물리 조건을 기술하는 셈이다.</p>
+
+            <aside class="note warm">
+              <span class="note-title">엄격 부등식과 퇴화 경계를 구분하기</span>
+              <p><strong>J ≻ 0은 엄격한 삼각부등식에 대응한다.</strong> 이상적인 판·선·점질량처럼 분포가 퇴화하면 Σ<sub>C</sub> 또는 J가 특이해질 수 있다. 이런 경계 사례까지 포함한 모멘트 조건은 m &gt; 0과 J ⪰ 0으로 구분해서 읽어야 한다. “삼각부등식의 등호 허용”과 “J ≻ 0”을 같은 조건으로 섞지 않는다.</p>
+            </aside>
+          </section>
+
+          <section class="section" id="geometry" aria-labelledby="geometry-title">
+            <div class="section-label">04 / GEOMETRIC PRIOR</div>
+            <h2 id="geometry-title">질량중심만 안에 있다고 충분할까?</h2>
+            <p class="lead">실제 링크의 크기를 안다면, 그 안에서 질량 분포가 만들어질 수 있는지도 물을 수 있다.</p>
+            <p>CAD 형상을 감싸는 타원체를 S라 하자. 중심 x<sub>s</sub>와 양의 정부호 형상 행렬 Q<sub>s</sub>를 사용하면 경계를 다음과 같이 쓴다.</p>
+            <div class="equation" tabindex="0" role="group" aria-label="경계 타원체와 질량중심 제약">
+              <span class="formula">S = {x : (x − x<sub>s</sub>)<sup>T</sup>Q<sub>s</sub><sup>−1</sup>(x − x<sub>s</sub>) ≤ 1}</span>
+              <div class="formula formula-row">
+                <span>C(π) =</span>
+                <span class="matrix">
+                  <span>m</span><span>h<sup>T</sup> − mx<sub>s</sub><sup>T</sup></span>
+                  <span>h − mx<sub>s</sub></span><span>mQ<sub>s</sub></span>
+                </span>
+                <span>⪰ 0</span>
+              </div>
+              <span class="eq-caption">식 (21), (22). m &gt; 0일 때 C(π) ⪰ 0은 질량중심 c가 타원체 안에 있다는 조건이다.</span>
+            </div>
+            <p>그러나 질량중심이 타원체 안에 있어도, 2차 모멘트가 지나치게 크면 그 관성을 만들 질량은 경계 밖에 놓여야 한다. 중심이 경계에 가까워질수록 허용되는 분산도 줄어든다.</p>
+            <div class="equation" tabindex="0" role="group" aria-label="타원체 내부 질량 분포 실현 가능 조건">
+              <span class="formula">S = {x : [x; 1]<sup>T</sup>Q[x; 1] ≥ 0}</span>
+              <span class="formula">J(π) ≻ 0,　Tr(J(π)Q) ≥ 0</span>
+              <span class="eq-caption">식 (23), Theorem 4. Q는 타원체의 4×4 동차 좌표 표현이며 Q<sub>s</sub>와 다르다. J ≻ 0과 함께 쓰는 trace 부등식은 S 안에서의 질량 분포 실현 가능성을 제약한다.</span>
+            </div>
+            <p>Tr(JQ)는 타원체를 정의하는 이차식의 질량 가중 적분이다. 지지집합이 S 안에 있다면 이 값은 음수가 될 수 없다. 논문은 모멘트 문제의 결과를 이용해, 해당 조건 아래에서 <strong>같은 관성 모멘트를 갖는 내부 질량 분포가 존재함</strong>을 보인다. 그 모멘트는 점질량 네 개로도 표현할 수 있다. 실제 링크를 네 점으로 근사해 식별한다는 뜻은 아니다.</p>
+
+            <figure class="figure">
+              <img src="assets/figure3.png" alt="빨간 경계 타원체와 파란 공분산 타원체의 네 사례. 질량중심이 내부에 있어도 분포의 2차 모멘트가 경계 조건을 위반하는 경우를 보여준다." loading="lazy" decoding="async">
+              <figcaption><span class="figure-label">FIG. 3</span><strong>위치와 퍼짐을 함께 검사해야 한다.</strong> 독해 노트에 기록된 trace 값은 실현 가능한 사례에서 0.52, 질량중심은 내부지만 실현 불가능한 사례에서 −0.04, 경계 근처 사례에서 −0.28이다. 파란 타원체는 2차 모멘트를 시각화한 것이며 실제 질량 분포의 외곽선과 동일하지 않다.</figcaption>
+            </figure>
+            <p>굽은 붐처럼 단일 타원체가 형상을 느슨하게 감싸는 경우에는 여러 타원체의 합집합을 사용할 수 있다. 각 조각의 파라미터 π<sub>j</sub>가 자기 타원체 안에서 실현 가능하고, 그 합이 전체 π가 되도록 구성한다(Corollary 2). 하나의 큰 타원체로 감싸는 것보다 형상 정보를 더 구체적으로 반영하는 방법이다.</p>
+
+            <figure class="workflow" aria-labelledby="workflow-caption">
+              <div class="diagram-title">측정과 형상이 만나는 식별 흐름</div>
+              <div class="flow-inputs">
+                <div class="flow-box"><strong>운동·토크 데이터</strong>q, ν, ν̇, τ → 회귀행렬 Y<br><small>동역학을 설명하는 데이터 항</small></div>
+                <div class="flow-box"><strong>CAD 사전 정보</strong>π̂, 질량중심·경계 타원체<br><small>해의 위치와 물리적 범위</small></div>
+              </div>
+              <div class="flow-arrow" aria-hidden="true">↓</div>
+              <div class="flow-main">
+                <strong>제약 최소제곱 / SDP</strong>
+                <p>토크 잔차 + 사전값 정규화<br>J<sub>i</sub> ≻ 0 · C<sub>i</sub> ⪰ 0 · Tr(J<sub>i</sub>Q<sub>i</sub>) ≥ 0</p>
+              </div>
+              <div class="flow-arrow" aria-hidden="true">↓</div>
+              <div class="flow-box flow-out"><strong>관성 파라미터 π* + 점성·쿨롱 마찰</strong><small>주어진 모델·목적함수·제약 아래의 최적해</small></div>
+              <figcaption id="workflow-caption">원 노트의 흐름도를 정적 도식으로 재구성했다. 볼록성은 국소 최적점 문제를 제거하지만, 모델의 정확성이나 개별 파라미터의 유일성을 보장하지 않는다.</figcaption>
+            </figure>
+          </section>
+
+          <section class="section" id="evidence" aria-labelledby="evidence-title">
+            <div class="section-label">05 / EXPERIMENTAL EVIDENCE</div>
+            <h2 id="evidence-title">Cheetah 3 다리에서 확인한 것</h2>
+            <p>실험 대상은 MIT Cheetah 3의 다리 하나다. 세 관절에 링크 세 개와 로터 세 개를 포함해 총 여섯 강체를 모델링했다. 기어비가 10.6:1인 구동계에서는 로터 관성도 토크에 기여하므로, 링크 관성과 함께 식별했다.</p>
+
+            <figure class="figure compact">
+              <img src="assets/figure1.png" alt="MIT Cheetah 3 다리 관성 파라미터 식별 실험 장치. 세 관절 다리와 각 링크의 질량, 질량중심, 관성을 설명한다." loading="lazy" decoding="async">
+              <figcaption><span class="figure-label">FIG. 1</span>3자유도 Cheetah 3 다리 식별 장치. 검증 범위는 접촉 없는 다리 운동이며, 유압 구동이나 굴착 하중을 포함하지 않는다.</figcaption>
+            </figure>
+
+            <div class="stats" aria-label="실험 주요 수치">
+              <div class="stat"><b>3 + 3</b><span>링크 3개 · 로터 3개</span></div>
+              <div class="stat"><b>1 kHz</b><span>학습 10,000 · 검증 10,000 표본</span></div>
+              <div class="stat"><b>1.67 s</b><span>논문 보고 풀이 시간 · 2011년형 i5</span></div>
+            </div>
+
+            <h3>관성과 마찰을 함께 추정한다</h3>
+            <div class="equation" tabindex="0" role="group" aria-label="마찰을 포함한 식별 목적함수">
+              <span class="formula">τ = Yπ + Bν + B<sub>c</sub>sign(ν)</span>
+              <span class="formula">min<sub>π, B, Bc</sub> (1/n<sub>s</sub>)∑<sub>k</sub> ‖Y<sup>(k)</sup>π + Bν<sup>(k)</sup> + B<sub>c</sub>sign(ν<sup>(k)</sup>) − τ<sup>(k)</sup>‖²</span>
+              <span class="formula">+ w<sub>π</sub>‖π − π̂‖²</span>
+              <span class="eq-caption">식 (24), (25). B와 B<sub>c</sub>는 대각 점성·쿨롱 마찰 계수다. 링크별 물리 일관성과 타원체 제약을 적용하며, CAD 사전값의 정규화 가중치는 w<sub>π</sub> = 10<sup>−6</sup>이다.</span>
+            </div>
+
+            <div class="table-wrap" tabindex="0" role="region" aria-label="실험 조건과 결과">
+              <table>
+                <caption>실험 조건과 보고값 · §VI, pp. 6–7</caption>
+                <tbody>
+                  <tr><th scope="row">추정 변수</th><td>관성 60개(6강체 × 10), 점성 마찰 3개, 쿨롱 마찰 3개.</td></tr>
+                  <tr><th scope="row">입력 궤적</th><td>발끝을 가상 타원체 껍질 위에서 임피던스 제어. 구면각 속도에 정현파를 사용했다.</td></tr>
+                  <tr><th scope="row">궤적 수치</th><td>φ̇ = A<sub>φ</sub>sin(ω<sub>φ</sub>t), θ̇ = A<sub>θ</sub>sin(ω<sub>θ</sub>t). A<sub>φ</sub> = 12, A<sub>θ</sub> = 3.4 rad/s; ω<sub>φ</sub> = 1.63, ω<sub>θ</sub> = 0.265 rad/s.</td></tr>
+                  <tr><th scope="row">토크 경로</th><td>모터 드라이버의 <strong>명령 토크에 기반한 추정</strong>. 독립 토크 센서 실측이 아니다.</td></tr>
+                  <tr><th scope="row">회귀·전처리</th><td>수정 RNEA로 회귀행렬의 열을 계산. 검증에서는 비인과 필터를 이용해 오프라인 미분한 가속도를 사용했다.</td></tr>
+                  <tr><th scope="row">데이터 분할</th><td>같은 실험의 앞 10,000표본으로 학습하고 다음 10,000표본으로 검증했다.</td></tr>
+                  <tr><th scope="row">솔버</th><td>MATLAB / MOSEK. 논문 보고 시간 1.67초이며 본 해설에서는 재현하지 않았다.</td></tr>
+                  <tr><th scope="row">관절별 검증 RMS</th><td><strong>1.48 / 1.16 / 1.16 N·m</strong> — ab/ad, hip, knee 순서.</td></tr>
+                  <tr><th scope="row">쿨롱 마찰</th><td>B<sub>c</sub> = diag(3.12, 1.25, 0.95) N·m. 논문은 모든 제약의 만족을 확인했다고 보고한다.</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <figure class="figure">
+              <img src="assets/figure4.png" alt="학습에 사용하지 않은 10초 구간의 세 관절 각도와 토크 그래프. 토크 비교에서 정지 부근 오차와 신호의 거칠기 차이가 나타난다." loading="lazy" decoding="async">
+              <figcaption><span class="figure-label">FIG. 4</span><strong>검증 구간의 예측 토크 비교.</strong> 파란 토크 신호와 빨간 모델 예측의 매끄러움에는 가속도 처리 방식의 차이도 작용한다. ab/ad 관절은 약 17.5초의 정지 구간에서 쿨롱 마찰 부호가 불분명해 오차가 커진다. 그림 캡션의 RMS 1.46 N·m는 본문 관절별 수치와 별도로 읽어야 한다.</figcaption>
+            </figure>
+
+            <h3>표본이 적을 때 물리 제약의 가치가 드러난다</h3>
+            <figure class="figure">
+              <img src="assets/figure6.png" alt="학습 표본 수에 따른 검증 RMS를 비교한 로그 축 그래프. 무제약, 반일관성, 타원체 기반 제약의 성능 차이를 보여준다." loading="lazy" decoding="async">
+              <figcaption><span class="figure-label">FIG. 6</span><strong>물리적 허용 영역이 과적합을 줄이는 방향으로 작용한다.</strong> 논문 실험에서는 타원체 밀도 실현 제약이 적은 표본에서 유리한 경향을 보인다. 독해 노트는 가로축 표시와 전체 10,000표본의 연결을 미확인으로 남겼으므로, 특정 표본 수에서의 정량 개선율은 제시하지 않는다.</figcaption>
+            </figure>
+            <p>데이터가 적을 때 최소제곱 해는 잡음 방향으로 크게 움직일 수 있다. 물리 제약은 그중 불가능한 방향을 잘라내고, 타원체는 형상 정보를 이용해 허용 영역을 더 좁힌다. 이 결과는 <strong>이 실험에서의 일반화 개선 근거</strong>이며, 모든 로봇에서 같은 개선 폭을 보장하는 것은 아니다.</p>
+            <p class="small">Fig. 5는 원 노트에서 이미지 오추출로 분류되어 싣지 않았다. 해당 논의는 링크 관성·로터 관성·마찰이 모두 토크에 기여하므로 함께 모델링해야 한다는 내용이다. 각 기여 비율은 기체와 변속기에 의존한다.</p>
+          </section>
+
+          <section class="section" id="limits" aria-labelledby="limits-title">
+            <div class="section-label">06 / WHAT THE EVIDENCE DOES NOT SETTLE</div>
+            <h2 id="limits-title">물리 일관성은 식별 가능성을 만들지 않는다</h2>
+            <p class="lead">토크를 똑같이 설명하는 파라미터가 여럿이라면, 물리 제약을 넣은 뒤에도 여러 해가 남을 수 있다.</p>
+            <p>회귀행렬 Y의 열이 선형종속이면 데이터는 일부 파라미터 조합만 구분한다. Yδπ = 0인 변화는 예측 토크를 바꾸지 않는다. <strong>기저 파라미터는 데이터가 구분하는 독립 조합</strong>이고, 물리 일관성은 전체 파라미터가 놓일 수 있는 영역이다.</p>
+            <div class="two-column">
+              <div class="mini-card">
+                <h3>데이터가 정하는 것</h3>
+                <p>운동과 토크에 나타나는 파라미터 조합. 자극, 기구학, 센서, 모델 구조에 따라 관측 가능한 방향이 달라진다.</p>
+              </div>
+              <div class="mini-card">
+                <h3>제약·사전값이 고르는 것</h3>
+                <p>같은 토크를 만드는 후보 중 물리적으로 가능한 배치. 비식별 방향에서는 CAD 정규화와 형상 가정의 영향이 남는다.</p>
+              </div>
+            </div>
+            <p>따라서 “전역 최적해를 구했다”는 말은 주어진 목적함수와 제약에 대한 설명이다. 실제 링크의 개별 질량과 관성을 유일하게 알아냈다는 뜻이 아니다. 작은 정규화 가중치라도 데이터가 전혀 보지 못하는 방향에서는 해 선택을 결정할 수 있다.</p>
+
+            <h3>논문 결과와 해설의 판단을 나누어 읽기</h3>
+            <div class="table-wrap" tabindex="0" role="region" aria-label="실험 한계와 후속 검증">
+              <table>
+                <thead><tr><th scope="col">근거의 범위</th><th scope="col">남는 질문</th><th scope="col">후속 검증</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">논문: 명령 토크 사용</th><td>구동기 모델 오차가 잔차에 포함될 수 있다.</td><td>실측 토크·힘 또는 구동기 모델을 포함한 검증.</td></tr>
+                  <tr><th scope="row">논문: 정지 부근 마찰 오차</th><td>쿨롱 부호 모델로 정지·스틱션을 충분히 설명하는가?</td><td>정지 구간 처리 규칙과 대안 마찰 모델 비교.</td></tr>
+                  <tr><th scope="row">논문: 통계적 해석</th><td>질량 분포의 공분산과 추정치의 불확실성은 다르다.</td><td>측정 불확실성·베이지안·집합 기반 추론과 결합.</td></tr>
+                  <tr><th scope="row">논문: 3 DoF 검증</th><td>고자유도·부동 기저에서도 효과가 유지되는가?</td><td>계산량과 예측 성능을 새 시스템에서 확인.</td></tr>
+                  <tr><th scope="row">해설: 시간순 분할</th><td>다른 하중·궤적·운전 조건에 일반화하는가?</td><td>별도 운전 조건의 보류 실험.</td></tr>
+                  <tr><th scope="row">해설: 개별값의 사전 의존</th><td>어떤 파라미터가 데이터로 결정되는가?</td><td>기저 랭크, 영공간, 사전값 감도 보고.</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <aside class="note warm">
+              <span class="note-title">보고 수치의 불일치: 그대로 남겨야 할 질문</span>
+              <p>본문의 관절별 RMS가 1.48, 1.16, 1.16 N·m라면, 동일 표본 수를 가정한 통합 RMS는 √((1.48² + 1.16² + 1.16²)/3) ≈ <strong>1.28 N·m</strong>다. Fig. 4 캡션의 <strong>1.46 N·m</strong>와 같지 않다. 단순한 동일 길이 벡터 적층만으로 이 차이가 설명되지는 않는다. 사용 구간·신호·집계 정의를 확인하기 전까지 두 보고값을 합치지 않는다.</p>
+            </aside>
+            <p>관절별 잔차가 쿨롱 마찰 크기와 비슷하다는 사실과 정지 구간의 오차는 마찰 모델의 한계를 의심할 근거다. 다만 이것만으로 전체 잔차의 주된 원인이 마찰이라고 정량적으로 확정할 수는 없다. 원자료에 의한 잔차 분해가 필요하다.</p>
+          </section>
+
+          <section class="section" id="hr35" aria-labelledby="hr35-title">
+            <div class="section-label">07 / IMPLICATIONS FOR HR35</div>
+            <h2 id="hr35-title">디지털 트윈에는 먼저 검사를, 그다음 식별을</h2>
+            <p>HR35 적용 맥락에서 문제는 명확하다. 실차의 동역학 식별은 묶음 파라미터를 제공할 수 있지만, AGX 트윈은 붐·암·버킷의 개별 질량·질량중심·관성을 요구한다. 유사관성 LMI는 <strong>현재 값을 검사하고, 나중에는 측정 묶음과 일치하는 물리적 배치를 고르는 도구</strong>가 된다.</p>
+            <aside class="note">
+              <span class="note-title">이 절의 근거 수준</span>
+              <p>아래 HR35 상태는 제공된 프로젝트 노트의 기록이다. 이 글에서 실제 URDF, 메시, 압력 데이터 또는 기구학을 새로 검사한 결과는 아니다. 비용은 원 노트의 작업 예상치다.</p>
+            </aside>
+
+            <div class="table-wrap" tabindex="0" role="region" aria-label="HR35 적용 준비도">
+              <table>
+                <thead><tr><th scope="col">요소</th><th scope="col">현재 기록</th><th scope="col">적용 판단</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">관성 표현</th><td>URDF의 m, c, Ī<sub>C</sub>. 기준점 관련 오류 기록이 있다.</td><td><span class="tag">오프라인 검사 가능</span><br>좌표 변환 후 J를 구성한다.</td></tr>
+                  <tr><th scope="row">경계 형상</th><td>bucket_spec 등 링크 메시를 사용할 수 있다.</td><td><span class="tag pending">버전 확인 필요</span><br>실차와 같은 형상을 사용한다.</td></tr>
+                  <tr><th scope="row">사전 질량</th><td>아주대 자료의 182 / 122 / 92 kg와 기하 추정 관성.</td><td><span class="tag pending">개체 동일성 미확인</span></td></tr>
+                  <tr><th scope="row">토크 경로</th><td>압력 → 기구 변환 → 관절 토크 경로가 필요하다.</td><td><span class="tag pending">회귀 단계의 선행 조건</span><br>압력 보정·유효 면적·변환을 확정한다.</td></tr>
+                  <tr><th scope="row">운동 측정</th><td>20 Hz 경사계 절대각.</td><td><span class="tag pending">가속도 품질 검증 필요</span><br>상대각 변환, 대역폭, 미분 잡음을 평가한다.</td></tr>
+                  <tr><th scope="row">마찰</th><td>실린더 공간의 점성·쿨롱 구조.</td><td>관절 공간으로 변환하고 하중 비례 가설과 비교한다.</td></tr>
+                  <tr><th scope="row">자극</th><td>개루프 램프 운전 기록.</td><td>논문의 정현파 임피던스 실험과 별도로 자극성을 평가한다.</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>표본율 20 Hz라는 사실만으로 관성 식별의 가능·불가능을 단정할 수는 없다. 실제 운동 대역과 가속도 신호 대 잡음비가 중요하다. 다만 1 kHz 엔코더 기반 실험과 같은 품질을 가정할 근거도 없다.</p>
+
+            <h3>실행 순서: 현재 값 → 랭크 → 형상 → 선택기 → 감도</h3>
+            <ol class="tasks">
+              <li>
+                <div>
+                  <h3>현재 트윈 관성의 물리 일관성 검사</h3>
+                  <div class="task-meta">원 과제 ① · 오프라인 약 2시간 · 선행 없음</div>
+                  <p>붐·암·버킷의 질량, 질량중심, 관성을 같은 링크 좌표계로 변환한다. J의 고유값, 질량, 주관성 삼각부등식 잔차를 기록한다.</p>
+                  <p><strong>완료 기준:</strong> 단위와 스케일을 명시한 수치 허용 오차 아래에서 각 링크의 상태를 판정한다. 음의 고유값이 유의하면 기준점·축·단위·관성 입력을 추적한다. 값을 임의로 키워 통과시키지 않는다.</p>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <h3>평면 3R 모델의 기저 파라미터 랭크 확인</h3>
+                  <div class="task-meta">원 과제 ④ · 오프라인 반나절 · 기구학 모델 필요</div>
+                  <p>평면 붐·암·버킷의 회귀행렬에 충분히 다양한 합성 운동을 넣고 QR 또는 SVD로 랭크와 영공간을 확인한다. 선회축은 별도 범위로 둔다.</p>
+                  <p><strong>완료 기준:</strong> 랭크의 수치 임계값과 운동 조건을 함께 보고한다. 원 노트의 “9개”는 검증할 가설이다. 모델 구조와 중력 방향을 확인하기 전에 30 − 9 = 21개의 비식별 방향을 확정하지 않는다.</p>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <h3>현재 메시로 경계 타원체 구성</h3>
+                  <div class="task-meta">원 과제 ② · 오프라인 반나절 · 관성 검사·메시 버전 확인 후</div>
+                  <p>각 링크의 외접 타원체를 계산하고 C(π) ⪰ 0과 Tr(JQ) ≥ 0을 검사한다. 단일 타원체가 너무 느슨하면 조각별 합집합을 검토한다.</p>
+                  <p><strong>완료 기준:</strong> 메시 포함 여부, 좌표계, 제약 잔차를 보관한다. 2026-09-22 확정으로 기록된 bucket_spec 버전을 확인하고, 옛 AK 830/840 메시를 혼용하지 않는다.</p>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <h3>묶음 측정에 맞는 개별값 선택기 작성</h3>
+                  <div class="task-meta">원 과제 ③ · 오프라인 약 1일 · 관성·형상·묶음 정의 필요</div>
+                  <p>Aπ = b로 묶음 파라미터를 고정하고, 링크별 J와 타원체 제약 아래에서 사전값과 가까운 해를 고른다. 실제 묶음값이 없으면 합성 데이터로 정식화와 제약을 먼저 검증한다.</p>
+                  <p><strong>완료 기준:</strong> 솔버 상태와 스케일을 고려한 등식·행렬 제약 잔차를 확인한다. 원 노트의 1% 잔차는 업무 수용 기준으로 둘 수 있지만, 정확한 등식 정식화의 수치 오차 기준은 따로 정한다.</p>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <h3>사전값 감도와 비식별 방향 보고</h3>
+                  <div class="task-meta">원 과제 ⑤ · 오프라인 반나절 · 선택기 검증 후</div>
+                  <p>아주대 자료, 기하 추정, 총중량 배분 등 사전값을 바꾸어 개별 질량·관성의 변화를 비교한다. 정규화 가중 행렬과 형상 가정의 영향도 분리한다.</p>
+                  <p><strong>완료 기준:</strong> 민감한 항목을 파라미터 지도의 <code>identifiability</code> 열에 “사전값 의존”으로 표시한다. 5% 같은 실무 임계값에는 비교 기준과 단위를 붙이고, 여러 해의 평균을 정답으로 취급하지 않는다.</p>
+                </div>
+              </li>
+            </ol>
+
+            <aside class="note warm">
+              <span class="note-title">검사 실패가 알려주는 것과 알려주지 않는 것</span>
+              <p><strong>J의 음의 고유값은 물리 일관성 실패의 증거이지, 기준점 오류만의 증거는 아니다.</strong> 축 변환, 단위, 부호, 원자료 자체도 원인일 수 있다. 또한 타원체 밀도 제약의 실패는 질량중심이 메시 밖에 있음을 뜻하지 않는다. 질량중심이 안에 있어도 2차 모멘트가 너무 클 수 있으며, 외접 타원체 통과 역시 실제 메시 내부의 질량 실현까지 보장하지 않는다.</p>
+            </aside>
+          </section>
+
+          <section class="section" id="appendix" aria-labelledby="appendix-title">
+            <div class="section-label">08 / TECHNICAL NOTES</div>
+            <h2 id="appendix-title">구현 전에 확인할 수식과 함정</h2>
+
+            <h3>1. 공간 관성과 유사관성을 구분하기</h3>
+            <div class="equation" tabindex="0" role="group" aria-label="6차원 공간 관성의 블록 표현">
+              <div class="formula formula-row">
+                <span>I(π) =</span>
+                <span class="matrix">
+                  <span>Ī</span><span>S(h)</span>
+                  <span>S(h)<sup>T</sup></span><span>m1<sub>3</sub></span>
+                </span>
+              </div>
+              <span class="eq-caption">식 (3). S(h)는 외적 행렬이다. I(π)는 6×6 공간 관성, J(π)는 4×4 유사관성이다. 기호와 기준점을 코드에서도 분리해 둔다.</span>
+            </div>
+            <p>평면 운동에서 일부 3차원 파라미터가 토크에 나타나지 않더라도, 3차원 트윈의 물리 일관성 검사는 전체 J에 대해 수행해야 한다. 예를 들어 회전축을 y로 두면 평면 밖 1차 모멘트와 일부 곱관성이 데이터에 나타나지 않을 수 있다.</p>
+
+            <h3>2. 타원체의 Q를 일관된 부호로 만들기</h3>
+            <div class="equation" tabindex="0" role="group" aria-label="타원체의 동차 행렬 Q">
+              <div class="formula formula-row">
+                <span>Q =</span>
+                <span class="matrix">
+                  <span>−Q<sub>s</sub><sup>−1</sup></span><span>Q<sub>s</sub><sup>−1</sup>x<sub>s</sub></span>
+                  <span>x<sub>s</sub><sup>T</sup>Q<sub>s</sub><sup>−1</sup></span><span>1 − x<sub>s</sub><sup>T</sup>Q<sub>s</sub><sup>−1</sup>x<sub>s</sub></span>
+                </span>
+              </div>
+              <span class="eq-caption">[x;1]<sup>T</sup>Q[x;1] = 1 − (x − x<sub>s</sub>)<sup>T</sup>Q<sub>s</sub><sup>−1</sup>(x − x<sub>s</sub>)。内部が非負となる定義に合わせて Tr(JQ) ≥ 0を使う。</span>
+            </div>
+
+            <h3>3. 厳密な不等式は数値マージンに置き換える</h3>
+            <p>通常のSDP実装では開集合の条件 J ≻ 0を直接扱わず、正のマージンを持つ閉じた制約を使う。ただしJには質量、1次モーメント、2次モーメントという異なる単位が混在するため、生の行列に一律の閾値を当てるだけでは単位やリンク寸法の影響を受ける。</p>
+            <div class="equation" tabindex="0" role="group" aria-label="ユサ慣性の無次元化">
+              <span class="formula">D = diag(1/ℓ, 1/ℓ, 1/ℓ, 1),　J̃ = DJD<sup>T</sup>/m<sub>ref</sub></span>
+              <span class="formula">J̃ ⪰ ε1<sub>4</sub>,　ε &gt; 0</span>
+              <span class="eq-caption">ℓとm<sub>ref</sub>は固定した代表長さ・質量。正則な合同変換は正定値性を保つ。εはスケール、ソルバー精度、許容する薄さに応じて選び、結果とともに記録する。</span>
+            </div>
+
+            <h3>4. 選択器の擬似コード</h3>
+            <p>以下は式の構造を示すCVXPY風の擬似コードであり、実行検証済みの実装ではない。入力は共通座標系・単位へ変換済みとし、マージンと事前値距離をスケーリングしている。</p>
+            <pre tabindex="0" aria-label="物理整合性を持つパラメータ選択器のPython擬似コード"><code>import cvxpy as cp
+import numpy as np
+
+# pi = [m, hx, hy, hz, Ixx, Ixy, Ixz, Iyy, Iyz, Izz]
+# I はリンク座標原点基準
+def pseudo_inertia(pi):
+    m = pi[0]
+    h = cp.reshape(pi[1:4], (3, 1), order="C")
+    I = cp.bmat([
+        [pi[4], pi[5], pi[6]],
+        [pi[5], pi[7], pi[8]],
+        [pi[6], pi[8], pi[9]],
+    ])
+    Sigma = 0.5 * cp.trace(I) * np.eye(3) - I
+    return cp.bmat([
+        [Sigma, h],
+        [h.T, cp.reshape(m, (1, 1), order="C")],
+    ])
+
+def choose_consistent(priors, A, b, ellipsoids,
+                      lengths, masses, weights, eps):
+    pis = [cp.Variable(10) for _ in priors]
+    constraints = []
+    penalties = []
+
+    for pi, prior, Q, ell, m_ref, W in zip(
+        pis, priors, ellipsoids, lengths, masses, weights
+    ):
+        J = pseudo_inertia(pi)
+        D = np.diag([1 / ell, 1 / ell, 1 / ell, 1])
+        J_scaled = D @ J @ D.T / m_ref
+
+        constraints += [
+            J_scaled &gt;&gt; eps * np.eye(4),
+            cp.trace(J @ Q) &gt;= 0,
+        ]
+        penalties.append(cp.sum_squares(W @ (pi - prior)))
+
+    stacked = cp.hstack(pis)
+    constraints += [A @ stacked == b]
+
+    problem = cp.Problem(
+        cp.Minimize(sum(penalties)),
+        constraints,
+    )
+    problem.solve(solver="SCS")  # MOSEK 等も選択肢
+
+    # 戻り値は「識別済み質量」ではなく、条件に整合する候補
+    # status に加え、等式残差・最小固有値・trace 残差を別途確認
+    return problem.status, [pi.value for pi in pis]</code></pre>
+
+            <aside class="note warm">
+              <span class="note-title">感度検証で見落としやすい点</span>
+              <p>制約を固定し、目的関数が事前値への距離だけなら、正のスカラーwを目的関数全体に掛けても理論上の最適解は変わらない。したがって、元の選択器でwを10<sup>−8</sup>～10<sup>−4</sup>に変えるだけでは事前値依存度を測れない。<strong>事前値そのものや相対重みを変える</strong>か、データ残差とのトレードオフがある目的関数で相対係数を変える必要がある。</p>
+            </aside>
+            <p>測定された束パラメータに誤差がある場合、正確な等式Aπ = bと物理制約が矛盾することもある。実行不能なら座標・束の定義・測定誤差を調べる。残差ペナルティや許容区間を導入する場合は、その変更が測定の信頼度をどう表すかを明示する。</p>
+
+            <h3>5. 系統識別の抽出表</h3>
+            <div class="table-wrap" tabindex="0" role="region" aria-label="系統識別に関する抽出表">
+              <table>
+                <caption>研究を再利用する際に保持すべき条件</caption>
+                <tbody>
+                  <tr><th scope="row">問題・運転範囲</th><td>剛体慣性パラメータの制約付き識別。3 DoFの空中運動、接触なし。</td></tr>
+                  <tr><th scope="row">入力・状態・出力</th><td>関節トルク指令とq、νを記録し、逆動力学のトルク残差を最小化。</td></tr>
+                  <tr><th scope="row">推定対象と固定値</th><td>慣性60 + 摩擦6。機構寸法・軸・ギア比・CAD楕円体を固定。</td></tr>
+                  <tr><th scope="row">座標と単位</th><td>慣性はリンク座標原点基準。トルクはN·m。楕円体も同じリンク座標系。</td></tr>
+                  <tr><th scope="row">測定・同期</th><td>1 kHz、トルクは指令値。同期精度の具体的記述はノートにない。</td></tr>
+                  <tr><th scope="row">励起と除外規則</th><td>二つの周波数による正弦波運動。最適励起設計ではなく、停止区間の除外規則も記録されていない。</td></tr>
+                  <tr><th scope="row">閉ループ・雑音</th><td>インピーダンス制御下での直接回帰。非因果フィルターは使用するが、閉ループ偏りや操作変数法の検討は記録されていない。</td></tr>
+                  <tr><th scope="row">検証・不確かさ</th><td>同一実験の時系列分割。トルクRMSで比較し、個別パラメータの信頼区間は示されていない。</td></tr>
+                  <tr><th scope="row">公開物</th><td>ノートでは本文中のコード・データ公開リンクを確認できていない。補足数値への言及はあるが、現時点の公開状況は未確認。</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>6. 主張・検算・推論を分ける</h3>
+            <div class="table-wrap" tabindex="0" role="region" aria-label="主張と検算状況の対応">
+              <table>
+                <thead><tr><th scope="col">項目</th><th scope="col">追跡できる根拠</th><th scope="col">残る限界</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">式 (17)</th><td>式 (16)のtraceを取り、元の式へ代入。</td><td>測定値を用いた再現ではなく代数的確認。</td></tr>
+                  <tr><th scope="row">Theorem 3</th><td>Schur補数からm &gt; 0、Σ<sub>C</sub> ≻ 0を得る。</td><td>退化境界は半正定値条件として区別する。</td></tr>
+                  <tr><th scope="row">主慣性の例</th><td>μ = (2, 5, 1)から(6, 3, 7)を計算。</td><td>図の原データを再構成したものではない。</td></tr>
+                  <tr><th scope="row">RMS</th><td>本文の3値から約1.28 N·mを算出。</td><td>キャプション1.46 N·mとの違いは未解決。</td></tr>
+                  <tr><th scope="row">標本数の効果</th><td>Fig. 6の比較と論文の解釈。</td><td>原データがなく再現できていない。軸単位の確認も残る。</td></tr>
+                  <tr><th scope="row">計算時間</th><td>論文報告1.67秒。</td><td>HR35の処理時間を保証する根拠にはしない。</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="section" id="sources" aria-labelledby="sources-title">
+            <div class="section-label">09 / SOURCES &amp; READING NOTES</div>
+            <h2 id="sources-title">出典と読解の範囲</h2>
+            <p>本稿は提供されたObsidian論文ノートを再構成した研究解説であり、実験の再現報告ではない。重複する深掘りQ1–Q12は、理論・実験・HR35適用・実装ノートに統合した。</p>
+            <ol class="source-list">
+              <li id="source-paper">
+                <strong>主論文</strong><br>
+                Patrick M. Wensing, Sangbae Kim, Jean-Jacques E. Slotine.
+                <cite>Linear Matrix Inequalities for Physically-Consistent Inertial Parameter Identification: A Statistical Perspective on the Mass Distribution.</cite>
+                IEEE Robotics and Automation Letters, 3(1), 2018.
+                <a>DOI: 10.1109/LRA.2017.2729659</a>
+                <span class="source-detail">所属：University of Notre Dame / MIT。書誌情報は提供ノートに基づく。ノートには2026-09-25のCrossref確認記録があるが、本稿作成時の再照会は行っていない。</span>
+              </li>
+              <li>
+                <strong>式・図番号の基準</strong><br>
+                <a>arXiv:1701.04395v3</a>、2017-09-18、8ページ。
+                <span class="source-detail">ノートの読解版。著者公開版には公式版参照の記載がある。図1・2・3・4・6とTable Iをローカル抽出画像から掲載し、誤抽出の図5は除外した。画像の出典はすべて主論文。</span>
+              </li>
+              <li>
+                <strong>先行研究の位置づけ</strong><br>
+                Sousa &amp; Cortesão（2014）、Traversaroほか（2016）、Ayusawaほか（2011）は物理一貫性の表現を比較する文脈。Gautier &amp; Khalil（1990/1991）は基底パラメータ、Swevers（1997）は最適励起の文脈で参照される。
+                <span class="source-detail">原ノートではSousa &amp; Cortesãoの本文は未確保、Sweversは確保済みと記録。すべての先行原典を本稿で独立検証したわけではない。</span>
+              </li>
+              <li>
+                <strong>後続研究の読書候補</strong><br>
+                Lee, Wensing, Park（2020, TRO）の幾何学的識別、TIE 2023の油圧マニピュレータ識別、BIRDy 2021のサーベイ。
+                <span class="source-detail">前二者は原ノートで未確保。ここでの結果を補強する検証済み根拠としては用いていない。</span>
+              </li>
+              <li>
+                <strong>HR35のプロジェクト記録</strong><br>
+                Werner 2025の要約、Bakの要約、URDF整合性分析、バケットメッシュの版管理記録。
+                <span class="source-detail">この部分は提供ノート内の内部文脈であり、読者がたどれる公開原典は提示されていない。物理制約の適用案と、実機で検証済みの結論を区別する。</span>
+              </li>
+            </ol>
+            <aside class="note">
+              <span class="note-title">再構成に際して明確化した点</span>
+              <p>正定値と半正定値の境界、検査失敗の原因、楕円体と実メッシュの違い、事前距離だけの目的関数での重み感度、平面3Rのランク仮説を明確化した。「負の固有値なら基準点誤りが確定」「楕円体条件を破れば質量中心がメッシュ外」「3リンクなら必ずミリ秒で解ける」といった断定は採用していない。</p>
+            </aside>
+            <div class="keywords" aria-label="キーワード">
+              <span>inertial parameters</span>
+              <span>physical consistency</span>
+              <span>pseudo-inertia</span>
+              <span>LMI / SDP</span>
+              <span>density-weighted covariance</span>
+              <span>bounding ellipsoid</span>
+              <span>problem of moments</span>
+              <span>base parameters</span>
+            </div>
+          </section>
+
+          <section class="section" id="ending" aria-labelledby="ending-title">
+            <div class="section-label">10 / TAKE IT FORWARD</div>
+            <h2 id="ending-title">最初の成果は、今あるモデルを説明できること</h2>
+            <p>この研究の力は、推定値に「実際の物体として存在できるか」という問いを加えながら、最適化の扱いやすさを保つ点にある。Cheetah 3の結果はその有効性を示す一方、データが見ていない個別値まで決めてくれるわけではない。</p>
+            <p>HR35で次に行うべきことは、新しい測定を待たずに既存の慣性値を同じ座標系にそろえ、Jと三角不等式を検査することだ。その後、回帰のランクと事前値感度を調べれば、モデルのどの部分を測定が支え、どの部分を仮定が支えているかが見えてくる。</p>
+
+            <div class="end-card">
+              <div class="eyebrow">A useful label</div>
+              <h2>「物理一貫性を持つ一つの解」</h2>
+              <p>束パラメータ、形状、事前値から選んだ個別慣性には、このラベルが適切だ。測定経路、励起、検証が整い、さらにその個別値の識別可能性が示されて初めて、「識別された値」と呼ぶ根拠が揃う。</p>
+              <p><strong>実在可能であることは、真の値だとわかったこととは異なる。</strong> この区別を残すことが、信頼できるデジタルツインにつながる。</p>
+            </div>
+
+            <aside class="share-copy" aria-label="共有用の短い要約">
+              <div class="eyebrow">COPY-READY / 共有用の一文</div>
+              <p>ロボットの慣性値は、トルクに合うだけでは足りない。4×4のユサ慣性行列は「実在可能な質量分布か」を検査できるが、個別パラメータの識別可能性は別に確かめる必要がある。</p>
+            </aside>
+            <p class="small"><a href="#mechanism">核心の導出へ戻る</a> · <a href="#hr35">HR35の実行項目を読む</a> · <a href="#source-paper">原論文を確認する</a></p>
+          </section>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <span>RESEARCH NOTES · WENSING / KIM / SLOTINE · 2018</span>
+    <span>韓国語論文ノートを基にした研究解説 · 2026.09.25 · <a href="#top">ページ先頭へ ↑</a></span>
+  </footer>
+</div>
 </body>
 </html>
