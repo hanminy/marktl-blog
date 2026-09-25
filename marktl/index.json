@@ -1,7 +1,27 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T12:01:17.431Z",
+  "updatedAt": "2026-09-25T12:06:03.178Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/egli2022-soil/",
+      "excerpt": "Soil Adaptive Excavation Using Reinforcement Learning 요약 한줄 요약 12 t 굴착기가 흙의 성질을 모른 채, 압력에서 얻은 관절 토크만 보고 한 삽 안에서도 굴착 궤적을 바꾸는 제어기. 해석적 토양 모델(FEE 기반 분리력 + 관입력)의 파라미터 6개를 넓게 무작위화한 시뮬(RaiSim)에서 PPO 로 관절 속도 정책을 7시간 학습해 실차에 그대로 올렸다. 부드러운 흙에서는 깊고 짧",
+      "shortId": "1ce297o",
+      "slug": "egli2022-soil",
+      "sourcePath": "02_research/필드로봇/시스템식별/egli2022-soil.md",
+      "tags": [
+        "논문요약",
+        "굴착기",
+        "토양적응",
+        "강화학습",
+        "FEE모델",
+        "도메인무작위화",
+        "ETH"
+      ],
+      "title": "Soil-Adaptive Excavation Using Reinforcement Learning - 요약",
+      "updatedAt": "2026-09-25T12:06:03.178Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/1ce297o/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/zhao2020-soil-id/",

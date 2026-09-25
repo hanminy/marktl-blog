@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>흙을 몰라도, 굴착기는 힘을 읽는다 · 연구 해설</title>
+  <style>
+    :root {
+      --paper: #f7f5ef;
+      --surface: #fffefb;
+      --ink: #202d2a;
+      --muted: #606b64;
+      --line: #d9ded4;
+      --green: #23594c;
+      --green-light: #e8eee5;
+      --clay: #9d4c32;
+      --clay-light: #f4e9df;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "Batang", Georgia, serif;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.85;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--green); text-underline-offset: 4px; }
+    a:hover { color: var(--clay); }
+    a:focus-visible { outline: 3px solid var(--clay); outline-offset: 5px; }
+    ::selection { background: #d8e5d3; }
+    .skip { position: absolute; left: 20px; top: -100px; padding: 8px 16px; background: white; z-index: 10; }
+    .skip:focus { top: 12px; }
+    .shell { width: min(1120px, calc(100% - 64px)); margin-inline: auto; }
+    .masthead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 25px 0 19px;
+      border-bottom: 1px solid var(--ink);
+      font-size: 12px;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    .brand { font-weight: 800; }
+    .masthead span:last-child { color: var(--muted); letter-spacing: .04em; }
+    .hero { padding: 70px 0 40px; }
+    .eyebrow, .section-label {
+      margin: 0 0 20px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    h1, h2, h3, p, figure, blockquote { margin-top: 0; }
+    h1 {
+      max-width: 950px;
+      margin-bottom: 26px;
+      font-family: var(--serif);
+      font-size: clamp(39px, 5.6vw, 69px);
+      font-weight: 700;
+      line-height: 1.26;
+      letter-spacing: -.055em;
+    }
+    .hero-deck {
+      max-width: 760px;
+      margin-bottom: 28px;
+      font-size: clamp(18px, 2vw, 22px);
+      line-height: 1.8;
+      color: var(--muted);
+      letter-spacing: -.025em;
+    }
+    .meta { display: flex; flex-wrap: wrap; gap: 10px 22px; font-size: 12px; color: var(--muted); }
+    .hero-image {
+      margin: 0;
+      padding: 26px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+    }
+    img { display: block; max-width: 100%; height: auto; margin-inline: auto; }
+    .hero-image img { max-height: 520px; object-fit: contain; }
+    figcaption {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.75;
+    }
+    .fig-label { color: var(--green); font-weight: 800; margin-right: 8px; }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      margin: 24px 0 0;
+      padding: 27px 0;
+      border-block: 1px solid var(--line);
+    }
+    .metric { padding: 0 28px; border-right: 1px solid var(--line); }
+    .metric:first-child { padding-left: 0; }
+    .metric:last-child { border-right: 0; }
+    .metric strong { display: block; font-size: 36px; line-height: 1.2; letter-spacing: -.05em; color: var(--green); }
+    .metric strong span { font-size: 17px; letter-spacing: 0; }
+    .metric p { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+    .reading-layout { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 60px; margin-top: 58px; }
+    .contents { position: sticky; top: 28px; align-self: start; font-size: 13px; }
+    .contents p { margin-bottom: 14px; color: var(--muted); font-size: 11px; letter-spacing: .12em; font-weight: 800; }
+    .contents ol { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--line); }
+    .contents a { display: block; padding: 11px 0; border-bottom: 1px solid var(--line); color: var(--muted); text-decoration: none; }
+    .contents a:hover { color: var(--green); }
+    .contents a span { margin-right: 10px; color: var(--clay); font-size: 11px; }
+    .article-body { min-width: 0; }
+    section { margin-bottom: 62px; }
+    h2 {
+      margin-bottom: 22px;
+      font-family: var(--serif);
+      font-size: clamp(27px, 3vw, 35px);
+      line-height: 1.4;
+      letter-spacing: -.04em;
+    }
+    h3 { margin: 30px 0 12px; font-size: 20px; line-height: 1.5; letter-spacing: -.025em; }
+    p { margin-bottom: 20px; }
+    strong { font-weight: 750; }
+    .section-head { padding-top: 26px; border-top: 1px solid var(--ink); }
+    .section-head .section-label { margin-bottom: 13px; }
+    .abstract { padding: 30px 34px; background: var(--green-light); border-top: 3px solid var(--green); }
+    .abstract h2 { font-size: 25px; }
+    .abstract p:last-child { margin-bottom: 0; }
+    .findings { display: grid; gap: 14px; margin-top: 26px; }
+    .finding { display: grid; grid-template-columns: 38px 1fr; gap: 14px; padding: 22px 24px; background: var(--surface); border: 1px solid var(--line); }
+    .finding .number { color: var(--clay); font-family: Georgia, serif; font-size: 25px; line-height: 1.5; }
+    .finding h3 { margin: 0 0 5px; font-size: 18px; }
+    .finding p { margin: 0; font-size: 15px; color: var(--muted); }
+    .pullquote { margin: 34px 0; padding: 7px 0 7px 26px; border-left: 3px solid var(--clay); }
+    .pullquote p { margin: 0; font-family: var(--serif); font-size: clamp(23px, 2.8vw, 30px); line-height: 1.6; letter-spacing: -.035em; }
+    .pullquote footer { margin-top: 12px; font-size: 12px; color: var(--muted); }
+    .table-wrap { margin: 22px 0; overflow-x: auto; background: var(--surface); border: 1px solid var(--line); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.7; }
+    caption { padding: 14px 17px; text-align: left; font-size: 12px; font-weight: 700; color: var(--green); border-bottom: 1px solid var(--line); }
+    th, td { padding: 13px 17px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+    thead th { background: var(--green-light); font-size: 12px; }
+    tbody th { width: 25%; font-weight: 650; }
+    tbody tr:last-child > * { border-bottom: 0; }
+    .parameters td:nth-child(2), .parameters td:nth-child(3) { white-space: nowrap; }
+    .note { margin: 24px 0; padding: 20px 24px; background: var(--clay-light); font-size: 15px; }
+    .note p { margin: 0; }
+    .note strong { color: var(--clay); }
+    .figure { margin: 30px 0; padding: 23px; background: var(--surface); border: 1px solid var(--line); }
+    .figure img { max-height: 650px; object-fit: contain; }
+    .reward img { max-width: min(100%, 620px); }
+    .flow { margin: 28px 0; padding: 24px; border: 1px solid var(--line); background: var(--surface); }
+    .flow-title { font-size: 12px; color: var(--green); font-weight: 800; margin-bottom: 18px; }
+    .flow-steps { display: grid; grid-template-columns: 1fr 22px 1fr 22px 1fr; gap: 8px; align-items: center; }
+    .flow-step { height: 100%; padding: 17px 12px; background: var(--green-light); text-align: center; font-size: 14px; font-weight: 750; }
+    .flow-step small { display: block; margin-top: 7px; font-size: 12px; line-height: 1.65; font-weight: 400; color: var(--muted); }
+    .arrow { text-align: center; color: var(--clay); }
+    .flow-caption { margin: 15px 0 0; font-size: 12px; color: var(--muted); }
+    .equation { padding: 17px; margin: 20px 0; background: var(--green-light); text-align: center; font-family: var(--sans); font-size: 16px; }
+    .compact-list { padding-left: 22px; }
+    .compact-list li { margin-bottom: 10px; padding-left: 3px; }
+    .evidence-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 22px 0; }
+    .evidence-card { padding: 20px; background: var(--green-light); }
+    .evidence-card .tag { font-size: 11px; color: var(--green); font-weight: 800; }
+    .evidence-card h3 { margin: 8px 0 10px; font-size: 17px; }
+    .evidence-card .result { font-size: 23px; font-weight: 800; line-height: 1.5; letter-spacing: -.04em; }
+    .evidence-card p { margin: 9px 0 0; font-size: 13px; color: var(--muted); }
+    .research-note { padding: 28px 30px; border: 1px solid var(--green); }
+    .research-note .section-label { margin-bottom: 12px; }
+    .research-note h2 { font-size: 28px; }
+    .checklist { list-style: none; padding: 0; margin: 20px 0 0; }
+    .checklist li { position: relative; padding: 16px 0 16px 26px; border-top: 1px solid var(--line); font-size: 15px; }
+    .checklist li::before { content: "□"; position: absolute; left: 0; color: var(--green); }
+    .ending { padding: 34px; background: var(--green); color: #fffef8; }
+    .ending .section-label { color: #cbdbc1; }
+    .ending h2 { font-size: 30px; }
+    .ending p { color: #e3eadf; }
+    .ending p:last-child { margin-bottom: 0; }
+    .share { border-block: 1px solid var(--line); padding: 26px 0; margin-top: 30px; }
+    .share h3 { margin: 0 0 12px; font-size: 14px; color: var(--green); }
+    .copy-text { margin-bottom: 0; font-size: 16px; }
+    .sources { font-size: 14px; color: var(--muted); }
+    .sources h2 { color: var(--ink); font-size: 26px; }
+    .sources ol { padding-left: 22px; }
+    .sources li { margin-bottom: 16px; }
+    .citation { padding: 20px; background: var(--surface); border: 1px solid var(--line); line-height: 1.8; }
+    .citation cite { font-style: normal; color: var(--ink); }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 23px; }
+    .tags span { padding: 4px 10px; border: 1px solid var(--line); border-radius: 3px; font-size: 11px; }
+    .page-footer { display: flex; justify-content: space-between; gap: 20px; border-top: 1px solid var(--ink); padding: 24px 0 35px; color: var(--muted); font-size: 12px; }
+    @media (max-width: 960px) {
+      .reading-layout { grid-template-columns: 1fr; gap: 32px; }
+      .contents { position: static; }
+      .contents ol { display: flex; flex-wrap: wrap; gap: 0 20px; padding-top: 8px; }
+      .contents a { border: 0; padding: 5px 0; }
+      .article-body { max-width: 800px; margin-inline: auto; width: 100%; }
+    }
+    @media (max-width: 620px) {
+      body { font-size: 16px; line-height: 1.85; }
+      .shell { width: calc(100% - 36px); }
+      .masthead { font-size: 10px; gap: 10px; }
+      .hero { padding-top: 43px; }
+      .hero-deck { font-size: 18px; }
+      .hero-image, .figure { padding: 12px; }
+      .metrics { padding-block: 21px; }
+      .metric { padding-inline: 12px; }
+      .metric strong { font-size: 29px; }
+      .metric strong span { font-size: 13px; }
+      .metric p { font-size: 11px; }
+      .reading-layout { margin-top: 34px; }
+      section { margin-bottom: 44px; }
+      .abstract, .research-note, .ending { padding: 24px 21px; }
+      .finding { padding: 19px 16px; grid-template-columns: 30px 1fr; gap: 10px; }
+      .evidence-cards { grid-template-columns: 1fr; }
+      .evidence-card { padding: 18px 21px; }
+      .evidence-card h3 { margin-top: 4px; }
+      .flow { padding: 18px; }
+      .flow-steps { grid-template-columns: 1fr; }
+      .arrow { transform: rotate(90deg); line-height: 1.2; }
+      .flow-step { padding: 12px; }
+      th, td { padding: 11px 12px; }
+      .table-wrap table { min-width: 470px; }
+      .parameters table { min-width: 360px; }
+      .page-footer { flex-direction: column; gap: 8px; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    @media print {
+      body { background: white; color: black; font-size: 11pt; }
+      .shell { width: 100%; }
+      .skip, .contents, .page-footer a { display: none; }
+      .hero { padding-top: 28px; }
+      .reading-layout { display: block; margin-top: 30px; }
+      .article-body { max-width: none; }
+      h1 { font-size: 34pt; }
+      h2, h3 { break-after: avoid; }
+      figure, .finding, .evidence-card, tr { break-inside: avoid; }
+      .table-wrap { overflow: visible; }
+      .table-wrap table { min-width: 0; }
+      .ending { color: black; background: #edf0e9; border: 1px solid #999; }
+      .ending p, .ending .section-label { color: black; }
+      a { color: inherit; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Soil-Adaptive Excavation Using Reinforcement Learning - 요약">
+<meta property="og:description" content="Soil Adaptive Excavation Using Reinforcement Learning 요약 한줄 요약 12 t 굴착기가 흙의 성질을 모른 채, 압력에서 얻은 관절 토크만 보고 한 삽 안에서도 굴착 궤적을 바꾸는 제어기. 해석적 토양 모델(FEE 기반 분리력 + 관입력)의 파라미터 6개를 넓게 무작위화한 시뮬(RaiSim)에서 PPO 로 관절 속도 정책을 7시간 학습해 실차에 그대로 올렸다. 부드러운 흙에서는 깊고 짧">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/1ce297o/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/1ce297o/assets/figure1.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Soil-Adaptive Excavation Using Reinforcement Learning - 요약">
+<meta name="twitter:description" content="Soil Adaptive Excavation Using Reinforcement Learning 요약 한줄 요약 12 t 굴착기가 흙의 성질을 모른 채, 압력에서 얻은 관절 토크만 보고 한 삽 안에서도 굴착 궤적을 바꾸는 제어기. 해석적 토양 모델(FEE 기반 분리력 + 관입력)의 파라미터 6개를 넓게 무작위화한 시뮬(RaiSim)에서 PPO 로 관절 속도 정책을 7시간 학습해 실차에 그대로 올렸다. 부드러운 흙에서는 깊고 짧">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/1ce297o/assets/figure1.png">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/egli2022-soil/">
+</head>
+<body>
+  <a class="skip" href="#main">본문으로 바로가기</a>
+  <div class="shell">
+    <header class="masthead" id="top">
+      <span class="brand">Field Notes / Robotics</span>
+      <span>논문으로 읽는 현장 로봇 · 2022 연구</span>
+    </header>
+
+    <main id="main">
+      <article aria-labelledby="article-title">
+        <header class="hero">
+          <p class="eyebrow">Research Report &nbsp; / &nbsp; 토양 적응 · 강화학습</p>
+          <h1 id="article-title">흙을 몰라도,<br>굴착기는 힘을 읽는다</h1>
+          <p class="hero-deck">깊게 팔지, 얕게 끌지. 12톤 굴착기는 한 삽 안에서도 결정을 바꾼다. 토양의 성질을 미리 식별하는 대신, 압력에서 얻은 토크와 기구학 정보를 바탕으로 반응을 학습한 ETH Zürich의 연구.</p>
+          <div class="meta">
+            <span>연구 · Pascal Egli 외 4인</span>
+            <span>ETH Zürich Robotic Systems Lab</span>
+            <span>해설 노트 · <time datetime="2026-09-25">2026.09.25</time></span>
+          </div>
+        </header>
+
+        <figure class="hero-image">
+          <img src="assets/figure1.png" alt="부드러운 흙과 매설한 화강암 블록이 함께 있는 실차 굴착 실험 장면">
+          <figcaption><span class="fig-label">FIG. 1</span>한 번의 굴착 중에 달라지는 저항. 매설한 화강암 블록은 단단한 구간을 모사한다. 제어기는 이 변화를 미리 전달받지 않고 대응한다.</figcaption>
+        </figure>
+
+        <div class="metrics" aria-label="연구의 주요 규모">
+          <div class="metric">
+            <strong>12 <span>t</span></strong>
+            <p>실차 검증에 사용한 굴착기</p>
+          </div>
+          <div class="metric">
+            <strong>6 <span>개</span></strong>
+            <p>무작위화한 토양 모델 파라미터</p>
+          </div>
+          <div class="metric">
+            <strong>7 <span>시간</span></strong>
+            <p>보고된 시뮬레이션 학습 시간</p>
+          </div>
+        </div>
+
+        <div class="reading-layout">
+          <nav class="contents" aria-label="목차">
+            <p>IN THIS REPORT</p>
+            <ol>
+              <li><a href="#abstract"><span>00</span>초록과 핵심 발견</a></li>
+              <li><a href="#problem"><span>01</span>왜 적응이 필요한가</a></li>
+              <li><a href="#simulation"><span>02</span>다양한 흙을 만드는 법</a></li>
+              <li><a href="#learning"><span>03</span>무엇을 보고 배우는가</a></li>
+              <li><a href="#evidence"><span>04</span>실차가 보여 준 근거</a></li>
+              <li><a href="#limits"><span>05</span>검증의 경계</a></li>
+              <li><a href="#implications"><span>06</span>HR35에 주는 시사점</a></li>
+              <li><a href="#sources"><span>07</span>출처와 읽기 안내</a></li>
+            </ol>
+          </nav>
+
+          <div class="article-body">
+            <section id="abstract" aria-labelledby="abstract-title">
+              <div class="abstract">
+                <p class="section-label">Abstract / 초록</p>
+                <h2 id="abstract-title">토양 식별 없이, 저항에 맞춰 경로를 바꾸다</h2>
+                <p>「Soil-Adaptive Excavation Using Reinforcement Learning」은 토양 파라미터를 입력받지 않고 굴착 중의 저항 변화에 적응하는 강화학습 제어기를 제안한다. 연구진은 FEE 기반 분리력과 관입력을 결합한 해석적 토양 모델의 파라미터 6개를 무작위화하고, RaiSim에서 PPO로 관절 속도 정책을 학습했다.</p>
+                <p>학습한 정책은 표준 비례 밸브를 사용하는 12톤 굴착기에 이식됐다. 보고된 실험에서 부드러운 흙에서는 깊게, 단단한 구간에서는 얕게 끌며 굴착했고, 정지나 기체 들림 없이 동작했다. 다만 <strong>베이스에 가까운 조건에서는 자기 충돌을 피하기 위해 채움비 32%에서 종료</strong>했다. 모든 조건에서 버킷을 가득 채웠다는 의미는 아니다.</p>
+              </div>
+
+              <div class="findings" aria-label="핵심 발견">
+                <div class="finding">
+                  <span class="number">01</span>
+                  <div>
+                    <h3>힘의 피드백이 적응을 가능하게 한다</h3>
+                    <p>관절 토크 관측을 제거하자 정책은 토크 한계보다 훨씬 낮은 영역에서 작동하는 보수적 행동을 보였다.</p>
+                  </div>
+                </div>
+                <div class="finding">
+                  <span class="number">02</span>
+                  <div>
+                    <h3>가벼운 모델로 넓은 조건을 경험시킨다</h3>
+                    <p>빠른 해석 모델과 파라미터 무작위화가 다양한 토양 저항을 경험하는 학습을 뒷받침했다.</p>
+                  </div>
+                </div>
+                <div class="finding">
+                  <span class="number">03</span>
+                  <div>
+                    <h3>성공은 채움량과 기계 제약의 균형이다</h3>
+                    <p>가능한 구간에서는 채우고, 가까운 구간에서는 충돌 전에 들어 올렸다. 적응은 파는 방식뿐 아니라 끝내는 판단에도 나타났다.</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section id="problem" aria-labelledby="problem-title">
+              <header class="section-head">
+                <p class="section-label">01 / The Problem</p>
+                <h2 id="problem-title">좋은 굴착 궤적은 흙에 따라 달라진다</h2>
+              </header>
+              <p>한 삽에 얼마나 담을 수 있는지는 버킷이 지나가는 경로와 토양 저항에 함께 달려 있다. 부드러운 흙에서는 깊고 짧게 파도 되지만, 단단한 흙에서는 얕고 길게 끌어야 힘의 한계를 넘지 않는다. 더 어려운 점은 <strong>같은 삽 안에서도 흙의 성질이 바뀔 수 있다</strong>는 것이다.</p>
+              <p>따라서 시작 전에 정한 경로만 정확히 따라가는 것으로는 충분하지 않다. 이 연구는 “흙이 무엇인지 먼저 알아내기”보다 “지금 느끼는 저항에 반응하기”에 무게를 둔다.</p>
+
+              <div class="table-wrap">
+                <table>
+                  <caption>기존 접근의 제약 · 제공된 논문 요약의 비교</caption>
+                  <thead><tr><th scope="col">접근</th><th scope="col">이 연구가 짚는 한계</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">기구학 궤적 최적화</th><td>토양 반력과 힘의 한계를 무시하면 굴착 중 정지할 수 있다.</td></tr>
+                    <tr><th scope="row">동역학·토양 최적화</th><td>토양 파라미터가 필요하고 계산이 분 단위로 걸릴 수 있다.</td></tr>
+                    <tr><th scope="row">사람 모사·규칙 제어</th><td>굴착 구간과 정지 규칙을 기체·현장별로 수동 설계해야 한다.</td></tr>
+                    <tr><th scope="row">말단 힘 기반 제어</th><td>비교 대상으로 언급된 Jud 2019 방식은 고성능 서보밸브를 요구한다.</td></tr>
+                    <tr><th scope="row">시연 학습</th><td>Son 2020의 비교 사례는 깊이 조절에 초점을 두고 끝점을 고정한다.</td></tr>
+                    <tr><th scope="row">입자 시뮬레이션 RL</th><td>비교된 선행 연구에서는 계산 비용 탓에 토양 다양성과 실차 검증이 제한됐다.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <blockquote class="pullquote">
+                <p>토양의 이름을 맞히는 대신,<br>버킷에 걸리는 힘에 반응하게 한다.</p>
+                <footer>연구 접근을 풀어 쓴 해설 문장 · 논문 직접 인용 아님</footer>
+              </blockquote>
+            </section>
+
+            <section id="simulation" aria-labelledby="simulation-title">
+              <header class="section-head">
+                <p class="section-label">02 / Simulation Design</p>
+                <h2 id="simulation-title">정밀한 흙 하나보다, 다양한 저항을 경험하기</h2>
+              </header>
+              <p>학습 환경은 RaiSim 강체 동역학과 해석적 토양 힘 모델을 결합한다. 토양 힘 계산은 강체 동역학 계산보다 약 40배 빠르다고 보고됐다. 이 수치는 <strong>전체 학습이 40배 빨라졌다는 뜻은 아니다.</strong> 빠른 토양 계산은 많은 조건을 반복 경험시키는 데 유리한 설계 선택이다.</p>
+
+              <h3>기계 모델: 유압의 비대칭을 토크 한계에 담다</h3>
+              <p>굴착기는 호스와 기름을 제외한 CAD 기반 강체 모델이다. 정책이 내놓은 관절 속도 명령을 PID가 토크로 바꾸고, 실차의 한계로 제한한다. 특히 명령과 반대 방향의 힘을 더 크게 견디는 유압 특성을 반영해 <strong>속도 방향에 따라 토크 한계를 다르게</strong> 설정했다.</p>
+              <p>베이스는 움직일 수 있게 두고, 바퀴와 지면 사이 마찰계수는 0.8로 설정했다. 다리와 선회는 고정했다. 이 구성은 팔의 굴착 동작뿐 아니라 기체가 끌리거나 들리는 현상도 학습에 반영하기 위한 것이다.</p>
+
+              <figure class="figure">
+                <img src="assets/figure2.png" loading="lazy" alt="버킷에 작용하는 토양 분리력, 관입력과 적재된 흙의 자중을 설명하는 모델 도식">
+                <figcaption><span class="fig-label">FIG. 2</span>토양 반력의 구성. 파괴면을 따라 흙을 분리하는 힘, 바닥판·날의 관입 저항, 버킷에 실린 흙의 무게를 함께 고려한다.</figcaption>
+              </figure>
+
+              <h3>토양 모델: 분리력 + 관입력 + 적재 자중</h3>
+              <ul class="compact-list">
+                <li><strong>분리력.</strong> Reece의 FEE(Fundamental Earthmoving Equation)를 3차원으로 확장한 Park 2002 모델을 사용한다. 버킷을 삼각형과 반원으로 근사하고, 채워질 때 생기는 2차 분리판과 적재 흙의 무게를 반영한다.</li>
+                <li><strong>관입력.</strong> 바닥판 마찰은 토압 기반 모델로, 날의 저항은 공동 확장 이론의 한계 압력을 계수 <i>p</i><sub>t</sub>로 단순화해 계산한다. 날 저항은 바닥판과 이동 방향 사이 각도 φ의 cos 값으로 조정한다.</li>
+              </ul>
+
+              <div class="table-wrap parameters">
+                <table>
+                  <caption>학습 시 무작위화한 토양 파라미터 · 원문 표 I에 대한 노트 기록</caption>
+                  <thead><tr><th scope="col">파라미터</th><th scope="col">단위</th><th scope="col">범위</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">점착력 c</th><td>kPa</td><td>0–105</td></tr>
+                    <tr><th scope="row">부착력 c<sub>a</sub></th><td>kPa</td><td>0–c</td></tr>
+                    <tr><th scope="row">내부 마찰각 Φ</th><td>rad</td><td>0.3–0.8</td></tr>
+                    <tr><th scope="row">단위중량 γ</th><td>kN/m³</td><td>17–22</td></tr>
+                    <tr><th scope="row">흙–버킷 마찰각 δ</th><td>rad</td><td>0.2–0.4</td></tr>
+                    <tr><th scope="row">공동 압력 계수 p<sub>t</sub></th><td>무차원</td><td>0–300</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="note">
+                <p><strong>해석의 경계</strong> 넓은 무작위화는 모델 오차에 대응하는 전략이다. 그러나 특정 범위를 경험했다는 사실이 모든 실제 토양이나 장애물에 대한 적응을 보장하지는 않는다.</p>
+              </div>
+            </section>
+
+            <section id="learning" aria-labelledby="learning-title">
+              <header class="section-head">
+                <p class="section-label">03 / Learning to React</p>
+                <h2 id="learning-title">압력은 감각이 되고, 속도는 행동이 된다</h2>
+              </header>
+              <p>정책에는 점착력이나 마찰각 같은 토양 파라미터를 주지 않는다. 대신 관절 토크와 기구학 정보를 중심으로 총 27개 관측값을 제공한다. 따라서 이 방법을 <strong>“토크만 보는 제어기”라고 설명하면 부정확하다.</strong> 토크는 흙의 저항에 대응하는 데 중요한 피드백이지만, 자세·속도·흙 높이·채움비도 함께 사용한다.</p>
+
+              <div class="flow" role="group" aria-label="실차 제어 흐름">
+                <p class="flow-title">실차의 피드백 흐름</p>
+                <div class="flow-steps">
+                  <div class="flow-step">관측<small>압력 → 관절 토크<br>자세·속도·추정 상태</small></div>
+                  <span class="arrow" aria-hidden="true">→</span>
+                  <div class="flow-step">PPO 정책<small>토양 파라미터 입력 없이<br>현재 상태에 반응</small></div>
+                  <span class="arrow" aria-hidden="true">→</span>
+                  <div class="flow-step">관절 속도 명령<small>PID + 피드포워드<br>유압 구동</small></div>
+                </div>
+                <p class="flow-caption">굴착 후 달라진 힘과 자세가 다시 관측으로 돌아온다. 학습은 시뮬레이션에서, 적응 행동은 실행 중에 이루어진다.</p>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <caption>정책의 관측 구성 · 총 27개</caption>
+                  <thead><tr><th scope="col">관측</th><th scope="col">차원</th><th scope="col">담고 있는 정보</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">관절 토크</th><td>4</td><td>관절에 걸리는 부하</td></tr>
+                    <tr><th scope="row">관절 위치·속도</th><td>8</td><td>팔의 구성과 움직임</td></tr>
+                    <tr><th scope="row">이전 명령</th><td>4</td><td>직전의 제어 행동</td></tr>
+                    <tr><th scope="row">흙 높이·채움비</th><td>2</td><td>지면과 적재 상태</td></tr>
+                    <tr><th scope="row">버킷 자세·속도</th><td>6</td><td>캐빈 기준 버킷 상태</td></tr>
+                    <tr><th scope="row">캐빈 피치·피치율</th><td>2</td><td>기체 기울기와 변화</td></tr>
+                    <tr><th scope="row">각도 φ</th><td>1</td><td>바닥판과 이동 방향의 관계</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <p>행동은 4개 관절의 속도다. 토크를 직접 명령하는 정책은 모델 부정확성과 밸브 데드밴드 때문에 배제했다. 토크 관측을 제거한 비교에서는 정책이 정지를 피하려고 가용 토크를 충분히 쓰지 않는 보수적 굴착을 보였다. 이는 <strong>토크 피드백의 중요성을 보여 주지만, 관측을 빼면 모든 굴착이 불가능해진다는 뜻은 아니다.</strong></p>
+
+              <h3>성공 조건은 “많이 담기” 하나가 아니다</h3>
+              <p>성공 종료는 충분히 채웠거나 베이스에 가까워진 상태에서, 버킷을 충분히 높이고 감되 과도하게 감지 않았을 때 성립한다. 커리큘럼은 학습이 진행될수록 채움비와 들어 올리는 높이의 요구를 높인다.</p>
+
+              <div class="equation" aria-label="성공 종료 조건과 커리큘럼">
+                (T1 ∨ T2) ∧ T3 ∧ T4 ∧ T5<br>
+                k<sub>j</sub> = 1 − e<sup>−0.01j</sup>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <caption>긍정 종료를 구성하는 조건</caption>
+                  <thead><tr><th scope="col">조건</th><th scope="col">판정 기준</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">T1 · 충분히 참</th><td>채움비 &gt; k<sub>j</sub> × 0.68 + 0.3 · 보상 +10</td></tr>
+                    <tr><th scope="row">T2 · 베이스에 가까움</th><td>날–베이스 거리 &lt; 3.0 m · 보상 +5</td></tr>
+                    <tr><th scope="row">T3 · 충분히 높음</th><td>날 높이 &gt; k<sub>j</sub> × 0.7 + 0.3 m</td></tr>
+                    <tr><th scope="row">T4 · 충분히 감음</th><td>수평 대비 각도 &lt; 0.3 rad</td></tr>
+                    <tr><th scope="row">T5 · 과다 감기 방지</th><td>버킷 원점이 날보다 높음</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <p>부정 종료에는 −1의 보상을 둔다. 버킷 속도 0.5 m/s 초과, 바닥판으로 흙 밀기(φ &lt; 0), 베이스 속도 0.1 m/s 초과, 빈 버킷이 0.5 m 위에 있는 상태, 자기 충돌, 너무 깊거나 평평한 상태 등이 해당한다.</p>
+
+              <figure class="figure reward">
+                <img src="assets/table2.png" loading="lazy" alt="내려가기, 채우기, 들어 올리기와 감기, 행동의 매끄러움에 대한 보상 항을 정리한 논문 표 II">
+                <figcaption><span class="fig-label">TABLE II</span>학습 보상. 채움비가 5% 미만일 때 내려가기, 부피 증가, 찼거나 가까울 때 올리기·감기, 행동의 매끄러움을 유도한다. 날 속도가 0.4 m/s를 넘으면 제시된 보상 항은 모두 0이 된다.</figcaption>
+              </figure>
+
+              <h3>학습 설정</h3>
+              <p>PPO와 GAE를 사용했고 구현은 rsl_rl에 기반한다. 정책·가치 신경망은 128×128 은닉층과 LeakyReLU를 사용한다. 할인율은 0.99, 시간 간격은 0.15초, 에피소드는 19.95초, 배치는 약 6.81만 샘플이다. 약 3,000회 갱신, 총 2억 샘플 규모의 학습에 약 7시간이 걸렸다.</p>
+              <p>초기 상태도 다양화했다. 토양, 흙 높이(−2.0∼−0.5 m), 팔 자세를 무작위화하고, 25%는 버킷이 이미 흙 속에 있고 채움비가 임의인 상태에서 시작한다. 피치는 ±0.1 rad 범위로 바꾼다.</p>
+            </section>
+
+            <section id="evidence" aria-labelledby="evidence-title">
+              <header class="section-head">
+                <p class="section-label">04 / Evidence</p>
+                <h2 id="evidence-title">저항이 커지자, 더 얕고 길게 팠다</h2>
+              </header>
+              <p>시뮬레이션에서 정책은 토양에 따라 다른 경로를 선택했다. 부드러운 흙에서는 깊게 들어가 감았고, 중간 흙에서는 깊이를 줄인 채 끌었다. 단단한 흙에서는 얕게 전 작업 범위를 사용한 뒤, 자기 충돌 전에 들어 올렸다.</p>
+
+              <figure class="figure">
+                <img src="assets/figure5.png" loading="lazy" alt="부드러운 흙, 중간 흙, 단단한 흙에서 달라지는 굴착 궤적과 동작을 비교한 시뮬레이션 결과">
+                <figcaption><span class="fig-label">FIG. 5</span>시뮬레이션. (a) 부드러운 흙: 10.0초에 가득 채움. (b) 중간 흙: 디퍼가 토크 한계에서 작동하며 9.3초. (c) 단단한 흙: 17.3초, 채움비 약 80%에서 충돌 전에 들어 올림.</figcaption>
+              </figure>
+
+              <p>명령 속도가 매끄럽게 바뀐다는 점도 실차 이식에 중요하다. 실제 M545에서는 표준 비례 밸브와 파일럿 전기 밸브, PID와 피드포워드 속도 제어를 사용했다. 압력으로 관절 토크를 구하고, IMU로 관절각을 얻었다.</p>
+
+              <figure class="figure">
+                <img src="assets/figure6.png" loading="lazy" alt="일반 흙, 베이스에 가까운 위치, 화강암이 묻힌 흙에서 수행한 실차 굴착 결과">
+                <figcaption><span class="fig-label">FIG. 6</span>실차의 세 조건. 일반 흙에서는 가득 채우고, 가까운 시작 위치에서는 충돌을 피하며 일찍 종료했다. 화강암 구간에서는 바위 위를 끈 뒤, 끝을 지나 다시 깊게 파고들었다.</figcaption>
+              </figure>
+
+              <div class="evidence-cards">
+                <div class="evidence-card">
+                  <span class="tag">FIELD A</span>
+                  <h3>부드러운∼중간 흙</h3>
+                  <div class="result">9.6 ± 0.5 s</div>
+                  <p>보고된 반복 실험에서 매번 버킷을 가득 채웠다.</p>
+                </div>
+                <div class="evidence-card">
+                  <span class="tag">FIELD B</span>
+                  <h3>베이스 가까이</h3>
+                  <div class="result">32% 채움</div>
+                  <p>자기 충돌 회피를 위해 가득 차기 전에 들어 올렸다.</p>
+                </div>
+                <div class="evidence-card">
+                  <span class="tag">FIELD C</span>
+                  <h3>매설 화강암</h3>
+                  <div class="result">12.0 ± 0.2 s</div>
+                  <p>바위 위를 끌고 끝에서 다시 깊게 파 가득 채웠다.</p>
+                </div>
+              </div>
+
+              <p>화강암 조건에서 정책은 붐으로 아래로 힘을 가하며 바위 위를 끌었다. 바위 끝을 지나자 다시 깊게 파고들었다. 이는 한 번 정한 깊이를 유지하는 동작보다, <strong>굴착 도중 달라지는 저항에 반응하는 행동</strong>에 가깝다.</p>
+
+              <figure class="figure">
+                <img src="assets/figure7.png" loading="lazy" alt="단단한 흙에서 깊은 굴착 경로를 수동으로 시도하자 앞바퀴가 들린 비교 실험">
+                <figcaption><span class="fig-label">FIG. 7</span>수동 비교 실험. 부드러운 흙용 깊은 경로를 단단한 흙에서 시도하자 붐 토크가 기준 한계의 100%를 넘고 앞바퀴가 들려 중단했다. 보고된 학습 제어기 실험에서는 이런 들림이 없었다.</figcaption>
+              </figure>
+
+              <div class="note">
+                <p><strong>결과를 읽는 방법</strong> 이 비교는 토양에 맞지 않는 경로의 위험을 보여 준다. 숙련 작업자나 모든 기존 제어기보다 우수하다는 일반적 성능 비교는 아니다. 시간의 ± 값은 제공된 노트의 표기를 유지했으며, 반복 횟수와 통계량 정의는 원문 확인이 필요하다.</p>
+              </div>
+            </section>
+
+            <section id="limits" aria-labelledby="limits-title">
+              <header class="section-head">
+                <p class="section-label">05 / Boundaries</p>
+                <h2 id="limits-title">실차 적응은 확인됐지만, 현장 전체를 푼 것은 아니다</h2>
+              </header>
+              <p>이 연구의 강점은 시뮬레이션 정책을 실제 유압 굴착기에 옮겨 적응 행동을 확인했다는 데 있다. 다만 지형 인식, 기체 전 자세의 안정성, 작업 전체의 생산성까지 검증한 시스템으로 읽어서는 안 된다.</p>
+
+              <div class="table-wrap">
+                <table>
+                  <caption>모델·실험의 한계와 해석상 의미</caption>
+                  <thead><tr><th scope="col">남은 제약</th><th scope="col">의미</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">수평 지면 가정</th><td>모델은 경사를 표현할 수 있지만, 사용한 지면 가정은 단순하다. 흙 높이는 바퀴 높이 평균으로 추정한다.</td></tr>
+                    <tr><th scope="row">채움비 근사</th><td>경로 적분으로 추정하므로 버킷 내부의 실제 적재량을 직접 측정한 값과 구분해야 한다.</td></tr>
+                    <tr><th scope="row">일정한 토크 한계</th><td>실린더 기구에 따라 달라지는 자세별 가용 토크를 상수 한계로 단순화했다.</td></tr>
+                    <tr><th scope="row">선회 위치 고정</th><td>선회 방향에 따른 안정성 변화는 무작위화하지 않았다.</td></tr>
+                    <tr><th scope="row">유압 지연·데드존</th><td>실차 버킷 속도는 0.4 m/s를 약간 넘기도 했다. 학습 보상의 기준이 실차의 엄격한 속도 상한은 아니다.</td></tr>
+                    <tr><th scope="row">속도 최적화 미수행</th><td>보고된 동작 시간만으로 작업 생산성이 최적이라고 결론 낼 수 없다.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>향후 방향은 지각 센서를 통한 지형 인식, 매설 장애물에 대한 명시적 학습, 그리고 궤적 추종 제어기와의 결합이다. 한 삽의 적응 굴착을 건물 기초 전체 굴착 같은 연속 작업으로 확장하는 단계가 남아 있다.</p>
+            </section>
+
+            <section id="implications" class="research-note" aria-labelledby="implications-title">
+              <p class="section-label">06 / Implications · 독자 관점</p>
+              <h2 id="implications-title">HR35에 가져올 것은 수치보다 검증 질문이다</h2>
+              <p>다음은 논문의 검증 결과와 구분되는 <strong>HR35 적용 관점의 해석</strong>이다. 토양 파라미터를 식별하는 접근과 달리, 이 연구는 접촉 중의 반응을 학습한다. AGX 토양을 사용하는 디지털 트윈에서도 실차 제어기 후보로 검토할 가치가 있다.</p>
+
+              <ul class="checklist" aria-label="HR35 적용 전 검토 항목">
+                <li><strong>압력 보정의 우선순위.</strong> 토크 관측의 효과는 압력 count→bar 보정과 압력→관절 토크 변환 검증의 중요성을 뒷받침한다. 센서 신호를 쓸 수 있다는 것과 신뢰할 수 있다는 것은 별개의 문제다.</li>
+                <li><strong>토양 범위의 의미 확인.</strong> 표 I의 범위는 AGX 무작위화 설계의 출발점으로 사용할 수 있다. 다만 모델별 파라미터 정의와 단위를 대조한 뒤 적용해야 하며, 숫자를 그대로 옮길 근거는 충분하지 않다.</li>
+                <li><strong>방향별 유압 한계 검증.</strong> 명령 반대 방향의 부하를 더 크게 견디는 특성이 HR35에서도 나타나는지 확인한다. 릴리프·체크밸브 거동과 자세별 토크 한계를 함께 살펴볼 필요가 있다.</li>
+                <li><strong>기체 안정성부터 시험.</strong> 3.5톤급 HR35의 들림 여유는 질량만으로 판단할 수 없다. 무게중심, 지지 영역과 작업 자세를 반영해 검증하고, 베이스 속도 0.1 m/s 같은 종료 기준도 기체에 맞게 평가한다.</li>
+              </ul>
+
+              <p>원 노트는 Zhao 2020의 토양 식별 접근·실측 토양 5종 및 Nan 2024의 압력 없는 접근과 대조할 것을 제안한다. 해당 연구들의 상세 비교는 이 글의 검증 범위에 포함하지 않는다.</p>
+            </section>
+
+            <section aria-labelledby="ending-title">
+              <div class="ending">
+                <p class="section-label">Takeaway</p>
+                <h2 id="ending-title">모르는 흙에서도,<br>반응을 배울 수 있다</h2>
+                <p>이 연구의 성과는 모든 흙의 성질을 알아낸 데 있지 않다. 다양한 저항을 경험한 정책이 토크와 자세를 읽고, 실제 굴착 중에 파는 방식을 바꿀 수 있음을 보인 데 있다.</p>
+                <p>다음 적용에서 물어야 할 질문도 분명하다. <strong>힘을 얼마나 믿을 수 있게 관측하는가. 기계의 한계를 얼마나 잘 모델링했는가. 그리고 언제 덜 담고 끝내야 하는가.</strong></p>
+              </div>
+              <div class="share" aria-label="공유용 요약">
+                <h3>공유용 한 문단 · 복사해서 사용할 수 있는 요약</h3>
+                <p class="copy-text">흙의 성질을 미리 몰라도 굴착 경로를 바꿀 수 있을까? ETH Zürich는 토양 모델의 6개 파라미터를 무작위화해 학습한 정책을 12톤 굴착기에 이식했다. 토크와 기구학 정보를 활용한 제어기는 일반 흙과 매설 화강암 조건에서 버킷을 채웠고, 베이스 가까이에서는 충돌을 피하려고 일찍 종료했다. 핵심은 토양을 식별하는 대신 저항에 반응하도록 학습했다는 점이다.</p>
+              </div>
+            </section>
+
+            <section id="sources" class="sources" aria-labelledby="sources-title">
+              <header class="section-head">
+                <p class="section-label">07 / Source Notes</p>
+                <h2 id="sources-title">출처와 읽기 안내</h2>
+              </header>
+              <div class="citation">
+                <cite>Pascal Egli, Dominique Gaschen, Simon Kerscher, Dominic Jud, Marco Hutter. <strong>“Soil-Adaptive Excavation Using Reinforcement Learning.”</strong></cite><br>
+                <em>IEEE Robotics and Automation Letters</em>, 7(4), 2022.<br>
+                ETH Zürich Robotic Systems Lab.<br>
+                <a>출판 논문 · DOI 10.1109/LRA.2022.3189834</a><br>
+                <a>노트에서 읽은 판 · ETH Research Collection</a>
+              </div>
+              <ol>
+                <li><strong>작성 범위.</strong> 이 글은 제공된 Obsidian 논문 요약을 공개 기사 형식으로 재구성했다. 별도의 원문 대조나 독립 재현을 수행한 보고서는 아니다.</li>
+                <li><strong>그림과 표.</strong> 그림 1·2·5·6·7과 표 II는 제공된 원 논문 이미지 자산을 사용했다. 캡션은 노트의 설명을 바탕으로 편집했다. 텍스트 표와 제어 흐름도는 해설용 재구성이다.</li>
+                <li><strong>수치의 범위.</strong> 학습 시간, 동작 시간, 채움비 및 “정지·들림 없음”은 보고된 설정과 실험 조건에 해당한다. 보편적인 성능 보장으로 확장하지 않는다.</li>
+                <li><strong>결과와 해석.</strong> HR35 검토 항목과 마지막 시사점은 적용을 위한 해석이다. 원 노트에 짧게 언급된 선행 연구는 서지 정보가 충분하지 않아 독립 참고문헌으로 확장하지 않았다.</li>
+              </ol>
+              <div class="tags" aria-label="핵심 키워드">
+                <span>고유수용 적응</span>
+                <span>FEE 3차원</span>
+                <span>토크 관측</span>
+                <span>관절 속도 정책</span>
+                <span>도메인 무작위화</span>
+                <span>시뮬레이션에서 실차로</span>
+              </div>
+            </section>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <footer class="page-footer">
+      <span>Field Notes / Robotics · 연구 해설 · 2026.09.25</span>
+      <a href="#top">맨 위로 ↑</a>
+    </footer>
+  </div>
+</body>
+</html>
