@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T11:15:17.371Z",
+  "updatedAt": "2026-09-25T11:20:52.108Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/egli2020-towards/",
+      "excerpt": "Towards RL Based Hydraulic Excavator Automation 요약 한줄 요약 12 t 보행 굴착기 Menzi Muck M545 의 유압 액추에이터 4개를 실차에서 2시간 모은 데이터로 학습한 신경망(밸브 명령 이력 → 다음 관절 속도) 으로 대신하고, 그 모델 위에서 강화학습으로 버킷 위치 제어기를 1시간 만에 학습해 실차에 바로 올렸다. 유압 물리식도, 실린더 관절 기하 지식도, 실차 게인 튜닝도 필",
+      "shortId": "h40pbv",
+      "slug": "egli2020-towards",
+      "sourcePath": "02_research/필드로봇/시스템식별/egli2020-towards.md",
+      "tags": [
+        "논문요약",
+        "시스템식별",
+        "굴착기",
+        "데이터기반액추에이터모델",
+        "강화학습",
+        "ETH"
+      ],
+      "title": "Towards RL-Based Hydraulic Excavator Automation - 요약",
+      "updatedAt": "2026-09-25T11:20:52.108Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/h40pbv/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/casoli2015-sim/",
