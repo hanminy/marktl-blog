@@ -1,7 +1,27 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T11:36:40.671Z",
+  "updatedAt": "2026-09-25T11:42:08.972Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/nan2024-adaptive/",
+      "excerpt": "Learning Adaptive Controller for Hydraulic Machinery Automation 요약 한줄 요약 실차 데이터 없이 1차 원리 축소 유압 모델의 파라미터(지연·데드존·비선형 맵·강성·마찰)를 크게 무작위화한 시뮬 에서, 시스템 동역학을 16차원 잠재변수 z 로 받는 범용 실린더 속도 제어기 를 강화학습으로 만들고, 실차에서는 에너지 기반 적응 모듈 이 관측 데이터로 z 를 1초마다 갱신한다. 1",
+      "shortId": "2z32rj",
+      "slug": "nan2024-adaptive",
+      "sourcePath": "02_research/필드로봇/시스템식별/nan2024-adaptive.md",
+      "tags": [
+        "논문요약",
+        "시스템식별",
+        "유압액추에이터",
+        "적응제어",
+        "도메인무작위화",
+        "잠재변수",
+        "ETH"
+      ],
+      "title": "Learning Adaptive Controller for Hydraulic Machinery Automation - 요약",
+      "updatedAt": "2026-09-25T11:42:08.972Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/2z32rj/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/lra2022-nonlinear-model-learning/",

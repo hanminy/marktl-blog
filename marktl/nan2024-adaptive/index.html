@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>유압 제어기는 다른 기계에서도 배울 수 있을까? — 유압 자동화 연구 리포트</title>
+  <style>
+    :root {
+      --paper: #f5f3ed;
+      --white: #fffefa;
+      --ink: #202d2b;
+      --muted: #626e68;
+      --green: #183e3a;
+      --green-soft: #e6ece5;
+      --accent: #b3482d;
+      --accent-soft: #f3e7dd;
+      --line: #d6d9cf;
+      --serif: "Iowan Old Style", "Palatino Linotype", "Noto Serif KR", "Batang", serif;
+      --sans: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 28px; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.85;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: #d9e4ce; color: var(--green); }
+    a { color: var(--green); text-underline-offset: 4px; text-decoration-thickness: 1px; }
+    a:hover { color: var(--accent); }
+    a:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--accent); outline-offset: 5px; }
+    img { display: block; max-width: 100%; height: auto; }
+    figure, blockquote { margin: 0; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { text-wrap: balance; }
+    strong { font-weight: 750; }
+    sub, sup { line-height: 0; }
+    .skip-link {
+      position: absolute; left: 16px; top: -90px; z-index: 5;
+      padding: 10px 18px; background: var(--white); color: var(--green);
+    }
+    .skip-link:focus { top: 12px; }
+    .shell { width: min(1180px, calc(100% - 88px)); margin-inline: auto; }
+    .masthead {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 20px; padding: 25px 0 20px; border-bottom: 1px solid var(--ink);
+      font-size: 12px; letter-spacing: .13em; text-transform: uppercase;
+    }
+    .brand { font-weight: 800; color: var(--green); }
+    .masthead span:last-child { color: var(--muted); letter-spacing: .05em; }
+    .hero { padding: 68px 0 42px; }
+    .eyebrow {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 22px;
+      color: var(--accent); font-size: 12px; letter-spacing: .13em; font-weight: 800;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 27px; height: 2px; background: currentColor; }
+    h1 {
+      max-width: 1000px; margin-bottom: 25px; font-size: clamp(38px, 5.5vw, 68px);
+      line-height: 1.2; letter-spacing: -.065em; font-weight: 800;
+    }
+    h1 em { font-style: normal; color: var(--green); }
+    .dek { max-width: 790px; margin-bottom: 26px; color: #4d5c55; font-size: clamp(18px, 2vw, 22px); line-height: 1.85; letter-spacing: -.025em; }
+    .metadata { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 12px; color: var(--muted); }
+    .hero-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 28px; margin: 0 0 42px; }
+    .hero-figure { background: var(--white); border: 1px solid var(--line); padding: 26px; display: flex; flex-direction: column; justify-content: center; }
+    .hero-figure img { width: 100%; max-height: 395px; object-fit: contain; }
+    figcaption { margin-top: 17px; color: var(--muted); font-size: 12px; line-height: 1.8; }
+    .fig-label { color: var(--accent); font-weight: 800; margin-right: 7px; }
+    .abstract { background: var(--green); color: #f6f5eb; padding: 34px 34px 30px; }
+    .label { display: block; font-size: 11px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+    .abstract .label { color: #becdbd; margin-bottom: 17px; }
+    .abstract h2 { margin-bottom: 18px; font-size: 25px; line-height: 1.5; letter-spacing: -.04em; }
+    .abstract p { font-size: 15px; line-height: 1.95; margin-bottom: 0; color: #e3e8dc; }
+    .abstract strong { color: #fff; }
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-bottom: 64px; }
+    .metric { padding: 25px 30px 25px 0; }
+    .metric + .metric { padding-left: 30px; border-left: 1px solid var(--line); }
+    .metric-number { display: block; color: var(--green); font-size: 38px; font-family: var(--serif); font-weight: 700; line-height: 1.2; letter-spacing: -.04em; font-variant-numeric: lining-nums tabular-nums; }
+    .metric-number small { font-size: 16px; font-family: var(--sans); letter-spacing: 0; }
+    .metric-title { display: block; font-size: 14px; font-weight: 750; margin-top: 9px; }
+    .metric-note { display: block; font-size: 11px; color: var(--muted); line-height: 1.7; margin-top: 4px; }
+    .reading-layout { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 60px; align-items: start; }
+    .sidebar { position: sticky; top: 28px; font-size: 12px; }
+    .sidebar .label { margin-bottom: 18px; color: var(--muted); }
+    .toc { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+    .toc li { border-bottom: 1px solid var(--line); }
+    .toc a { display: flex; gap: 12px; padding: 12px 0; text-decoration: none; }
+    .toc .num { color: var(--accent); font-size: 11px; font-variant-numeric: tabular-nums; }
+    .sidebar-note { margin-top: 24px; color: var(--muted); font-size: 11px; line-height: 1.9; }
+    .article-body { min-width: 0; }
+    .section { padding-bottom: 58px; margin-bottom: 48px; border-bottom: 1px solid var(--line); }
+    .section-heading { margin-bottom: 26px; }
+    .section-heading .label { color: var(--accent); margin-bottom: 10px; }
+    h2 { font-size: clamp(26px, 3vw, 34px); line-height: 1.45; letter-spacing: -.045em; margin-bottom: 22px; }
+    h3 { font-size: 21px; line-height: 1.5; letter-spacing: -.035em; margin-bottom: 14px; }
+    p { margin-bottom: 21px; }
+    .lead { font-size: 20px; line-height: 1.8; color: var(--green); letter-spacing: -.025em; }
+    .findings { display: grid; gap: 0; margin: 28px 0 0; padding: 0; list-style: none; }
+    .findings li { display: grid; grid-template-columns: 36px 1fr; gap: 15px; padding: 22px 0; border-top: 1px solid var(--line); }
+    .findings li:last-child { padding-bottom: 0; }
+    .finding-index { color: var(--accent); font-family: var(--serif); font-size: 26px; line-height: 1.4; }
+    .findings strong { display: block; margin-bottom: 5px; font-size: 18px; }
+    .findings p { margin: 0; font-size: 15px; color: var(--muted); }
+    .pullquote { padding: 30px 0 30px 28px; margin: 34px 0; border-left: 3px solid var(--accent); }
+    .pullquote p { max-width: 690px; font-family: var(--serif); font-size: clamp(23px, 3vw, 29px); font-weight: 600; line-height: 1.7; letter-spacing: -.035em; color: var(--green); margin: 0; }
+    .pullquote footer { font-size: 11px; color: var(--muted); margin-top: 12px; }
+    .paper-figure { margin: 28px 0; padding: 24px; border: 1px solid var(--line); background: var(--white); }
+    .paper-figure img { margin-inline: auto; max-height: 620px; object-fit: contain; }
+    .paper-figure.wide img { width: 100%; }
+    .figure-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 28px 0; }
+    .figure-pair .paper-figure { margin: 0; padding: 19px; }
+    .figure-pair img { width: 100%; height: 255px; object-fit: contain; }
+    .process { list-style: none; padding: 0; margin: 28px 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; }
+    .process li { position: relative; background: var(--green-soft); padding: 21px 19px; }
+    .process .step { color: var(--accent); display: block; font-size: 11px; font-weight: 800; letter-spacing: .06em; margin-bottom: 10px; }
+    .process h3 { font-size: 17px; margin-bottom: 9px; }
+    .process p { font-size: 13px; line-height: 1.85; margin: 0; color: #4d5c55; }
+    .note { padding: 22px 25px; background: var(--green-soft); margin: 26px 0; font-size: 14px; line-height: 1.9; }
+    .note p:last-child { margin-bottom: 0; }
+    .note-title { display: block; color: var(--green); font-size: 14px; font-weight: 800; margin-bottom: 7px; }
+    .note.warm { background: var(--accent-soft); }
+    .note.warm .note-title { color: var(--accent); }
+    .equation-block { margin: 25px 0; border: 1px solid var(--line); padding: 22px 24px; background: #eeeee7; }
+    .equation-block .label { color: var(--muted); margin-bottom: 14px; }
+    .math-scroll { overflow-x: auto; padding: 7px 0 11px; }
+    .math { font-family: "Cambria Math", "STIX Two Math", "Times New Roman", serif; font-size: 19px; white-space: nowrap; line-height: 2.25; letter-spacing: .01em; }
+    .math.small { font-size: 17px; }
+    .math-line { display: block; }
+    .equation-note { margin: 10px 0 0; font-size: 12px; line-height: 1.8; color: var(--muted); }
+    .table-wrap { overflow-x: auto; margin: 26px 0; border: 1px solid var(--line); background: var(--white); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; line-height: 1.7; }
+    caption { padding: 18px 20px; text-align: left; font-weight: 800; color: var(--green); font-size: 14px; }
+    th, td { padding: 15px 17px; text-align: left; vertical-align: top; border-top: 1px solid var(--line); }
+    thead th { background: #e9ece3; color: var(--green); font-weight: 750; }
+    tbody th { font-weight: 650; }
+    .results-table { min-width: 740px; font-variant-numeric: tabular-nums; }
+    .results-table td, .results-table thead th:not(:first-child) { text-align: right; }
+    .results-table .ours { background: #eef3e9; }
+    .results-table .highlight { color: var(--green); font-weight: 800; font-size: 17px; }
+    .table-note { font-size: 12px; color: var(--muted); margin-top: -12px; line-height: 1.85; }
+    .spec-list { display: grid; grid-template-columns: 128px 1fr; margin: 24px 0; font-size: 14px; }
+    .spec-list dt, .spec-list dd { margin: 0; padding: 14px 0; border-top: 1px solid var(--line); }
+    .spec-list dt { color: var(--green); font-weight: 750; padding-right: 15px; }
+    .spec-list dd { color: #536058; }
+    .subsection { margin-top: 38px; }
+    .evidence-tag { display: inline-block; padding: 4px 9px; margin-bottom: 12px; background: var(--green-soft); color: var(--green); font-size: 10px; font-weight: 800; letter-spacing: .05em; }
+    .result-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 20px 23px; margin: 22px 0; border-left: 3px solid var(--green); background: var(--green-soft); }
+    .result-strip strong { display: block; color: var(--green); font-size: 23px; line-height: 1.4; }
+    .result-strip span { display: block; font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .limitations { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 26px 0; }
+    .limit-card { border-top: 3px solid var(--green); padding: 23px; background: var(--white); }
+    .limit-card.caution { border-color: var(--accent); background: var(--accent-soft); }
+    .limit-card h3 { font-size: 18px; }
+    .limit-card ul { margin: 0; padding-left: 18px; font-size: 14px; }
+    .limit-card li + li { margin-top: 10px; }
+    .implications { counter-reset: implications; list-style: none; padding: 0; margin: 25px 0 0; }
+    .implications li { counter-increment: implications; padding: 22px 0 22px 45px; border-top: 1px solid var(--line); position: relative; }
+    .implications li::before { content: "0" counter(implications); position: absolute; left: 0; top: 22px; color: var(--accent); font-family: var(--serif); font-size: 23px; }
+    .implications h3 { font-size: 18px; margin-bottom: 8px; }
+    .implications p { font-size: 15px; color: #536058; margin: 0; }
+    code { font-family: var(--mono); font-size: .85em; background: #e8e9e1; padding: 2px 5px; border-radius: 3px; }
+    .closing { padding: 36px; background: var(--green); color: var(--white); margin-bottom: 34px; }
+    .closing .label { color: #bfcebd; margin-bottom: 17px; }
+    .closing h2 { font-size: 29px; }
+    .closing p { color: #e0e7db; font-size: 16px; }
+    .closing p:last-child { margin-bottom: 0; }
+    .share-copy { border: 1px solid var(--line); padding: 26px 29px; background: var(--white); margin: 30px 0; }
+    .share-copy .label { color: var(--accent); margin-bottom: 13px; }
+    .share-copy p { margin: 0; font-size: 15px; line-height: 1.95; }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 25px 0; }
+    .tags li { font-size: 11px; padding: 4px 11px; border: 1px solid var(--line); border-radius: 20px; color: var(--muted); }
+    .source-section { font-size: 13px; color: var(--muted); margin-bottom: 60px; }
+    .source-section h2 { font-size: 23px; color: var(--ink); }
+    .source-section ol { padding-left: 20px; }
+    .source-section li { padding-left: 5px; margin-bottom: 15px; }
+    .source-section cite { color: var(--ink); font-style: normal; }
+    .source-links { display: flex; flex-wrap: wrap; gap: 10px 22px; margin: 20px 0; }
+    .source-links a { font-size: 12px; font-weight: 750; }
+    .page-footer { border-top: 1px solid var(--ink); display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 22px 0 35px; font-size: 11px; color: var(--muted); }
+    @media (max-width: 1000px) {
+      .shell { width: calc(100% - 56px); }
+      .reading-layout { grid-template-columns: 140px minmax(0, 1fr); gap: 32px; }
+      .hero-grid { grid-template-columns: 1fr 1fr; gap: 20px; }
+      .abstract { padding: 27px; }
+      .process { grid-template-columns: 1fr; gap: 10px; }
+      .process li { padding: 19px 23px; }
+      .process .step { margin-bottom: 5px; }
+      .figure-pair { grid-template-columns: 1fr; }
+      .figure-pair img { height: auto; max-height: 440px; }
+    }
+    @media (max-width: 760px) {
+      body { font-size: 16px; }
+      .shell { width: calc(100% - 36px); }
+      .masthead { font-size: 10px; padding-top: 18px; letter-spacing: .06em; }
+      .hero { padding-top: 43px; padding-bottom: 30px; }
+      .hero-grid { grid-template-columns: 1fr; gap: 16px; }
+      .hero-figure { padding: 20px; }
+      .hero-figure img { max-height: 330px; }
+      .abstract { padding: 28px; }
+      .metrics { margin-bottom: 35px; }
+      .metric { padding: 19px 12px 20px 0; }
+      .metric + .metric { padding-left: 13px; }
+      .metric-number { font-size: 28px; }
+      .metric-number small { font-size: 12px; }
+      .metric-title { font-size: 12px; }
+      .metric-note { font-size: 10px; }
+      .reading-layout { display: block; }
+      .sidebar { position: static; margin-bottom: 40px; }
+      .sidebar .label { margin-bottom: 12px; }
+      .toc { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+      .toc a { padding: 9px 0; }
+      .sidebar-note { display: none; }
+      .section { padding-bottom: 37px; margin-bottom: 36px; }
+      .paper-figure { padding: 15px; margin: 23px 0; }
+      .limitations { grid-template-columns: 1fr; }
+      .equation-block { padding: 18px; }
+      .spec-list { grid-template-columns: 102px 1fr; }
+      .result-strip { padding: 18px; gap: 10px; }
+      .result-strip strong { font-size: 20px; }
+      .closing { padding: 28px 24px; }
+      .share-copy { padding: 23px; }
+      .page-footer { align-items: flex-start; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    @media print {
+      body { background: white; color: black; font-size: 10pt; }
+      .shell { width: 100%; }
+      .sidebar, .skip-link, .back-top { display: none; }
+      .reading-layout { display: block; }
+      .hero { padding-top: 25px; }
+      h1 { font-size: 32pt; }
+      h2 { font-size: 21pt; }
+      h3 { break-after: avoid; }
+      .abstract, .closing { background: #eef0e9; color: black; }
+      .abstract p, .abstract strong, .closing p, .abstract .label, .closing .label { color: #222; }
+      .paper-figure, .hero-figure, .limit-card, .note, .equation-block { break-inside: avoid; }
+      .paper-figure img { max-height: 440px; }
+      .table-wrap, .math-scroll { overflow: visible; }
+      .results-table { min-width: 0; font-size: 8pt; }
+      th, td { padding: 8px; }
+      .section { padding-bottom: 24px; margin-bottom: 25px; }
+      .metrics { margin-bottom: 28px; }
+      a { color: inherit; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Learning Adaptive Controller for Hydraulic Machinery Automation - 요약">
+<meta property="og:description" content="Learning Adaptive Controller for Hydraulic Machinery Automation 요약 한줄 요약 실차 데이터 없이 1차 원리 축소 유압 모델의 파라미터(지연·데드존·비선형 맵·강성·마찰)를 크게 무작위화한 시뮬 에서, 시스템 동역학을 16차원 잠재변수 z 로 받는 범용 실린더 속도 제어기 를 강화학습으로 만들고, 실차에서는 에너지 기반 적응 모듈 이 관측 데이터로 z 를 1초마다 갱신한다. 1">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/2z32rj/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/2z32rj/assets/figure1.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Learning Adaptive Controller for Hydraulic Machinery Automation - 요약">
+<meta name="twitter:description" content="Learning Adaptive Controller for Hydraulic Machinery Automation 요약 한줄 요약 실차 데이터 없이 1차 원리 축소 유압 모델의 파라미터(지연·데드존·비선형 맵·강성·마찰)를 크게 무작위화한 시뮬 에서, 시스템 동역학을 16차원 잠재변수 z 로 받는 범용 실린더 속도 제어기 를 강화학습으로 만들고, 실차에서는 에너지 기반 적응 모듈 이 관측 데이터로 z 를 1초마다 갱신한다. 1">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/2z32rj/assets/figure1.png">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/nan2024-adaptive/">
+</head>
+<body>
+  <a class="skip-link" href="#article-content">본문으로 바로 가기</a>
+  <div class="shell" id="top">
+    <header class="masthead">
+      <a class="brand" href="#top" aria-label="리포트 처음으로">Fieldnotes / Robotics</a>
+      <span>Research report · 2024 paper</span>
+    </header>
+
+    <main>
+      <article aria-labelledby="article-title">
+        <header class="hero">
+          <div class="eyebrow">유압 자동화 · 논문 읽기</div>
+          <h1 id="article-title">유압 제어기는<br><em>다른 기계에서도</em><br>배울 수 있을까?</h1>
+          <p class="dek">기체마다 다시 만드는 제어기에서, 현장에서 적응하는 제어기로. ETH의 연구는 16차원 잠재변수와 8–10분의 적응으로 두 유압 기계의 정밀 운동을 구현했다. 성과만큼 중요한 것은 이 접근이 통하는 조건이다.</p>
+          <div class="metadata">
+            <span>연구 · Fang Nan &amp; Marco Hutter</span>
+            <span>ETH Zürich · Robotic Systems Lab</span>
+            <span>노트 작성 · <time datetime="2026-09-25">2026.09.25</time></span>
+            <a href="#sources">논문 및 출처</a>
+          </div>
+        </header>
+
+        <div class="hero-grid">
+          <figure class="hero-figure">
+            <img src="assets/figure1.png" alt="시뮬레이션에서 학습한 범용 제어기를 서로 다른 유압 기계에 적용하고 실린더별로 온라인 적응하는 연구 개요" fetchpriority="high">
+            <figcaption><span class="fig-label">FIG. 1</span>시뮬레이션에서 학습하고, 각 기체의 실린더에서 적응한다. 목표는 서로 다른 기계로 옮겨 쓸 수 있는 정밀 운동 제어다.</figcaption>
+          </figure>
+          <section class="abstract" aria-labelledby="abstract-title">
+            <span class="label">Abstract / 초록</span>
+            <h2 id="abstract-title">기계마다 학습하는 대신,<br>차이를 추정한다</h2>
+            <p>이 연구는 지연·데드존·밸브 비선형·강성·마찰을 넓게 무작위화한 축소 유압 시뮬레이션에서 범용 실린더 속도 정책을 학습한다. 정책은 시스템 특성을 담은 <strong>16차원 잠재변수 z</strong>를 입력받고, 실차에서는 에너지 기반 적응 모듈이 관측으로 z를 <strong>1초마다 갱신</strong>한다. 기체별 실측 학습 데이터 없이 훈련한 정책을 12 t 굴착기 HEAP과 4.5 t 임업기 SAHA에 적용했다. 다만 급격한 외력 변화가 있는 깊은 굴착은 검증된 적용 범위 밖이다.</p>
+          </section>
+        </div>
+
+        <div class="metrics" aria-label="연구의 주요 수치">
+          <div class="metric">
+            <span class="metric-number">8–10 <small>분</small></span>
+            <span class="metric-title">실차에서의 적응 시간</span>
+            <span class="metric-note">SAHA 8분 · HEAP 10분<br>시뮬레이션 학습 시간과 구분</span>
+          </div>
+          <div class="metric">
+            <span class="metric-number">0.69–1.16 <small>cm</small></span>
+            <span class="metric-title">HEAP 평균 직선 경로 편차</span>
+            <span class="metric-note">느린 조건과 빠른 조건의 결과<br>모든 작업에 대한 정확도 보장은 아님</span>
+          </div>
+          <div class="metric">
+            <span class="metric-number">17.5–59.7 <small>%</small></span>
+            <span class="metric-title">DR 대비 RMS 오차 감소</span>
+            <span class="metric-note">HEAP의 학습 액추에이터 모델 위 평가<br>붐부터 피치까지 실린더별 차이</span>
+          </div>
+        </div>
+
+        <div class="reading-layout">
+          <aside class="sidebar" aria-label="목차">
+            <span class="label">In this report</span>
+            <nav aria-label="본문 탐색">
+              <ol class="toc">
+                <li><a href="#findings"><span class="num">01</span>핵심 발견</a></li>
+                <li><a href="#architecture"><span class="num">02</span>학습과 적응</a></li>
+                <li><a href="#model"><span class="num">03</span>축소 유압 모델</a></li>
+                <li><a href="#learning"><span class="num">04</span>정책의 내부</a></li>
+                <li><a href="#evidence"><span class="num">05</span>실험과 근거</a></li>
+                <li><a href="#limits"><span class="num">06</span>적용의 경계</a></li>
+                <li><a href="#implications"><span class="num">07</span>HR35 시사점</a></li>
+                <li><a href="#sources"><span class="num">08</span>출처와 읽기 메모</a></li>
+              </ol>
+            </nav>
+            <p class="sidebar-note">읽는 관점<br>범용 정책은 무엇을 공유하고, 현장 적응은 무엇을 바꾸는가?</p>
+          </aside>
+
+          <div class="article-body" id="article-content">
+            <section class="section" id="findings" aria-labelledby="findings-title">
+              <header class="section-heading">
+                <span class="label">01 / Key findings</span>
+                <h2 id="findings-title">범용성의 핵심은<br>차이를 무시하지 않는 데 있다</h2>
+              </header>
+              <p class="lead">유압 실린더의 제어를 어렵게 만드는 것은 기계마다 다른 응답이다. 같은 명령도 지연, 밸브 데드존, 마찰, 노화에 따라 다른 움직임을 만든다.</p>
+              <p>수동 피드포워드 표와 PID를 조합하거나 기체 전용 데이터로 액추에이터 모델을 학습하면 좋은 제어기를 만들 수 있다. 하지만 기체가 바뀌면 조정과 데이터 수집의 부담이 돌아온다. 이 논문은 공통 정책을 먼저 학습하고, 현장에서는 기계의 특성을 나타내는 작은 벡터를 맞추는 방식으로 문제를 나눈다.</p>
+              <ol class="findings">
+                <li>
+                  <span class="finding-index">01</span>
+                  <div>
+                    <strong>실측 학습 데이터를 줄여도, 현장 관측은 필요하다</strong>
+                    <p>정책은 무작위화한 물리 시뮬레이션에서 학습한다. 실차에 배치한 뒤에는 실제 입출력 관측으로 적응한다. 무작위화 범위에는 HEAP에 대한 경험도 반영되어 있다.</p>
+                  </div>
+                </li>
+                <li>
+                  <span class="finding-index">02</span>
+                  <div>
+                    <strong>기계의 차이를 z로 알려주면 추종 성능이 좋아진다</strong>
+                    <p>잠재변수로 동역학 정보를 받는 정책은 도메인 무작위화만 적용한 정책보다 낮은 RMS 속도 오차를 보였다. 이 비교는 적응을 통한 시스템 정보가 제어에 도움이 된다는 근거다.</p>
+                  </div>
+                </li>
+                <li>
+                  <span class="finding-index">03</span>
+                  <div>
+                    <strong>정밀 운동의 성공과 굴착의 성공은 구분해야 한다</strong>
+                    <p>두 실기에서 운동 제어를 검증했지만, 급변하는 접촉 부하까지 해결한 것은 아니다. HEAP의 평균 직선 편차는 작았으나 최대 편차는 비교 대상인 전작보다 컸다.</p>
+                  </div>
+                </li>
+              </ol>
+            </section>
+
+            <section class="section" id="architecture" aria-labelledby="architecture-title">
+              <header class="section-heading">
+                <span class="label">02 / System architecture</span>
+                <h2 id="architecture-title">정책은 공유하고,<br>시스템의 표현을 적응시킨다</h2>
+              </header>
+              <p>전체 흐름은 세 단계다. 먼저 시뮬레이터에서만 쉽게 얻을 수 있는 풍부한 응답 정보를 z로 압축하며 정책을 학습한다. 다음으로 일상적인 입출력 관측만으로 적절한 z를 찾는 적응 모듈을 학습한다. 실차에서는 이 모듈이 z를 갱신한다.</p>
+
+              <figure class="paper-figure wide">
+                <img src="assets/figure2.png" alt="세 단계 구조: 특권 정보를 인코딩해 정책 학습, 관측 기반 에너지 모듈 학습, 실차에서 잠재변수 z 온라인 갱신" loading="lazy">
+                <figcaption><span class="fig-label">FIG. 2</span>(a) 정상·과도 응답을 인코딩한 정책 학습, (b) 관측으로 z를 추정하는 에너지 모듈 학습, (c) 실차 온라인 적응.</figcaption>
+              </figure>
+
+              <ol class="process" aria-label="학습과 배치의 세 단계">
+                <li>
+                  <span class="step">STEP 01 · SIMULATION</span>
+                  <h3>많은 기계를 만든다</h3>
+                  <p>축소 모델의 지연, 데드존, 비선형 맵과 동역학 파라미터를 무작위화해 다양한 시스템을 생성한다.</p>
+                </li>
+                <li>
+                  <span class="step">STEP 02 · REPRESENTATION</span>
+                  <h3>차이를 16차원에 담는다</h3>
+                  <p>정상 응답과 스텝·사인 과도 응답을 z로 압축한다. 정책은 z에 조건화되어 목표 속도를 추종한다.</p>
+                </li>
+                <li>
+                  <span class="step">STEP 03 · REAL MACHINE</span>
+                  <h3>관측에 맞는 z를 찾는다</h3>
+                  <p>실차 입출력에 대한 에너지를 낮추도록 z를 갱신한다. 같은 정책을 실린더별 특성에 맞춰 사용한다.</p>
+                </li>
+              </ol>
+
+              <blockquote class="pullquote">
+                <p>하나의 정책이 여러 기계를 다루려면,<br>지금 어떤 기계를 제어하는지 알아야 한다.</p>
+                <footer>연구의 설계 원리를 풀어쓴 편집 요약 · 논문 직접 인용 아님</footer>
+              </blockquote>
+              <p>이때 z는 지연이나 마찰 계수를 하나씩 명시한 물리 파라미터 표가 아니다. 제어에 유용한 동역학 정보를 압축한 <strong>학습된 표현</strong>이다. 따라서 적응의 목표도 모든 물리량을 정확히 복원하는 것보다, 관측과 맞고 정책에 유용한 표현을 찾는 데 있다.</p>
+            </section>
+
+            <section class="section" id="model" aria-labelledby="model-title">
+              <header class="section-heading">
+                <span class="label">03 / Reduced-order physics</span>
+                <h2 id="model-title">복잡한 유압계를<br>어디까지 단순화할 수 있을까</h2>
+              </header>
+              <p>모델은 파일럿단 전류 u가 주 스풀 개도 d를 만들고, 밸브를 통과한 유량이 압력을 바꾸며 피스톤을 움직이는 구조에서 출발한다. 중요한 선택은 세부 현상을 모두 재현하는 대신, 속도 제어에 필요한 응답을 남기는 것이다.</p>
+
+              <figure class="paper-figure">
+                <img src="assets/figure3.png" alt="파일럿단 입력, 주 스풀 개도, 유량과 압력으로 연결되는 일반 유압 실린더 구성" loading="lazy">
+                <figcaption><span class="fig-label">FIG. 3</span>일반 유압 실린더의 구조. 파일럿단 입력이 주 스풀 개도를 바꾸고, 오리피스 유량이 피스톤 운동으로 이어진다.</figcaption>
+              </figure>
+
+              <div class="equation-block">
+                <span class="label">Model / 식 1–3</span>
+                <div class="math-scroll" tabindex="0" role="region" aria-label="유량, 압력 변화와 피스톤 가속도 방정식. 좁은 화면에서는 가로로 스크롤할 수 있습니다.">
+                  <div class="math">
+                    <span class="math-line">Q<sub>L</sub> = dK √(P<sub>S</sub> − P<sub>T</sub> − sign(d)P<sub>L</sub>)</span>
+                    <span class="math-line">dP<sub>L</sub>/dt = (4E/V<sub>t</sub>)(Q<sub>L</sub> − Āẋ)</span>
+                    <span class="math-line">ẍ = (1/m)(ĀP<sub>L</sub> + F<sub>L</sub> + F<sub>f</sub>)</span>
+                  </div>
+                </div>
+                <p class="equation-note">Q<sub>L</sub>: 부하 유량 · P<sub>S</sub>, P<sub>T</sub>: 공급·탱크 압력 · P<sub>L</sub>: 부하 압력 · x: 피스톤 위치 · d: 스풀 개도.</p>
+              </div>
+
+              <p>로드센싱이 제곱근 항을 일정하게 유지한다고 가정하면, 개도에서 속도로 이어지는 관계는 2차 시스템으로 축소된다. 아래 식은 위치 x에 대해 3차 미분이지만, 제어 대상인 속도 ẋ에 대해서는 2차다.</p>
+
+              <div class="equation-block">
+                <span class="label">Reduced dynamics / 식 4</span>
+                <div class="math-scroll" tabindex="0" role="region" aria-label="축소 유압 동역학 방정식">
+                  <div class="math">m d³x/dt³ = (4EĀ/V<sub>t</sub>)K′d − (4EĀ²/V<sub>t</sub>)ẋ + dF<sub>L</sub>/dt + dF<sub>f</sub>/dt</div>
+                </div>
+              </div>
+
+              <div class="table-wrap" tabindex="0" role="region" aria-label="모델의 주요 기호 표">
+                <table>
+                  <caption>축소 모델에 남은 물리량</caption>
+                  <thead><tr><th scope="col">기호</th><th scope="col">의미와 가정</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">E, V<sub>t</sub></th><td>오일 체적탄성계수와 실린더 총 체적.</td></tr>
+                    <tr><th scope="row">Ā</th><td>평균 유효 피스톤 면적.</td></tr>
+                    <tr><th scope="row">m</th><td>피스톤에 투영한 등가 질량. 자세에 따른 고유진동수 변동이 30% 미만이라는 근거로 상수 취급한다.</td></tr>
+                    <tr><th scope="row">F<sub>L</sub></th><td>중력 등을 포함한 외력. 시간에 따라 느리게 변한다고 가정한다.</td></tr>
+                    <tr><th scope="row">F<sub>f</sub></th><td>마찰. −μẋ − F<sub>s</sub> sign(ẋ) 형태로 표현한다.</td></tr>
+                    <tr><th scope="row">K′</th><td>로드센싱 조건에서의 유효 밸브 이득.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <aside class="note">
+                <span class="note-title">압력 센서 없이 제어할 수 있는 이유, 그리고 그 조건</span>
+                <p>식 (4)에는 외력 자체보다 <strong>외력의 시간 변화</strong>가 나타난다. 모델의 로드센싱 가정 아래에서 외력이 거의 일정하면 그 미분항은 작아진다. 이는 느린 운동에서 압력 관측 없이 속도를 제어하는 근거가 된다. 부하의 영향이 모든 상황에서 사라진다는 뜻은 아니다.</p>
+              </aside>
+
+              <figure class="paper-figure wide">
+                <img src="assets/figure4.png" alt="지연, 데드존, 비선형 맵, 축소 동역학, 출력 비선형 맵으로 구성된 시뮬레이션 모델" loading="lazy">
+                <figcaption><span class="fig-label">FIG. 4</span>시뮬레이션 모델의 연결: 지연 → 데드존 → 비선형 맵 → 축소 동역학 → 비선형 맵.</figcaption>
+              </figure>
+
+              <p>빠른 파일럿단은 지연과 데드존으로 대체한다. 밸브 비선형은 기울기가 양수인 구간선형 맵으로 동역학 앞뒤에 배치한다. 무작위화는 <strong>최대 0.6초의 지연, 최대 25%의 데드존</strong>, 맵 기울기, 선형계 파라미터와 마찰을 포함한다.</p>
+              <p class="table-note">해석상의 주의: 범위 설정에는 HEAP 경험이 사용됐다. 따라서 “기체별 실측 데이터로 정책을 학습하지 않았다”와 “유압 기계에 대한 사전 지식이 전혀 필요 없다”는 서로 다른 주장이다.</p>
+            </section>
+
+            <section class="section" id="learning" aria-labelledby="learning-title">
+              <header class="section-heading">
+                <span class="label">04 / Policy &amp; adaptation</span>
+                <h2 id="learning-title">제어는 정책이,<br>기계에 대한 추정은 에너지가 맡는다</h2>
+              </header>
+
+              <h3>목표 속도의 미래와 시스템의 과거를 함께 본다</h3>
+              <p>정책은 최근 관측·명령 이력, 목표 속도 미리보기, z를 받는다. 목표의 다음 변화를 알고 시스템의 지연을 추정할 수 있으면, 오차가 생긴 뒤 반응하는 것에 더해 필요한 입력을 앞서 준비할 수 있다.</p>
+              <dl class="spec-list">
+                <dt>정책</dt><dd>MLP [64, 32]. 관측 o<sub>t</sub> = [ẋ<sub>t</sub>, u<sub>t−1</sub>, …, u<sub>t−k</sub>], 목표 속도 [ẋ*<sub>t</sub>, …, ẋ*<sub>t+N</sub>], 16차원 z를 입력받는다.</dd>
+                <dt>인코더</dt><dd>CNN + MLP [96, 64]. −1.0부터 1.0까지 0.1 간격의 상수 입력에 대한 정상 응답과 스텝·사인 과도 응답을 압축한다. 학습 중 각 환경의 z는 한 번 계산한다.</dd>
+                <dt>정책 학습</dt><dd>PPO + GAE, 병렬 시뮬레이션. 노트에 보고된 학습 시간은 약 0.5시간이다.</dd>
+              </dl>
+
+              <div class="equation-block">
+                <span class="label">Reward / 식 5–8 요약</span>
+                <div class="math-scroll" tabindex="0" role="region" aria-label="속도 오차, 속도 변화 오차, 입력 변화에 대한 보상 함수">
+                  <div class="math small">
+                    <span class="math-line">r<sub>k</sub> = 0.5 exp(−40 ‖ẋ<sub>k</sub> − ẋ*<sub>k</sub>‖²)</span>
+                    <span class="math-line">　 + 0.2 exp(−5 ‖(ẋ<sub>k</sub> − ẋ<sub>k−1</sub>) − (ẋ*<sub>k</sub> − ẋ*<sub>k−1</sub>)‖²)</span>
+                    <span class="math-line">　 + 0.1 exp(−2 ‖u<sub>k</sub> − u<sub>k−1</sub>‖²)</span>
+                  </div>
+                </div>
+                <p class="equation-note">세 항은 각각 속도 추종, 목표와 일치하는 속도 변화, 부드러운 제어 입력을 유도한다.</p>
+              </div>
+
+              <div class="subsection">
+                <h3>실차에서 특권 정보를 대신하는 에너지 함수</h3>
+                <p>시뮬레이션에서는 정상·과도 응답을 체계적으로 얻기 쉽다. 실차에서는 이런 특권 정보를 매번 확보하기 어렵다. 에너지 함수 f<sub>θ</sub>(o<sub>t</sub>, u<sub>t</sub>, ẋ<sub>t+1</sub>, z)는 현재 관측과 다음 응답에 잘 맞는 z에서 값이 낮아지도록 학습된다.</p>
+                <p>학습에는 무작위 환경 3,000개, 환경별 기준 z*, 200스텝 롤아웃을 사용한다. 임의의 z에서 경사하강을 5회 수행한 뒤, 도달한 z와 기준 z* 사이의 거리로 에너지 모델을 갱신한다. 이 과정을 2,400회 반복하며, 보고된 학습 시간은 약 3.5시간이다.</p>
+              </div>
+
+              <div class="equation-block">
+                <span class="label">Online update / 식 9</span>
+                <div class="math-scroll" tabindex="0" role="region" aria-label="최근 관측 구간의 에너지 기울기를 이용한 잠재변수 갱신">
+                  <div class="math small">
+                    <span class="math-line">ẑ<sub>t</sub> ← ẑ<sub>t−1</sub> − γ ∇<sub>z</sub> ∑<sub>τ∈[t−16,t]</sub> f<sub>θ</sub>(o<sub>τ</sub>, u<sub>τ</sub>, ẋ<sub>τ+tₛ</sub>, ẑ<sub>t−1</sub>)</span>
+                  </div>
+                </div>
+                <p class="equation-note">실차에서는 최근 관측 구간의 에너지를 줄이는 방향으로 z를 1초마다 갱신한다. t<sub>s</sub>는 식에서 다음 응답을 참조하는 시간 간격이다.</p>
+              </div>
+
+              <aside class="note">
+                <span class="note-title">왜 z에 대해 볼록하게 만드는가</span>
+                <p>입력 볼록 신경망은 z 방향의 에너지 구조를 제약해 경사 기반 추정을 돕는다. 짧은 관측만으로 구분하기 어려운 시스템들이 있을 때 보수적으로 적응하도록 설계한 것이다. <strong>볼록성만으로 실제 동역학의 유일한 식별이나 모든 운전 조건의 안정성이 보장되는 것은 아니다.</strong></p>
+              </aside>
+            </section>
+
+            <section class="section" id="evidence" aria-labelledby="evidence-title">
+              <header class="section-heading">
+                <span class="label">05 / Evidence</span>
+                <h2 id="evidence-title">무엇을, 어디에서,<br>얼마나 잘했는가</h2>
+              </header>
+              <p>결과는 세 층위로 읽어야 한다. 무작위 시뮬레이션은 적응 작동 여부를, 실측 데이터로 학습된 액추에이터 모델은 더 현실적인 동역학에서의 비교를, 실제 기계는 현장 적용 가능성을 보여준다.</p>
+
+              <div class="subsection">
+                <span class="evidence-tag">EVIDENCE A · 시뮬레이션</span>
+                <h3>무작위화만으로 남는 오차를 적응으로 줄였다</h3>
+                <div class="figure-pair">
+                  <figure class="paper-figure">
+                    <img src="assets/figure5.png" alt="무작위 시스템의 적응 전후 속도 추종, 스텝·램프·사인 기준 신호, 약 2분에 걸친 잠재변수 추정 오차 수렴" loading="lazy">
+                    <figcaption><span class="fig-label">FIG. 5</span>무작위 시스템에서 적응 전후 추종과 z 추정 오차. 적응용 신호는 스텝·램프·사인으로 구성되며, 추정 오차는 약 2분에 걸쳐 수렴한다.</figcaption>
+                  </figure>
+                  <figure class="paper-figure">
+                    <img src="assets/figure6.png" alt="HEAP 네 실린더의 학습 액추에이터 모델에서 적응 전후 제어기와 도메인 무작위화 제어기의 추종 비교" loading="lazy">
+                    <figcaption><span class="fig-label">FIG. 6</span>Egli 2021의 HEAP 실측 학습 액추에이터 모델 위 비교. 적응 전후 성능과 도메인 무작위화만 적용한 제어기(DR)를 비교한다.</figcaption>
+                  </figure>
+                </div>
+                <p>학습 액추에이터 모델 위에서 적응 제어기는 DR 대비 RMS 오차를 <strong>붐 17.5%에서 피치 59.7%까지</strong> 줄였다. 논문의 설명은 동역학 정보가 없는 DR 정책이 피드백에 더 의존하면서 지연·오버슈트·진동을 보인다는 것이다. z 조건화는 시스템에 맞는 피드포워드 동작을 만드는 데 도움을 준다.</p>
+              </div>
+
+              <div class="subsection">
+                <span class="evidence-tag">EVIDENCE B · HEAP / 12 t 보행 굴착기</span>
+                <h3>10분 적응 후, 직선의 평균 편차는 1 cm 안팎</h3>
+                <p>HEAP에서는 10분의 적응 뒤 네 실린더의 속도 추종과 말단 궤적을 평가했다. 변조 사인 신호를 따를 수 있었지만, 속도가 0을 지나는 구간에는 마찰에 따른 급가속이 관찰됐다.</p>
+
+                <figure class="paper-figure wide">
+                  <img src="assets/figure7.png" alt="HEAP 네 실린더에서 적응 후 변조 사인 목표 속도를 추종하는 결과" loading="lazy">
+                  <figcaption><span class="fig-label">FIG. 7</span>HEAP의 적응 후 실린더 속도 추종. 영속도 교차 구간은 마찰의 영향이 드러나는 지점이다.</figcaption>
+                </figure>
+
+                <div class="figure-pair">
+                  <figure class="paper-figure">
+                    <img src="assets/figure8.png" alt="HEAP의 지름 1.5미터 원 궤적 추종 결과" loading="lazy">
+                    <figcaption><span class="fig-label">FIG. 8</span>지름 1.5 m 원 궤적을 40 cm/s로 추종. 말단 평균 오차는 4.1 cm로 보고됐다.</figcaption>
+                  </figure>
+                  <figure class="paper-figure">
+                    <img src="assets/figure9.png" alt="다섯 높이에서 수행한 2미터 직선 궤적과 Leica iCON 대비 경로 편차" loading="lazy">
+                    <figcaption><span class="fig-label">FIG. 9</span>다섯 높이의 2 m 직선 궤적과 Leica iCON 비교. 노트의 그림 설명상 기준 속도는 15 cm/s이며, 조건별 평균 속도는 아래 표에 구분했다.</figcaption>
+                  </figure>
+                </div>
+
+                <div class="table-wrap" tabindex="0" role="region" aria-label="HEAP 직선 추종 결과 비교표. 좁은 화면에서는 가로로 스크롤할 수 있습니다.">
+                  <table class="results-table">
+                    <caption>HEAP 직선 추종 — 평균뿐 아니라 최대 편차도 함께 보기</caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">지표</th>
+                        <th scope="col" class="ours">본 논문<br>느림</th>
+                        <th scope="col" class="ours">본 논문<br>빠름</th>
+                        <th scope="col">Egli 2021<br>느림</th>
+                        <th scope="col">Egli 2021<br>빠름</th>
+                        <th scope="col">Leica<br>빠름</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row">평균 속도 <small>[cm/s]</small></th><td class="ours">13.0</td><td class="ours">20.0</td><td>13.1</td><td>18.3</td><td>16.3</td></tr>
+                      <tr><th scope="row">평균 경로 편차 <small>[cm]</small></th><td class="ours highlight">0.69</td><td class="ours highlight">1.16</td><td>0.8</td><td>0.9</td><td>1.8</td></tr>
+                      <tr><th scope="row">최대 경로 편차 <small>[cm]</small></th><td class="ours">3.73</td><td class="ours">5.91</td><td>1.7</td><td>2.2</td><td>4.2</td></tr>
+                      <tr><th scope="row">평균 각속도 오차 <small>[rad/s]</small></th><td class="ours">0.004</td><td class="ours">0.007</td><td>0.010</td><td>0.012</td><td>0.015</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <p class="table-note">출처: 제공된 논문 요약 노트의 비교표. 각 조건의 실제 평균 속도가 다르므로 동일 속도에서의 통제 비교로 해석하지 않는다.</p>
+
+                <aside class="note warm">
+                  <span class="note-title">“전작과 비슷하다”는 말의 정확한 범위</span>
+                  <p>평균 직선 편차는 기체 전용 데이터로 학습한 전작과 비슷한 수준이다. 그러나 빠른 조건의 평균 편차와 두 조건의 최대 편차는 전작보다 크다. 큰 편차는 주로 궤적 시작 부분에서 발생했으며, 논문은 실린더별 독립 제어와 관련지어 상위 협조 제어의 개선 가능성을 제시한다.</p>
+                </aside>
+
+                <figure class="paper-figure">
+                  <img src="assets/figure10.png" alt="HEAP이 약 5센티미터 깊이의 얕은 정지작업을 수행하는 실험 결과" loading="lazy">
+                  <figcaption><span class="fig-label">FIG. 10</span>약 5 cm 깊이의 얕은 정지작업을 20 cm/s로 수행한 결과. 평균 오차는 3.62 cm이며, 더 깊은 굴착으로 일반화하지 않는다.</figcaption>
+                </figure>
+              </div>
+
+              <div class="subsection">
+                <span class="evidence-tag">EVIDENCE C · SAHA / 4.5 t 임업기</span>
+                <h3>다른 크기와 상태의 기계로 옮겨도 작동했다</h3>
+                <p>SAHA는 HEAP과 크기·용도·노후 상태가 다른 플랫폼이다. 8분 적응 뒤 웨이포인트 기반 직선 궤적을 세 차례 반복했다. 이 실험은 같은 제어 구조가 다른 기계로 이전될 수 있음을 보여준다.</p>
+
+                <figure class="paper-figure wide">
+                  <img src="assets/figure12.png" alt="SAHA 임업기의 웨이포인트 직선 궤적을 세 차례 반복한 추종 결과" loading="lazy">
+                  <figcaption><span class="fig-label">FIG. 12</span>SAHA의 직선 궤적 반복 실험. 0.6 m/s 조건에서 평균 오차 5.39 cm가 보고됐다.</figcaption>
+                </figure>
+
+                <div class="result-strip" aria-label="SAHA 실험 조건과 결과">
+                  <div><strong>8분</strong><span>현장 적응</span></div>
+                  <div><strong>0.6 m/s</strong><span>궤적 속도</span></div>
+                  <div><strong>5.39 cm</strong><span>평균 오차</span></div>
+                </div>
+                <p>오차의 배경으로는 노후 유압계, 큰 백래시, 수동으로 현수된 말단 구조가 제시된다. HEAP 직선 실험과는 속도와 기계 조건이 달라 수치만으로 우열을 비교하기 어렵다.</p>
+              </div>
+            </section>
+
+            <section class="section" id="limits" aria-labelledby="limits-title">
+              <header class="section-heading">
+                <span class="label">06 / Scope &amp; limitations</span>
+                <h2 id="limits-title">운동 제어의 범용성은<br>부하 변화 앞에서 경계를 만난다</h2>
+              </header>
+              <p>이 접근의 강점과 한계는 같은 모델 가정에서 나온다. 외력이 느리게 변하고 로드센싱이 잘 동작하면 단순한 속도 모델이 유용하다. 흙을 깊게 파면서 부하가 급변하면 그 전제가 흔들린다.</p>
+
+              <div class="limitations">
+                <section class="limit-card" aria-labelledby="supported-title">
+                  <h3 id="supported-title">이번 연구가 보여준 범위</h3>
+                  <ul>
+                    <li>서로 다른 두 실기에서의 실린더 속도 제어와 말단 운동.</li>
+                    <li>실차 압력 관측 없이 수행한 온라인 잠재변수 적응.</li>
+                    <li>HEAP의 얕은 접촉 작업과 정밀 경로 추종.</li>
+                  </ul>
+                </section>
+                <section class="limit-card caution" aria-labelledby="open-title">
+                  <h3 id="open-title">남아 있는 과제</h3>
+                  <ul>
+                    <li>깊은 굴착과 급격한 외력 변화에 대한 대응.</li>
+                    <li>학습 시 무작위화 범위를 벗어나는 동역학.</li>
+                    <li>일상 운전의 편향된 자극만으로 지속적으로 학습하는 문제.</li>
+                  </ul>
+                </section>
+              </div>
+
+              <p>확장 방향은 실린더·펌프 압력을 포함해 부하 의존 동역학을 다루는 것이다. 또 현장 데이터가 충분한 정보를 담는지도 따져야 한다. 반복되는 좁은 운전 조건에서는 관측이 쌓여도 서로 다른 시스템을 구분하기 어려울 수 있다.</p>
+              <blockquote class="pullquote">
+                <p>압력 없이 가능한 범위를 밝힌 연구는,<br>압력이 필요한 이유도 함께 보여준다.</p>
+                <footer>모델 가정과 실험 범위를 연결한 편집 해석</footer>
+              </blockquote>
+            </section>
+
+            <section class="section" id="implications" aria-labelledby="implications-title">
+              <header class="section-heading">
+                <span class="label">07 / Implications for HR35</span>
+                <h2 id="implications-title">현장 설계로 가져갈 것은<br>정답보다 범위와 시험 절차다</h2>
+              </header>
+              <p class="lead">아래는 논문 결과를 HR35에 연결한 노트 작성자의 해석이다. HR35에서 검증된 결과와는 구분한다.</p>
+              <ol class="implications">
+                <li>
+                  <h3>트윈의 가정값을 무작위화 범위로 바꾼다</h3>
+                  <p>유압 파라미터 장부의 <code>assumed</code> 값을 단일 수치로만 남기지 않고 하한·상한과 근거를 기록한다. E, V<sub>t</sub>, Ā, 마찰, 데드존, 지연 중 무엇을 실험으로 좁히고 무엇을 적응에 맡길지 판단하는 출발점이 된다.</p>
+                </li>
+                <li>
+                  <h3>식별의 가치를 제어 오차로 평가한다</h3>
+                  <p>DR 대비 RMS 오차 감소는 시스템 정보가 제어 성능으로 이어질 수 있다는 근거다. HR35에서도 식별 오차만 보지 않고, 그 정보가 지연·오버슈트·경로 편차를 얼마나 줄이는지 연결해 평가할 수 있다.</p>
+                </li>
+                <li>
+                  <h3>트렌칭에는 압력 정보와 데이터 기반 모델을 함께 고려한다</h3>
+                  <p>HR35 트렌칭은 급격한 접촉 부하를 다뤄야 하므로 이 논문의 압력 없는 모델을 그대로 적용하기 어렵다. 노트의 축 B(압력 기반)와 축 E(데이터 기반)를 결합하려는 방향을 뒷받침하는 설계상의 시사점이다.</p>
+                </li>
+                <li>
+                  <h3>적응 신호를 현장 시험 계획의 출발점으로 삼는다</h3>
+                  <p>스텝·램프·변조 사인, 관절별 개별 시험, 운전자 감독이라는 구성을 축 G의 시험 계획에 참고할 수 있다. 실제 진폭과 속도 범위는 HR35의 운전 조건에 맞춰 정해야 한다.</p>
+                </li>
+                <li>
+                  <h3>한 번의 응답 시험으로 여러 모델 가설을 비교한다</h3>
+                  <p>노트는 이 연구의 2차 모델을 별도로 읽은 “ETH 2026”의 2차·데드타임 MPC 관절 모델과 연결한다. HR35 스텝 응답을 두 모델의 적합성을 비교하는 공통 자료로 활용하자는 제안이다. 해당 2026년 자료의 서지정보는 제공되지 않아, 모델 간 동등성을 확인한 결론으로 다루지는 않는다.</p>
+                </li>
+              </ol>
+            </section>
+
+            <section class="closing" aria-labelledby="closing-title">
+              <span class="label">The takeaway</span>
+              <h2 id="closing-title">공통으로 배울 것과<br>현장에서 알아낼 것을 나누자</h2>
+              <p>이 연구의 성과는 “어떤 유압 기계에나 곧바로 붙는 완성형 제어기”보다 구체적이다. 넓은 시뮬레이션에서 공통 제어 능력을 학습하고, 실제 기계의 차이는 작은 잠재변수로 적응시키는 방식이 두 실기에서 작동했다.</p>
+              <p>다음 설계에서 물어야 할 것은 세 가지다. <strong>기계의 차이를 학습 범위가 담고 있는가. 현장 관측이 그 차이를 드러내는가. 작업 부하가 모델 가정을 유지하는가.</strong> 이 질문에 답할 때, 범용 정책은 현장에서 쓸 수 있는 제어기로 가까워진다.</p>
+            </section>
+
+            <aside class="share-copy" aria-label="복사하여 공유할 수 있는 핵심 요약">
+              <span class="label">Copy-ready / 공유용 요약</span>
+              <p>유압 제어기를 기계마다 다시 학습해야 할까? ETH의 2024년 연구는 무작위화한 물리 시뮬레이션과 16차원 잠재변수 적응을 결합했다. 두 실기에서 8–10분 적응 후 운동 제어를 검증했고, HEAP의 평균 직선 편차는 0.69–1.16 cm였다. 핵심은 기계의 차이를 추정하는 것. 다만 급변하는 부하와 깊은 굴착은 여전히 다음 과제다.</p>
+            </aside>
+
+            <ul class="tags" aria-label="주제 키워드">
+              <li>축소 유압 모델</li>
+              <li>도메인 무작위화</li>
+              <li>잠재변수 z</li>
+              <li>에너지 기반 적응</li>
+              <li>입력 볼록 신경망</li>
+              <li>실린더 속도 제어</li>
+              <li>HEAP · SAHA</li>
+            </ul>
+
+            <section class="source-section" id="sources" aria-labelledby="sources-title">
+              <span class="label">08 / Sources &amp; editorial notes</span>
+              <h2 id="sources-title">출처와 읽기 메모</h2>
+              <ol>
+                <li>
+                  <cite>Fang Nan and Marco Hutter. “Learning Adaptive Controller for Hydraulic Machinery Automation.”</cite>
+                  <em>IEEE Robotics and Automation Letters</em>, 9(4), 2024.
+                  DOI: <a>10.1109/LRA.2024.3372831</a>.
+                  소속: ETH Zürich Robotic Systems Lab.
+                </li>
+                <li>
+                  <strong>노트에서 읽은 판:</strong>
+                  <a>ETH Research Collection · 10.3929/ethz-b-000667484</a>.
+                  이 글은 제공된 한국어 요약 노트를 편집·재구성했다. 수식, 수치, 실험 조건은 해당 노트 기준이며 원문을 별도로 대조한 판은 아니다.
+                </li>
+                <li>
+                  <strong>그림과 표:</strong> 제공된 논문 그림 1–10, 12를 원래 번호로 수록했다. 그림 11은 제공 자료에 포함되지 않았다. 캡션은 노트 설명을 바탕으로 재서술했으며, HEAP 비교표는 제공 수치를 유지했다. 그림의 출처는 위 논문이며 이 페이지에서 별도의 재사용 라이선스를 부여하지 않는다.
+                </li>
+                <li>
+                  <strong>비교 연구:</strong> “Egli 2021”은 노트에 제시된 기체 전용 학습 제어기 및 액추에이터 모델을 가리킨다. 완전한 서지정보가 제공되지 않아 추가하지 않았다. RMS 감소율은 학습 액추에이터 모델 위 평가이고, 경로 편차는 실차 평가이므로 두 결과를 같은 지표로 합치지 않았다.
+                </li>
+                <li>
+                  <strong>해석의 구분:</strong> 강조 인용문은 논문 저자의 직접 발언이 아닌 편집 요약이다. HR35 적용과 “ETH 2026” 연결은 노트 작성자의 프로젝트 관점이며, 이 논문이 직접 검증한 주장에 포함되지 않는다.
+                </li>
+              </ol>
+              <div class="source-links">
+                <a>학술지 논문 ↗</a>
+                <a>ETH 읽기 판 ↗</a>
+                <a href="#evidence">실험 결과 다시 보기 ↑</a>
+              </div>
+            </section>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <footer class="page-footer">
+      <span>FIELDNOTES / ROBOTICS<br>유압 자동화 연구 리포트 · 노트 기준 2026.09.25</span>
+      <a class="back-top" href="#top">처음으로 ↑</a>
+    </footer>
+  </div>
+</body>
+</html>
