@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T12:33:41.371Z",
+  "updatedAt": "2026-09-25T12:38:45.480Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/chis2011-si-comparison/",
+      "excerpt": "Structural Identifiability of Systems Biology Models: A Critical Comparison of Methods 요약 한줄 요약 비선형 동적 모델의 구조적 식별가능성 (데이터가 완벽해도 파라미터를 유일하게 정할 수 있는가)을 검사하는 일곱 방법 — 테일러 급수, 생성 급수(+식별가능성 타블로), 유사 변환, 직접 검사, 미분 대수(DAISY), 음함수 정리, 반응망 이론 — 을 생물 ",
+      "shortId": "1qvfcu9",
+      "slug": "chis2011-si-comparison",
+      "sourcePath": "02_research/필드로봇/시스템식별/chis2011-si-comparison.md",
+      "tags": [
+        "논문요약",
+        "구조적식별가능성",
+        "방법비교",
+        "생성급수",
+        "식별가능성타블로",
+        "미분대수"
+      ],
+      "title": "Structural Identifiability of Systems Biology Models: A Critical Comparison of Methods - 요약",
+      "updatedAt": "2026-09-25T12:38:45.480Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/1qvfcu9/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/villaverde2016-strikegoldd/",

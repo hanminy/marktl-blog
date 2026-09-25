@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>데이터가 완벽해도, 파라미터를 알 수 있을까? — 구조적 식별가능성의 일곱 가지 해법</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      --paper: #f7f5ef;
+      --surface: #fffefb;
+      --ink: #202f34;
+      --muted: #59686b;
+      --line: #d9dfd8;
+      --green: #1f6356;
+      --green-soft: #eaf0e9;
+      --orange: #a94a29;
+      --orange-soft: #f5e9df;
+      --dark: #183e38;
+      --serif: "Noto Serif KR", "Source Han Serif K", "Nanum Myeongjo", "Batang", serif;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-padding-top: 2rem; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.9;
+      letter-spacing: -.025em;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: #d5e6ce; color: #152f2b; }
+    a { color: var(--green); text-decoration-thickness: 1px; text-underline-offset: .22em; }
+    a:hover { color: var(--orange); }
+    a:focus-visible, [tabindex]:focus-visible {
+      outline: 3px solid var(--orange);
+      outline-offset: 5px;
+    }
+    p { margin: 0 0 1.2rem; }
+    strong { font-weight: 750; }
+    h1, h2, h3, h4 { line-height: 1.4; margin: 0; text-wrap: balance; }
+    h1, h2 { letter-spacing: -.055em; }
+    h3 { letter-spacing: -.035em; }
+    figure, blockquote { margin: 0; }
+    img { display: block; max-width: 100%; height: auto; }
+    sup { font-size: .7em; }
+    .page { width: min(1180px, calc(100% - 88px)); margin-inline: auto; }
+    .skip-link {
+      position: absolute;
+      top: -100px;
+      left: 20px;
+      z-index: 10;
+      padding: .6rem 1rem;
+      background: var(--surface);
+    }
+    .skip-link:focus { top: 16px; }
+    .masthead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 25px 0;
+      border-bottom: 1px solid var(--ink);
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark { width: 13px; height: 13px; background: var(--green); }
+    .masthead-note { color: var(--muted); letter-spacing: .03em; }
+    .eyebrow {
+      display: block;
+      color: var(--green);
+      font-size: .71rem;
+      font-weight: 750;
+      line-height: 1.6;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    .hero { padding: 70px 0 42px; }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 240px;
+      gap: 60px;
+      align-items: end;
+    }
+    .hero h1 {
+      font-family: var(--serif);
+      font-size: clamp(2.65rem, 4.4vw, 4.1rem);
+      font-weight: 700;
+      line-height: 1.38;
+      margin: 23px 0;
+    }
+    .hero h1 em { color: var(--green); font-style: normal; }
+    .deck { max-width: 740px; color: var(--muted); font-size: 1.12rem; line-height: 1.85; }
+    .hero-aside {
+      padding: 25px 0 14px 25px;
+      border-left: 1px solid var(--line);
+    }
+    .hero-aside .number {
+      font-family: Georgia, serif;
+      display: block;
+      font-size: 3.6rem;
+      line-height: 1.1;
+      letter-spacing: -.07em;
+      color: var(--green);
+    }
+    .hero-aside p { font-size: .82rem; margin: .5rem 0 1.4rem; color: var(--muted); }
+    .hero-aside p:last-child { margin-bottom: 0; }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 23px;
+      border-top: 1px solid var(--line);
+      margin-top: 30px;
+      padding-top: 17px;
+      color: var(--muted);
+      font-size: .76rem;
+      letter-spacing: 0;
+    }
+    .abstract {
+      display: grid;
+      grid-template-columns: 170px minmax(0, 1fr);
+      gap: 36px;
+      padding: 34px 38px;
+      background: var(--green-soft);
+      border-top: 3px solid var(--green);
+    }
+    .abstract h2 { font-size: 1.35rem; margin-top: 5px; }
+    .abstract p { margin: 0; font-size: 1rem; }
+    .abstract .abstract-note { margin-top: .8rem; color: var(--muted); font-size: .78rem; }
+    .toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px 25px;
+      padding: 22px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: .8rem;
+    }
+    .toc a { text-decoration: none; }
+    .toc span { color: var(--orange); margin-right: 7px; font-size: .68rem; }
+    .article-grid {
+      display: grid;
+      grid-template-columns: 170px minmax(0, 1fr);
+      gap: 48px;
+      margin-top: 58px;
+    }
+    .rail { font-size: .75rem; color: var(--muted); }
+    .rail-block { border-top: 1px solid var(--line); padding-top: 15px; margin-bottom: 33px; }
+    .rail strong { display: block; color: var(--ink); font-size: .78rem; margin-bottom: 8px; }
+    .rail p { margin-bottom: .65rem; }
+    .rail .original-title { font-family: Georgia, serif; font-size: .86rem; line-height: 1.65; letter-spacing: 0; }
+    .article-body { min-width: 0; }
+    .section { padding-bottom: 56px; margin-bottom: 47px; border-bottom: 1px solid var(--line); }
+    .section:last-child { margin-bottom: 0; }
+    .section-heading { margin-bottom: 26px; }
+    .section-heading .eyebrow { margin-bottom: 10px; }
+    .section h2 { font-size: clamp(1.7rem, 2.55vw, 2.15rem); font-weight: 750; }
+    .section h3 { margin: 30px 0 13px; font-size: 1.23rem; }
+    .section-intro { font-size: 1.05rem; color: var(--muted); }
+    .findings {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin: 27px 0 21px;
+    }
+    .finding { padding: 23px 21px; border: 1px solid var(--line); background: var(--surface); }
+    .finding .index { font: italic 1.8rem Georgia, serif; color: var(--orange); }
+    .finding h3 { margin: 14px 0 11px; font-size: 1.05rem; }
+    .finding p { margin: 0; color: var(--muted); font-size: .86rem; line-height: 1.85; }
+    .source-line { font-size: .74rem; color: var(--muted); line-height: 1.8; }
+    .definitions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin: 27px 0; }
+    .definition { padding: 20px; background: var(--surface); border-top: 2px solid var(--green); }
+    .definition + .definition { border-left: 1px solid var(--line); }
+    .definition dt { font-size: .91rem; font-weight: 750; margin-bottom: 8px; }
+    .definition dt span { display: block; color: var(--green); font-size: .72rem; letter-spacing: .08em; }
+    .definition dd { margin: 0; color: var(--muted); font-size: .85rem; }
+    .note { padding: 19px 23px; background: var(--orange-soft); border-left: 3px solid var(--orange); font-size: .88rem; margin: 24px 0; }
+    .note p:last-child { margin: 0; }
+    .note strong { color: #7e391f; }
+    .table-wrap {
+      overflow-x: auto;
+      margin: 24px 0 12px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+    }
+    table { border-collapse: collapse; width: 100%; text-align: left; font-size: .82rem; line-height: 1.8; }
+    caption { padding: 17px 20px; text-align: left; font-size: .8rem; font-weight: 700; color: var(--green); background: var(--green-soft); }
+    th, td { padding: 16px 18px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    thead th { font-size: .74rem; font-weight: 750; color: var(--muted); background: #f0f2ed; }
+    tbody th { font-weight: 750; }
+    tbody tr:last-child > * { border-bottom: 0; }
+    .methods { min-width: 720px; }
+    .methods th:first-child { width: 17%; }
+    .methods td:nth-child(2) { width: 30%; }
+    .methods td:nth-child(3) { width: 23%; }
+    .methods .recommended > * { background: #f0f6ec; }
+    .tag { display: inline-block; font-size: .66rem; border: 1px solid #a8bfb4; color: var(--green); padding: 0 6px; margin-top: 5px; white-space: nowrap; }
+    .table-hint { font-size: .72rem; color: var(--muted); }
+    .pullquote { padding: 26px 0 26px 28px; margin: 35px 0; border-left: 4px solid var(--green); }
+    .pullquote p { font-family: var(--serif); font-size: clamp(1.25rem, 2.2vw, 1.7rem); line-height: 1.7; margin-bottom: 9px; letter-spacing: -.04em; }
+    .pullquote .attribution { font-family: var(--sans); font-size: .73rem; color: var(--muted); margin: 0; letter-spacing: 0; }
+    .flow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 15px; list-style: none; padding: 0; margin: 25px 0; }
+    .flow li { border: 1px solid var(--line); padding: 20px; position: relative; background: var(--surface); font-size: .83rem; }
+    .flow li:not(:last-child)::after { content: "→"; position: absolute; right: -14px; top: 38%; z-index: 1; color: var(--green); background: var(--paper); line-height: 1.2; }
+    .flow strong { display: block; font-size: .94rem; margin: 5px 0; }
+    .flow small { color: var(--green); font-size: .65rem; font-weight: 750; letter-spacing: .08em; }
+    .flow span { color: var(--muted); }
+    .equation { text-align: center; border-block: 1px solid var(--line); padding: 17px; margin: 25px 0; font-family: Georgia, var(--serif); font-size: 1.08rem; letter-spacing: 0; }
+    .equation small { display: block; font-family: var(--sans); font-size: .74rem; margin-top: 7px; color: var(--muted); }
+    .reading-list { padding-left: 1.3rem; font-size: .95rem; }
+    .reading-list li { padding-left: .35rem; margin-bottom: 12px; }
+    .reading-list li::marker { color: var(--green); font-weight: 700; }
+    .research-figure { margin: 31px 0; }
+    .figure-stage { background: #fff; border: 1px solid var(--line); padding: 30px 22px; display: flex; justify-content: center; align-items: center; }
+    .figure-stage img { object-fit: contain; }
+    .figure-two img { width: 340px; }
+    .figure-four img { width: 480px; }
+    .figure-five img { width: 440px; }
+    figcaption { padding-top: 13px; color: var(--muted); font-size: .78rem; line-height: 1.8; }
+    .fig-label { color: var(--green); font-size: .69rem; font-weight: 750; letter-spacing: .08em; margin-right: 8px; }
+    .cases { min-width: 690px; }
+    .cases th:first-child { width: 23%; }
+    .cases td:nth-child(2) { width: 17%; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .case-name { display: block; font-size: .65rem; color: var(--green); margin-bottom: 5px; letter-spacing: .07em; }
+    .benchmark { background: var(--dark); color: #f8f7ef; padding: 31px; margin: 31px 0; }
+    .benchmark .eyebrow { color: #b9d8be; }
+    .benchmark h3 { margin: 10px 0 25px; font-size: 1.3rem; }
+    .benchmark-grid { display: grid; grid-template-columns: 1fr 1fr; }
+    .benchmark-item { padding: 10px 24px 15px 0; }
+    .benchmark-item + .benchmark-item { padding-left: 30px; border-left: 1px solid #618077; }
+    .benchmark-number { font-family: Georgia, serif; font-size: clamp(2.9rem, 6vw, 4.5rem); line-height: 1.2; letter-spacing: -.06em; }
+    .benchmark-number span { font-family: var(--sans); font-size: 1.05rem; margin-left: 8px; letter-spacing: -.02em; }
+    .benchmark-item p { font-size: .8rem; margin: 8px 0 0; color: #d0dfd3; }
+    .benchmark .fine-print { font-size: .74rem; margin: 22px 0 0; padding-top: 17px; border-top: 1px solid #618077; color: #d0dfd3; }
+    .decision-list { padding: 0; list-style: none; margin: 25px 0; counter-reset: decision; }
+    .decision-list li { padding: 22px 0 22px 52px; border-top: 1px solid var(--line); position: relative; counter-increment: decision; }
+    .decision-list li::before { content: "0" counter(decision); position: absolute; left: 0; color: var(--orange); font-family: Georgia, serif; font-size: 1.25rem; }
+    .decision-list strong { display: block; margin-bottom: 5px; }
+    .decision-list p { font-size: .9rem; color: var(--muted); margin: 0; }
+    .application { padding: 30px; border: 1px solid #c6d3c5; background: #eef2e9; }
+    .application .eyebrow { margin-bottom: 9px; }
+    .application h3 { margin-top: 25px; font-size: 1.1rem; }
+    .application p { font-size: .94rem; }
+    .application .scope { font-size: .8rem; color: var(--muted); margin-top: 16px; }
+    .checklist { list-style: none; padding: 0; margin: 22px 0 0; }
+    .checklist li { position: relative; padding-left: 26px; margin-bottom: 12px; font-size: .87rem; }
+    .checklist li::before { content: ""; position: absolute; top: .58em; left: 0; width: 12px; height: 12px; border: 1px solid var(--green); }
+    .ending { padding: 0 0 15px; }
+    .ending h2 { font-family: var(--serif); }
+    .share-card { padding: 26px; background: var(--surface); border: 1px solid var(--line); margin: 30px 0 0; }
+    .share-card blockquote { font-size: 1.05rem; margin-top: 10px; line-height: 1.85; }
+    .share-card .share-credit { font-size: .74rem; color: var(--muted); margin: 16px 0 0; overflow-wrap: anywhere; }
+    .sources { border-top: 2px solid var(--ink); margin-top: 45px; padding-top: 25px; font-size: .8rem; color: var(--muted); }
+    .sources h2 { font-size: 1.17rem; color: var(--ink); margin-bottom: 17px; }
+    .sources h3 { font-size: .86rem; color: var(--ink); margin: 23px 0 8px; }
+    .sources cite { font-style: normal; }
+    .source-title { color: var(--ink); font-weight: 650; }
+    .keywords { display: flex; flex-wrap: wrap; gap: 7px; margin: 23px 0; padding: 0; list-style: none; }
+    .keywords li { border: 1px solid var(--line); padding: 3px 9px; font-size: .7rem; color: var(--muted); background: var(--surface); }
+    .footer { display: flex; justify-content: space-between; gap: 20px; border-top: 1px solid var(--line); margin-top: 62px; padding: 23px 0 35px; font-size: .72rem; color: var(--muted); letter-spacing: .02em; }
+
+    @media (max-width: 1000px) {
+      .page { width: min(100% - 48px, 920px); }
+      .hero-grid { grid-template-columns: minmax(0, 1fr) 170px; gap: 30px; }
+      .article-grid { grid-template-columns: 1fr; gap: 0; }
+      .rail { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 17px; }
+      .abstract { grid-template-columns: 140px 1fr; gap: 24px; }
+      .hero h1 { font-size: clamp(2.5rem, 5vw, 3.8rem); }
+    }
+    @media (max-width: 650px) {
+      body { font-size: 16px; line-height: 1.85; }
+      .page { width: calc(100% - 36px); }
+      .masthead { padding: 19px 0; font-size: .62rem; }
+      .masthead-note { font-size: .62rem; }
+      .hero { padding: 42px 0 30px; }
+      .hero-grid { grid-template-columns: 1fr; gap: 20px; }
+      .hero h1 { font-size: clamp(2.25rem, 8.7vw, 3.2rem); margin-top: 17px; }
+      .deck { font-size: 1.02rem; }
+      .hero-aside { display: flex; gap: 30px; border-left: 0; border-top: 1px solid var(--line); padding: 20px 0 0; }
+      .hero-aside .number { font-size: 2.5rem; }
+      .hero-aside p { margin: 5px 0 0; font-size: .75rem; }
+      .meta { gap: 6px 16px; font-size: .7rem; }
+      .abstract { grid-template-columns: 1fr; padding: 25px 23px; gap: 16px; }
+      .abstract h2 { margin: 3px 0 0; }
+      .toc { gap: 10px 19px; font-size: .75rem; }
+      .article-grid { margin-top: 33px; }
+      .rail { grid-template-columns: 1fr; gap: 0; }
+      .rail-block { margin-bottom: 23px; }
+      .rail-block:last-child { display: none; }
+      .section { padding-bottom: 36px; margin-bottom: 36px; }
+      .findings { grid-template-columns: 1fr; }
+      .finding { display: grid; grid-template-columns: 35px 1fr; column-gap: 12px; padding: 20px; }
+      .finding .index { grid-row: 1 / 3; }
+      .finding h3 { margin: 3px 0 8px; }
+      .finding p { grid-column: 2; }
+      .definitions { grid-template-columns: 1fr; }
+      .definition + .definition { border-left: 0; border-top: 1px solid var(--line); }
+      .flow { grid-template-columns: 1fr; gap: 13px; }
+      .flow li:not(:last-child)::after { content: "↓"; top: auto; bottom: -16px; right: 50%; }
+      .figure-stage { padding: 22px 12px; }
+      .benchmark { padding: 23px; }
+      .benchmark-item + .benchmark-item { padding-left: 20px; }
+      .benchmark-number { font-size: 2.7rem; }
+      .benchmark-number span { font-size: .83rem; margin-left: 5px; }
+      .benchmark-item p { font-size: .72rem; }
+      .application { padding: 24px 20px; }
+      .pullquote { padding-left: 21px; }
+      .footer { margin-top: 40px; font-size: .66rem; }
+    }
+    @media print {
+      body { background: #fff; color: #000; font-size: 10.5pt; }
+      .page { width: 100%; }
+      .skip-link, .toc, .rail, .footer a { display: none; }
+      .hero { padding-top: 22px; }
+      .hero h1 { font-size: 30pt; }
+      .article-grid { display: block; }
+      .section { margin-bottom: 25px; padding-bottom: 25px; }
+      .table-wrap { overflow: visible; }
+      .methods, .cases { min-width: 0; }
+      th, td { padding: 8px; font-size: 9pt; }
+      thead { display: table-header-group; }
+      tr, figure, .finding, .benchmark { break-inside: avoid; }
+      h2, h3 { break-after: avoid; }
+      .benchmark { background: #edf2ed; color: #000; }
+      .benchmark .eyebrow, .benchmark-item p, .benchmark .fine-print { color: #333; }
+      a { color: inherit; }
+      .figure-stage img { max-height: 350px; width: auto; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Structural Identifiability of Systems Biology Models: A Critical Comparison of Methods - 요약">
+<meta property="og:description" content="Structural Identifiability of Systems Biology Models: A Critical Comparison of Methods 요약 한줄 요약 비선형 동적 모델의 구조적 식별가능성 (데이터가 완벽해도 파라미터를 유일하게 정할 수 있는가)을 검사하는 일곱 방법 — 테일러 급수, 생성 급수(+식별가능성 타블로), 유사 변환, 직접 검사, 미분 대수(DAISY), 음함수 정리, 반응망 이론 — 을 생물 ">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/1qvfcu9/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/1qvfcu9/assets/figure2.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Structural Identifiability of Systems Biology Models: A Critical Comparison of Methods - 요약">
+<meta name="twitter:description" content="Structural Identifiability of Systems Biology Models: A Critical Comparison of Methods 요약 한줄 요약 비선형 동적 모델의 구조적 식별가능성 (데이터가 완벽해도 파라미터를 유일하게 정할 수 있는가)을 검사하는 일곱 방법 — 테일러 급수, 생성 급수(+식별가능성 타블로), 유사 변환, 직접 검사, 미분 대수(DAISY), 음함수 정리, 반응망 이론 — 을 생물 ">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/1qvfcu9/assets/figure2.png">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/chis2011-si-comparison/">
+</head>
+<body>
+  <a class="skip-link" href="#main">본문으로 바로 가기</a>
+
+  <div class="page" id="top">
+    <header class="masthead">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span> MODEL / EVIDENCE</div>
+      <div class="masthead-note">논문을 읽고, 모델을 다시 묻다</div>
+    </header>
+
+    <main id="main">
+      <article aria-labelledby="article-title">
+        <header class="hero">
+          <div class="hero-grid">
+            <div>
+              <span class="eyebrow">Research review · Systems biology · 2011</span>
+              <h1 id="article-title">데이터가 완벽해도,<br>파라미터를 <em>알 수 있을까?</em></h1>
+              <p class="deck">구조적 식별가능성의 일곱 가지 해법을 비교한 연구. 생성 급수와 타블로가 보여 주는 것은 계산의 지름길이자, 무엇을 측정하고 어떻게 자극해야 하는지를 묻는 새로운 관점이다.</p>
+            </div>
+            <aside class="hero-aside" aria-label="연구의 비교 범위">
+              <div>
+                <span class="number">7</span>
+                <p>비교한 분석 방법</p>
+              </div>
+              <div>
+                <span class="number">6</span>
+                <p>검증에 사용한 생물 모델</p>
+              </div>
+            </aside>
+          </div>
+          <div class="meta">
+            <span>원 논문 · Chiş, Banga &amp; Balsa-Canto</span>
+            <span>PLoS ONE · 2011</span>
+            <span>노트 작성 · <time datetime="2026-09-25">2026.09.25</time></span>
+            <span>논문 해설 + HR35 적용 메모</span>
+          </div>
+        </header>
+
+        <section class="abstract" aria-labelledby="abstract-title">
+          <div>
+            <span class="eyebrow">Abstract</span>
+            <h2 id="abstract-title">연구의 요지</h2>
+          </div>
+          <div>
+            <p>완벽한 데이터를 얻더라도 모델의 파라미터를 유일하게 결정하지 못할 수 있다. 이 연구는 그 가능성을 사전에 검사하는 <strong>일곱 가지 구조적 식별가능성 분석법</strong>을 여섯 생물 모델에 적용했다. 비교의 중심은 적용 범위, 계산 비용, 그리고 얻을 수 있는 정보다. 연구에서 가장 균형 잡힌 선택은 <strong>생성 급수와 식별가능성 타블로의 결합</strong>이었다. 다만 계산이 멈췄다는 사실과 모델이 비식별이라는 결론은 구분해야 한다.</p>
+            <p class="abstract-note">이 글은 2011년 연구와 제공된 독서 노트를 재구성한 해설이다. 방법 선택에 관한 권고는 해당 연구의 비교 범위를 따른다. <a>원 논문 읽기 ↗</a></p>
+          </div>
+        </section>
+
+        <nav class="toc" aria-label="글의 목차">
+          <a href="#findings"><span>01</span>핵심 발견</a>
+          <a href="#concept"><span>02</span>개념과 전제</a>
+          <a href="#methods"><span>03</span>일곱 방법</a>
+          <a href="#tableau"><span>04</span>타블로 읽기</a>
+          <a href="#evidence"><span>05</span>여섯 사례</a>
+          <a href="#implications"><span>06</span>선택 지침</a>
+          <a href="#hr35"><span>07</span>HR35에 적용</a>
+        </nav>
+
+        <div class="article-grid">
+          <aside class="rail" aria-label="논문 정보">
+            <div class="rail-block">
+              <span class="eyebrow">The paper</span>
+              <p class="original-title" lang="en">Structural Identifiability of Systems Biology Models: A Critical Comparison of Methods</p>
+              <p>Oana-Teodora Chiş<br>Julio R. Banga<br>Eva Balsa-Canto</p>
+              <p>Bioprocess Engineering Group<br>IIM-CSIC, Vigo</p>
+              <a href="#sources">서지·출처 노트 ↓</a>
+            </div>
+            <div class="rail-block">
+              <strong>이 글의 질문</strong>
+              <p>추정 알고리즘을 고르기 전에, 추정할 수 있는 모델인지 어떻게 확인할까?</p>
+              <strong>읽을 때의 기준</strong>
+              <p>전역 식별, 국소 식별, 비식별, 계산상 미결론을 서로 다른 결과로 읽는다.</p>
+            </div>
+          </aside>
+
+          <div class="article-body">
+            <section class="section" id="findings" aria-labelledby="findings-title">
+              <div class="section-heading">
+                <span class="eyebrow">01 / Key findings</span>
+                <h2 id="findings-title">먼저 가져갈 세 가지 발견</h2>
+              </div>
+              <div class="findings">
+                <div class="finding">
+                  <span class="index">01</span>
+                  <h3>좋은 기본값은 생성 급수 + 타블로</h3>
+                  <p>비교 사례에서 식을 상대적으로 단순하게 만들고, 부분 결과와 파라미터 의존 관계를 함께 보여 주었다.</p>
+                </div>
+                <div class="finding">
+                  <span class="index">02</span>
+                  <h3>상태 수만으로 난이도를 알 수 없다</h3>
+                  <p>20상태 모델도 전부 관측하면 빠르게 풀렸다. 관측 구조와 비선형 항의 형태가 계산 난도를 크게 좌우한다.</p>
+                </div>
+                <div class="finding">
+                  <span class="index">03</span>
+                  <h3>결과는 다음 실험을 가리킨다</h3>
+                  <p>어떤 변수를 더 측정할지, 일정한 입력 대신 어떤 자극을 줄지 판단하는 데 식별가능성 분석을 활용할 수 있다.</p>
+                </div>
+              </div>
+              <p class="source-line">근거: Chiş et al.의 방법 비교 및 사례 분석. <a>논문 본문</a></p>
+            </section>
+
+            <section class="section" id="concept" aria-labelledby="concept-title">
+              <div class="section-heading">
+                <span class="eyebrow">02 / The question before estimation</span>
+                <h2 id="concept-title">추정의 실패가 데이터 탓만은 아니다</h2>
+              </div>
+              <p>파라미터를 바꾸어도 같은 출력이 나오는 모델이 있다고 하자. 측정 잡음을 없애고 시간에 따라 연속적으로 관측해도, 그 출력만으로는 어느 파라미터가 참인지 구별하지 못한다. 이것이 <strong>구조적 식별가능성</strong>이 다루는 문제다.</p>
+              <p>반면 실제 데이터의 잡음, 부족한 표본, 제한된 실험 조건 때문에 추정이 어려운 문제는 <strong>실용적 식별가능성</strong>에 속한다. 구조적으로 식별 가능한 모델도 실제 데이터에서는 추정이 불안정할 수 있다.</p>
+
+              <dl class="definitions">
+                <div class="definition">
+                  <dt><span>SGI</span>구조적 전역 식별</dt>
+                  <dd>거의 모든 파라미터 값에서, 같은 출력을 만드는 다른 파라미터 값이 없다.</dd>
+                </div>
+                <div class="definition">
+                  <dt><span>SLI</span>구조적 국소 식별</dt>
+                  <dd>파라미터의 충분히 작은 이웃에서는 유일성을 보장한다. 멀리 떨어진 다른 해가 남을 수 있다.</dd>
+                </div>
+                <div class="definition">
+                  <dt><span>SNI</span>구조적 비식별</dt>
+                  <dd>어떤 작은 이웃에서도 출력만으로 파라미터를 유일하게 구별할 수 없다.</dd>
+                </div>
+              </dl>
+
+              <p>여기서 <strong>완전 요약(exhaustive summary)</strong>은 입력과 출력으로부터 얻을 수 있는 파라미터 정보를 모두 담은 표현이다. 방법마다 이 정보를 급수 계수, 입출력 미분방정식, 또는 다른 대수적 관계로 꺼내어 비교한다.</p>
+              <aside class="note">
+                <p><strong>“실험을 더 한다”의 의미를 나누어야 한다.</strong> 같은 관측·입력 조건에서 데이터만 늘리는 것으로는 구조적 모호성을 해결할 수 없다. 관측 변수를 추가하거나 입력을 바꾸고, 일부 파라미터를 고정하거나 모델을 재정식화하는 접근이 필요하다.</p>
+              </aside>
+              <p class="source-line">정의와 배경: 원 논문의 Introduction 및 Structural identifiability definition. <a>출처</a></p>
+            </section>
+
+            <section class="section" id="methods" aria-labelledby="methods-title">
+              <div class="section-heading">
+                <span class="eyebrow">03 / Methods compared</span>
+                <h2 id="methods-title">같은 질문에 접근하는 일곱 가지 방법</h2>
+              </div>
+              <p class="section-intro">모든 방법은 결국 “같은 입력·출력이 다른 파라미터를 허용하는가?”를 묻는다. 차이는 무엇을 계산하고, 어떤 조건을 요구하며, 어디서 계산이 어려워지는가에 있다.</p>
+
+              <div class="table-wrap" role="region" aria-label="일곱 가지 분석 방법 비교표" tabindex="0">
+                <table class="methods">
+                  <caption>방법별 원리, 적용 조건, 실무적 절충</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">방법</th>
+                      <th scope="col">핵심 원리</th>
+                      <th scope="col">조건·강점</th>
+                      <th scope="col">주요 한계</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">테일러 급수</th>
+                      <td>초기 시점 주변의 출력 미분 계수를 구하고, 계수에 대응하는 파라미터 해의 유일성을 검사한다.</td>
+                      <td>급수 전개에 필요한 매끄러움·해석성 전제. 입력에 대한 비선형 의존도 다룬다.</td>
+                      <td>필요한 미분 차수를 미리 알기 어렵고 고차 대수식이 복잡해진다.</td>
+                    </tr>
+                    <tr class="recommended">
+                      <th scope="row">생성 급수<br><span class="tag">타블로와 결합</span></th>
+                      <td>출력을 벡터장 방향의 리 미분으로 전개하고, 계수의 파라미터 의존 관계를 분석한다.</td>
+                      <td>논문에서 다루는 형식은 입력에 선형·아핀 의존. 테일러 급수보다 단순한 식을 얻는 경우가 많다.</td>
+                      <td>충분한 미분 차수를 미리 알기 어렵다. 유한 차수에서 결과가 없다고 비식별이 확정되지는 않는다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">유사 변환</th>
+                      <td>입출력 관계와 모델 구조를 보존하는 상태 변환을 찾는다.</td>
+                      <td>관측가능성·제어가능성 등 적용 조건이 필요하다.</td>
+                      <td>조건 검증과 편미분방정식 풀이가 복잡하다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">직접 검사</th>
+                      <td>모델의 동등성 관계에서 파라미터 간 방정식을 직접 유도하고 푼다.</td>
+                      <td>자율·무입력 계에 적용하는 개념적으로 단순한 접근이다.</td>
+                      <td>형식적 대수 조작이 크게 늘어나 결론을 얻기 어려울 수 있다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">미분 대수<br><span class="tag">DAISY</span></th>
+                      <td>미관측 상태를 소거해 입출력 미분 다항식을 만들고, 계수의 유일성을 검사한다.</td>
+                      <td>다항·유리식 모델. 계산이 완료되면 식별·비식별에 대한 명확한 정보를 얻는다.</td>
+                      <td>소거 과정의 계산·메모리 비용이 크다. 복잡한 유리식과 초기조건 처리에 어려움이 나타났다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">음함수 정리</th>
+                      <td>입출력 관계를 파라미터로 편미분한 식별 행렬의 정칙성을 검사한다.</td>
+                      <td>국소 식별 판정과 필요한 관측 변수 검토에 활용할 수 있다.</td>
+                      <td>전역 유일성을 보장하지 않으며, 파라미터가 많으면 행렬 구성부터 복잡해진다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">반응망 이론</th>
+                      <td>화학량론 행렬로 반응 속도의 식별성을 검사한 뒤, 파라미터 분석법을 결합한다.</td>
+                      <td>반응망 구조를 활용하며, 생성 급수와 결합할 때 효율적일 수 있다.</td>
+                      <td>적절한 반응망 표현이 필요하고, 파라미터 판정을 위한 추가 분석이 필요하다.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="table-hint">작은 화면에서는 표를 좌우로 스크롤해 읽을 수 있다.</p>
+              <p>이 비교에서 <strong>GenSSI</strong>는 생성 급수와 타블로를 결합한 도구다. 알려진 초기조건을 반영하고 계산 중에도 일부 파라미터의 결과를 제공한다는 점이 장점으로 제시된다. 반면 당시 DAISY 구현은 계산이 완료되기 전까지 중간 결과를 얻기 어렵다는 한계가 있었다.</p>
+              <p class="source-line">방법 및 구현 설명: 원 논문의 Methods와 Implementation of methods. 도구에 관한 평가는 2011년 논문 기준이다. <a>출처</a></p>
+            </section>
+
+            <section class="section" id="tableau" aria-labelledby="tableau-title">
+              <div class="section-heading">
+                <span class="eyebrow">04 / Reading the tableau</span>
+                <h2 id="tableau-title">어느 정보가 어느 파라미터를 드러내는가</h2>
+              </div>
+              <p>식별가능성 타블로는 급수 계수를 파라미터로 미분한 <strong>야코비안의 0이 아닌 원소</strong>를 시각화한 표다. 열은 파라미터, 행은 급수 계수다. 검은 칸은 해당 계수가 그 파라미터에 의존한다는 뜻이다.</p>
+
+              <ol class="flow" aria-label="타블로를 만드는 세 단계">
+                <li><small>STEP 01</small><strong>출력을 전개한다</strong><span>테일러 계수 또는 리 미분 계수를 계산한다.</span></li>
+                <li><small>STEP 02</small><strong>의존 관계를 그린다</strong><span>각 계수를 파라미터로 미분해 타블로를 만든다.</span></li>
+                <li><small>STEP 03</small><strong>순위를 확인하고 푼다</strong><span>독립적인 정보를 확인하고 해를 구해 타블로를 축소한다.</span></li>
+              </ol>
+
+              <div class="equation">
+                rank(∂c / ∂p) = dim(p)
+                <small>c: 급수 계수 벡터 · p: 미지 파라미터 벡터</small>
+              </div>
+
+              <ol class="reading-list">
+                <li><strong>빈 열은 추가 검토의 신호다.</strong> 계산한 차수까지 그 파라미터가 나타나지 않았다는 뜻이다. 더 높은 차수에서도 정보가 없다는 근거 없이 비식별을 확정해서는 안 된다.</li>
+                <li><strong>국소 식별의 핵심은 계수 개수가 아니라 야코비안의 순위다.</strong> 계수가 파라미터 수만큼 있어도 서로 종속이면 충분하지 않다. 적절한 일반점에서 완전 열 순위를 확보하는지가 중요하다.</li>
+                <li><strong>단순한 행부터 방정식을 푼다.</strong> 하나의 파라미터에만 의존하는 행은 유용한 출발점이다. 해와 유일성을 확인한 뒤 해당 파라미터를 제거하고, 축소된 타블로에서 다음 순서를 찾는다.</li>
+              </ol>
+
+              <figure class="research-figure">
+                <div class="figure-stage figure-two">
+                  <img src="assets/figure2.png" alt="약동학 모델의 식별가능성 타블로. 검은 칸은 행의 급수 계수가 열의 파라미터에 의존함을 나타낸다." loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-label">FIGURE 2</span>약동학 모델의 타블로. 하나의 출력만 관측하는 경우에도 급수법으로 국소 식별을 확인했다. 검은 칸의 개수 자체가 아니라 야코비안의 순위와 방정식의 해를 함께 읽어야 한다. <a>원 그림</a> · Chiş et al., 2011, CC BY.</figcaption>
+              </figure>
+
+              <blockquote class="pullquote">
+                <p>타블로는 “어느 정보가 어느 파라미터를 드러내는가”를 보여 주는 지도다.</p>
+                <p class="attribution">독서 노트의 해설 · 원 논문의 직접 인용이 아님</p>
+              </blockquote>
+              <p>검은 칸이 적고 구조가 분리되어 있으면, 함께 풀어야 하는 파라미터 묶음을 찾기 쉬워진다. 다만 <strong>성긴 타블로 자체가 식별가능성의 증명은 아니다.</strong> 마지막 판단에는 순위 검사와 해의 유일성 확인이 필요하다.</p>
+              <p class="source-line">타블로와 순위 조건: 원 논문의 Identifiability tableaus. <a>출처</a></p>
+            </section>
+
+            <section class="section" id="evidence" aria-labelledby="evidence-title">
+              <div class="section-heading">
+                <span class="eyebrow">05 / Evidence from six models</span>
+                <h2 id="evidence-title">여섯 모델이 보여 준 가능성과 한계</h2>
+              </div>
+              <p class="section-intro">출력이 하나인 약동학 모델부터 모든 상태를 관측하는 20상태 모델까지. 사례들은 모델의 크기뿐 아니라 관측 방식, 입력 조건, 수식 표현이 결론에 어떻게 영향을 주는지 보여 준다.</p>
+
+              <div class="table-wrap" role="region" aria-label="여섯 모델의 분석 결과 비교표" tabindex="0">
+                <table class="cases">
+                  <caption>사례별 핵심 결과 · 수치는 분석 시나리오에 따라 달라짐</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">모델</th>
+                      <th scope="col">상태 / 출력 /<br>미지 파라미터</th>
+                      <th scope="col">보고된 결과와 해석</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row"><span class="case-name">CASE 01</span>Goodwin 진동자</th>
+                      <td>3 / 1 또는 3 / 8</td>
+                      <td>출력 하나에서는 급수법이 6차 미분까지 진행했으나 결론을 얻지 못했다. 전체 관측에서는 국소 식별, 다항식 재정식화와 전체 관측에서는 전역 식별을 확인했다. DAISY는 초기조건 미사용 시 비식별을 보고했고, 초기조건 적용 과정에서는 오류가 발생했다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="case-name">CASE 02</span>약동학 2구획</th>
+                      <td>4 / 1 또는 2 /<br>6–7</td>
+                      <td>현실적인 단일 출력 조건에서도 급수법의 야코비안은 완전 순위를 얻어 국소 식별을 확인했다. DAISY는 단일 출력 조건에서 메모리 부족으로 계산을 마치지 못했다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="case-name">CASE 03</span>해당과정 모사 경로</th>
+                      <td>5 / 5 / 5</td>
+                      <td>생성 급수, 미분 대수, 반응망 접근으로 전역 식별을 확인했다. 테일러 급수에서는 복수의 후보 해가 나왔고, 허용되는 실수·양수 범위에서의 유일성 확인이 어려웠다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="case-name">CASE 04</span>고차원 비선형 모델</th>
+                      <td>20 / 20 / 22</td>
+                      <td>전체 상태를 관측하는 조건에서 전역 식별을 확인했다. 생성 급수는 약 4초, 비교 대상으로 인용된 DAISY 계산은 약 150분이었다. 급수법은 낮은 미분 차수로 필요한 순위에 도달했다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="case-name">CASE 05</span>애기장대 생체시계</th>
+                      <td>7 / 2 / 29</td>
+                      <td>일정한 빛에서는 5개 파라미터가 비식별이었다. 펄스 자극에서는 급수법을 고차까지 적용했지만 부분 결과에 그쳤다. 다항식형에서는 더 많은 정보를 얻었으며, 생성 급수로 11개 파라미터의 유일해를 구했다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row"><span class="case-name">CASE 06</span>NF-κB 신호전달</th>
+                      <td>15 / 6 / 13</td>
+                      <td>일부 파라미터를 문헌값으로 고정한 조건에서, 생성 급수로 분석 대상 미지 파라미터 13개의 전역 식별을 확인했다. 미분 대수와 음함수 정리 접근은 계산상 어려움을 겪었다. 반응망과 생성 급수의 결합도 유효했다.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="source-line">근거: 원 논문의 Results, Case studies 1–6 및 제공된 노트의 수치 요약. <a>사례 분석 원문</a></p>
+
+              <h3>20상태 모델: 크기보다 관측과 식의 구조</h3>
+              <p>가장 눈에 띄는 계산 시간 차이는 20상태 모델에서 나왔다. 이 사례는 모든 상태를 관측하며 비교적 다루기 쉬운 구조를 갖는다. 생성 급수와 타블로의 결합은 파라미터를 단계적으로 분리해 푸는 데 효과적이었다.</p>
+
+              <aside class="benchmark" aria-label="20상태 모델의 보고된 계산 시간">
+                <span class="eyebrow">Case 04 · Reported computation time</span>
+                <h3>같은 전역 식별 결론, 큰 계산 시간 차이</h3>
+                <div class="benchmark-grid">
+                  <div class="benchmark-item">
+                    <div class="benchmark-number">4<span>초</span></div>
+                    <p>생성 급수 + 타블로 · 약</p>
+                  </div>
+                  <div class="benchmark-item">
+                    <div class="benchmark-number">150<span>분</span></div>
+                    <p>DAISY · 비교 문헌에서 보고</p>
+                  </div>
+                </div>
+                <p class="fine-print">20상태 · 20출력 · 22파라미터. 서로 다른 계산 환경의 보고값이며, 동일 장비에서의 성능 배수나 모든 모델에 대한 속도 보장을 뜻하지 않는다.</p>
+              </aside>
+
+              <figure class="research-figure">
+                <div class="figure-stage figure-four">
+                  <img src="assets/figure4.png" alt="20상태 비선형 모델의 식별가능성 타블로 비교. 패널 a는 테일러 급수, 패널 b는 생성 급수의 결과다." loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-label">FIGURE 4</span>20상태 모델의 타블로. (a) 테일러 급수, (b) 생성 급수. 생성 급수의 상대적으로 성긴 의존 구조는 파라미터별 방정식을 나누어 푸는 데 유리했다. <a>원 그림</a> · Chiş et al., 2011, CC BY.</figcaption>
+              </figure>
+
+              <h3>애기장대 시계: 측정뿐 아니라 자극도 바꾼다</h3>
+              <p>29개 파라미터에 출력이 2개인 애기장대 모델은 훨씬 까다로웠다. 일정한 빛과 펄스 형태의 빛은 서로 다른 정보를 제공했다. 다항식 재정식화도 더 많은 파라미터 정보를 끌어내는 데 도움이 되었지만, 모든 미지수를 해결하지는 못했다.</p>
+
+              <figure class="research-figure">
+                <div class="figure-stage figure-five">
+                  <img src="assets/figure5.png" alt="다항식형 애기장대 모델의 축소 타블로. 패널 a는 테일러 급수, 패널 b는 생성 급수를 적용한 결과다." loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-label">FIGURE 5</span>애기장대 모델을 다항식형으로 바꾼 뒤 얻은 축소 타블로. (a) 테일러 7차, (b) 생성 급수 8차에서 야코비안 순위 17의 정보를 얻었다. 순위 17은 모든 29개 파라미터가 식별된다는 뜻이 아니다. <a>원 그림</a> · Chiş et al., 2011, CC BY.</figcaption>
+              </figure>
+
+              <aside class="note">
+                <p><strong>출력/파라미터 비는 경고 신호이지 판정식이 아니다.</strong> 출력이 적으면 분석이 어려워질 수 있지만, 단일 출력 약동학 모델은 국소 식별을 보였고 NF-κB에서는 생성 급수로 분석 대상 13개의 전역 식별을 확인했다. “관측이 적으면 모든 방법이 부분 결과에 그친다”는 일반화는 이 사례들과 맞지 않는다.</p>
+              </aside>
+
+              <h3>서로 다른 결론을 읽는 법</h3>
+              <p>방법별 결과를 비교하려면 모델 표현, 입력, 관측, 초기조건이 같은지 먼저 살펴야 한다. 완전 순위는 확인했지만 기호 방정식을 끝까지 풀지 못한 경우에는 국소 식별만 보고될 수 있다. 반대로 초기조건을 생략한 분석은 특정 초기조건을 사용하는 실험과 다른 문제를 풀고 있을 수 있다.</p>
+              <p><strong>메모리 부족, 기호 계산 실패, 미분 차수의 한계는 ‘미결론’이다.</strong> 이를 구조적 비식별의 증거로 바꾸어 읽어서는 안 된다.</p>
+              <p class="source-line">해석 근거: Goodwin, 약동학, 애기장대 및 NF-κB 사례의 계산 조건과 결과. <a>출처</a></p>
+            </section>
+
+            <section class="section" id="implications" aria-labelledby="implications-title">
+              <div class="section-heading">
+                <span class="eyebrow">06 / Implications</span>
+                <h2 id="implications-title">방법 선택을 실험 설계로 연결하기</h2>
+              </div>
+              <p>논문이 제안하는 실용적 출발점은 생성 급수와 타블로다. 그러나 적용 조건을 확인한 뒤, 필요한 결론과 계산 가능성에 맞춰 다른 접근을 함께 검토해야 한다.</p>
+
+              <ol class="decision-list">
+                <li>
+                  <strong>입력에 선형·아핀 의존하는 모델이라면 생성 급수부터 검토한다.</strong>
+                  <p>GenSSI와 타블로를 통해 초기조건을 반영하고, 전체 판정에 도달하기 전에도 어떤 파라미터가 드러나는지 살핀다. 반응망 구조가 있다면 함께 활용한다.</p>
+                </li>
+                <li>
+                  <strong>비식별을 확정하려면 완결된 분석을 확보한다.</strong>
+                  <p>다항·유리식 모델에서 미분 대수와 DAISY가 후보가 된다. 적용 전제와 초기조건 처리를 확인하고, 계산 오류를 비식별 판정으로 취급하지 않는다.</p>
+                </li>
+                <li>
+                  <strong>입력에 비선형으로 의존한다면 방법의 적용 범위를 다시 확인한다.</strong>
+                  <p>논문은 이런 경우 테일러 급수를 대안으로 제시한다. 다만 급수 전개에 필요한 매끄러움이 확보되어야 하며, 입력 비선형과 상태 비선형을 구분해서 보아야 한다.</p>
+                </li>
+                <li>
+                  <strong>부분 결과를 얻었다면 측정과 자극을 바꾸는 근거로 쓴다.</strong>
+                  <p>더 관측해야 할 상태, 구별되지 않는 파라미터 조합, 입력 변화로 드러날 정보를 검토한다. 유사 변환·직접 검사·음함수 정리도 해당 구조에서 적용 가능할 때 선택적으로 사용한다.</p>
+                </li>
+              </ol>
+
+              <p>다항식 재정식화는 계산을 돕는 표현상의 선택이다. 동등한 모델이라면 표현을 바꾸었다는 이유만으로 실험 정보가 새로 생기지는 않는다. 더 많은 결과를 얻었다면, 이전 계산에서 드러내지 못했던 정보를 풀어낸 것인지 관측·제약 조건까지 달라진 것인지 구분해야 한다.</p>
+              <p class="source-line">선택 지침은 원 논문의 비교 결과를 재구성한 것이다. 현재 도구 전체의 성능 순위를 의미하지 않는다. <a>원 논문</a></p>
+            </section>
+
+            <section class="section" id="hr35" aria-labelledby="hr35-title">
+              <div class="section-heading">
+                <span class="eyebrow">07 / Application memo</span>
+                <h2 id="hr35-title">HR35 유압 모델에는 무엇을 가져갈까</h2>
+              </div>
+              <p class="section-intro">이하 내용은 독서 노트의 HR35 적용 의견을 정리한 연구 제안이다. 생물 모델에서 얻은 결과를 유압 모델의 식별가능성 판정으로 곧바로 옮길 수는 없다.</p>
+
+              <div class="application">
+                <span class="eyebrow">Working hypothesis · 검증할 가설</span>
+                <h3>먼저 비선형 항이 어디에 걸리는지 구분한다</h3>
+                <p>노트의 HR35 모델에는 밸브 명령의 데드밴드와 √ΔP 같은 항이 등장한다. 데드밴드는 입력 의존성 및 구간 경계의 매끄러움을 확인해야 할 대상이다. √ΔP는 압력 상태의 비선형일 수 있으므로, 그 존재만으로 입력에 선형인 생성 급수 형식을 배제할 수는 없다.</p>
+                <p>밸브 비선형을 별도 변수·상태로 표현하는 경로와 테일러 급수를 적용하는 경로를 검토하되, 새 상태의 초기조건과 제약, 원래 모델과의 동등성을 함께 확인해야 한다. 특히 매끄럽지 않은 경계를 포함한다면 테일러 급수도 자동으로 적용되는 대안은 아니다.</p>
+
+                <h3>압력 센서의 가치는 채널 수보다 독립적인 정보에 있다</h3>
+                <p>노트에 따르면 디지털 트윈은 수십 개 파라미터에 대해 경사계 3채널과 압력 6채널을 사용한다. 압력 관측이 파라미터의 모호성을 줄일 가능성은 크지만, “압력을 빼면 반드시 비식별”이라고 지금 단정할 수는 없다.</p>
+                <p><strong>각도만 사용하는 경우, 각도와 압력을 함께 사용하는 경우, 특정 압력 채널을 제외하는 경우</strong>를 같은 입력·초기조건 아래에서 비교해야 한다. “버킷 압력을 뺄 수 있는가?”는 이 비교를 통해 답할 수 있는 구체적인 질문이다.</p>
+
+                <h3>타블로를 첫 계산 과제로 삼는다</h3>
+                <p>타블로는 어떤 관측 계수가 어떤 파라미터에 정보를 주는지 보여 준다. 다만 높은 미분 차수가 필요하다는 사실이 곧바로 빠른 자극을 쓰라는 처방은 아니다. 실제 자극은 센서 대역폭과 잡음, 운전 조건까지 고려해 설계해야 한다.</p>
+
+                <ul class="checklist" aria-label="HR35 후속 분석 체크리스트">
+                  <li>미지 파라미터, 고정값, 초기조건, 실제 관측 함수를 명시한다.</li>
+                  <li>밸브 명령과 압력 상태에 대한 비선형 의존성을 각각 정리한다.</li>
+                  <li>관측 채널 조합별 타블로와 야코비안 순위를 비교한다.</li>
+                  <li>구별되지 않는 파라미터 조합과 이를 드러낼 입력 후보를 기록한다.</li>
+                  <li>판정을 전역 식별·국소 식별·비식별·미결론으로 나누어 보고한다.</li>
+                </ul>
+                <p class="scope">분석 상태: 제안 단계. 이 글에는 HR35의 실제 방정식을 이용한 식별가능성 계산 결과가 포함되어 있지 않다.</p>
+              </div>
+            </section>
+
+            <section class="ending" aria-labelledby="ending-title">
+              <div class="section-heading">
+                <span class="eyebrow">Takeaway</span>
+                <h2 id="ending-title">추정을 시작하기 전에,<br>구별할 수 있는지 먼저 묻자</h2>
+              </div>
+              <p>이 비교 연구의 실용적 교훈은 분명하다. 생성 급수와 타블로는 유용한 출발점이며, 분석이 어려워질수록 모델의 표현, 관측 변수, 입력 자극을 함께 보아야 한다.</p>
+              <p>다음 모델에서 먼저 적어 볼 것은 세 가지다. <strong>무엇을 모르는가. 무엇을 관측하는가. 무엇을 바꿔 가며 실험할 수 있는가.</strong> 이 세 목록 사이의 관계를 확인하는 일이, 더 잘 맞는 모델을 만들기 위한 첫 단계다.</p>
+
+              <aside class="share-card" aria-labelledby="share-title">
+                <span class="eyebrow" id="share-title">공유용 한 문장 · 복사해 사용하세요</span>
+                <blockquote>데이터가 완벽해도 파라미터를 유일하게 정할 수 없는 모델이 있다. 구조적 식별가능성 분석은 추정에 앞서 무엇을 측정하고 어떻게 자극해야 할지 묻는 도구다.</blockquote>
+                <p class="share-credit">Chiş, Banga &amp; Balsa-Canto (2011) 논문 해설 · DOI: 10.1371/journal.pone.0027755<br><a>원 논문과 함께 공유하기 ↗</a></p>
+              </aside>
+            </section>
+
+            <section class="sources" id="sources" aria-labelledby="sources-title">
+              <h2 id="sources-title">출처와 편집 노트</h2>
+              <p><span class="source-title">기본 문헌</span><br>Chiş, O.-T., Banga, J. R., &amp; Balsa-Canto, E. (2011). <cite lang="en">Structural Identifiability of Systems Biology Models: A Critical Comparison of Methods.</cite> <i lang="en">PLoS ONE</i>, 6(11), e27755. <a>doi:10.1371/journal.pone.0027755</a>.</p>
+              <p><span class="source-title">원 저자 소속</span><br>Bioprocess Engineering Group, IIM-CSIC, Vigo, Spain.</p>
+              <p><span class="source-title">그림과 이용 조건</span><br>그림 2·4·5는 원 논문의 이미지를 사용했다. © 2011 Chiş et al. 원 논문은 Creative Commons Attribution(CC BY) 조건으로 공개되어 있으며, 각 그림 설명에 출처를 연결했다.</p>
+
+              <h3>노트를 정리하며 명확히 한 부분</h3>
+              <p>국소 식별의 조건은 급수 계수의 개수가 아니라 야코비안 순위로 표현했다. 관측이 적은 사례를 모두 부분 결과로 묶지 않고, NF-κB에서 분석 대상 파라미터의 전역 식별을 얻었다는 결과를 구분했다. 계산 시간은 논문에 보고된 사례값으로 제시했다.</p>
+              <p>HR35 관련 내용은 원 논문의 결과와 분리된 적용 가설이다. 특히 센서 제거의 영향, 비선형 항의 재정식화, 자극 설계의 효과는 실제 모델로 추가 검증해야 한다. 노트에서 언급한 Villaverde 2018은 정확한 서지정보가 제공되지 않아 별도의 검증 근거로 사용하지 않았다.</p>
+
+              <ul class="keywords" aria-label="핵심 키워드">
+                <li>구조적 식별가능성</li>
+                <li>생성 급수</li>
+                <li>식별가능성 타블로</li>
+                <li>미분 대수</li>
+                <li>DAISY</li>
+                <li>GenSSI</li>
+                <li>실험 설계</li>
+                <li>다항식 재정식화</li>
+              </ul>
+            </section>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <footer class="footer">
+      <span>MODEL / EVIDENCE · 논문 해설 · 2026.09.25</span>
+      <a href="#top">처음으로 ↑</a>
+    </footer>
+  </div>
+</body>
+</html>
