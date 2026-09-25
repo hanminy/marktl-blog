@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T12:10:54.029Z",
+  "updatedAt": "2026-09-25T12:15:51.383Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/janot2014-iv/",
+      "excerpt": "A Generic Instrumental Variable Approach for Industrial Robot Identification 요약 한줄 요약 로봇 동역학 식별의 표준인 역동역학 모델 + 최소제곱(IDIM–LS) 은 관절 각도를 대역 필터로 미분해 속도·가속도를 만드는데, 필터가 잘못 맞으면 회귀 행렬이 잡음과 상관돼 편향 된다. 이 논문은 순동역학 모델을 같은 제어기 구조로 시뮬레이션한 잡음 없는 데이터 를 도구변",
+      "shortId": "qpz8rq",
+      "slug": "janot2014-iv",
+      "sourcePath": "02_research/필드로봇/시스템식별/janot2014-iv.md",
+      "tags": [
+        "논문요약",
+        "시스템식별",
+        "도구변수",
+        "폐루프식별",
+        "로봇동역학",
+        "통계검정"
+      ],
+      "title": "A Generic Instrumental Variable Approach for Industrial Robot Identification - 요약",
+      "updatedAt": "2026-09-25T12:15:51.383Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/qpz8rq/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/swevers1997-excitation/",

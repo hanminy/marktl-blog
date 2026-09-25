@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>필터가 흔들려도, 로봇 식별은 정확할 수 있을까? — IDIM–IV 연구 리포트</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      --paper: #f5f3ed;
+      --surface: #fffefa;
+      --ink: #202d32;
+      --muted: #637074;
+      --line: #d9ded7;
+      --accent: #a84b2e;
+      --accent-soft: #f4e8dd;
+      --teal: #27635f;
+      --teal-soft: #e8f0e9;
+      --night: #182e33;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "AppleMyungjo", "Batang", serif;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.85;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: #d7e6dc; color: var(--night); }
+    a { color: var(--teal); text-underline-offset: .22em; text-decoration-thickness: 1px; }
+    a:hover { color: var(--accent); }
+    a:focus-visible { outline: 3px solid var(--accent); outline-offset: 5px; border-radius: 2px; }
+    .skip-link {
+      position: absolute;
+      top: -100px;
+      left: 20px;
+      z-index: 10;
+      padding: 10px 20px;
+      background: var(--surface);
+    }
+    .skip-link:focus { top: 12px; }
+    .container { width: min(1180px, calc(100% - 80px)); margin-inline: auto; }
+    .masthead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding-block: 24px;
+      border-bottom: 1px solid var(--line);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .masthead a { color: var(--ink); text-decoration: none; }
+    .masthead .edition { color: var(--muted); letter-spacing: .03em; font-weight: 500; }
+    .hero { padding: 66px 0 48px; }
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 30px; height: 2px; background: currentColor; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      max-width: 1050px;
+      margin: 24px 0 27px;
+      font-family: var(--serif);
+      font-size: clamp(37px, 4.6vw, 66px);
+      font-weight: 700;
+      letter-spacing: -.055em;
+      line-height: 1.27;
+      text-wrap: balance;
+    }
+    .hero-deck {
+      max-width: 820px;
+      margin-bottom: 26px;
+      font-size: clamp(18px, 2vw, 22px);
+      line-height: 1.85;
+      color: #4b5c60;
+      letter-spacing: -.025em;
+    }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px 22px; color: var(--muted); font-size: 13px; }
+    .meta span + span { border-left: 1px solid var(--line); padding-left: 22px; }
+    .hero-panel {
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+      background: var(--night);
+      color: #f4f5ee;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 55px;
+    }
+    .hero-thesis { padding: 35px 38px; border-right: 1px solid #456066; }
+    .mini-label { display: block; margin-bottom: 13px; font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    .hero-thesis .mini-label { color: #b7cbc6; }
+    .hero-thesis p { margin: 0; font-family: var(--serif); font-size: 24px; line-height: 1.65; letter-spacing: -.025em; }
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); align-items: center; padding: 25px; gap: 15px; }
+    .metric { text-align: center; }
+    .metric strong { display: block; color: #edc5a3; font-size: 48px; line-height: 1.2; letter-spacing: -.04em; font-weight: 500; font-variant-numeric: tabular-nums; }
+    .metric span { display: block; margin-top: 9px; font-size: 12px; color: #d7e0d9; }
+    .metric small { display: block; color: #b1c3bd; font-size: 10px; margin-top: 2px; }
+
+    .article-layout { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 64px; align-items: start; }
+    .sidebar { position: sticky; top: 28px; padding-bottom: 30px; font-size: 13px; }
+    .sidebar .mini-label { color: var(--muted); margin-bottom: 16px; }
+    .toc { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--line); }
+    .toc li { border-bottom: 1px solid var(--line); }
+    .toc a { display: flex; gap: 12px; padding: 12px 0; text-decoration: none; color: #46585d; }
+    .toc a:hover { color: var(--accent); }
+    .toc .num { color: var(--accent); font-size: 11px; padding-top: 2px; font-variant-numeric: tabular-nums; }
+    .sidebar-note { margin: 23px 0 0; color: var(--muted); font-size: 11px; line-height: 1.9; }
+    .article-body { min-width: 0; }
+    .article-body > section { margin-bottom: 65px; }
+    .section-heading { display: flex; align-items: baseline; gap: 15px; border-top: 1px solid var(--ink); padding-top: 20px; margin-bottom: 26px; }
+    .section-heading .section-num { color: var(--accent); font-size: 13px; font-weight: 700; }
+    h2 { margin: 0; font-family: var(--serif); font-size: clamp(26px, 3vw, 34px); line-height: 1.45; letter-spacing: -.04em; }
+    h3 { margin: 32px 0 14px; font-size: 21px; line-height: 1.5; letter-spacing: -.025em; }
+    p { margin-bottom: 20px; }
+    strong { font-weight: 750; }
+    .abstract { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--teal); padding: 28px 32px; }
+    .abstract h2 { font-family: var(--sans); font-size: 14px; font-weight: 800; letter-spacing: .06em; color: var(--teal); margin-bottom: 16px; }
+    .abstract p:last-child { margin-bottom: 0; }
+    .finding-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 26px 0 18px; }
+    .finding { padding: 24px 21px; border: 1px solid var(--line); background: var(--surface); }
+    .finding .index { color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .1em; }
+    .finding h3 { margin: 13px 0 11px; font-size: 18px; line-height: 1.55; }
+    .finding p { margin: 0; color: #58676b; font-size: 14px; line-height: 1.8; }
+    .small-note { font-size: 13px; line-height: 1.8; color: var(--muted); }
+    .callout { padding: 23px 27px; background: var(--teal-soft); border-radius: 3px; margin: 25px 0; }
+    .callout.warm { background: var(--accent-soft); }
+    .callout strong.label { display: block; font-size: 13px; color: var(--teal); margin-bottom: 7px; }
+    .callout.warm strong.label { color: var(--accent); }
+    .callout p { margin: 0; font-size: 15px; }
+    blockquote.pullquote { margin: 36px 0; padding: 8px 0 8px 26px; border-left: 3px solid var(--accent); }
+    .pullquote p { font-family: var(--serif); font-size: clamp(22px, 2.5vw, 29px); line-height: 1.65; letter-spacing: -.03em; margin: 0; }
+    .pullquote footer { margin-top: 12px; font-size: 12px; color: var(--muted); }
+    .equation {
+      margin: 24px 0;
+      padding: 22px 25px;
+      background: #eeefe8;
+      border: 1px solid #dfe3d8;
+      border-radius: 3px;
+      overflow-x: auto;
+    }
+    .eq-label { display: block; margin-bottom: 13px; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .05em; }
+    .math { margin: 7px 0; font-family: "Cambria Math", "STIX Two Math", "Times New Roman", serif; font-size: 20px; line-height: 1.9; white-space: nowrap; word-break: normal; }
+    .math sub, .math sup { font-size: .7em; }
+    .math .roman { font-style: normal; }
+    .eq-note { margin-top: 13px; font-size: 12px; color: var(--muted); }
+    .table-wrap { overflow-x: auto; margin: 22px 0; border: 1px solid var(--line); background: var(--surface); border-radius: 3px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.8; text-align: left; }
+    caption { text-align: left; padding: 16px 18px; color: var(--muted); font-size: 12px; border-bottom: 1px solid var(--line); }
+    th, td { padding: 15px 18px; vertical-align: top; border-bottom: 1px solid var(--line); }
+    thead th { font-size: 12px; font-weight: 750; background: #ebeee6; color: #485b5b; }
+    tbody th { font-weight: 700; min-width: 110px; }
+    tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
+    .comparison { min-width: 580px; }
+    .comparison td:nth-child(3) { background: #f0f5ed; }
+    figure { margin: 28px 0; }
+    .figure-frame { padding: 22px; border: 1px solid var(--line); background: #fff; border-radius: 3px; text-align: center; }
+    .figure-frame a { display: block; }
+    .figure-frame img { display: block; width: auto; max-width: 100%; height: auto; max-height: 620px; margin-inline: auto; }
+    figcaption { margin-top: 11px; font-size: 12px; line-height: 1.85; color: var(--muted); }
+    figcaption b { color: var(--teal); font-weight: 750; margin-right: 6px; }
+    .figure-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+    .figure-pair figure { margin: 0; min-width: 0; }
+    .figure-pair .figure-frame { height: 390px; display: flex; align-items: center; justify-content: center; padding: 12px; }
+    .figure-pair img { max-height: 365px; }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      list-style: none;
+      counter-reset: flow;
+      padding: 0;
+      margin: 24px 0 10px;
+    }
+    .flow li { position: relative; background: var(--surface); border-top: 3px solid var(--teal); padding: 18px 15px; counter-increment: flow; }
+    .flow li::before { content: "0" counter(flow); display: block; color: var(--teal); font-size: 12px; font-weight: 800; margin-bottom: 12px; }
+    .flow strong { display: block; font-size: 15px; margin-bottom: 7px; }
+    .flow span { display: block; color: var(--muted); font-size: 12px; line-height: 1.8; }
+    .steps { padding-left: 23px; margin: 18px 0 25px; }
+    .steps li { padding-left: 7px; margin-bottom: 12px; }
+    .steps li::marker { color: var(--accent); font-weight: 750; }
+    .stat-strip { display: grid; grid-template-columns: repeat(3, 1fr); margin: 25px 0; background: var(--teal-soft); }
+    .stat-strip div { padding: 23px 18px; border-right: 1px solid #cfdcd2; }
+    .stat-strip div:last-child { border-right: 0; }
+    .stat-strip strong { display: block; font-size: 27px; font-weight: 600; letter-spacing: -.04em; color: var(--teal); }
+    .stat-strip span { font-size: 12px; color: #4a6360; }
+    .context-tag { display: inline-block; font-size: 11px; letter-spacing: .07em; font-weight: 750; padding: 3px 9px; background: var(--accent-soft); color: var(--accent); margin-bottom: 15px; }
+    .checklist { list-style: none; margin: 23px 0; padding: 0; }
+    .checklist li { position: relative; padding: 15px 0 15px 29px; border-bottom: 1px solid var(--line); font-size: 15px; }
+    .checklist li::before { content: "□"; position: absolute; left: 0; color: var(--teal); font-size: 21px; line-height: 1.35; }
+    .closing { background: var(--night); color: #edf1e9; padding: 34px; border-radius: 3px; }
+    .closing .mini-label { color: #bdd2c7; }
+    .closing h2 { color: #f4d6b9; margin-bottom: 20px; font-size: 29px; }
+    .closing p { color: #d5e0d7; font-size: 16px; }
+    .closing p:last-child { margin-bottom: 0; }
+    .share-copy { padding: 23px 0; border-block: 1px solid var(--line); margin: 29px 0; }
+    .share-copy .mini-label { color: var(--accent); }
+    .share-copy p { margin: 0; font-family: var(--serif); font-size: 20px; line-height: 1.8; }
+    .source-card { border: 1px solid var(--line); background: var(--surface); padding: 25px 28px; }
+    .source-card cite { display: block; font-style: normal; font-size: 20px; font-weight: 700; line-height: 1.55; word-break: normal; margin-bottom: 16px; }
+    .source-card p { font-size: 14px; margin-bottom: 12px; }
+    .source-card p:last-child { margin-bottom: 0; }
+    .source-notes { font-size: 13px; color: var(--muted); padding-left: 21px; }
+    .source-notes li { padding-left: 5px; margin-bottom: 11px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 25px; }
+    .tags span { padding: 4px 10px; border: 1px solid var(--line); color: var(--muted); font-size: 11px; border-radius: 2px; }
+    .page-footer { display: flex; justify-content: space-between; gap: 25px; margin-top: 20px; padding: 27px 0 38px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+
+    @media (min-width: 1500px) {
+      body { font-size: 18px; }
+    }
+    @media (max-width: 1050px) {
+      .container { width: calc(100% - 48px); }
+      .article-layout { grid-template-columns: 155px minmax(0, 1fr); gap: 35px; }
+      .hero-thesis { padding: 28px; }
+      .hero-thesis p { font-size: 21px; }
+      .metrics { padding: 20px 14px; gap: 8px; }
+      .metric strong { font-size: 40px; }
+      .finding-grid { grid-template-columns: 1fr; }
+      .finding { padding: 20px 24px; }
+      .finding h3 { margin: 7px 0; }
+      .flow { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 760px) {
+      body { font-size: 16px; }
+      .container { width: calc(100% - 36px); }
+      .masthead { padding-block: 18px; font-size: 10px; gap: 10px; }
+      .masthead .edition { font-size: 10px; }
+      .hero { padding: 40px 0 30px; }
+      h1 { margin-top: 20px; }
+      .hero-deck { font-size: 18px; }
+      .meta { font-size: 11px; gap: 7px 12px; }
+      .meta span + span { padding-left: 12px; }
+      .hero-panel { grid-template-columns: 1fr; margin-bottom: 33px; }
+      .hero-thesis { border-right: 0; border-bottom: 1px solid #456066; padding: 26px; }
+      .metrics { padding: 26px 15px; }
+      .article-layout { display: block; }
+      .sidebar { position: static; padding-bottom: 28px; }
+      .sidebar .mini-label { margin-bottom: 10px; }
+      .toc { display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 20px; }
+      .toc a { font-size: 12px; padding: 9px 0; }
+      .sidebar-note { display: none; }
+      .article-body > section { margin-bottom: 44px; }
+      .abstract { padding: 23px; }
+      .section-heading { padding-top: 17px; gap: 11px; }
+      .finding-grid { gap: 10px; }
+      .pullquote p { font-size: 23px; }
+      .equation { padding: 18px; }
+      .math { font-size: 18px; }
+      .figure-frame { padding: 12px; }
+      .figure-pair { grid-template-columns: 1fr; gap: 26px; }
+      .figure-pair .figure-frame { height: auto; padding: 18px; }
+      .figure-pair img { max-height: 600px; }
+      .stat-strip div { padding: 18px 12px; }
+      .stat-strip strong { font-size: 24px; }
+      .stat-strip span { font-size: 11px; }
+      .closing { padding: 27px 23px; }
+      .closing h2 { font-size: 25px; }
+      .source-card { padding: 22px; }
+      .page-footer { font-size: 11px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+    @media print {
+      @page { margin: 18mm; }
+      body { background: #fff; color: #111; font-size: 10.5pt; line-height: 1.65; }
+      .container { width: 100%; max-width: none; }
+      .sidebar, .skip-link, .page-footer a { display: none; }
+      .article-layout { display: block; }
+      .hero { padding: 24px 0; }
+      h1 { font-size: 30pt; }
+      h2 { font-size: 20pt; }
+      .hero-panel, .closing { background: #eef1eb; color: #111; border: 1px solid #aaa; }
+      .hero-thesis p, .hero-thesis .mini-label, .metric strong, .metric span, .metric small,
+      .closing h2, .closing p, .closing .mini-label { color: #111; }
+      .hero-panel { margin-bottom: 25px; }
+      .article-body > section { margin-bottom: 30px; }
+      .section-heading, h3 { break-after: avoid; }
+      figure, .finding, .equation, .source-card { break-inside: avoid; }
+      .table-wrap, .equation { overflow: visible; }
+      .comparison { min-width: 0; }
+      .math { white-space: normal; }
+      .figure-frame img { max-height: 135mm; }
+      a { color: inherit; }
+      .tags { display: none; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="A Generic Instrumental Variable Approach for Industrial Robot Identification - 요약">
+<meta property="og:description" content="A Generic Instrumental Variable Approach for Industrial Robot Identification 요약 한줄 요약 로봇 동역학 식별의 표준인 역동역학 모델 + 최소제곱(IDIM–LS) 은 관절 각도를 대역 필터로 미분해 속도·가속도를 만드는데, 필터가 잘못 맞으면 회귀 행렬이 잡음과 상관돼 편향 된다. 이 논문은 순동역학 모델을 같은 제어기 구조로 시뮬레이션한 잡음 없는 데이터 를 도구변">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/qpz8rq/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/qpz8rq/assets/figure1.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="A Generic Instrumental Variable Approach for Industrial Robot Identification - 요약">
+<meta name="twitter:description" content="A Generic Instrumental Variable Approach for Industrial Robot Identification 요약 한줄 요약 로봇 동역학 식별의 표준인 역동역학 모델 + 최소제곱(IDIM–LS) 은 관절 각도를 대역 필터로 미분해 속도·가속도를 만드는데, 필터가 잘못 맞으면 회귀 행렬이 잡음과 상관돼 편향 된다. 이 논문은 순동역학 모델을 같은 제어기 구조로 시뮬레이션한 잡음 없는 데이터 를 도구변">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/qpz8rq/assets/figure1.png">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/janot2014-iv/">
+</head>
+<body>
+  <a class="skip-link" href="#article">본문으로 바로 가기</a>
+
+  <div class="container">
+    <header class="masthead" id="top">
+      <a href="#top" aria-label="기사 처음으로">Robotics / Research Notes</a>
+      <span class="edition">논문 읽기 · 시스템 식별</span>
+    </header>
+
+    <main id="article">
+      <article aria-labelledby="article-title">
+        <header class="hero">
+          <div class="eyebrow">Research report · Janot et al., 2014</div>
+          <h1 id="article-title">필터가 흔들려도,<br>로봇 식별은 정확할 수 있을까?</h1>
+          <p class="hero-deck">
+            관절 각도를 미분하는 순간, 측정 잡음은 동역학 파라미터의 편향으로 번질 수 있다.
+            IDIM–IV는 같은 명령으로 움직이는 시뮬레이션 로봇에서 해법을 찾는다.
+            디지털 트윈을 식별의 도구로 읽게 만드는 한 편의 연구.
+          </p>
+          <div class="meta">
+            <span>원 논문 · Janot · Vandanjon · Gautier</span>
+            <span>IEEE TCST · 2014</span>
+            <span>노트 작성 · <time datetime="2026-09-25">2026.09.25</time></span>
+          </div>
+        </header>
+
+        <div class="hero-panel" aria-label="연구의 핵심과 실험 규모">
+          <div class="hero-thesis">
+            <span class="mini-label">The central idea</span>
+            <p>측정 데이터로 동역학을 맞추고,<br>시뮬레이션 데이터로 편향을 다룬다.</p>
+          </div>
+          <div class="metrics">
+            <div class="metric">
+              <strong>60</strong>
+              <span>기저 파라미터</span>
+              <small>TX40 · 6축</small>
+            </div>
+            <div class="metric">
+              <strong>3</strong>
+              <span>IV 수렴 반복 수</span>
+              <small>보고된 실험 조건</small>
+            </div>
+            <div class="metric">
+              <strong>28</strong>
+              <span>축소 후 필수 파라미터</span>
+              <small>필터 적용 · F 검정</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="article-layout">
+          <aside class="sidebar" aria-label="기사 목차">
+            <span class="mini-label">In this report</span>
+            <nav aria-label="본문 탐색">
+              <ol class="toc">
+                <li><a href="#abstract"><span class="num">00</span>초록과 핵심 발견</a></li>
+                <li><a href="#problem"><span class="num">01</span>최소제곱의 약점</a></li>
+                <li><a href="#method"><span class="num">02</span>시뮬레이션을 도구로</a></li>
+                <li><a href="#validation"><span class="num">03</span>통계로 확인하기</a></li>
+                <li><a href="#evidence"><span class="num">04</span>TX40 실험의 증거</a></li>
+                <li><a href="#implications"><span class="num">05</span>HR35로 가져갈 것</a></li>
+                <li><a href="#takeaway"><span class="num">06</span>남는 질문과 결론</a></li>
+                <li><a href="#sources"><span class="num">07</span>출처와 읽기 메모</a></li>
+              </ol>
+            </nav>
+            <p class="sidebar-note">
+              원 논문의 방법과 실험을 정리한 연구 노트입니다.
+              HR35 적용 논의는 별도의 해석과 후속 검토 과제로 구분했습니다.
+            </p>
+          </aside>
+
+          <div class="article-body">
+            <section id="abstract" aria-labelledby="abstract-heading">
+              <div class="abstract">
+                <h2 id="abstract-heading">ABSTRACT / 초록</h2>
+                <p>
+                  로봇 동역학 식별의 표준적인 접근인 <strong>역동역학 모델 기반 최소제곱법(IDIM–LS)</strong>은
+                  관절 각도를 필터링하고 미분해 회귀 행렬을 만든다. 이 과정에서 회귀 행렬과 잔차가 상관되면
+                  파라미터 추정에 편향이 생길 수 있다.
+                </p>
+                <p>
+                  Janot, Vandanjon, Gautier는 <strong>순동역학 모델을 폐루프로 시뮬레이션해 도구변수를 만드는
+                  IDIM–IV</strong>를 제안한다. 추정 파라미터가 바뀔 때 시뮬레이션 제어기의 이득도 갱신해,
+                  실물과 시뮬레이션의 응답을 가깝게 유지한다. Stäubli TX40 실험에서는 60개 기저 파라미터를
+                  3회 반복으로 식별했고, 미분 전처리 필터를 제거한 조건에서도 필터 적용 시의 추정값에 가까운 결과를 얻었다.
+                  정규성·잔차 독립성·모델 축소 검정은 결과를 해석하는 통계적 근거를 제공한다.
+                </p>
+              </div>
+
+              <div class="finding-grid" aria-label="세 가지 핵심 발견">
+                <div class="finding">
+                  <span class="index">FINDING 01</span>
+                  <h3>잡음을 줄이는 것과<br>편향을 줄이는 것은 다르다</h3>
+                  <p>LS의 문제는 잡음의 크기만이 아니다. 회귀 행렬과 잔차 사이의 상관이 추정값을 체계적으로 흔들 수 있다.</p>
+                </div>
+                <div class="finding">
+                  <span class="index">FINDING 02</span>
+                  <h3>좋은 도구변수는<br>좋은 폐루프 응답에서 온다</h3>
+                  <p>시뮬레이션이 잡음 없다는 사실만으로 충분하지 않다. 실물의 움직임과도 가깝게 유지되어야 한다.</p>
+                </div>
+                <div class="finding">
+                  <span class="index">FINDING 03</span>
+                  <h3>필터 의존성은 줄지만<br>전처리의 가치는 남는다</h3>
+                  <p>필터를 제거해도 IV 추정은 안정적이었다. 다만 데시메이션을 생략하면 표준편차가 커지는 효율 손실이 나타났다.</p>
+                </div>
+              </div>
+              <p class="small-note">
+                이 글의 수치와 성능 비교는 제공된 논문 요약의 실험 조건에 한정한다.
+                특정 실험의 추정값 일치나 검정 통과를 모든 조건에서의 비편향성 보장으로 해석하지 않는다.
+              </p>
+            </section>
+
+            <section id="problem" aria-labelledby="problem-heading">
+              <div class="section-heading">
+                <span class="section-num">01</span>
+                <h2 id="problem-heading">최소제곱은 어디서 흔들리는가</h2>
+              </div>
+              <p>
+                로봇의 관성·질량·마찰을 추정하려면, 움직임과 토크 사이의 관계를 설명하는 모델이 필요하다.
+                역동역학 모델은 이 관계를 기저 파라미터에 대해 선형으로 쓸 수 있게 한다.
+                측정 데이터를 쌓아 회귀 문제로 만들면, 익숙한 최소제곱법으로 파라미터를 구할 수 있다.
+              </p>
+
+              <div class="equation" role="group" aria-label="역동역학 모델과 관측 회귀식">
+                <span class="eq-label">원 논문 식 (2), (4) · 파라미터에 대해 선형인 동역학</span>
+                <div class="math">τ = IDM(q, q̇, q̈) β</div>
+                <div class="math">Y(τ) = W(q̂, q̇̂, q̈̂) β + ρ</div>
+                <div class="eq-note">Y: 토크 관측 벡터 · W: 회귀 행렬 · β: 기저 파라미터 벡터 · ρ: 잔차</div>
+              </div>
+
+              <p>
+                어려움은 <strong>속도와 가속도를 어떻게 얻느냐</strong>에 있다. 일반적으로 관절 각도에
+                양방향 버터워스 저역 통과 필터를 적용한 뒤 중앙 차분으로 미분한다.
+                토크와 회귀 행렬에는 병렬 데시메이션을 적용해 토크 리플과 정보가 적은 고주파 성분을 줄인다.
+                필터 설정이 적절하면 잘 작동하지만, 그 적절성을 사전에 확신하기는 어렵다.
+              </p>
+
+              <div class="table-wrap">
+                <table>
+                  <caption>역동역학 식별을 구성하는 주요 요소</caption>
+                  <thead><tr><th scope="col">요소</th><th scope="col">의미와 역할</th></tr></thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">기저 파라미터 β</th>
+                      <td>링크별 관성 텐서 6성분, 1차 모멘트 3성분, 질량, 로터 관성, 마찰 2성분 등을 식별 가능한 최소 조합으로 묶은 b개 파라미터.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">토크 τ</th>
+                      <td>전류 기준 v<sub>τ</sub>와 드라이브 이득 G<sub>τ</sub>의 곱. 연구에서는 500 Hz를 넘는 전류 루프 대역폭을 근거로 정적 이득 관계를 사용한다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">회귀 행렬 W</th>
+                      <td>필터링·미분한 관절 위치, 속도, 가속도로 구성한다. 측정 잡음의 영향을 받는 지점이다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">가중 추정</th>
+                      <td>관절별 잔차 분산으로 정규화한 가중 최소제곱을 사용하고, 공분산과 상대 표준편차로 추정 불확실성을 평가한다.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <figure>
+                <div class="figure-frame">
+                  <a href="assets/figure1.png" aria-label="그림 1 IDIM–LS 흐름 원본 이미지 열기">
+                    <img src="assets/figure1.png" alt="IDIM–LS의 처리 흐름. 측정한 관절 각도를 필터링하고 미분한 뒤 역동역학 회귀 행렬을 구성해 최소제곱으로 파라미터를 추정한다." loading="lazy" decoding="async">
+                  </a>
+                </div>
+                <figcaption><b>그림 1</b>표준 IDIM–LS 흐름. 필터·다운샘플링을 거쳐 역동역학 회귀 행렬을 구성한다. 원 논문 Figure 1.</figcaption>
+              </figure>
+
+              <div class="callout warm">
+                <strong class="label">문제의 핵심: 회귀 행렬과 잔차의 상관</strong>
+                <p>
+                  E(W<sup>T</sup>ρ) ≠ 0이면 LS의 비편향성·일관성을 뒷받침하는 직교 조건이 깨진다.
+                  잡음이 섞인 관절 각도를 미분해 W를 만들기 때문에, 이 상관을 무시하기 어렵다.
+                </p>
+              </div>
+              <p>
+                저자들은 당시의 EKF, 집합 소속, LMI, 최대우도 등의 접근이 LS 대비 실질적인 개선과
+                6축 산업 로봇 검증을 충분히 보여주지 못했다고 문제를 제기한다.
+                이 연구의 기여는 오래된 도구변수 아이디어를 <strong>실제 산업 로봇에서 사용할 수 있는
+                시뮬레이션 기반 절차</strong>로 구체화한 데 있다.
+              </p>
+            </section>
+
+            <section id="method" aria-labelledby="method-heading">
+              <div class="section-heading">
+                <span class="section-num">02</span>
+                <h2 id="method-heading">시뮬레이션을 식별의 도구로 바꾸다</h2>
+              </div>
+              <p>
+                도구변수(instrument)는 회귀 행렬이 담고 있는 유효한 움직임 정보와 관련되면서,
+                잔차와는 상관되지 않아야 한다. 이상적인 후보는 잡음 없는 회귀 행렬 W<sub>nf</sub>다.
+                실제로 이를 관측할 수 없으므로, 논문은 <strong>순동역학 모델(DDM)의 시뮬레이션</strong>으로
+                그 역할을 할 데이터를 만든다.
+              </p>
+
+              <div class="equation" role="group" aria-label="유효한 도구변수의 조건과 가중 도구변수 추정식">
+                <span class="eq-label">원 논문 식 (14)–(16), (25) · 도구변수의 조건과 추정</span>
+                <div class="math">Z = W<sub>nf</sub></div>
+                <div class="math">rank E(Z<sup>T</sup>W) = b, &nbsp; E(Z<sup>T</sup>ρ) = 0</div>
+                <div class="math">β̂<sub>IV</sub><sup>k</sup> = (Z<sup>T</sup>Σ<sup>−1</sup>W)<sup>−1</sup>Z<sup>T</sup>Σ<sup>−1</sup>Y</div>
+                <div class="eq-note">Z: 도구변수 행렬 · Σ: 잔차 공분산에 따른 가중 행렬 · k: 반복 인덱스</div>
+              </div>
+
+              <h3>같은 궤적, 같은 제어 구조, 다른 데이터 경로</h3>
+              <p>
+                실물 로봇과 시뮬레이션 로봇에 같은 기준 궤적을 주고, 같은 구조의 제어 법칙을 적용한다.
+                실물 데이터로 W와 Y를 만들고, 측정 잡음이 없는 시뮬레이션 상태로 Z를 만든다.
+                시뮬레이션의 가속도는 현재 추정 파라미터를 넣은 순동역학으로 계산한다.
+              </p>
+
+              <div class="equation" role="group" aria-label="순동역학 시뮬레이션 식">
+                <span class="eq-label">원 논문 식 (17) · 이전 추정값으로 다음 도구변수 생성</span>
+                <div class="math">q̈<sub>S</sub> = M(q<sub>S</sub>, β̂<sub>IV</sub><sup>k−1</sup>)<sup>−1</sup>[τ<sub>S</sub> − N(q<sub>S</sub>, q̇<sub>S</sub>, β̂<sub>IV</sub><sup>k−1</sup>)]</div>
+                <div class="eq-note">M: 관성 행렬 · N: 관성 행렬 항 외의 동역학 항 · 아래첨자 S: 시뮬레이션 상태</div>
+              </div>
+
+              <p>
+                여기에는 중요한 조건이 붙는다. <strong>시뮬레이션의 상태가 실물의 상태와 충분히 가까워야 한다.</strong>
+                파라미터 추정값이 달라지면 시뮬레이션 로봇의 관성도 달라진다.
+                제어기 이득을 그대로 두면 폐루프 응답이 변하고, 실물과 시뮬레이션의 궤적이 벌어질 수 있다.
+              </p>
+
+              <h3>핵심 장치: 추정값이 바뀌면 제어기 이득도 갱신한다</h3>
+              <p>
+                논문은 관절 간 결합 토크를 외란으로 보고 각 관절을 이중 적분기로 근사한다.
+                이때 관절 관성 J<sub>j</sub>는 자세에 따른 최대값을 사용하며,
+                시뮬레이션 PD 제어기의 미분 이득을 관성 추정값에 비례하도록 조정한다.
+              </p>
+
+              <div class="equation" role="group" aria-label="시뮬레이션 제어기의 미분 이득 갱신식">
+                <span class="eq-label">원 논문 식 (22) · 관성 변화에 맞춘 이득 갱신</span>
+                <div class="math">k<sub>vⱼ</sub><sup>s,k</sup> = k<sub>vⱼ</sub><sup>a</sup> · Ĵ<sub>j</sub><sup>k</sup> / J<sub>j</sub><sup>ap</sup></div>
+                <div class="eq-note">
+                  k<sub>vⱼ</sub><sup>a</sup>: 실물 제어기의 미분 이득 ·
+                  J<sub>j</sub><sup>ap</sup>: 사전 관성값 ·
+                  Ĵ<sub>j</sub><sup>k</sup>: k번째 추정으로 계산한 관성
+                </div>
+              </div>
+
+              <blockquote class="pullquote">
+                <p>시뮬레이션 로봇의 ‘무게’가 바뀌면,<br>같은 움직임을 만들 제어기 이득도 함께 바꾼다.</p>
+                <footer>이득 갱신의 직관을 풀어 쓴 설명 · 원문 직접 인용 아님</footer>
+              </blockquote>
+
+              <figure>
+                <div class="figure-frame">
+                  <a href="assets/figure4.png" aria-label="그림 4 IDIM–IV 흐름 원본 이미지 열기">
+                    <img src="assets/figure4.png" alt="실물 로봇과 시뮬레이션 로봇의 두 경로를 결합한 IDIM–IV 흐름. 실물에서 관측 데이터를 얻고, 이득을 갱신한 순동역학 시뮬레이션에서 도구변수 Z를 구성한다." loading="lazy" decoding="async">
+                  </a>
+                </div>
+                <figcaption><b>그림 2</b>IDIM–IV의 두 데이터 경로. 실물은 관측을 제공하고 시뮬레이션은 도구변수를 제공한다. 원 논문 Figure 4.</figcaption>
+              </figure>
+
+              <h3>반복 알고리즘</h3>
+              <p>
+                SYMORO+로 역·순동역학 모델을 생성하고 실측 데이터에서 W와 Y를 계산한다.
+                초기 파라미터는 0으로 두되, 관성 행렬이 정칙이 되도록 로터 관성 I<sub>a</sub>는 1로 설정한다.
+                이후 다음 네 단계를 반복한다.
+              </p>
+              <ol class="flow" aria-label="IDIM–IV의 반복 절차">
+                <li><strong>이득 갱신</strong><span>현재 관성 추정값에 맞춰 시뮬레이션 제어기를 조정한다.</span></li>
+                <li><strong>DDM 시뮬레이션</strong><span>실물과 같은 기준 궤적으로 폐루프 응답을 생성한다.</span></li>
+                <li><strong>도구변수 구성</strong><span>시뮬레이션 상태를 역동역학 모델에 넣어 Z를 만든다.</span></li>
+                <li><strong>가중 IV 추정</strong><span>W, Y, Z로 파라미터를 갱신하고 수렴 여부를 확인한다.</span></li>
+              </ol>
+              <p class="small-note">
+                종료 기준은 잔차 노름의 변화와 파라미터의 최대 상대 변화다.
+                논문 요약에 제시된 허용오차 범위는 2.5–5%다.
+                이 절차는 역동역학 회귀와 순동역학 시뮬레이션의 정합성을 함께 확인하게 한다.
+              </p>
+            </section>
+
+            <section id="validation" aria-labelledby="validation-heading">
+              <div class="section-heading">
+                <span class="section-num">03</span>
+                <h2 id="validation-heading">추정값 다음에는, 가정을 검정한다</h2>
+              </div>
+              <p>
+                작은 토크 오차만으로 좋은 식별을 선언할 수는 없다.
+                추정 불확실성을 믿을 수 있는지, 잔차에 설명되지 않은 구조가 남아 있는지,
+                모든 파라미터를 유지할 필요가 있는지도 확인해야 한다.
+                이 논문은 세 종류의 검정을 식별 절차에 연결한다.
+              </p>
+
+              <div class="table-wrap">
+                <table>
+                  <caption>통계 검정의 목적과 해석</caption>
+                  <thead>
+                    <tr><th scope="col">검정</th><th scope="col">논문의 확인 방법</th><th scope="col">결과가 알려주는 것</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">정규성</th>
+                      <td>정규화 잔차가 N(0,1)을 따르는지 Kolmogorov–Smirnov 검정. 유의수준 0.05.</td>
+                      <td>기각될 경우 측정·필터 문제나 마찰·강성 등의 모델 누락을 점검할 단서가 된다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">잔차 독립성</th>
+                      <td>잔차에 p차 자기회귀 모델을 적합. 계수가 0에 가까운지, R² &lt; 0.1인지 확인.</td>
+                      <td>시간 상관이 남으면 상대 표준편차가 과소평가될 수 있어 데시메이션을 재검토한다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">모델 축소</th>
+                      <td>전체 b개 모델과 필수 b<sub>c</sub>개 모델의 잔차를 F 통계량으로 비교.</td>
+                      <td>불확실성이 큰 파라미터를 제거해도 적합도가 유의하게 나빠지지 않는지 평가한다.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <p>
+                특히 F 검정은 “상대 표준편차가 20–30%를 넘으면 제거한다”는 경험적 기준을
+                데이터에 비추어 평가할 수 있게 한다.
+                다만 <strong>30%는 모든 로봇에 적용할 고정 규칙이 아니다.</strong>
+                제거 이후의 모델이 해당 데이터에서 받아들일 만한지를 별도로 확인하는 것이 핵심이다.
+              </p>
+              <div class="callout">
+                <strong class="label">검정 통과의 의미</strong>
+                <p>
+                  정규성 검정에서 기각되지 않았다는 것은 정규성이 증명됐다는 뜻이 아니다.
+                  낮은 자기회귀 R² 역시 모든 종류의 의존성이 없음을 보장하지 않는다.
+                  각 검정은 가정의 타당성을 살피는 근거로 읽어야 한다.
+                </p>
+              </div>
+            </section>
+
+            <section id="evidence" aria-labelledby="evidence-heading">
+              <div class="section-heading">
+                <span class="section-num">04</span>
+                <h2 id="evidence-heading">TX40에서 확인한 것</h2>
+              </div>
+              <p>
+                실험 대상은 6축 산업용 로봇 <strong>Stäubli TX40</strong>이다.
+                60개 기저 파라미터를 대상으로 5 kHz에서 데이터를 수집했다.
+                기준 궤적은 5차 다항식으로 구성했으며, 회귀 행렬의 조건수 cond(W)는 200이었다.
+                5·6축의 결합을 반영하기 위해 모터 6의 마찰 파라미터 두 개가 추가된다.
+              </p>
+
+              <figure>
+                <div class="figure-frame">
+                  <a href="assets/figure5.png" aria-label="TX40 링크 좌표계 원본 이미지 열기">
+                    <img src="assets/figure5.png" alt="Stäubli TX40 6축 산업용 로봇의 링크와 관절 좌표계를 나타낸 원 논문의 도식." loading="lazy" decoding="async">
+                  </a>
+                </div>
+                <figcaption><b>그림 3</b>TX40의 링크 좌표계. 원 논문 Figure 5.</figcaption>
+              </figure>
+
+              <p class="small-note">
+                계산 비용 참고: 8초 궤적에 대한 IV 한 단계는 2011년 당시 노트북에서 약 3.5초가 걸렸다고 보고된다.
+                현재 하드웨어의 성능이나 실시간 실행 가능성을 직접 나타내는 수치는 아니다.
+              </p>
+
+              <h3>조건 A · 필터가 잘 맞으면 LS와 IV가 가까워진다</h3>
+              <p>
+                50 Hz 버터워스 필터와 10 Hz 데시메이션 설정을 사용한 조건에서 IV는 3단계 만에 수렴했다.
+                LS와 IV의 추정값은 서로 일치하는 양상을 보였고,
+                보고된 상대 오차는 LS 5%, IV 6%였다.
+                이 조건에서는 IV가 토크 적합 오차를 더 작게 만드는 것이 핵심 성과는 아니었다.
+              </p>
+
+              <div class="stat-strip" aria-label="필터 적용 실험의 주요 결과">
+                <div><strong>&lt; 0.2%</strong><span>시뮬–실물 관절 위치 상대 오차</span></div>
+                <div><strong>0.05</strong><span>잔차 자기회귀 R²</span></div>
+                <div><strong>60 → 28</strong><span>모델 축소 후 파라미터 수</span></div>
+              </div>
+
+              <p>
+                정규성 검정은 통과했고, 요약에 보고된 잔차 표준편차는 LS 1.03, IV 1.0이었다.
+                시뮬레이션과 실물의 관절 위치 상대 오차가 0.2% 미만이었다는 결과는
+                이득 갱신이 두 응답을 가깝게 유지했다는 실험적 근거다.
+                또한 상대 표준편차가 30%를 넘는 파라미터를 제거하는 축소가 F 검정에서 수용되어,
+                28개의 필수 파라미터가 남았다.
+              </p>
+
+              <figure>
+                <div class="figure-frame">
+                  <a href="assets/figure6.png" aria-label="6관절 직접 검증 그래프 원본 이미지 열기">
+                    <img src="assets/figure6.png" alt="TX40의 여섯 관절에 대한 직접 검증 그래프. 측정값은 파랑, 추정값은 빨강, 오차는 검정으로 표시되어 있다." loading="lazy" decoding="async">
+                  </a>
+                </div>
+                <figcaption><b>그림 4</b>6관절 직접 검증. 측정값(파랑), 추정값(빨강), 오차(검정)를 비교한다. 원 논문 Figure 6.</figcaption>
+              </figure>
+
+              <h3>조건 B · 필터를 제거하면 차이가 드러난다</h3>
+              <p>
+                버터워스 필터와 데시메이션 없이 관절 각도를 미분했을 때 LS 추정값은 크게 달라졌다.
+                예를 들어 원 논문의 표기에서 ZZ1R은 1.25에서 0.06으로,
+                MX2R은 2.20에서 4.20으로 변했다.
+                반면 IV는 여전히 3단계에 수렴했고, 필터 적용 시의 추정값에 가까운 결과를 유지했다.
+              </p>
+
+              <div class="figure-pair">
+                <figure>
+                  <div class="figure-frame">
+                    <a href="assets/table2.png" aria-label="필터 적용 IDIM–LS 추정표 원본 이미지 열기">
+                      <img src="assets/table2.png" alt="잘 맞춘 필터를 사용한 IDIM–LS 파라미터 추정값과 상대 표준편차를 제시한 원 논문 Table II." loading="lazy" decoding="async">
+                    </a>
+                  </div>
+                  <figcaption><b>원문 표 II</b>필터 적용 조건의 LS 추정값과 상대 표준편차(%). 이미지를 선택하면 원본을 볼 수 있다.</figcaption>
+                </figure>
+                <figure>
+                  <div class="figure-frame">
+                    <a href="assets/table6.png" aria-label="필터 미적용 IDIM–LS 추정표 원본 이미지 열기">
+                      <img src="assets/table6.png" alt="필터 없이 미분한 IDIM–LS 결과를 제시한 원 논문 Table VI. ZZ1R과 MX2R 등의 추정값이 필터 적용 조건에서 크게 벗어난다." loading="lazy" decoding="async">
+                    </a>
+                  </div>
+                  <figcaption><b>원문 표 VI</b>필터 미적용 조건의 LS 추정값. 주요 파라미터의 변화가 전처리 민감성을 보여준다.</figcaption>
+                </figure>
+              </div>
+
+              <div class="table-wrap">
+                <table class="comparison">
+                  <caption>실험 결과 비교 · 모든 수치는 해당 논문의 실험 조건에 한정</caption>
+                  <thead>
+                    <tr><th scope="col">비교 항목</th><th scope="col">IDIM–LS</th><th scope="col">IDIM–IV</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><th scope="row">필터 적용</th><td>IV와 가까운 추정값</td><td>3회 반복으로 수렴</td></tr>
+                    <tr><th scope="row">보고된 상대 오차</th><td>5%</td><td>6%</td></tr>
+                    <tr><th scope="row">필터 미적용</th><td>주요 파라미터 추정값이 크게 변화</td><td>필터 적용 결과에 가까운 값 유지, 3회 수렴</td></tr>
+                    <tr><th scope="row">데시메이션 생략</th><td>이 실험에서 편향 문제 관찰</td><td>추정 표준편차 증가 · 효율 손실</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="callout warm">
+                <strong class="label">편향과 분산을 나누어 읽기</strong>
+                <p>
+                  IV가 미분 잡음에 따른 편향을 억제하더라도 추정의 분산까지 자동으로 작아지는 것은 아니다.
+                  이 실험에서 데시메이션은 추정 효율을 높이는 사전 필터 역할을 했다.
+                  “필터 없이도 견딘다”는 결과가 “필터가 필요 없다”는 결론으로 이어지지는 않는다.
+                </p>
+              </div>
+
+              <h3>다른 방법과의 비교, 그리고 해석의 경계</h3>
+              <p>
+                총최소제곱(TLS)도 필터를 제거한 조건에서는 편향을 보였다.
+                폐루프 출력오차법(CLOE, <code>lsqnonlin</code>)은 좋은 초기값을 주면
+                1,000회 반복 후 IV와 같은 값에 도달했지만, 논문의 규칙 기반 초기화에서는 발산했다.
+                이 비교는 제안된 IV 절차의 초기값 강건성과 수렴 속도를 뒷받침한다.
+              </p>
+              <p>
+                필터 적용 시 LS와 IV의 일치는 Hausman 검정의 논리와 연결해 LS의 편향을 진단하는 근거로 읽을 수 있다.
+                그러나 <strong>두 추정값의 일치만으로 비편향성이 증명되거나, 차이만으로 LS 편향이 확정되지는 않는다.</strong>
+                IV의 유효성, 표본 불확실성, 모델 오차를 함께 확인해야 한다.
+              </p>
+            </section>
+
+            <section id="implications" aria-labelledby="implications-heading">
+              <div class="section-heading">
+                <span class="section-num">05</span>
+                <h2 id="implications-heading">HR35에는 무엇을 가져갈 수 있을까</h2>
+              </div>
+              <span class="context-tag">노트 작성자의 해석 · 후속 연구 과제</span>
+              <p>
+                HR35 관점에서 가장 흥미로운 전환은 트윈의 역할이다.
+                트윈을 식별 결과를 담는 모델로만 생각할 필요는 없다.
+                같은 명령과 제어 구조로 궤적을 생성할 수 있다면,
+                <strong>트윈 자체가 도구변수를 공급하는 식별 도구</strong>가 될 수 있다.
+              </p>
+
+              <h3>직접 가져올 수 있는 것은 검증의 구조다</h3>
+              <p>
+                20 Hz 경사계 데이터를 필터링·미분해 구한 LS 추정과,
+                트윈에서 만든 도구변수로 구한 IV 추정을 비교하는 절차는 유용한 출발점이다.
+                차이가 나타나면 LS 편향의 가능성을 검토하되,
+                트윈의 오차와 도구변수의 유효성도 함께 조사해야 한다.
+                정규성·잔차 독립성·F 모델 축소 검정은 식별 보고서의 공통 검토 항목으로 가져올 수 있다.
+              </p>
+
+              <h3>그대로 가져올 수 없는 것은 액추에이터와 제어기 가정이다</h3>
+              <p>
+                TX40에서 사용한 “토크 = 이득 × 명령” 관계는 유압 시스템에 그대로 적용되지 않는다.
+                HR35의 순동역학 모델에는 밸브와 압력 등 액추에이터 동역학이 포함되어야 한다.
+                제어 법칙의 구조도 알아야 하며, 관성 비례 이득 갱신은 유압 이득과 동특성을 고려해 다시 유도할 필요가 있다.
+              </p>
+
+              <div class="table-wrap">
+                <table>
+                  <caption>원 논문의 조건과 HR35 적용 시 남는 질문</caption>
+                  <thead><tr><th scope="col">항목</th><th scope="col">TX40 연구</th><th scope="col">HR35 검토 과제</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">액추에이터</th><td>전류 기준과 토크의 정적 이득 관계</td><td>밸브·압력 동역학을 포함한 모델 구성</td></tr>
+                    <tr><th scope="row">관측 속도</th><td>5 kHz 데이터 수집</td><td>20 Hz 경사계에서 확보할 수 있는 식별 정보 평가</td></tr>
+                    <tr><th scope="row">제어기 갱신</th><td>이중 적분기 근사, 관성 비례 이득</td><td>유압계의 폐루프 응답을 유지하는 규칙 유도</td></tr>
+                    <tr><th scope="row">자극 궤적</th><td>5차 다항식, cond(W) = 200</td><td>주기 자극과 저속 관측을 결합한 식별 가능성 검토</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <p>
+                Swevers의 주기 자극 접근과 결합해 낮은 샘플링 속도에서도 충분한 정보를 확보할 수 있을지는
+                후속 검토 과제다. 원 논문은 20 Hz 유압 로봇에서의 성능을 검증하지 않는다.
+                먼저 도구변수의 관련성과 실물–시뮬레이션 정합성을 확인할 수 있는 실험이 필요하다.
+              </p>
+
+              <ul class="checklist" aria-label="HR35 적용을 위한 미완료 검토 항목">
+                <li>실제 명령과 제어 구조를 반영해 트윈의 폐루프 궤적을 재현할 수 있는가?</li>
+                <li>유압 액추에이터 모델을 포함한 DDM이 관측된 동특성을 설명하는가?</li>
+                <li>20 Hz 데이터에서도 W와 Z가 파라미터 식별에 충분한 정보를 담는가?</li>
+                <li>LS–IV 차이를 추정 불확실성과 도구변수 유효성을 고려해 설명할 수 있는가?</li>
+                <li>잔차 검정과 모델 축소 결과를 일관된 형식으로 보고할 수 있는가?</li>
+              </ul>
+            </section>
+
+            <section id="takeaway" aria-labelledby="takeaway-heading">
+              <div class="closing">
+                <span class="mini-label">What stays with us</span>
+                <h2 id="takeaway-heading">좋은 식별은 작은 오차를 넘어선다</h2>
+                <p>
+                  이 연구가 보여주는 것은 새로운 추정식 하나만이 아니다.
+                  측정에서 생기는 편향을 시뮬레이션으로 다루고,
+                  제어기 갱신으로 두 세계의 움직임을 맞추며,
+                  통계 검정으로 결과의 해석 범위를 정하는 하나의 절차다.
+                </p>
+                <p>
+                  TX40에서는 이 구조가 3회 반복의 수렴과 필터 설정에 대한 강건성으로 이어졌다.
+                  다른 로봇에서의 다음 질문은 명확하다.
+                  <strong>우리의 시뮬레이션은 실물과 충분히 가까우면서, 측정 잡음에서 독립적인 정보를 제공할 수 있는가?</strong>
+                  트윈을 식별 도구로 쓰는 일은 그 질문을 실험으로 확인하는 데서 시작된다.
+                </p>
+              </div>
+
+              <div class="share-copy" aria-label="공유용 요약 문구">
+                <span class="mini-label">공유용 한 문장</span>
+                <p>
+                  로봇의 파라미터를 추정할 때, 시뮬레이션은 결과를 확인하는 모델을 넘어
+                  측정 잡음에 따른 편향을 줄이는 도구가 될 수 있다.
+                </p>
+              </div>
+            </section>
+
+            <section id="sources" aria-labelledby="sources-heading">
+              <div class="section-heading">
+                <span class="section-num">07</span>
+                <h2 id="sources-heading">출처와 읽기 메모</h2>
+              </div>
+
+              <div class="source-card">
+                <span class="mini-label">Primary paper</span>
+                <cite lang="en">A Generic Instrumental Variable Approach for Industrial Robot Identification</cite>
+                <p>Alexandre Janot · Pierre-Olivier Vandanjon · Maxime Gautier</p>
+                <p>ONERA Toulouse · Ifsttar Nantes · University of Nantes</p>
+                <p>
+                  <em>IEEE Transactions on Control Systems Technology</em>,
+                  22(1), 132–145, 2014.<br>
+                  DOI: <a>10.1109/TCST.2013.2246163</a>
+                </p>
+                <p>읽은 판: <a>HAL · hal-04799881v1</a></p>
+              </div>
+
+              <ol class="source-notes">
+                <li>
+                  이 글은 제공된 Obsidian 논문 요약을 공개 기사 형식으로 재구성했다.
+                  논문의 주장과 실험 결과는 요약에 근거하며, 원문 전체를 별도로 재검증한 보고서는 아니다.
+                </li>
+                <li>
+                  그림 1–4는 각각 원 논문의 Figure 1, 4, 5, 6이며, 표 이미지는 Table II와 Table VI다.
+                  이미지의 저작권과 출처는 원 저작물에 귀속된다.
+                  제공된 서지 메모는 HAL 열람본의 라이선스를 CC BY-NC로 기록한다.
+                </li>
+                <li>
+                  수식 번호는 원 논문의 번호를 유지했다. 화면의 수식은 읽기 쉽게 다시 조판했다.
+                  요약에 척도나 단위가 명시되지 않은 잔차 표준편차 수치에는 단위를 새로 부여하지 않았다.
+                </li>
+                <li>
+                  초기값 강건성, 반복 횟수, 오차와 모델 축소 결과는 보고된 TX40 실험에 대한 결과다.
+                  HR35·유압 모델·20 Hz 관측·주기 자극 논의는 노트 작성자의 응용 해석이며 검증된 실험 결과가 아니다.
+                </li>
+                <li>
+                  LS–IV 일치, KS 검정과 잔차 자기회귀 결과는 진단 근거로 기술했다.
+                  검정 통과와 추정값 일치를 통계적 가정의 증명으로 확대하지 않았다.
+                </li>
+              </ol>
+
+              <div class="tags" aria-label="핵심 키워드">
+                <span>IDIM–IV</span>
+                <span>도구변수</span>
+                <span>폐루프 식별</span>
+                <span>순동역학 시뮬레이션</span>
+                <span>제어기 이득 갱신</span>
+                <span>Hausman 검정</span>
+                <span>KS 정규성</span>
+                <span>F 검정</span>
+                <span>병렬 데시메이션</span>
+              </div>
+            </section>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <footer class="page-footer">
+      <span>Research Notes · 로봇 동역학과 시스템 식별</span>
+      <a href="#top">기사 처음으로 ↑</a>
+    </footer>
+  </div>
+</body>
+</html>
