@@ -1,7 +1,27 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T12:19:47.996Z",
+  "updatedAt": "2026-09-25T12:25:20.590Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/autcon2022-fullbody-pose/",
+      "excerpt": "Full body Pose Estimation for Excavators Based on Data Fusion of Multiple Onboard Sensors 요약 한줄 요약 굴착기 안전 감시용 전신 자세(키포인트 5개의 3차원 위치)를 캐빈에 단 스마트폰 스테레오 카메라 + 팔 하부의 ArUco 마커 와 부품별 9축 IMU 를 확장 칼만 필터(EKF) 로 융합해 추정한다. 카메라만 쓰면 마커 미인식·결손이 생기고 IMU 만",
+      "shortId": "gx54v5",
+      "slug": "autcon2022-fullbody-pose",
+      "sourcePath": "02_research/필드로봇/시스템식별/autcon2022-fullbody-pose.md",
+      "tags": [
+        "논문요약",
+        "자세추정",
+        "굴착기",
+        "센서융합",
+        "확장칼만필터",
+        "IMU",
+        "스테레오비전"
+      ],
+      "title": "Full-body Pose Estimation for Excavators Based on Data Fusion of Multiple Onboard Sensors - 요약",
+      "updatedAt": "2026-09-25T12:25:20.590Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/gx54v5/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/vision-pose-2023/",

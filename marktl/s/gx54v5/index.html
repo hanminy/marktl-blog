@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>굴착기의 자세를 끊김 없이 읽는 법 — 카메라와 IMU의 센서 융합</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      --paper: #f6f4ed;
+      --surface: #fffef9;
+      --ink: #1e302d;
+      --muted: #5e6c65;
+      --green: #245b4c;
+      --green-dark: #173d34;
+      --mint: #e7eee5;
+      --line: #d7ddd2;
+      --ochre: #bd7535;
+      --sand: #f0e4d2;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "Batang", Georgia, serif;
+      --sans: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.85;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--green); text-underline-offset: 4px; text-decoration-thickness: 1px; }
+    a:hover { color: #9c5829; }
+    a:focus-visible, [tabindex]:focus-visible {
+      outline: 3px solid var(--ochre);
+      outline-offset: 5px;
+    }
+    ::selection { background: #d5e2d0; color: var(--green-dark); }
+    .skip {
+      position: absolute;
+      left: 16px;
+      top: -100px;
+      z-index: 5;
+      padding: 10px 18px;
+      background: var(--surface);
+    }
+    .skip:focus { top: 12px; }
+    .shell { width: min(1180px, calc(100% - 96px)); margin-inline: auto; }
+    .masthead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding-block: 26px 22px;
+      border-bottom: 1px solid var(--ink);
+      font-size: 12px;
+      letter-spacing: .12em;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; }
+    .brand-mark { width: 12px; height: 12px; background: var(--green); }
+    .masthead span:last-child { color: var(--muted); }
+    .hero { padding-block: 67px 42px; }
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 0 0 25px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 750;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .eyebrow .rule { width: 35px; height: 2px; background: var(--ochre); }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 64px; align-items: end; }
+    h1 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(40px, 5.3vw, 66px);
+      line-height: 1.3;
+      letter-spacing: -.055em;
+      font-weight: 800;
+      text-wrap: balance;
+    }
+    h1 em { color: var(--green); font-style: normal; }
+    .dek { max-width: 740px; margin: 25px 0 0; font-size: 19px; line-height: 1.85; color: var(--muted); }
+    .hero-stat { border-top: 3px solid var(--green); padding-top: 15px; padding-bottom: 5px; }
+    .hero-stat .label { font-size: 12px; color: var(--muted); }
+    .hero-stat .number { display: block; font-size: 88px; line-height: 1.2; font-weight: 750; letter-spacing: -.065em; font-variant-numeric: tabular-nums; }
+    .hero-stat .number small { font-size: 25px; letter-spacing: -.02em; margin-left: 6px; }
+    .hero-stat p { margin: 8px 0 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .article-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 25px;
+      margin-top: 35px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .article-meta strong { color: var(--ink); font-weight: 650; }
+    .abstract {
+      display: grid;
+      grid-template-columns: 155px minmax(0, 1fr);
+      gap: 32px;
+      padding: 33px 38px;
+      background: var(--green-dark);
+      color: #f8f7ee;
+    }
+    .abstract h2 { margin: 3px 0; font-size: 13px; letter-spacing: .13em; font-family: var(--sans); }
+    .abstract p { margin: 0; line-height: 1.95; font-size: 16px; color: #e3ebe2; }
+    .abstract strong { color: #fff; }
+    .content-layout {
+      display: grid;
+      grid-template-columns: 190px minmax(0, 1fr);
+      gap: 62px;
+      padding-top: 58px;
+    }
+    .contents { align-self: start; position: sticky; top: 26px; font-size: 13px; }
+    .contents .nav-label { margin: 0 0 18px; font-size: 11px; font-weight: 750; letter-spacing: .15em; color: var(--muted); }
+    .contents ol { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--line); }
+    .contents li { border-bottom: 1px solid var(--line); }
+    .contents a { display: flex; gap: 12px; padding: 13px 0; color: var(--ink); text-decoration: none; }
+    .contents a span { color: var(--ochre); font-size: 11px; padding-top: 2px; }
+    .contents a:hover { color: var(--green); text-decoration: underline; }
+    .nav-note { padding-top: 20px; color: var(--muted); font-size: 12px; line-height: 1.8; }
+    .article-body { min-width: 0; }
+    .section { margin-bottom: 65px; }
+    .section + .section { padding-top: 35px; border-top: 1px solid var(--line); }
+    .section-label { margin: 0 0 10px; color: var(--ochre); font-size: 11px; letter-spacing: .12em; font-weight: 800; }
+    h2 { margin: 0 0 22px; font-size: clamp(26px, 3vw, 33px); line-height: 1.45; letter-spacing: -.04em; text-wrap: balance; }
+    h3 { margin: 33px 0 12px; font-size: 20px; line-height: 1.5; letter-spacing: -.025em; }
+    p { margin: 0 0 20px; }
+    strong { font-weight: 750; }
+    .lead { font-size: 19px; color: var(--green-dark); }
+    .findings { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; margin-top: 26px; }
+    .finding { padding: 22px 21px; border: 1px solid var(--line); background: var(--surface); }
+    .finding .index { display: block; font-size: 11px; color: var(--ochre); letter-spacing: .12em; margin-bottom: 14px; }
+    .finding h3 { font-size: 17px; margin: 0 0 11px; }
+    .finding p { font-size: 14px; color: var(--muted); margin: 0; line-height: 1.85; }
+    .pullquote { margin: 36px 0; padding: 27px 0 27px 28px; border-left: 3px solid var(--ochre); }
+    .pullquote p { margin: 0; font-family: var(--serif); font-size: clamp(22px, 2.5vw, 29px); line-height: 1.7; letter-spacing: -.035em; }
+    .pullquote footer { margin-top: 13px; font-family: var(--sans); font-size: 12px; color: var(--muted); }
+    .table-wrap { overflow-x: auto; margin: 24px 0; border-top: 2px solid var(--green); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.8; }
+    caption { text-align: left; padding: 14px 0; font-size: 12px; color: var(--muted); }
+    th, td { padding: 15px 16px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+    thead th { background: #eaece3; font-weight: 700; white-space: nowrap; }
+    tbody th { font-weight: 650; }
+    tbody tr:nth-child(even) { background: #f0f1e9; }
+    .results-table { min-width: 640px; font-variant-numeric: tabular-nums; }
+    .results-table .best { background: var(--mint); color: var(--green-dark); font-weight: 750; }
+    .cell-note { display: block; font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 400; }
+    figure { margin: 30px 0; }
+    .image-frame { padding: 23px; border: 1px solid var(--line); background: #fff; text-align: center; }
+    .image-frame img { display: block; width: 100%; height: auto; max-width: 760px; margin-inline: auto; }
+    .image-frame.geometry img { max-width: 600px; }
+    .image-frame.rmse img { max-width: 650px; }
+    figcaption { margin-top: 13px; color: var(--muted); font-size: 12px; line-height: 1.85; }
+    figcaption .fig-label { font-weight: 750; color: var(--green); margin-right: 8px; }
+    .keypoints { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin: 25px 0; border: 1px solid var(--line); }
+    .keypoint { padding: 17px 10px; text-align: center; background: var(--surface); }
+    .keypoint + .keypoint { border-left: 1px solid var(--line); }
+    .keypoint b { display: block; color: var(--green); font-size: 20px; line-height: 1.4; }
+    .keypoint span { display: block; margin-top: 7px; font-size: 12px; }
+    .keypoint small { display: block; font-size: 10px; color: var(--muted); margin-top: 3px; }
+    .sensor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 25px 0; }
+    .sensor-card { padding: 25px; background: var(--mint); }
+    .sensor-card.camera { background: var(--sand); }
+    .sensor-card .card-label { font-size: 10px; font-weight: 800; letter-spacing: .13em; color: var(--muted); }
+    .sensor-card h3 { margin: 8px 0 10px; font-size: 19px; }
+    .sensor-card p { font-size: 14px; margin: 0; }
+    .specs { border-top: 1px solid #bfcabb; padding-top: 13px; margin-top: 17px; color: #4e5e55; font-size: 12px; }
+    .camera .specs { border-color: #d9c5aa; }
+    .flow { padding: 28px; background: var(--surface); border: 1px solid var(--line); }
+    .flow-label { margin: 0 0 20px; font-size: 11px; font-weight: 750; color: var(--muted); letter-spacing: .08em; }
+    .flow-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .flow-node { padding: 18px; border: 1px solid var(--line); text-align: center; }
+    .flow-node strong { display: block; font-size: 16px; }
+    .flow-node span { display: block; font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .flow-node.imu { background: var(--mint); }
+    .flow-node.vision { background: var(--sand); }
+    .flow-arrows { display: grid; grid-template-columns: 1fr 1fr; text-align: center; color: var(--green); font-size: 23px; line-height: 1.6; }
+    .flow-node.fusion { background: var(--green-dark); color: white; border-color: var(--green-dark); }
+    .flow-node.fusion span { color: #dce5da; }
+    .flow-down { text-align: center; color: var(--green); font-size: 23px; line-height: 1.6; }
+    .flow-aside { margin: 15px 0 0; text-align: center; color: var(--muted); font-size: 12px; }
+    .equation { padding: 24px; margin: 24px 0; background: #eeeee5; border-left: 3px solid var(--green); }
+    .equation .eq-label { margin: 0 0 13px; font-size: 11px; color: var(--muted); font-family: var(--sans); letter-spacing: .06em; }
+    .formula { overflow-x: auto; padding-block: 5px; font-family: Georgia, "Times New Roman", serif; font-size: 19px; line-height: 2; white-space: nowrap; }
+    .equation .eq-note { margin: 12px 0 0; font-size: 12px; color: var(--muted); }
+    .steps { padding: 0; margin: 25px 0; list-style: none; counter-reset: method; }
+    .steps li { position: relative; padding: 0 0 23px 44px; counter-increment: method; }
+    .steps li::before { content: counter(method, decimal-leading-zero); position: absolute; left: 0; top: 3px; color: var(--ochre); font-size: 12px; font-weight: 800; }
+    .steps li:last-child { padding-bottom: 0; }
+    .steps li strong { display: block; margin-bottom: 5px; }
+    .steps li p { margin: 0; color: var(--muted); font-size: 15px; }
+    .note { padding: 21px 25px; background: var(--sand); border-left: 3px solid var(--ochre); margin: 24px 0; font-size: 14px; }
+    .note strong { display: block; margin-bottom: 7px; }
+    .note p { margin: 0; }
+    .comparison { padding: 27px; background: var(--surface); border: 1px solid var(--line); }
+    .chart-heading { margin: 0 0 23px; font-size: 14px; font-weight: 700; }
+    .bar-row { display: grid; grid-template-columns: 88px minmax(0, 1fr) 68px; align-items: center; gap: 15px; margin: 17px 0; font-size: 13px; }
+    .bar-track { height: 22px; background: #efefe7; }
+    .bar { display: block; height: 100%; }
+    .bar.imu { width: 95.2%; background: #a6afa2; }
+    .bar.camera { width: 66%; background: #c78c59; }
+    .bar.fused { width: 48.4%; background: var(--green); }
+    .bar-value { text-align: right; font-weight: 750; font-variant-numeric: tabular-nums; }
+    .chart-note { margin: 19px 0 0; font-size: 12px; color: var(--muted); }
+    .limits { margin: 24px 0; padding: 0; list-style: none; }
+    .limits li { padding: 20px 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: 155px 1fr; gap: 22px; }
+    .limits li:last-child { border-bottom: 1px solid var(--line); }
+    .limits strong { color: var(--green-dark); font-size: 15px; }
+    .limits p { font-size: 15px; margin: 0; color: var(--muted); }
+    .perspective { padding: 32px; background: #ebece3; }
+    .perspective .section-label { color: var(--green); }
+    .perspective h3 { margin-top: 26px; font-size: 18px; }
+    .perspective p { font-size: 15px; }
+    .perspective p:last-child { margin-bottom: 0; }
+    .checklist { list-style: none; padding: 0; margin: 22px 0 0; }
+    .checklist li { position: relative; padding: 12px 0 12px 27px; font-size: 14px; border-top: 1px solid #cbd2c5; }
+    .checklist li::before { content: ""; position: absolute; width: 11px; height: 11px; border: 1px solid var(--green); left: 0; top: 21px; }
+    .ending { border-top: 3px solid var(--green); padding-top: 30px; margin-top: 42px; }
+    .ending p { font-family: var(--serif); font-size: 23px; line-height: 1.8; letter-spacing: -.035em; }
+    .share-block { margin: 32px 0 0; padding: 24px 27px; border: 1px dashed #9ba99b; background: var(--surface); }
+    .share-block .share-label { font-size: 11px; letter-spacing: .07em; color: var(--green); font-weight: 750; margin-bottom: 10px; }
+    .share-block p { font-size: 14px; margin: 0; line-height: 1.9; user-select: text; }
+    .sources { margin-bottom: 45px; }
+    .sources h2 { font-size: 23px; }
+    .citation { padding: 25px; background: var(--surface); border: 1px solid var(--line); font-size: 14px; }
+    .citation .paper-title { font-size: 18px; font-family: Georgia, var(--serif); line-height: 1.65; color: var(--green-dark); margin-bottom: 13px; word-break: normal; }
+    .citation p { margin-bottom: 10px; }
+    .citation p:last-child { margin-bottom: 0; }
+    .citation .affiliation { color: var(--muted); font-size: 12px; }
+    .source-notes { margin: 20px 0 0; padding-left: 21px; color: var(--muted); font-size: 12px; }
+    .source-notes li { padding: 4px 0; }
+    .tags { display: flex; gap: 8px; flex-wrap: wrap; margin: 27px 0; }
+    .tag { padding: 4px 10px; border: 1px solid var(--line); border-radius: 3px; color: var(--muted); font-size: 11px; }
+    .page-footer { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 25px 0 35px; border-top: 1px solid var(--ink); font-size: 11px; color: var(--muted); }
+    .page-footer a { font-size: 12px; }
+    @media (min-width: 1500px) {
+      .hero { padding-top: 85px; }
+    }
+    @media (max-width: 1000px) {
+      .shell { width: calc(100% - 56px); }
+      .hero-grid { grid-template-columns: minmax(0, 1fr) 190px; gap: 32px; }
+      .hero-stat .number { font-size: 72px; }
+      .content-layout { grid-template-columns: 145px minmax(0, 1fr); gap: 30px; }
+      .findings { grid-template-columns: 1fr; }
+      .finding { display: grid; grid-template-columns: 28px 1fr; gap: 0 12px; }
+      .finding .index { grid-row: 1 / 3; margin: 2px 0 0; }
+      .finding p { grid-column: 2; }
+      .abstract { grid-template-columns: 110px 1fr; gap: 20px; }
+    }
+    @media (max-width: 760px) {
+      body { font-size: 16px; }
+      .shell { width: calc(100% - 40px); }
+      .masthead { padding-top: 19px; font-size: 10px; letter-spacing: .06em; }
+      .hero { padding-top: 40px; }
+      .hero-grid { grid-template-columns: 1fr; gap: 28px; }
+      h1 { font-size: clamp(36px, 8.5vw, 54px); }
+      .dek { font-size: 17px; margin-top: 20px; }
+      .hero-stat { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; padding-top: 12px; }
+      .hero-stat .label { grid-column: 1; }
+      .hero-stat .number { grid-column: 1; font-size: 65px; }
+      .hero-stat p { grid-column: 2; grid-row: 1 / 3; align-self: center; font-size: 12px; }
+      .article-meta { margin-top: 24px; gap: 6px 17px; }
+      .abstract { grid-template-columns: 1fr; padding: 25px; gap: 10px; }
+      .abstract p { font-size: 15px; }
+      .content-layout { display: block; padding-top: 28px; }
+      .contents { position: static; margin-bottom: 40px; }
+      .contents .nav-label { margin-bottom: 10px; }
+      .contents ol { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .contents a { font-size: 12px; gap: 7px; }
+      .nav-note { display: none; }
+      .section { margin-bottom: 44px; }
+      .section + .section { padding-top: 27px; }
+      .sensor-grid { gap: 12px; }
+      .sensor-card { padding: 19px; }
+      .image-frame { padding: 12px; }
+      .perspective { padding: 25px; }
+      .limits li { grid-template-columns: 1fr; gap: 6px; }
+      .flow { padding: 20px; }
+    }
+    @media (max-width: 460px) {
+      .masthead { align-items: flex-start; gap: 12px; }
+      .masthead > span { max-width: 120px; text-align: right; }
+      .eyebrow { font-size: 10px; gap: 8px; }
+      .sensor-grid { grid-template-columns: 1fr; }
+      .keypoint { padding-inline: 3px; }
+      .keypoint span { font-size: 10px; }
+      .keypoint small { font-size: 9px; }
+      .flow-inputs { gap: 9px; }
+      .flow-node { padding: 13px 9px; }
+      .flow-node strong { font-size: 14px; }
+      .flow-node span { font-size: 11px; }
+      .comparison { padding: 20px; }
+      .bar-row { grid-template-columns: 70px minmax(0, 1fr) 53px; gap: 9px; font-size: 12px; }
+      .equation { padding: 18px; }
+      th, td { padding: 12px; }
+      .page-footer { align-items: flex-start; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+    @media print {
+      body { background: #fff; color: #000; font-size: 10.5pt; }
+      .shell { width: 100%; }
+      .hero { padding-top: 25px; }
+      h1 { font-size: 34pt; }
+      .contents, .skip, .page-footer a { display: none; }
+      .content-layout { display: block; padding-top: 28px; }
+      .abstract { color: #000; background: #eee; }
+      .abstract p, .abstract strong { color: #000; }
+      .section { margin-bottom: 28px; }
+      figure, .finding, .sensor-card, .citation, .share-block { break-inside: avoid; }
+      h2, h3 { break-after: avoid; }
+      .table-wrap, .formula { overflow: visible; }
+      .results-table { min-width: 0; font-size: 9pt; }
+      .flow-node.fusion { background: #eee; color: #000; }
+      .flow-node.fusion span { color: #333; }
+      a { color: #000; }
+      .hero-stat .number { font-size: 58pt; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Full-body Pose Estimation for Excavators Based on Data Fusion of Multiple Onboard Sensors - 요약">
+<meta property="og:description" content="Full body Pose Estimation for Excavators Based on Data Fusion of Multiple Onboard Sensors 요약 한줄 요약 굴착기 안전 감시용 전신 자세(키포인트 5개의 3차원 위치)를 캐빈에 단 스마트폰 스테레오 카메라 + 팔 하부의 ArUco 마커 와 부품별 9축 IMU 를 확장 칼만 필터(EKF) 로 융합해 추정한다. 카메라만 쓰면 마커 미인식·결손이 생기고 IMU 만">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/gx54v5/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/gx54v5/assets/figure7.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Full-body Pose Estimation for Excavators Based on Data Fusion of Multiple Onboard Sensors - 요약">
+<meta name="twitter:description" content="Full body Pose Estimation for Excavators Based on Data Fusion of Multiple Onboard Sensors 요약 한줄 요약 굴착기 안전 감시용 전신 자세(키포인트 5개의 3차원 위치)를 캐빈에 단 스마트폰 스테레오 카메라 + 팔 하부의 ArUco 마커 와 부품별 9축 IMU 를 확장 칼만 필터(EKF) 로 융합해 추정한다. 카메라만 쓰면 마커 미인식·결손이 생기고 IMU 만">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/gx54v5/assets/figure7.png">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/autcon2022-fullbody-pose/">
+</head>
+<body>
+  <a class="skip" href="#main">본문 바로가기</a>
+
+  <div class="shell" id="top">
+    <header class="masthead">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span> FIELDNOTES / RESEARCH</div>
+      <span>건설 자동화 · 센서와 현장</span>
+    </header>
+
+    <main id="main">
+      <article aria-labelledby="article-title">
+        <header class="hero">
+          <p class="eyebrow"><span class="rule" aria-hidden="true"></span> Research Report <span>2022 논문 리뷰</span></p>
+          <div class="hero-grid">
+            <div>
+              <h1 id="article-title">굴착기의 자세를<br><em>끊김 없이 읽는 법</em></h1>
+              <p class="dek">카메라는 위치를 관측하고, IMU는 움직임을 이어 간다. 스테레오 카메라와 마커 하나, 부품별 관성 센서를 결합해 굴착기 전신 자세를 추정한 연구를 읽는다.</p>
+            </div>
+            <aside class="hero-stat" aria-label="연구의 대표 결과">
+              <span class="label">융합 방식의 보고된 전체 평균 오차</span>
+              <span class="number">82<small>mm</small></span>
+              <p>이동 거리 대비 <strong>1.21%</strong><br>두 기체의 실차 실험에서<br>센서 융합의 개선 효과 확인</p>
+            </aside>
+          </div>
+          <div class="article-meta">
+            <span><strong>원 연구</strong> Tang 외, 2022</span>
+            <span><strong>학술지</strong> Automation in Construction</span>
+            <span><strong>정리일</strong> <time datetime="2026-09-25">2026.09.25</time></span>
+            <span><a href="#sources">논문·출처 안내 ↗</a></span>
+          </div>
+        </header>
+
+        <section class="abstract" aria-labelledby="abstract-title">
+          <h2 id="abstract-title">ABSTRACT<br>연구 초록</h2>
+          <p>굴착기 안전 감시에는 캐빈부터 버킷 끝까지 이어지는 자세 정보가 필요하다. 이 연구는 캐빈에 설치한 스마트폰 스테레오 카메라, 암 하부의 ArUco 마커, 네 부품의 9축 IMU를 결합한다. <strong>IMU의 관절각 변화로 자세를 예측하고 카메라 관측으로 보정하는 확장 칼만 필터(EKF)</strong>가 핵심이다. 실험에서 융합 방식은 카메라의 결손과 IMU의 누적 편향을 보완하며 평균 오차 82 mm를 보고했다. 다만 카메라 관측이 오래 끊기면 IMU에 의존하므로, 추정의 연속성과 정밀도 보장은 구분해야 한다.</p>
+        </section>
+
+        <div class="content-layout">
+          <nav class="contents" aria-label="글 목차">
+            <p class="nav-label">IN THIS REPORT</p>
+            <ol>
+              <li><a href="#findings"><span>01</span> 핵심 발견</a></li>
+              <li><a href="#problem"><span>02</span> 문제와 접근</a></li>
+              <li><a href="#method"><span>03</span> 작동 원리</a></li>
+              <li><a href="#evidence"><span>04</span> 실험과 근거</a></li>
+              <li><a href="#implications"><span>05</span> 한계와 적용</a></li>
+              <li><a href="#sources"><span>06</span> 출처 노트</a></li>
+            </ol>
+            <p class="nav-note">제공된 채택 원고판 요약을 바탕으로 재구성했다. 연구 결과와 HR35 적용에 관한 해석은 구분해 제시한다.</p>
+          </nav>
+
+          <div class="article-body">
+            <section class="section" id="findings" aria-labelledby="findings-title">
+              <p class="section-label">01 / KEY FINDINGS</p>
+              <h2 id="findings-title">정확도와 연속성을 함께 얻다</h2>
+              <p class="lead">센서 융합의 가치는 평균 오차를 줄이는 데서 끝나지 않는다. 한 센서가 취약해지는 순간, 다른 센서가 추정을 이어 갈 수 있다는 데 있다.</p>
+              <div class="findings">
+                <div class="finding">
+                  <span class="index">A</span>
+                  <h3>단독 센서보다 작은 오차</h3>
+                  <p>전체 평균 오차의 이동 거리 비율은 카메라 1.65%, IMU 2.38%, 융합 1.21%로 보고됐다.</p>
+                </div>
+                <div class="finding">
+                  <span class="index">B</span>
+                  <h3>관측이 사라져도 이어지는 추정</h3>
+                  <p>연속 운동 중 카메라에 5~10초 결손이 발생한 구간에서는 IMU 기반 예측으로 궤적을 이어 갔다.</p>
+                </div>
+                <div class="finding">
+                  <span class="index">C</span>
+                  <h3>두 기체에서 확인한 개선</h3>
+                  <p>별도의 대형기 실험에서도 융합 오차 비율은 1.11%로, 카메라와 IMU 단독 결과보다 낮았다.</p>
+                </div>
+              </div>
+              <blockquote class="pullquote">
+                <p>IMU는 “얼마나 돌았나”를,<br>카메라는 “지금 어디 있나”를 알려 준다.</p>
+                <footer>센서의 역할을 설명하기 위한 요약 문장 · 논문 직접 인용 아님</footer>
+              </blockquote>
+            </section>
+
+            <section class="section" id="problem" aria-labelledby="problem-title">
+              <p class="section-label">02 / THE PROBLEM</p>
+              <h2 id="problem-title">굴착기는 한 점으로 설명되지 않는다</h2>
+              <p>굴착기는 캐빈·붐·암·버킷의 움직임이 결합되는 장비다. 현장에서 장비와 사람의 접촉 위험을 감시하려면 장비의 위치만이 아니라, 각 부품이 어디에 놓여 있는지 알아야 한다. 이 연구는 이를 <strong>다섯 키포인트의 3차원 위치를 추정하는 문제</strong>로 다룬다.</p>
+              <p>어려움은 센서마다 다른 방식으로 오차가 생긴다는 점이다. 카메라는 가림, 조명 변화, 제한된 시야에 취약하다. IMU는 온도와 진동의 영향을 받으며, 각속도 적분에 의한 드리프트가 누적될 수 있다. 제공된 요약에서는 자이로 드리프트가 20초에 1° 이상 쌓이는 사례를 언급한다.</p>
+
+              <div class="table-wrap" tabindex="0" role="region" aria-label="기존 접근과 제약 비교">
+                <table>
+                  <caption>기존 접근의 한계 — 제공된 논문 요약의 비교 관점</caption>
+                  <thead><tr><th scope="col">접근</th><th scope="col">현장 적용의 제약</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">마커·윤곽·딥러닝 비전</th><td>가림, 조명, 시야에 따라 관측이 불안정해진다.</td></tr>
+                    <tr><th scope="row">IMU 기반 기구학</th><td>드리프트와 온도 영향으로 시간에 따른 편향이 생긴다.</td></tr>
+                    <tr><th scope="row">상보 융합</th><td>서로 다른 정보를 결합하지만, 같은 추정량의 불확실성을 직접 줄이는 데에는 한계가 있다.</td></tr>
+                    <tr><th scope="row">일부 로봇 말단 EKF</th><td>동역학 파라미터가 필요하거나 단일 점에 집중해, 비침습 설치와 전신 추정에 제약이 있다.</td></tr>
+                    <tr><th scope="row">외부 기준 장비</th><td>LiDAR·UWB 등의 추가 장비와 설치 비용을 고려해야 한다.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <p>연구진은 장비에 부착하는 온보드 센서로 접근했다. 붐·암 관절은 카메라와 IMU가 중복 추적해 보정하고, 캐빈 회전과 버킷 자세는 IMU로 보완한다. <strong>같은 대상을 함께 측정하는 경쟁 융합</strong>과 <strong>서로 다른 정보를 채우는 상보 융합</strong>을 한 시스템에 배치한 것이다.</p>
+            </section>
+
+            <section class="section" id="method" aria-labelledby="method-title">
+              <p class="section-label">03 / HOW IT WORKS</p>
+              <h2 id="method-title">마커 하나에서 전신 자세까지</h2>
+
+              <h3>관절을 잇는 다섯 개의 기준점</h3>
+              <p>모델은 캐빈 끝 K1, 고정된 붐 관절 K2, 암 관절 K3, 버킷 관절 K4, 버킷 끝 K5를 사용한다. 키포인트는 모델의 한 평면에 놓이며, 카메라 기준 평면에서 계산한 뒤 캐빈 회전을 반영해 세계 좌표로 변환한다.</p>
+
+              <div class="keypoints" aria-label="키포인트 정의">
+                <div class="keypoint"><b>K1</b><span>캐빈 끝</span><small>차체 기준</small></div>
+                <div class="keypoint"><b>K2</b><span>붐 관절</span><small>고정점</small></div>
+                <div class="keypoint"><b>K3</b><span>암 관절</span><small>융합 대상</small></div>
+                <div class="keypoint"><b>K4</b><span>버킷 관절</span><small>융합 대상</small></div>
+                <div class="keypoint"><b>K5</b><span>버킷 끝</span><small>IMU로 보완</small></div>
+              </div>
+
+              <div class="sensor-grid">
+                <section class="sensor-card camera" aria-labelledby="camera-title">
+                  <span class="card-label">VISION / 위치 관측</span>
+                  <h3 id="camera-title">캐빈의 스테레오 카메라</h3>
+                  <p>앞창에 스마트폰 두 대를 설치하고 암 하부의 ArUco 마커 하나를 관측한다. 버킷이 흙에 가려져도 관측을 유지할 수 있는 위치를 택했다.</p>
+                  <div class="specs">1280 × 720 · 30 fps<br>기선 100 mm · 대형기 150 mm</div>
+                </section>
+                <section class="sensor-card" aria-labelledby="imu-title">
+                  <span class="card-label">INERTIAL / 움직임 추정</span>
+                  <h3 id="imu-title">부품별 9축 IMU</h3>
+                  <p>캐빈·붐·암·버킷 표면에 부착한다. Madgwick 사원수 필터로 부품 방향을 구하고, 기구학을 통해 관절각을 계산한다.</p>
+                  <div class="specs">LPMS-B2 · 100 Hz<br>보고된 블루투스 지연 &lt; 15 ms</div>
+                </section>
+              </div>
+
+              <figure>
+                <div class="image-frame geometry">
+                  <img src="assets/figure7.png" alt="굴착기 링크의 물리 파라미터 L1부터 L6, 키포인트와 암에 부착한 마커 중심 M의 기하 관계를 나타낸 원 논문 도해." loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-label">FIG. 7</span>물리 파라미터 L1~L6와 마커 중심 M. 카메라 시야 밖에 있는 K3는 링크 길이와 마커 위치의 기하 관계를 이용해 복원한다. 출처: 원 논문, 제공된 이미지.</figcaption>
+              </figure>
+
+              <h3>기하 디코더: 보이지 않는 관절을 복원한다</h3>
+              <p>카메라가 직접 읽는 것은 마커 중심이다. 픽셀 모멘트로 중심을 찾고, 스테레오 깊이를 계산해 카메라 좌표로 옮긴다. 이후 붐 길이 L1, 암 관절에서 마커까지의 거리 L2, 암 길이 L3, 카메라와 붐 관절 사이의 오프셋 L4~L6를 이용해 K3를 계산한다. K4는 K3와 L2·L3의 관계로 얻는다.<a href="#source-method" aria-label="기하 디코더 출처 노트">[1]</a></p>
+
+              <figure aria-labelledby="flow-caption">
+                <div class="flow">
+                  <p class="flow-label">SENSOR FUSION / 처리 흐름</p>
+                  <div class="flow-inputs">
+                    <div class="flow-node imu">
+                      <strong>부품별 IMU</strong>
+                      <span>방향 → 관절각 변화<br>프레임 사이의 움직임 예측</span>
+                    </div>
+                    <div class="flow-node vision">
+                      <strong>스테레오 + 마커</strong>
+                      <span>3차원 마커 위치 → 기하 디코더<br>K3·K4 위치 관측</span>
+                    </div>
+                  </div>
+                  <div class="flow-arrows" aria-hidden="true"><span>↓</span><span>↓</span></div>
+                  <div class="flow-node fusion">
+                    <strong>EKF · 경쟁 융합</strong>
+                    <span>IMU 변화량으로 예측하고, 유효한 카메라 측정으로 보정</span>
+                  </div>
+                  <div class="flow-down" aria-hidden="true">↓</div>
+                  <div class="flow-node">
+                    <strong>전신 자세 모델</strong>
+                    <span>융합한 K3·K4에 버킷·캐빈 IMU 정보를 결합 → 세계 좌표의 키포인트</span>
+                  </div>
+                  <p class="flow-aside">카메라 측정이 없거나 이상치로 판단되면 해당 단계에서는 예측을 채택한다.</p>
+                </div>
+                <figcaption id="flow-caption"><span class="fig-label">METHOD MAP</span>제공된 요약을 바탕으로 재구성한 처리 흐름. 카메라가 직접 보정하는 핵심 상태는 K3·K4다.</figcaption>
+              </figure>
+
+              <h3>EKF: 각도 변화로 예측하고 위치로 고친다</h3>
+              <p>캐빈에 고정된 카메라를 기준으로 키포인트를 2차원 평면에 투영하면 상태를 간결하게 표현할 수 있다. 필터 상태는 K3·K4의 좌표 네 개다. IMU가 제공하는 관절각 변화는 제어 입력, 카메라에서 복원한 좌표는 측정값이 된다.</p>
+
+              <div class="equation" aria-label="EKF 상태 벡터와 K3의 x 좌표 예측식">
+                <p class="eq-label">STATE &amp; PREDICTION · 원문 식 14–18 중 일부</p>
+                <div class="formula">
+                  <div><b>X</b><sub>k</sub> = [x<sub>3</sub>, y<sub>3</sub>, x<sub>4</sub>, y<sub>4</sub>]<sup>T</sup></div>
+                  <div>x<sub>3</sub><sup>k</sup> = x<sub>2</sub> + (x<sub>3</sub><sup>k−1</sup> − x<sub>2</sub>) cos u<sub>1</sub> − (y<sub>3</sub><sup>k−1</sup> − y<sub>2</sub>) sin u<sub>1</sub></div>
+                </div>
+                <p class="eq-note">고정 관절 K2를 중심으로 이전 좌표를 회전시키는 예측식이다. 여기에는 전체 상태 전이식 중 K3의 x 좌표만 표시했다.</p>
+              </div>
+
+              <div class="table-wrap" tabindex="0" role="region" aria-label="EKF 기호 설명">
+                <table>
+                  <thead><tr><th scope="col">기호</th><th scope="col">역할</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">u<sub>1</sub></th><td>IMU로 구한 캐빈–붐 관절각 변화.</td></tr>
+                    <tr><th scope="row">u<sub>2</sub></th><td>u<sub>1</sub>에 붐–암 관절각 변화를 더한 값.</td></tr>
+                    <tr><th scope="row">Q, R</th><td>공정·측정 잡음 공분산. 요약에는 Q = Iδ<sub>IMU</sub><sup>2</sup>, R = Iδ<sub>CAM</sub><sup>2</sup>와 잡음 설정값 0.1, 0.59가 제시돼 있다.<a href="#source-method">[1]</a></td></tr>
+                    <tr><th scope="row">H</th><td>K3·K4 좌표를 직접 관측하는 단위 행렬 블록 형태의 관측 행렬.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <ol class="steps">
+                <li>
+                  <strong>서로 다른 샘플률을 맞춘다</strong>
+                  <p>100 Hz IMU 데이터를 30 fps 카메라의 프레임 사이에서 누적·적분해, 해당 시간 구간의 관절각 변화량으로 사용한다.</p>
+                </li>
+                <li>
+                  <strong>유효한 관측만 보정에 사용한다</strong>
+                  <p>측정과 예측의 차이가 문턱을 넘거나 관측이 없으면 예측을 채택한다. 이때 궤적은 이어지지만, 카메라를 통한 위치 보정은 중단된다.</p>
+                </li>
+                <li>
+                  <strong>버킷과 캐빈 정보를 더한다</strong>
+                  <p>K5는 버킷–암의 IMU 각도로 구하고, 캐빈 IMU의 회전각으로 세계 좌표 변환을 수행한다. 이 부분이 상보 융합에 해당한다.</p>
+                </li>
+              </ol>
+            </section>
+
+            <section class="section" id="evidence" aria-labelledby="evidence-title">
+              <p class="section-label">04 / EVIDENCE</p>
+              <h2 id="evidence-title">실차에서 무엇이 달라졌나</h2>
+              <p>실험은 붐과 암을 각각 움직이는 독립 운동, 굴착과 덤프를 반복하는 연속 운동, 별도의 대형기 적용으로 구성됐다. 아래 장비 사진은 LOVOL FR65E2-H 기반 구성이며, 대형기 사례에는 Hitachi ZAXIS 240이 사용됐다.</p>
+
+              <figure>
+                <div class="image-frame">
+                  <img src="assets/figure10.png" alt="실험에 사용된 LOVOL FR65E2-H 굴착기, 부품에 부착된 LPMS-B2 IMU, 캐빈 스테레오 카메라와 ArUco 마커의 설치 모습." loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-label">FIG. 10</span>(a) 실험 굴착기, (b) 부품별 IMU, (c) 캐빈 스테레오 모듈과 ArUco 마커. 출처: 원 논문, 제공된 이미지.</figcaption>
+              </figure>
+
+              <h3>비교 기준과 실험 구성</h3>
+              <p>기준값은 장비 옆 약 2 m 위치에 설치한 RealSense D435i 두 대로 구성했다. 키포인트를 수동 라벨링하고, 여러 점과 두 카메라의 값을 평균하는 방식이다. 따라서 결과는 이 기준 측정 경로에 대한 비교이며, 기준값 자체의 불확실성도 함께 고려해야 한다.</p>
+
+              <div class="table-wrap" tabindex="0" role="region" aria-label="실험 사례별 구성">
+                <table>
+                  <thead><tr><th scope="col">사례</th><th scope="col">동작</th><th scope="col">표본 수</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">독립 운동</th><td>붐만·암만 각각 4회 반복</td><td>IMU 2,100<br>카메라 630</td></tr>
+                    <tr><th scope="row">연속 운동</th><td>굴착·덤프 2사이클</td><td>IMU 3,024<br>카메라 907</td></tr>
+                    <tr><th scope="row">대형기 적용</th><td>Hitachi ZAXIS 240</td><td>제공 요약에 미기재</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3>융합 방식은 모든 비교에서 오차가 작았다</h3>
+              <div class="table-wrap" tabindex="0" role="region" aria-label="센서 방식별 오차 결과. 작은 화면에서는 표를 가로로 스크롤할 수 있습니다.">
+                <table class="results-table">
+                  <caption>독립·연속 운동은 K3 / K4 RMSE와 평균, 나머지는 이동 거리 대비 오차 비율이다.</caption>
+                  <thead>
+                    <tr><th scope="col">평가 항목</th><th scope="col">카메라 단독</th><th scope="col">IMU 단독</th><th scope="col" class="best">센서 융합</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">독립 운동<span class="cell-note">K3 / K4 · mm</span></th>
+                      <td>110.4 / 120.6<span class="cell-note">평균 115.5</span></td>
+                      <td>131.2 / 171.5<span class="cell-note">평균 151.4</span></td>
+                      <td class="best">71.8 / 75.7<span class="cell-note">평균 73.8</span></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">연속 운동<span class="cell-note">K3 / K4 · mm</span></th>
+                      <td>85.8 / 153.9<span class="cell-note">평균 119.9</span></td>
+                      <td>147.4 / 208.8<span class="cell-note">평균 178.1</span></td>
+                      <td class="best">79.0 / 102.3<span class="cell-note">평균 90.7</span></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">전체 평균 오차<span class="cell-note">이동 거리 대비 비율</span></th>
+                      <td>1.65%</td><td>2.38%</td><td class="best">1.21%<span class="cell-note">평균 오차 82 mm</span></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">대형기 오차<span class="cell-note">이동 거리 대비 비율</span></th>
+                      <td>1.53%</td><td>2.07%</td><td class="best">1.11%</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <figure class="comparison" aria-labelledby="chart-caption">
+                <p class="chart-heading">전체 평균 오차 / 이동 거리 비율 <span class="cell-note">낮을수록 좋음 · 동일 척도</span></p>
+                <div class="bar-row"><span>IMU 단독</span><div class="bar-track" aria-hidden="true"><span class="bar imu"></span></div><span class="bar-value">2.38%</span></div>
+                <div class="bar-row"><span>카메라 단독</span><div class="bar-track" aria-hidden="true"><span class="bar camera"></span></div><span class="bar-value">1.65%</span></div>
+                <div class="bar-row"><strong>센서 융합</strong><div class="bar-track" aria-hidden="true"><span class="bar fused"></span></div><span class="bar-value">1.21%</span></div>
+                <figcaption id="chart-caption" class="chart-note">제공된 비율로 계산하면 융합의 상대 오차 감소는 카메라 대비 약 27%, IMU 대비 약 49%다. 이는 오차 비율의 상대 감소이며, 별도로 측정한 성능 지표는 아니다.</figcaption>
+              </figure>
+
+              <figure>
+                <div class="image-frame rmse">
+                  <img src="assets/figure12.png" alt="융합 방식의 키포인트 RMSE를 비교한 원 논문 결과 그림. 제공된 요약에서는 독립 운동보다 연속 운동의 오차가 더 크게 나타난다." loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-label">FIG. 12</span>융합 결과의 RMSE. 연속 운동의 오차 증가는 K3 불확실성의 K4 전파와 선회·급정지 진동 등의 영향으로 설명된다. 출처: 원 논문, 제공된 이미지.</figcaption>
+              </figure>
+
+              <h3>평균값 뒤에 있는 두 가지 실패 양상</h3>
+              <p>카메라 궤적에는 희소 시차와 마커 미인식에 따른 이상치·0 값, 그리고 진동 잡음이 나타났다. 반면 IMU 궤적에서는 시간과 함께 커지는 편향이 관찰됐다. 연속 운동에서는 캐빈 선회에 따른 조명 변화로 카메라 관측이 5~10초 끊기기도 했다.</p>
+              <p>융합은 이러한 결손 구간을 IMU로 연결하고, 유효한 카메라 관측이 들어오면 다시 위치를 보정한다. 노트북에서 보고한 <strong>전신 자세 모델링 응답 시간은 0.038초</strong>다. 이 값은 실험 환경의 처리 응답 결과로 읽어야 한다.</p>
+
+              <aside class="note">
+                <strong>82 mm를 읽는 범위</strong>
+                <p>82 mm는 제공된 요약의 전체 평균 오차다. 위 표의 상세 RMSE는 K3·K4에 관한 결과이므로, 이 숫자를 다섯 키포인트 각각의 오차 보장이나 버킷 끝의 최대 오차로 해석할 수는 없다.</p>
+              </aside>
+            </section>
+
+            <section class="section" id="implications" aria-labelledby="implications-title">
+              <p class="section-label">05 / IMPLICATIONS</p>
+              <h2 id="implications-title">추정이 이어진다는 것과<br>정밀도가 유지된다는 것은 다르다</h2>
+              <p>이 연구는 안전 감시를 위한 전신 자세 추정의 가능성을 보여 준다. 동시에 현장의 모든 조건에서 같은 정확도가 유지된다거나, 정밀 제어에 바로 사용할 수 있다는 근거까지 제공하는 것은 아니다.</p>
+
+              <ul class="limits">
+                <li>
+                  <strong>현장 잡음 모델</strong>
+                  <p>관성 진동과 환경 간섭을 충분히 반영한 잡음 모델이 없다. 실제 동작과 환경에 맞는 모델을 만드는 것이 후속 개선 과제다.</p>
+                </li>
+                <li>
+                  <strong>장시간 관측 결손</strong>
+                  <p>조명이 나빠 카메라가 작동하지 않으면 IMU 단독 추정으로 퇴화한다. 궤적을 계속 출력하더라도 누적 오차를 억제할 보정 정보는 줄어든다.</p>
+                </li>
+                <li>
+                  <strong>용도별 오차 기준</strong>
+                  <p>제공된 요약은 82 mm를 감시 목적에 유용한 수준으로 평가한다. 다만 실제 감시 시스템의 허용 오차는 별도 검토가 필요하며, 정밀 제어 피드백의 적합성을 입증한 결과는 아니다.</p>
+                </li>
+              </ul>
+
+              <aside class="perspective" aria-labelledby="hr35-title">
+                <p class="section-label">APPLICATION NOTE / 작성자 해석</p>
+                <h3 id="hr35-title">HR35에는 무엇을 가져올 수 있을까</h3>
+                <p>아래는 원 연구의 검증 결과가 아니라, 제공된 메모의 <strong>HR35 센서 검증 관점</strong>을 정리한 적용 아이디어다. 핵심은 비전을 경사계의 독립 측정 경로로 활용하는 것이다.</p>
+
+                <h3>경사계와 카메라를 서로 검증하게 한다</h3>
+                <p>HR35 경사계는 중력 기준 절대각을 사용하므로, 자이로 적분과 같은 방식의 드리프트 문제와는 구분된다. 하지만 진동·가속 중에는 오차가 발생할 수 있다. 카메라와 마커를 별도 관측 경로로 두면 동적 상황에서 경사계 결과를 비교할 수 있다.</p>
+
+                <h3>필터의 역할 분담은 참고하되 모델은 다시 설계한다</h3>
+                <p>“각도 정보로 예측하고 카메라 위치로 보정한다”는 구조는 참고할 만하다. 다만 절대각을 제공하는 경사계에는 상태·입력·측정 정의를 맞춰야 하며, 이 논문의 EKF를 그대로 적용할 수 있다는 뜻은 아니다.</p>
+
+                <h3>기준값 경로의 정밀도를 먼저 확인한다</h3>
+                <p>깊이 카메라 두 대와 수동 라벨링은 검증 경로의 후보가 될 수 있다. 그러나 논문의 82 mm는 융합 추정 오차이지, 기준 카메라 시스템의 정밀도를 나타내는 값은 아니다. 관절각 0.1° 수준의 검증에 사용할 수 있는지는 링크 길이, 위치 오차의 각도 환산, 기준 측정의 불확실성을 별도로 평가해야 한다.</p>
+
+                <h3>마커 위치는 실제 작업 중의 가시성으로 정한다</h3>
+                <p>암 하부에 마커 하나를 두는 설계는 트렌칭 시험의 출발점이 될 수 있다. 실제 장비에서는 굴착 깊이와 자세가 달라질 때도 마커가 보이는지 확인해야 한다. 제공된 메모의 적용 방향은 비전을 <strong>검증·감시용</strong>으로 두는 것이다.</p>
+
+                <ul class="checklist" aria-label="HR35 적용 전 확인할 항목">
+                  <li>진동·가속 구간에서 경사계와 비전의 차이를 비교한다.</li>
+                  <li>트렌칭 전 동작 범위에서 마커의 가시성을 확인한다.</li>
+                  <li>기준 측정 경로의 불확실성을 목표 허용 오차와 대조한다.</li>
+                  <li>관측 결손 구간의 길이와 오차 증가를 함께 기록한다.</li>
+                </ul>
+              </aside>
+
+              <div class="ending">
+                <h3>현장에 남는 질문</h3>
+                <p>좋은 센서 조합은 서로 다른 방식으로 실패하는 센서를 연결한다. 다음 실험에서 확인할 것은 평균 오차와 함께, <strong>관측이 끊기는 순간부터 오차가 어떻게 커지고 다시 회복되는가</strong>다.</p>
+              </div>
+
+              <aside class="share-block" aria-label="복사해 공유할 수 있는 요약">
+                <p class="share-label">공유용 한 문단 · 텍스트를 선택해 복사하세요</p>
+                <p>굴착기의 자세를 끊김 없이 읽는 법: 캐빈 스테레오 카메라와 암 하부 마커, 부품별 IMU를 EKF로 결합한 연구는 평균 오차 82 mm를 보고했다. IMU가 움직임을 예측하고 카메라가 위치를 보정하는 구조가 핵심이다. 다만 관측 결손 중 추정이 계속된다는 사실이 정밀도 유지까지 보장하지는 않는다.</p>
+              </aside>
+            </section>
+
+            <section class="section sources" id="sources" aria-labelledby="sources-title">
+              <p class="section-label">06 / SOURCE NOTES</p>
+              <h2 id="sources-title">원 논문과 읽기 범위</h2>
+              <div class="citation">
+                <p class="paper-title" lang="en">Full-body Pose Estimation for Excavators Based on Data Fusion of Multiple Onboard Sensors</p>
+                <p lang="en">Jingyuan Tang, Mingzhu Wang, Han Luo, Peter Kok-Yiu Wong, Xiao Zhang, Weiwei Chen, Jack C.P. Cheng</p>
+                <p><cite>Automation in Construction</cite> · 2022 · 채택 원고판 기준 요약</p>
+                <p class="affiliation">HKUST · Loughborough University · University of Cambridge</p>
+                <p><a>원 논문 보기 · DOI 10.1016/j.autcon.2022.104694 ↗</a></p>
+              </div>
+              <ol class="source-notes">
+                <li id="source-method">기하 디코더는 원문 식 5·6 및 알고리즘 1, EKF 예측은 식 14–18, 세계 좌표 변환은 식 25에 대응한다는 제공 요약의 안내를 따랐다. 구현에 필요한 좌표계·잡음 설정값의 단위와 정의는 원문을 확인해야 한다.</li>
+                <li>수치와 실험 설명은 제공된 Obsidian 논문 요약을 바탕으로 재구성했다. 원문 대조를 통한 추가 검증은 수행하지 않았다. 약 27%·49%의 상대 감소율만 제공된 오차 비율로 계산했다.</li>
+                <li>그림 7·10·12는 제공된 로컬 이미지를 유지했다. 처리 흐름도와 비율 막대그래프는 요약 내용을 설명하기 위해 재구성한 시각화다.</li>
+                <li>HR35 관련 내용은 적용을 위한 작성자 해석이다. 원 연구가 HR35 경사계나 해당 장비의 성능을 검증한 것은 아니다.</li>
+              </ol>
+              <div class="tags" aria-label="핵심 키워드">
+                <span class="tag">시각·관성 융합</span>
+                <span class="tag">EKF</span>
+                <span class="tag">기하 디코더</span>
+                <span class="tag">ArUco</span>
+                <span class="tag">Madgwick</span>
+                <span class="tag">경쟁·상보 융합</span>
+                <span class="tag">자이로 드리프트</span>
+              </div>
+            </section>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <footer class="page-footer">
+      <span>FIELDNOTES / RESEARCH<br>건설 자동화 논문 읽기 · 2026.09.25</span>
+      <a href="#top">맨 위로 ↑</a>
+    </footer>
+  </div>
+</body>
+</html>
