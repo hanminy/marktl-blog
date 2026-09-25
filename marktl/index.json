@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T12:15:51.383Z",
+  "updatedAt": "2026-09-25T12:15:02.854Z",
   "items": [
     {
       "artifactType": "research-report",
@@ -20,6 +20,21 @@
       "title": "A Generic Instrumental Variable Approach for Industrial Robot Identification - 요약",
       "updatedAt": "2026-09-25T12:15:51.383Z",
       "url": "https://hanminy.github.io/marktl-blog/marktl/s/qpz8rq/"
+    },
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-ep-115-%EC%A1%B0%ED%95%A9%EC%A0%81-%EB%86%80%EC%9D%B4%EA%B0%80-%EC%8B%9C%EC%9E%91%EB%90%90%EB%8B%A4-%EC%9A%94%EC%95%BD/",
+      "excerpt": "EP 115. 조합적 놀이가 시작됐다: 올인 서밋 2026 총정리 (AI 페이싱·버블·중국) 영상 정보 채널 : AI Frontier Korea (노정석) 게시일 : 2026 09 25 길이 : 1시간 20분 36초 (4,836초) 출연 : 최승준, 박종현 (노정석은 출장으로 불참) 녹화 시점 : 2026년 9월 19일 토요일 오전 (영상 도입부 발언 기준) 영문 제목 : EP 115. Combinatorial Play Has",
+      "shortId": "18yzvs4",
+      "slug": "yt-ep-115-조합적-놀이가-시작됐다-요약",
+      "sourcePath": "02_research/AI/노정석/yt_EP 115. 조합적 놀이가 시작됐다_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료"
+      ],
+      "title": "EP 115. 조합적 놀이가 시작됐다: 올인 서밋 2026 총정리 (AI 페이싱·버블·중국)",
+      "updatedAt": "2026-09-25T12:15:02.854Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/18yzvs4/"
     },
     {
       "artifactType": "research-report",
