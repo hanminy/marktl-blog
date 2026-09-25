@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+  <title>방향은 유지하고, 속도만 줄인다 — 자율 굴착기의 MCV 모델과 속도장 제어</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      --paper: #f6f4ed;
+      --surface: #fffefa;
+      --ink: #242c29;
+      --muted: #636c64;
+      --green: #243d36;
+      --green-light: #e7ede5;
+      --accent: #a34d2b;
+      --accent-light: #f2e7da;
+      --line: #d8dbd0;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "Batang", Georgia, serif;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 28px; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.85;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: #dce7c5; color: var(--ink); }
+    a { color: var(--green); text-underline-offset: 4px; text-decoration-thickness: 1px; }
+    a:hover { color: var(--accent); }
+    a:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--accent); outline-offset: 5px; }
+    .skip-link {
+      position: absolute; left: 16px; top: -100px; z-index: 10;
+      background: var(--surface); padding: 10px 20px;
+    }
+    .skip-link:focus { top: 12px; }
+    .wrap { width: min(1180px, calc(100% - 80px)); margin-inline: auto; }
+    .masthead {
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      padding: 24px 0; border-bottom: 1px solid var(--line);
+      font-size: 12px; letter-spacing: .12em; font-weight: 700;
+    }
+    .masthead .brand { display: inline-flex; align-items: center; gap: 12px; }
+    .brand-mark { display: inline-block; width: 12px; height: 12px; background: var(--accent); }
+    .masthead .edition { color: var(--muted); text-align: right; letter-spacing: .04em; }
+
+    .hero { padding: 72px 0 52px; }
+    .eyebrow {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px;
+      color: var(--accent); font-size: 12px; font-weight: 750;
+      letter-spacing: .12em; text-transform: uppercase;
+    }
+    .eyebrow .rule { width: 40px; height: 1px; background: currentColor; }
+    h1 {
+      max-width: 1000px; margin: 24px 0;
+      font-family: var(--serif); font-size: clamp(40px, 5.4vw, 70px);
+      line-height: 1.24; letter-spacing: -.065em; font-weight: 700;
+    }
+    .hero-deck {
+      max-width: 770px; font-size: clamp(18px, 2vw, 22px);
+      line-height: 1.8; color: #4a574e; margin: 0 0 30px;
+    }
+    .hero-meta {
+      display: flex; flex-wrap: wrap; gap: 10px 24px;
+      font-size: 12px; color: var(--muted);
+    }
+    .hero-meta span + span { border-left: 1px solid var(--line); padding-left: 24px; }
+
+    .opening {
+      display: grid; grid-template-columns: 1.45fr 1fr;
+      background: var(--green); color: #f8f8ef;
+      margin-bottom: 44px;
+    }
+    .abstract { padding: 38px 42px; }
+    .small-label {
+      display: block; margin-bottom: 12px; font-size: 11px;
+      letter-spacing: .15em; text-transform: uppercase; font-weight: 750;
+    }
+    .abstract .small-label { color: #c3d2bd; }
+    .abstract p { margin: 0; font-size: 17px; line-height: 1.95; }
+    .opening-metrics {
+      padding: 28px 34px; border-left: 1px solid #52675b;
+      display: grid; align-content: center; gap: 22px;
+    }
+    .metric { display: grid; grid-template-columns: 124px 1fr; align-items: center; gap: 16px; }
+    .metric strong { font-size: 33px; font-family: Georgia, serif; line-height: 1; font-weight: 400; }
+    .metric small { display: block; color: #c3d2bd; font-size: 12px; line-height: 1.6; }
+    .metric span { font-size: 13px; line-height: 1.6; }
+    .metric + .metric { border-top: 1px solid #52675b; padding-top: 22px; }
+
+    .findings { padding: 0 0 48px; border-bottom: 1px solid var(--line); }
+    .findings-heading { font-size: 14px; margin: 0 0 20px; letter-spacing: .02em; }
+    .finding-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+    .finding { border-top: 2px solid var(--green); padding-top: 17px; }
+    .finding .number { font: italic 20px Georgia, serif; color: var(--accent); }
+    .finding h3 { font-size: 19px; line-height: 1.5; margin: 10px 0; letter-spacing: -.03em; }
+    .finding p { font-size: 14px; margin: 0; color: var(--muted); line-height: 1.85; }
+
+    .article-grid { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 62px; padding-top: 52px; }
+    .rail { font-size: 12px; color: var(--muted); }
+    .rail-inner { position: sticky; top: 28px; }
+    .rail .small-label { color: var(--green); }
+    .toc { list-style: none; padding: 0; margin: 0; }
+    .toc li { border-bottom: 1px solid var(--line); }
+    .toc a { display: block; padding: 11px 0; text-decoration: none; color: var(--muted); }
+    .toc a:hover { color: var(--accent); }
+    .toc .toc-num { margin-right: 10px; font-size: 10px; color: var(--accent); }
+    .rail-note { border-left: 2px solid var(--accent); padding-left: 12px; margin-top: 28px; line-height: 1.75; }
+    .article-body { min-width: 0; }
+    .article-section { margin-bottom: 68px; }
+    .section-heading {
+      display: grid; grid-template-columns: 34px minmax(0, 1fr);
+      gap: 12px; align-items: baseline; margin-bottom: 24px;
+    }
+    .section-number { color: var(--accent); font: italic 19px Georgia, serif; }
+    h2 {
+      margin: 0; font-family: var(--serif); font-size: clamp(27px, 3vw, 35px);
+      letter-spacing: -.045em; line-height: 1.45;
+    }
+    h3 { font-size: 21px; line-height: 1.55; letter-spacing: -.035em; margin: 36px 0 14px; }
+    p { margin: 0 0 20px; }
+    strong { font-weight: 750; }
+    .lead { font-size: 19px; color: #47564a; }
+    .fine { font-size: 13px; color: var(--muted); line-height: 1.8; }
+    .accent { color: var(--accent); }
+    .tag {
+      display: inline-block; padding: 3px 9px; border: 1px solid var(--line);
+      font-size: 11px; line-height: 1.6; letter-spacing: .02em;
+    }
+
+    figure { margin: 30px 0; }
+    .figure-frame { background: #fff; border: 1px solid var(--line); padding: 22px; }
+    .figure-frame img { display: block; max-width: 100%; width: auto; height: auto; margin-inline: auto; }
+    .figure-frame.compact img { max-height: 440px; }
+    figcaption {
+      display: grid; grid-template-columns: 62px minmax(0, 1fr);
+      gap: 12px; margin-top: 12px; font-size: 12px; color: var(--muted); line-height: 1.8;
+    }
+    .figure-label { color: var(--accent); font-weight: 750; letter-spacing: .04em; }
+    .figure-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin: 30px 0; align-items: start; }
+    .figure-pair figure { margin: 0; }
+    .figure-pair .figure-frame { min-height: 245px; display: flex; align-items: center; padding: 16px; }
+
+    .callout { background: var(--green-light); border-left: 3px solid var(--green); padding: 24px 28px; margin: 28px 0; }
+    .callout p:last-child { margin-bottom: 0; }
+    .callout .small-label { color: var(--green); }
+    .callout.warm { background: var(--accent-light); border-left-color: var(--accent); }
+    .callout.warm .small-label { color: var(--accent); }
+    blockquote {
+      margin: 38px 0; padding: 26px 0 26px 30px;
+      border-left: 3px solid var(--accent);
+    }
+    blockquote p {
+      font-family: var(--serif); font-size: clamp(23px, 2.8vw, 31px);
+      line-height: 1.65; letter-spacing: -.045em; color: var(--green); margin-bottom: 14px;
+    }
+    blockquote footer { font-size: 12px; color: var(--muted); }
+
+    .assumptions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; list-style: none; padding: 0; margin: 20px 0; }
+    .assumptions li { background: #ecefe6; padding: 13px 17px; font-size: 14px; }
+    .assumptions span { color: var(--accent); margin-right: 8px; font-size: 11px; font-weight: 700; }
+    .equation {
+      background: var(--surface); border: 1px solid var(--line);
+      margin: 22px 0; padding: 22px 24px; overflow-x: auto;
+    }
+    .equation .small-label { color: var(--muted); margin-bottom: 15px; }
+    .math {
+      font-family: "Cambria Math", Cambria, "Times New Roman", serif;
+      font-size: 18px; line-height: 2.15; white-space: nowrap;
+      word-break: normal; overflow-wrap: normal;
+    }
+    .math sub, .math sup { font-size: .7em; }
+    .math-line + .math-line { margin-top: 8px; }
+    .equation-note { font-family: var(--sans); font-size: 12px; color: var(--muted); margin-top: 14px; line-height: 1.75; }
+    .table-wrap { overflow-x: auto; margin: 24px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; text-align: left; }
+    caption { caption-side: top; text-align: left; font-size: 12px; font-weight: 700; margin-bottom: 10px; color: var(--muted); }
+    th, td { padding: 15px 17px; vertical-align: top; border-bottom: 1px solid var(--line); }
+    thead th { background: var(--green); color: #f5f5ed; font-size: 12px; font-weight: 600; }
+    tbody th { font-weight: 700; color: var(--green); }
+    tbody tr:nth-child(even) { background: #eeefe7; }
+    .symbols tbody th { min-width: 140px; }
+    .evidence-table { min-width: 570px; }
+    .evidence-table tbody th { width: 20%; }
+    .evidence-table td { width: 40%; }
+
+    .flow-diagram { background: var(--surface); border: 1px solid var(--line); padding: 26px; }
+    .flow-diagram .small-label { color: var(--muted); }
+    .pump-row {
+      display: grid; grid-template-columns: 118px 36px minmax(0, 1fr);
+      align-items: center; gap: 14px; margin-top: 16px;
+    }
+    .pump { background: var(--green); color: white; text-align: center; padding: 14px 8px; font-size: 14px; font-weight: 700; }
+    .flow-arrow { text-align: center; color: var(--accent); font-size: 26px; }
+    .actuators { display: flex; gap: 10px; }
+    .actuator { flex: 1; padding: 13px; background: var(--green-light); text-align: center; font-size: 14px; }
+    .actuator small { display: block; color: var(--muted); font-size: 11px; }
+    .flow-caption { border-top: 1px solid var(--line); margin: 20px 0 0; padding-top: 16px; font-size: 12px; color: var(--muted); }
+
+    .steps { list-style: none; padding: 0; margin: 24px 0; counter-reset: step; }
+    .steps li { counter-increment: step; display: grid; grid-template-columns: 35px 1fr; gap: 14px; padding: 17px 0; border-bottom: 1px solid var(--line); }
+    .steps li::before { content: counter(step, decimal-leading-zero); color: var(--accent); font: italic 19px Georgia, serif; padding-top: 5px; }
+    .steps strong { display: block; margin-bottom: 4px; font-size: 16px; }
+    .steps p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .limits { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 24px 0; }
+    .limit { border-top: 1px solid var(--accent); padding: 18px 0 0; }
+    .limit h3 { font-size: 17px; margin: 0 0 10px; }
+    .limit p { color: var(--muted); font-size: 14px; }
+    .editorial-note { background: #ebece3; border: 1px solid var(--line); padding: 30px; }
+    .editorial-note > .small-label { color: var(--accent); }
+    .editorial-note h3 { margin-top: 24px; font-size: 18px; }
+    .editorial-note p { font-size: 15px; }
+    .checklist { list-style: none; padding: 0; margin: 20px 0 0; }
+    .checklist li { display: flex; align-items: flex-start; gap: 11px; padding: 12px 0; border-top: 1px solid var(--line); font-size: 14px; }
+    .checklist li::before { content: "□"; flex: 0 0 auto; color: var(--accent); }
+
+    .ending { background: var(--green); color: #f7f7ec; padding: 36px; margin-top: 38px; }
+    .ending .small-label { color: #bfceb9; }
+    .ending h3 { font-family: var(--serif); font-size: 29px; margin: 0 0 20px; line-height: 1.55; }
+    .ending p { font-size: 16px; color: #e0e7d9; }
+    .ending p:last-child { margin-bottom: 0; }
+    .share-copy { margin-top: 26px; padding: 20px 0; border-block: 1px solid var(--line); }
+    .share-copy p { font-size: 15px; margin: 0; }
+    .keywords { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 23px; }
+    .keywords span { font-size: 11px; color: var(--muted); padding: 4px 10px; border: 1px solid var(--line); }
+    .sources { border-top: 2px solid var(--green); padding-top: 26px; }
+    .sources h2 { font-family: var(--sans); font-size: 20px; margin-bottom: 20px; }
+    .source-card { padding: 24px; background: var(--surface); border: 1px solid var(--line); }
+    .source-card cite { display: block; font-style: normal; font-size: 19px; line-height: 1.55; font-family: Georgia, var(--serif); margin-bottom: 12px; }
+    .source-card p { font-size: 13px; margin-bottom: 8px; }
+    .source-card p:last-child { margin-bottom: 0; }
+    .source-notes { padding-left: 22px; font-size: 12px; color: var(--muted); line-height: 1.9; }
+    .source-notes li { margin-bottom: 10px; padding-left: 3px; }
+    .page-footer {
+      display: flex; justify-content: space-between; gap: 24px; padding: 28px 0;
+      border-top: 1px solid var(--line); margin-top: 56px; font-size: 11px; color: var(--muted);
+    }
+    .page-footer a { white-space: nowrap; }
+
+    @media (max-width: 1000px) {
+      .wrap { width: min(900px, calc(100% - 48px)); }
+      .article-grid { grid-template-columns: 150px minmax(0, 1fr); gap: 30px; }
+      .abstract { padding: 30px; }
+      .opening-metrics { padding: 26px; }
+      .metric { grid-template-columns: 105px 1fr; gap: 12px; }
+      .metric strong { font-size: 29px; }
+      .figure-pair { grid-template-columns: 1fr; }
+      .figure-pair .figure-frame { min-height: 0; }
+    }
+    @media (max-width: 760px) {
+      body { font-size: 16px; line-height: 1.85; }
+      .wrap { width: calc(100% - 36px); }
+      .masthead { padding: 20px 0; font-size: 10px; letter-spacing: .08em; }
+      .masthead .edition { max-width: 135px; }
+      .hero { padding: 44px 0 32px; }
+      h1 { font-size: clamp(38px, 8vw, 56px); margin-top: 21px; }
+      .hero-deck { font-size: 18px; }
+      .hero-meta { gap: 7px 16px; }
+      .hero-meta span + span { padding-left: 0; border: 0; }
+      .opening { grid-template-columns: 1fr; margin-bottom: 32px; }
+      .abstract { padding: 28px; }
+      .abstract p { font-size: 16px; }
+      .opening-metrics { border-left: 0; border-top: 1px solid #52675b; padding: 24px 28px; }
+      .metric { grid-template-columns: 120px 1fr; }
+      .finding-grid { grid-template-columns: 1fr; gap: 22px; }
+      .finding { display: grid; grid-template-columns: 32px 1fr; gap: 4px 10px; }
+      .finding .number { grid-row: 1 / 3; margin-top: 4px; }
+      .finding h3 { margin: 0 0 6px; font-size: 18px; }
+      .finding p { grid-column: 2; }
+      .findings { padding-bottom: 32px; }
+      .article-grid { grid-template-columns: 1fr; gap: 30px; padding-top: 26px; }
+      .rail-inner { position: static; }
+      .rail-note { display: none; }
+      .toc { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+      .toc li { border: 0; }
+      .toc a { padding: 4px 0; }
+      .toc .toc-num { margin-right: 5px; }
+      .article-section { margin-bottom: 48px; }
+      .section-heading { grid-template-columns: 25px minmax(0, 1fr); gap: 9px; }
+      h2 { font-size: 28px; }
+      h3 { font-size: 20px; margin-top: 28px; }
+      .lead { font-size: 18px; }
+      .assumptions, .limits { grid-template-columns: 1fr; }
+      .figure-frame { padding: 14px; }
+      figcaption { grid-template-columns: 53px minmax(0, 1fr); gap: 8px; }
+      .flow-diagram { padding: 20px 16px; }
+      .pump-row { grid-template-columns: 75px 20px minmax(0, 1fr); gap: 8px; }
+      .pump, .actuator { font-size: 12px; padding: 12px 7px; }
+      .actuators { gap: 6px; }
+      .callout, .editorial-note { padding: 22px; }
+      .equation { padding: 18px; }
+      .math { font-size: 16px; }
+      blockquote { padding-left: 22px; }
+      .ending { padding: 28px; }
+      .ending h3 { font-size: 25px; }
+      th, td { padding: 12px; }
+      .page-footer { margin-top: 36px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+    @media print {
+      body { background: white; font-size: 10.5pt; color: black; }
+      .wrap { width: 100%; }
+      .skip-link, .rail, .page-footer a { display: none; }
+      .article-grid { display: block; }
+      .hero { padding: 24px 0; }
+      h1 { font-size: 32pt; }
+      h2 { font-size: 21pt; }
+      .opening, .ending { background: #f1f3ef; color: black; }
+      .abstract .small-label, .opening-metrics small, .ending p, .ending .small-label { color: #333; }
+      .opening-metrics { border-color: #aaa; }
+      .metric + .metric { border-color: #aaa; }
+      figure, .callout, .source-card, .limit { break-inside: avoid; }
+      .figure-frame img { max-height: 340px; }
+      .table-wrap, .equation { overflow: visible; }
+      .math { white-space: normal; font-size: 12pt; }
+      .evidence-table { min-width: 0; }
+      .article-section { margin-bottom: 32px; }
+      thead th { background: #e5e8df; color: black; }
+      a { color: black; }
+      .hero, .opening, .ending, thead th { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Modeling and Velocity-Field Control of Autonomous Excavator with Main Control Valve - 요약">
+<meta property="og:description" content="Modeling and Velocity Field Control of Autonomous Excavator with Main Control Valve 요약 한줄 요약 산업용 굴착기는 실린더 3개를 펌프 2개 로 돌리는 메인 컨트롤 밸브(MCV)를 쓴다. 펌프 하나가 붐·버킷을 같이 먹이고, 각 밸브 안의 재생 체크 밸브 가 압력 상태에 따라 기계적으로 열려 회로가 바뀌며, 펌프 유량에는 상한이 있다. 이 논문은 그 회로를 정상">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/31igrw/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/31igrw/assets/figure1.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Modeling and Velocity-Field Control of Autonomous Excavator with Main Control Valve - 요약">
+<meta name="twitter:description" content="Modeling and Velocity Field Control of Autonomous Excavator with Main Control Valve 요약 한줄 요약 산업용 굴착기는 실린더 3개를 펌프 2개 로 돌리는 메인 컨트롤 밸브(MCV)를 쓴다. 펌프 하나가 붐·버킷을 같이 먹이고, 각 밸브 안의 재생 체크 밸브 가 압력 상태에 따라 기계적으로 열려 회로가 바뀌며, 펌프 유량에는 상한이 있다. 이 논문은 그 회로를 정상">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/31igrw/assets/figure1.png">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/snu2019-mcv/">
+</head>
+<body id="top">
+  <a class="skip-link" href="#article-content">본문으로 바로가기</a>
+
+  <div class="wrap">
+    <header class="masthead">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span> FIELD NOTES / ROBOTICS</div>
+      <div class="edition">RESEARCH REVIEW · 2019 PAPER</div>
+    </header>
+
+    <main>
+      <article aria-labelledby="article-title">
+        <header class="hero">
+          <div class="eyebrow"><span class="rule" aria-hidden="true"></span> Autonomous Excavation <span>논문 읽기</span></div>
+          <h1 id="article-title">방향은 유지하고,<br>속도만 줄인다</h1>
+          <p class="hero-deck">두 펌프로 세 실린더를 움직이는 자율 굴착기. 메인 컨트롤 밸브의 복잡한 유압 결합을 모델로 풀고, 장비의 한계 안에서 버킷의 진행 방향을 지키는 방법.</p>
+          <div class="hero-meta">
+            <span>Automatica · 104 · 67–81 · 2019</span>
+            <span>서울대학교 · 두산인프라코어</span>
+            <span>노트 작성 <time datetime="2026-09-25">2026.09.25</time></span>
+          </div>
+        </header>
+
+        <section class="opening" aria-label="초록과 연구 규모">
+          <div class="abstract">
+            <span class="small-label">Abstract / 초록</span>
+            <p>산업용 굴착기의 정밀 제어는 각 실린더만 잘 제어한다고 끝나지 않는다. 펌프를 공유하고, 압력에 따라 재생 체크 밸브가 열리며, 공급 유량에는 상한이 있기 때문이다. 이 연구는 메인 컨트롤 밸브(MCV) 전체를 정상 상태 유압 모델로 표현하고, <strong>세 실린더의 유입 유량으로 회로 상태를 결정</strong>하는 구조를 제시한다. 제어기는 유압 제약을 만족하는 최대 속도 배율 λ를 찾아 원하는 속도장 방향을 유지한다. 22톤급 굴착기 시뮬레이션에서 흙 반력과 장애물에 대한 대응을 확인했으며, 실차 검증은 후속 과제로 남았다.</p>
+          </div>
+          <div class="opening-metrics">
+            <div class="metric">
+              <strong>2 → 3</strong>
+              <span>펌프 두 개, 실린더 세 개<small>공유 회로에서 생기는 축 간 결합</small></span>
+            </div>
+            <div class="metric">
+              <strong>0 ≤ λ ≤ 1</strong>
+              <span>방향을 보존하는 속도 배율<small>제약 안에서 가능한 최대값 탐색</small></span>
+            </div>
+            <div class="metric">
+              <strong>22 t</strong>
+              <span>시뮬레이션 대상 굴착기<small>Simulink / Sim-Hydraulics · 100 Hz</small></span>
+            </div>
+          </div>
+        </section>
+
+        <section class="findings" aria-labelledby="findings-title">
+          <h2 class="findings-heading" id="findings-title">먼저 읽는 세 가지 발견</h2>
+          <div class="finding-grid">
+            <div class="finding">
+              <span class="number">01</span>
+              <h3>제어의 단위는 회로 전체다</h3>
+              <p>붐과 버킷은 같은 펌프를 쓴다. 한 축의 요구 유량이 다른 축에 영향을 주므로, 독립 축 모델만으로는 동시 동작을 설명하기 어렵다.</p>
+            </div>
+            <div class="finding">
+              <span class="number">02</span>
+              <h3>복잡한 회로도 유량으로 정리된다</h3>
+              <p>논문의 가정과 실행 가능 조건 아래, 유입 유량 세 개로 펌프 압력·재생 유량·스풀 위치를 결정하는 모델을 구성한다.</p>
+            </div>
+            <div class="finding">
+              <span class="number">03</span>
+              <h3>포화에는 공통 배율로 대응한다</h3>
+              <p>각 축의 속도를 따로 제한하는 대신 전체 요구 유량에 같은 λ를 적용한다. 원하는 움직임의 방향을 유지하면서 속도를 낮춘다.</p>
+            </div>
+          </div>
+        </section>
+
+        <div class="article-grid">
+          <aside class="rail" aria-label="기사 목차">
+            <div class="rail-inner">
+              <span class="small-label">In this report</span>
+              <nav aria-label="본문 섹션">
+                <ol class="toc">
+                  <li><a href="#problem"><span class="toc-num">01</span>독립 축 가정의 빈틈</a></li>
+                  <li><a href="#model"><span class="toc-num">02</span>MCV를 모델에 넣기</a></li>
+                  <li><a href="#control"><span class="toc-num">03</span>속도 배율 λ의 역할</a></li>
+                  <li><a href="#evidence"><span class="toc-num">04</span>시뮬레이션의 근거</a></li>
+                  <li><a href="#limits"><span class="toc-num">05</span>보장과 한계</a></li>
+                  <li><a href="#implications"><span class="toc-num">06</span>HR35에 던지는 질문</a></li>
+                  <li><a href="#sources"><span class="toc-num">↗</span>출처와 읽기 메모</a></li>
+                </ol>
+              </nav>
+              <p class="rail-note">읽기의 초점<br><strong>유압 회로의 결합</strong>이 모델과 제어 전략을 어떻게 바꾸는가.</p>
+            </div>
+          </aside>
+
+          <div class="article-body" id="article-content">
+            <section class="article-section" id="problem" aria-labelledby="problem-title">
+              <div class="section-heading">
+                <span class="section-number">01</span>
+                <h2 id="problem-title">실린더는 셋인데,<br>펌프는 둘이다</h2>
+              </div>
+              <p class="lead">실제 굴착기의 유압 시스템은 관절마다 독립적인 펌프가 달린 실험 장치와 다르다.</p>
+              <p>이 논문이 다루는 산업용 굴착기는 메인 컨트롤 밸브, 즉 MCV를 통해 두 펌프의 유량을 세 실린더에 나눠 준다. 펌프 1은 암을, 펌프 2는 붐과 버킷을 담당한다. 따라서 붐과 버킷의 동작은 공급 측에서 이미 연결되어 있다.</p>
+              <p>여기에 재생 체크 밸브가 더해진다. 밸브는 압력 상태에 따라 기계적으로 열리고 닫혀 유량 경로를 바꾼다. 제어기가 전환 상태를 임의로 지정할 수 없으며, 펌프가 낼 수 있는 유량 역시 제한된다. <strong>펌프 공유, 재생 회로 전환, 유량 상한</strong>을 함께 다뤄야 하는 이유다.</p>
+
+              <figure>
+                <div class="figure-frame compact">
+                  <img src="assets/figure1.png" alt="논문에서 다루는 산업용 굴착기의 메인 컨트롤 밸브" decoding="async">
+                </div>
+                <figcaption><span class="figure-label">FIG. 1</span><span>산업용 굴착기의 MCV. 여러 실린더에 공급되는 유량을 배분하는 핵심 장치다.</span></figcaption>
+              </figure>
+
+              <div class="flow-diagram" role="group" aria-label="펌프 1은 암을 공급하고, 펌프 2는 붐과 버킷에 유량을 공유하여 공급한다">
+                <span class="small-label">Circuit at a glance / 공급 구조</span>
+                <div class="pump-row">
+                  <div class="pump">펌프 1</div>
+                  <div class="flow-arrow" aria-hidden="true">→</div>
+                  <div class="actuators"><div class="actuator">암 <small>실린더 2</small></div></div>
+                </div>
+                <div class="pump-row">
+                  <div class="pump">펌프 2</div>
+                  <div class="flow-arrow" aria-hidden="true">→</div>
+                  <div class="actuators">
+                    <div class="actuator">붐 <small>실린더 1</small></div>
+                    <div class="actuator">버킷 <small>실린더 3</small></div>
+                  </div>
+                </div>
+                <p class="flow-caption">공급 관계만 재구성한 개념도. 실제 모델에는 각 밸브의 재생 회로와 바이패스 경로가 함께 포함된다.</p>
+              </div>
+
+              <p>논문은 기존 연구의 상당수가 1자유도 유압 제어에 집중했다고 지적한다. 이 연구의 기여는 개별 밸브의 정밀한 묘사에 그치지 않는다. 회로 전체의 제약을 계산 가능한 형태로 정리하고, 이를 버킷의 속도장 제어와 연결한 데 있다.</p>
+            </section>
+
+            <section class="article-section" id="model" aria-labelledby="model-title">
+              <div class="section-heading">
+                <span class="section-number">02</span>
+                <h2 id="model-title">복잡한 MCV를<br>유입 유량 세 개로 표현하기</h2>
+              </div>
+              <p>모델은 유체의 빠른 동역학을 정상 상태 오리피스 관계로 근사한다. 압력과 밸브 개구 면적이 유량을 정하고, 실린더 면적이 유량을 속도로 바꾼다. 이 관계를 재생 회로와 펌프까지 확장하는 것이 핵심이다.</p>
+
+              <figure>
+                <div class="figure-frame">
+                  <img src="assets/figure3.png" alt="3실린더·2펌프 MCV 유압 회로도. 암의 독립 공급 경로와 붐·버킷의 공유 공급 경로, 재생 및 바이패스 회로" loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="figure-label">FIG. 3</span><span>모델의 전체 회로. 각 4방향 밸브에 재생 체크 밸브와 바이패스 경로가 포함된다. 노트에서 Am2·Bm2로 표시된 보충 밸브는 비활성으로 취급한다.</span></figcaption>
+              </figure>
+
+              <h3>계산 가능성을 만드는 네 가지 가정</h3>
+              <ul class="assumptions">
+                <li><span>01</span>기름은 비압축성으로 근사한다.</li>
+                <li><span>02</span>유체 동역학은 기구 운동보다 충분히 빠르다.</li>
+                <li><span>03</span>스풀 위치 제어 루프는 충분히 빠르다.</li>
+                <li><span>04</span>실린더 변위와 양 챔버 압력을 측정할 수 있다.</li>
+              </ul>
+
+              <h3>① 밸브의 개구 면적을 힘–유량 관계로</h3>
+              <p>실제 밸브의 개구 면적은 명령에 단순 비례하지 않는다. 양방향 특성이 비대칭이고, 데드밴드가 있으며, 스풀이 움직일수록 바이패스는 반대로 닫힌다. 논문은 이 특성을 유효 계수 <i>c</i><sub>L</sub>(<i>x</i>)에 반영한다.</p>
+
+              <figure>
+                <div class="figure-frame compact">
+                  <img src="assets/figure5.png" alt="스풀 위치에 따른 유효 개구 면적 곡선. 비선형성과 방향별 비대칭, 데드밴드 및 바이패스 특성" loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="figure-label">FIG. 5</span><span>밸브의 유효 개구 면적. 데드밴드 [−δ<sub>neg</sub>, δ<sub>pos</sub>]와 방향별 차이를 무시하면 작은 명령과 방향 전환 구간을 제대로 설명하기 어렵다.</span></figcaption>
+              </figure>
+
+              <div class="equation" tabindex="0" role="group" aria-label="오리피스 유량식과 실린더 유량 연속 관계">
+                <span class="small-label">Orifice &amp; continuity / 원문 식 4·6</span>
+                <div class="math">
+                  <div class="math-line">Q<sub>in</sub> = √(2/ρ) C<sub>d</sub>A<sub>v,in</sub>(x) √|P<sub>in</sub> − P<sub>A</sub>| sgn(P<sub>in</sub> − P<sub>A</sub>)</div>
+                  <div class="math-line">Q<sub>in</sub> / A<sub>A</sub> = Q<sub>out</sub> / A<sub>B</sub> = V<sub>L</sub></div>
+                </div>
+              </div>
+
+              <div class="equation" tabindex="0" role="group" aria-label="공급력과 부하력으로 표현한 실린더 속도">
+                <span class="small-label">Force–flow relation / 원문 식 7·12</span>
+                <div class="math">
+                  <div class="math-line">V<sub>L</sub> = c<sub>L</sub>(x) √|F<sub>s</sub> − F<sub>L</sub> sgn x| sgn(F<sub>s</sub> − F<sub>L</sub> sgn x)</div>
+                  <div class="math-line">F<sub>s</sub> = A<sub>A</sub>P<sub>in</sub> − A<sub>B</sub>P<sub>out</sub></div>
+                  <div class="math-line">F<sub>L</sub> = A<sub>A</sub>P<sub>A</sub> − A<sub>B</sub>P<sub>B</sub></div>
+                </div>
+                <div class="equation-note">기호와 방향 규약은 제공된 노트를 따른다. 실제 적용에서는 스풀 방향에 따른 유입·유출 챔버와 유효 면적의 정의를 원문과 맞춰야 한다.</div>
+              </div>
+
+              <div class="table-wrap">
+                <table class="symbols">
+                  <caption>힘–유량식을 읽는 데 필요한 기호</caption>
+                  <thead><tr><th scope="col">기호</th><th scope="col">의미와 해석</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row"><i>c</i><sub>L</sub>(<i>x</i>)</th><td>밸브 개구 면적과 피스톤 면적으로 결정되는 계수. 데드밴드를 접은 좌표에서 <i>x</i> = 0일 때 0이 되도록 표현한다.</td></tr>
+                    <tr><th scope="row"><i>F</i><sub>s</sub> · 공급력</th><td>공급·출구 압력과 실린더 면적의 조합. 펌프가 유량 제어되므로 일정한 상수로 놓을 수 없다.</td></tr>
+                    <tr><th scope="row"><i>F</i><sub>L</sub> · 부하력</th><td>양 챔버의 측정 압력과 면적으로 계산하는 피스톤 부하력.</td></tr>
+                    <tr><th scope="row">역류 없음</th><td><i>F</i><sub>s</sub> − <i>F</i><sub>L</sub> sgn <i>x</i> &gt; 0이어야 스풀 명령 방향과 실린더 운동 방향이 일치한다.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="callout">
+                <span class="small-label">Physical intuition</span>
+                <p>고전적인 유압식 <i>Q</i> = <i>cx</i>√(<i>P</i><sub>s</sub> − <i>P</i><sub>L</sub>)를 비대칭 실린더와 비대칭 밸브로 확장한 것으로 읽을 수 있다. 핵심은 <strong>원하는 방향으로 움직일 만큼의 공급력 여유가 있는가</strong>다.</p>
+              </div>
+
+              <h3>② 압력에 따라 바뀌는 재생 회로</h3>
+              <p>하중이 실린더를 끌어가는 상황에서는 펌프 압력이 떨어질 수 있다. 동시에 배출 오리피스가 출구 압력을 높인다. 출구 압력이 펌프 측 압력보다 높아지면 체크 밸브가 열리고, 탱크로 빠져나갈 유량 일부가 공급 측으로 돌아간다.</p>
+
+              <figure>
+                <div class="figure-frame compact">
+                  <img src="assets/figure6.png" alt="암 밸브의 재생 회로. 압력 차에 따라 체크 밸브가 열려 출구 유량 일부를 공급 측으로 되돌리는 경로" loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="figure-label">FIG. 6</span><span>암의 재생 회로. 모델에서 재생이 작동하는 방향은 암의 신장(<i>x</i> &gt; 0), 붐·버킷의 수축(<i>x</i> &lt; 0)이다.</span></figcaption>
+              </figure>
+
+              <p>이 회로는 캐비테이션 방지와도 연결된다. 따라서 전자식 밸브를 쓴다고 반드시 사라지는 요소는 아니다. 모델링의 요점은 <strong>유출 유량 <i>Q</i><sub>out</sub>과 유입 압력 <i>P</i><sub>in</sub>이 주어지면 출구 압력이 유일하게 결정된다</strong>는 것이다. 체크 밸브가 닫혔을 때는 √<i>P</i><sub>out</sub> = <i>Q</i><sub>out</sub>/<i>c</i><sub>d</sub>이며, 열렸을 때도 별도의 닫힌 형태 식으로 계산한다.</p>
+
+              <h3>③ 펌프 공유를 포함한 유량 수지</h3>
+              <p>펌프가 실제로 공급해야 하는 양은 실린더 유입 유량에서 재생 유량을 빼고 바이패스 유량을 더한 값이다. 펌프 2에서는 붐과 버킷의 요구가 하나의 수지식에 함께 들어간다.</p>
+
+              <div class="equation" tabindex="0" role="group" aria-label="두 펌프의 유량 수지">
+                <span class="small-label">Pump flow balance / 원문 식 23·24</span>
+                <div class="math">
+                  <div class="math-line">Q<sub>p,1</sub> = Q<sub>in,2</sub> − Q<sub>rgn,2</sub> 𝟙(x<sub>2</sub>) + Q<sub>by,1</sub></div>
+                  <div class="math-line">Q<sub>p,2</sub> = ∑<sub>i∈{1,3}</sub> [Q<sub>in,i</sub> − Q<sub>rgn,i</sub> 𝟙(−x<sub>i</sub>)] + Q<sub>by,2</sub></div>
+                  <div class="math-line">∂Q<sub>p</sub> / ∂P<sub>p</sub> ≤ 0</div>
+                </div>
+                <div class="equation-note">rgn은 재생 유량, by는 바이패스 유량. 𝟙은 해당 재생 방향을 선택하는 지시함수다. 펌프 특성에는 압력이 높아질수록 공급 유량이 증가하지 않는다는 단조성 가정을 둔다.</div>
+              </div>
+
+              <p>제조사의 펌프 제어 논리를 상세히 알지 못하더라도 이 단조성 가정을 이용할 수 있다. 논문의 명제 2는 모델의 조건 아래 유입 유량이 주어졌을 때 펌프 압력의 해가 유일하게 정해지는 구조를 보인다. 해가 존재하는 조건은 펌프 유량 한계 부등식으로 표현된다.</p>
+
+              <figure>
+                <div class="figure-frame compact">
+                  <img src="assets/figure8.png" alt="펌프 압력 해의 존재를 설명하는 그래프. 압력에 비감소하는 요구 측 관계와 비증가하는 공급 측 관계의 교점" loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="figure-label">FIG. 8</span><span>압력에 대한 요구 측과 공급 측의 단조 관계로 펌프 압력의 해를 찾는다. 논문은 모델의 조건 아래 해의 존재와 유일성을 정리한다.</span></figcaption>
+              </figure>
+
+              <blockquote>
+                <p>유입 유량 세 개를 정하면,<br>회로 전체의 상태를 풀 수 있다.</p>
+                <footer>명제 2와 MCV 모델의 의미를 풀어 쓴 요약 · 직접 인용 아님</footer>
+              </blockquote>
+            </section>
+
+            <section class="article-section" id="control" aria-labelledby="control-title">
+              <div class="section-heading">
+                <span class="section-number">03</span>
+                <h2 id="control-title">방향을 바꾸지 않는<br>하나의 조절 변수, λ</h2>
+              </div>
+              <p class="lead">장비가 요구 속도를 감당하지 못할 때, 각 축을 제각각 제한하면 버킷이 움직이는 방향도 달라질 수 있다.</p>
+              <p>이 연구는 버킷의 위치와 자세에서 정의되는 목표 속도장 <i>v</i><sup>d</sup><sub>b</sub>(<i>p</i><sub>b</sub>, <i>φ</i><sub>b</sub>)에 공통 배율 λ를 곱한다. λ = 1이면 원래 속도, 0 &lt; λ &lt; 1이면 같은 방향의 감속, λ = 0이면 정지다. 제어 목표는 실제 속도가 이 축소된 목표 속도로 수렴하도록 하는 것이다.</p>
+
+              <div class="equation" tabindex="0" role="group" aria-label="속도장 제어 목표와 속도 배율 최적화 문제">
+                <span class="small-label">Velocity-field control / 원문 식 37의 구조</span>
+                <div class="math">
+                  <div class="math-line">v<sub>b</sub> → λ v<sup>d</sup><sub>b</sub>(p<sub>b</sub>, φ<sub>b</sub>), &nbsp; λ ∈ [0, 1]</div>
+                  <div class="math-line">maximize &nbsp; λ</div>
+                  <div class="math-line">subject to &nbsp; (Q<sub>in,i</sub>, Q<sub>out,i</sub>) = λ(Q<sup>d</sup><sub>in,i</sub>, Q<sup>d</sup><sub>out,i</sub>)</div>
+                  <div class="math-line">F<sub>s</sub> − F<sub>L</sub> sgn x ≥ F<sub>offset</sub>, &nbsp; |x<sub>i</sub>| ≤ x<sub>m</sub></div>
+                </div>
+                <div class="equation-note">위 조건과 함께 펌프 유량 한계(원문 식 29·30)를 만족해야 한다. <i>F</i><sub>offset</sub>은 역류를 피하기 위한 공급력 여유를 나타낸다.</div>
+              </div>
+
+              <h3>“이 속도로 갈 수 있는가”를 반복해서 묻는다</h3>
+              <ol class="steps">
+                <li><div><strong>원래 속도부터 검사한다</strong><p>λ = 1에서 목표 유량을 계산하고, 회로 전체가 이를 감당할 수 있는지 확인한다. 실행 가능하면 그대로 사용한다.</p></div></li>
+                <li><div><strong>두 펌프의 압력을 푼다</strong><p>후보 λ마다 스칼라 방정식 두 개를 풀어 펌프 압력과 관련 회로 상태를 계산한다.</p></div></li>
+                <li><div><strong>여덟 개 부등식을 확인한다</strong><p>펌프 유량, 역류 방지, 스풀 한계 등 제약을 검사해 해당 λ의 실행 가능 여부를 판단한다.</p></div></li>
+                <li><div><strong>이분법으로 가장 큰 λ를 찾는다</strong><p>실행 가능한 쪽과 불가능한 쪽의 간격을 좁혀, 지정한 오차 ε 안에서 속도 배율을 선택한다.</p></div></li>
+              </ol>
+
+              <div class="callout warm">
+                <span class="small-label">Timing / 숫자를 읽는 법</span>
+                <p>노트는 Newton–Raphson 계산이 10회 미만이며, <strong>후보 λ의 검사 계산에 약 0.052 ms</strong>가 걸렸다고 정리한다. 이 수치는 여러 후보를 검사하는 <strong>전체 최적화의 총시간과 구분</strong>해 읽어야 한다. 보고된 계산 환경을 벗어나 동일한 실행 시간을 보장하는 값도 아니다.</p>
+              </div>
+
+              <h3>속도장이라서 가능한 정지와 재개</h3>
+              <p>시간에 묶인 궤적 추종에서는 장비가 멈춘 동안에도 기준 궤적이 앞으로 진행할 수 있다. 여기서는 현재 버킷의 위치와 자세가 목표 방향을 정한다. 따라서 장애물로 멈췄다가 풀려도, 시간 지연에 따른 누적 추종 오차를 따라잡는 대신 현재 상태의 속도장 방향으로 움직임을 재개할 수 있다.</p>
+
+              <div class="table-wrap">
+                <table>
+                  <caption>속도 배율과 동작의 관계</caption>
+                  <thead><tr><th scope="col">배율</th><th scope="col">제어기의 선택</th><th scope="col">해석</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">λ = 1</th><td>목표 유량 그대로</td><td>현재 조건에서 원래 속도가 실행 가능하다.</td></tr>
+                    <tr><th scope="row">0 &lt; λ &lt; 1</th><td>모든 목표 유량을 같은 비율로 축소</td><td>목표 속도 방향을 유지하며 감속한다.</td></tr>
+                    <tr><th scope="row">λ = 0</th><td>목표 속도 0</td><td>정지 상태이며, 재개할 방향은 속도장이 정한다.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="article-section" id="evidence" aria-labelledby="evidence-title">
+              <div class="section-heading">
+                <span class="section-number">04</span>
+                <h2 id="evidence-title">시뮬레이션이 보여준 것</h2>
+              </div>
+              <p>검증 대상은 22톤급 굴착기의 Simulink/Sim-Hydraulics 모델이다. 제어 주기는 100 Hz, 이분법 허용 오차는 ε = 10<sup>−7</sup>로 설정했다. 자유 공간, 흙 반력, 단단한 장애물이라는 세 상황에서 제어 동작을 살핀다.</p>
+
+              <h3>자유 공간 · 경로로 수렴하고, 필요할 때 감속한다</h3>
+              <p>둥근 사각형 경로로 수렴하는 속도장을 사용하고 버킷 각도는 45°에서 120°로 보간한다. 제약이 활성화되는 구간에서는 λ가 1보다 작아진다. 제어기는 각 축을 따로 잘라 내는 대신, 공통 배율로 목표 속도를 낮춘다.</p>
+
+              <div class="figure-pair">
+                <figure>
+                  <div class="figure-frame">
+                    <img src="assets/figure9.png" alt="자유 공간 시뮬레이션에서 둥근 사각형 경로로 수렴하는 버킷의 궤적" loading="lazy" decoding="async">
+                  </div>
+                  <figcaption><span class="figure-label">FIG. 9</span><span>자유 공간의 속도장과 버킷 경로. 목표 경로로 수렴하는 동작을 보여준다.</span></figcaption>
+                </figure>
+                <figure>
+                  <div class="figure-frame">
+                    <img src="assets/figure10.png" alt="자유 공간 시뮬레이션의 속도 배율 람다. 유압 제약이 걸리는 구간에서 1보다 작아지는 변화" loading="lazy" decoding="async">
+                  </div>
+                  <figcaption><span class="figure-label">FIG. 10</span><span>속도 배율 λ의 변화. 감소 구간은 제약에 맞춰 목표 속도를 조정한 결과다.</span></figcaption>
+                </figure>
+              </div>
+
+              <h3>흙 반력 · 압력 피드백으로 부하에 대응한다</h3>
+              <p>지면 아래에서만 작용하는 반력 모델을 사용한다. 노트는 이를 50 kN 편향의 사인 성분과 무작위 성분으로 정리한다. 양 챔버 압력으로 부하력 <i>F</i><sub>L</sub>을 계산해 반영하므로, 외부 하중이 달라져도 회로의 힘 여유를 다시 평가할 수 있다.</p>
+
+              <figure>
+                <div class="figure-frame">
+                  <img src="assets/figure13.png" alt="흙 반력이 작용하는 조건에서 속도장 제어를 적용한 버킷 궤적" loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="figure-label">FIG. 13</span><span>흙 반력 아래의 궤적. 제공된 노트는 목표 경로를 잘 따라가는 결과로 해석한다. 이 글에는 별도의 정량 추종 오차 수치가 제공되어 있지 않다.</span></figcaption>
+              </figure>
+
+              <h3>단단한 장애물 · 정지한 뒤 움직임을 재개한다</h3>
+              <p>장애물에 막힌 조건에서는 27초 이후 λ가 0으로 접근하며 정지한다. 장애물이 해제되면 속도장이 정하는 방향으로 움직임을 재개한다. 정지 중에도 시간 기준 궤적을 쫓아가야 하는 방식과 구별되는 동작이다.</p>
+
+              <figure>
+                <div class="figure-frame">
+                  <img src="assets/figure19.png" alt="단단한 장애물에 의해 정지하고 장애물이 해제된 뒤 재개하는 시뮬레이션 결과" loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="figure-label">FIG. 19</span><span>장애물 대응 결과. 노트는 27초 이후 속도 배율이 0에 접근하는 정지 동작과, 해제 후의 재개를 보고한다.</span></figcaption>
+              </figure>
+
+              <div class="table-wrap">
+                <table class="evidence-table">
+                  <caption>관측 결과와 해석의 범위</caption>
+                  <thead><tr><th scope="col">조건</th><th scope="col">노트가 보고한 결과</th><th scope="col">읽을 때의 경계</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">자유 공간</th><td>경로 수렴, 제약 구간에서 λ 감소</td><td>속도장의 설계와 해당 모델의 유압 조건에 대한 결과다.</td></tr>
+                    <tr><th scope="row">흙 반력</th><td>부하 변화 아래에서도 경로를 추종</td><td>설정한 반력 모델의 검증이며, 모든 토질을 대표하지 않는다.</td></tr>
+                    <tr><th scope="row">장애물</th><td>λ가 0에 접근하며 정지, 해제 후 재개</td><td>실차 충돌 안전성이나 접촉력 제한을 검증한 결과는 아니다.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <p class="fine">시뮬레이션에서는 유체 압축성 때문에 순간적인 속도 변동이 나타난다. 노트는 큰 관성과 감쇠가 이를 완화해 궤적에 미치는 영향이 작았다고 설명한다. 이는 시험한 조건에서 정상 상태 근사가 유효했다는 근거로 읽을 수 있다.</p>
+            </section>
+
+            <section class="article-section" id="limits" aria-labelledby="limits-title">
+              <div class="section-heading">
+                <span class="section-number">05</span>
+                <h2 id="limits-title">빠르게 풀린다는 것과<br>언제나 최적이라는 것은 다르다</h2>
+              </div>
+              <p>이분법이 가장 큰 실행 가능 λ를 찾으려면, 가능한 값들이 중간에 끊기지 않은 구간을 이뤄야 한다. 논문은 이 구조를 무조건 가정하지 않고, 펌프의 공급 능력과 재생 밸브 상태에 따른 조건으로 다룬다.</p>
+
+              <div class="limits">
+                <div class="limit">
+                  <h3>정리 3 · 실행 가능 구간</h3>
+                  <p>펌프가 충분한 공급 능력을 갖는 조건(원문 식 43) 아래 λ = 0 부근의 실행 가능성을 보인다. 실행 가능 집합은 조건에 따라 [0, λ<sub>min</sub>] 형태의 볼록 구간이 된다. 붐·버킷이 수축하는 경우에는 재생 밸브가 열리는 λ<sub>r</sub>까지로 볼록성 보장 범위가 제한된다.</p>
+                </div>
+                <div class="limit">
+                  <h3>정리 4 · 최적성의 범위</h3>
+                  <p>볼록 구간에서는 이분법으로 ε 정확도의 전역 최적해를 구할 수 있다. 재생 전환이 개입하는 영역에서는 노트가 정리한 보장이 국소 최적에 그치며, λ의 채터링 가능성도 남는다.</p>
+                </div>
+                <div class="limit">
+                  <h3>검증 · 아직은 시뮬레이션</h3>
+                  <p>실차 실험은 포함되지 않는다. 빠른 스풀 위치 제어, 사용 가능한 압력 센서, 정상 상태 유압 근사가 실제 장비에서도 충분한지는 별도 검증이 필요하다.</p>
+                </div>
+                <div class="limit">
+                  <h3>후속 과제 · 속도장과 피드백</h3>
+                  <p>속도장 자동 생성, 상위 속도 피드백, 실차 실험이 후속 과제로 제시된다. 이 연구는 원하는 속도장이 이미 주어진 상황에서 유압 제약을 처리하는 기반을 만든다.</p>
+                </div>
+              </div>
+
+              <div class="callout">
+                <span class="small-label">Reading note / 반복 횟수</span>
+                <p>노트에 적힌 종료 상한은 <strong>N = ⌈−log₂ ε⌉</strong>이다. 이 식에 ε = 10<sup>−7</sup>을 넣으면 24회가 된다. 노트의 “23회” 표기와 차이가 있으므로, 실제 반복 횟수는 초기 검사 포함 여부와 종료 조건을 원문 알고리즘에서 확인할 항목으로 남긴다.</p>
+              </div>
+            </section>
+
+            <section class="article-section" id="implications" aria-labelledby="implications-title">
+              <div class="section-heading">
+                <span class="section-number">06</span>
+                <h2 id="implications-title">HR35에 적용하기 전,<br>먼저 확인해야 할 회로</h2>
+              </div>
+              <p class="lead">이 논문이 주는 실무적 질문은 단순하다. 디지털 트윈에 실제 장비의 공급 구조가 들어 있는가?</p>
+
+              <div class="editorial-note">
+                <span class="small-label">Reader’s interpretation / HR35 관점의 독자 메모</span>
+                <p>이 절은 논문의 직접적인 실험 결과가 아니라, 제공된 노트의 HR35 적용 의견을 정리한 것이다. HR35 실차의 회로 구성과 코드 포함 여부는 아직 확인되지 않은 전제로 다룬다.</p>
+
+                <h3>1. 다축 오차의 원인을 공급 회로에서 찾는다</h3>
+                <p>노트에 따르면 현재 HR35 트윈은 실린더별 독립 유압과 릴리프를 중심으로 구성되어 있다. 실제 장비에 펌프 공유·재생·바이패스가 있다면, 다축 동시 조작에서 트윈과 실차가 달라지는 원인 후보가 된다. 먼저 펌프 수와 실린더별 연결 관계를 확보해야 한다.</p>
+
+                <h3>2. 힘–유량식을 정적 식별의 출발점으로 쓴다</h3>
+                <p>양 챔버 압력 6채널, 조이스틱 명령, 경사계 기반 속도를 활용하면 명령별 <i>c</i><sub>L</sub>(<i>x</i>)를 추정하는 접근을 검토할 수 있다. 노트는 이를 축 B의 정적 식별과 연결한다. 다만 조이스틱 명령과 실제 스풀 위치의 관계, 속도 환산, 정상 상태 구간을 함께 확인해야 계수의 의미가 분명해진다.</p>
+
+                <h3>3. 비공개 펌프 논리와 측정 가능한 특성을 구분한다</h3>
+                <p>단조성 조건은 제조사 내부 제어 로직을 모두 알지 못해도 모델을 구성할 여지를 준다. 그렇다고 펌프 특성 데이터가 필요 없다는 뜻은 아니다. 압력–유량 관계와 공급 한계를 실험으로 확인하고, 모델의 단조성 가정이 맞는지 검증해야 한다.</p>
+
+                <h3>4. 공통 속도 배율을 트렌칭 제어의 후보로 검토한다</h3>
+                <p>노트는 이 연구를 서울대 MPC 연구 흐름과 연결하고, 실차팀 코드에 MCV 모델이 포함되어 있는지 확인할 것을 제안한다. 유량 포화에서 방향을 유지하는 λ 전략은 HR35 트렌칭에도 참고할 만하지만, 도입 판단은 실차 회로와 접촉 조건에 대한 검증을 거쳐야 한다.</p>
+
+                <h3>다음 조사에서 확보할 자료</h3>
+                <ul class="checklist" aria-label="HR35 적용 전 확인 목록">
+                  <li>펌프 수, 각 펌프에 연결된 실린더, 다축 동시 공급 경로</li>
+                  <li>재생 체크 밸브·바이패스·보충 밸브의 존재와 작동 조건</li>
+                  <li>펌프 압력–유량 특성과 조이스틱 명령–스풀 위치 관계</li>
+                  <li>단축·다축 동작의 동기화된 압력·명령·속도 로그</li>
+                  <li>실차 제어 코드의 MCV 모델, 포화 처리, 속도 배율 적용 여부</li>
+                </ul>
+              </div>
+
+              <div class="ending">
+                <span class="small-label">Takeaway / 읽고 남길 한 가지</span>
+                <h3>정밀한 움직임을 원한다면,<br>먼저 유량을 함께 쓰는 방식을 보자.</h3>
+                <p>이 연구의 설득력은 복잡한 유압 회로를 제어기가 반복해서 검사할 수 있는 문제로 바꾼 데 있다. 펌프 공유와 재생 회로를 계산에 넣으면, 장비의 한계에 닿았을 때 얼마나 느려져야 하는지도 함께 결정할 수 있다.</p>
+                <p>다음 단계는 실제 회로와 모델을 대조하는 일이다. 그 연결이 확인되어야 “방향은 유지하고, 속도만 줄인다”는 원칙을 실제 굴착기의 동작으로 옮길 수 있다.</p>
+              </div>
+
+              <aside class="share-copy" aria-label="공유용 한 문장">
+                <span class="small-label">Copy-ready / 공유할 한 문장</span>
+                <p>두 펌프로 세 실린더를 움직이는 자율 굴착기. MCV의 펌프 공유와 재생 회로를 모델링하면, 유압 한계에서도 목표 방향을 지키며 속도만 줄이는 제어를 설계할 수 있다. 근거는 22톤급 시뮬레이션이며 실차 검증은 남아 있다.</p>
+              </aside>
+
+              <div class="keywords" aria-label="핵심 키워드">
+                <span>메인 컨트롤 밸브</span><span>펌프 공유</span><span>재생 체크 밸브</span><span>힘–유량식</span><span>펌프 유량 제약</span><span>속도장 제어</span><span>이분법 λ</span>
+              </div>
+            </section>
+
+            <section class="sources" id="sources" aria-labelledby="sources-title" role="doc-bibliography">
+              <h2 id="sources-title">출처와 읽기 메모</h2>
+              <div class="source-card">
+                <span class="small-label">Primary paper</span>
+                <cite lang="en">Modeling and Velocity-Field Control of Autonomous Excavator with Main Control Valve</cite>
+                <p>Kwangmin Kim · Minji Kim · Dongmok Kim · Dongjun Lee</p>
+                <p>Seoul National University · Doosan Infracore</p>
+                <p><em>Automatica</em> 104, 67–81, 2019</p>
+                <p><a>논문 원문 · DOI 10.1016/j.automatica.2019.02.041 ↗</a></p>
+              </div>
+              <ol class="source-notes">
+                <li><strong>자료 범위.</strong> 이 글은 제공된 Obsidian 논문 요약 노트를 바탕으로 재구성했다. 노트가 읽은 판본은 2018년 2월 프리프린트로 기재되어 있다. 저널 출판 정보와 구분하며, 식·명제·정리 번호는 노트의 표기를 따른다.</li>
+                <li><strong>그림.</strong> Fig. 1, 3, 5, 6, 8, 9, 10, 13, 19는 제공된 로컬 논문 이미지다. 원래 번호를 유지했고, 캡션은 노트의 설명을 바탕으로 편집했다. 공급 구조 개념도는 노트의 연결 관계를 재구성한 것이다.</li>
+                <li><strong>주장과 해석.</strong> 모델 및 시뮬레이션 결과는 노트가 전하는 논문 내용이다. HR35 적용, 식별 실험, 코드 확인 제안은 독자의 해석이며 해당 논문에서 HR35를 검증했다는 뜻이 아니다.</li>
+                <li><strong>추가 문헌 메모.</strong> 원 노트는 HR35 비교 맥락에서 Casoli 2015, ETH 2026, Taheri 2022를 언급한다. 완전한 서지 정보가 제공되지 않아 이 글에서는 독립적인 검증 근거로 사용하지 않았다.</li>
+                <li><strong>수치 해석.</strong> 약 0.052 ms는 노트에 보고된 후보 검사 계산의 수치로 다뤘다. ε = 10<sup>−7</sup>의 이분법 반복 횟수는 노트의 수치와 공식 사이에 차이가 있어 본문에 명시했다.</li>
+              </ol>
+            </section>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <footer class="page-footer">
+      <span>FIELD NOTES / ROBOTICS · 논문 요약과 적용 메모 · 2026.09.25</span>
+      <a href="#top">처음으로 ↑</a>
+    </footer>
+  </div>
+</body>
+</html>

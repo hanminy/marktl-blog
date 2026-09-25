@@ -1,7 +1,27 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T12:43:51.709Z",
+  "updatedAt": "2026-09-25T12:49:28.868Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/snu2019-mcv/",
+      "excerpt": "Modeling and Velocity Field Control of Autonomous Excavator with Main Control Valve 요약 한줄 요약 산업용 굴착기는 실린더 3개를 펌프 2개 로 돌리는 메인 컨트롤 밸브(MCV)를 쓴다. 펌프 하나가 붐·버킷을 같이 먹이고, 각 밸브 안의 재생 체크 밸브 가 압력 상태에 따라 기계적으로 열려 회로가 바뀌며, 펌프 유량에는 상한이 있다. 이 논문은 그 회로를 정상",
+      "shortId": "31igrw",
+      "slug": "snu2019-mcv",
+      "sourcePath": "02_research/필드로봇/시스템식별/snu2019-mcv.md",
+      "tags": [
+        "논문요약",
+        "유압모델",
+        "굴착기",
+        "메인컨트롤밸브",
+        "속도장제어",
+        "제약최적화",
+        "서울대"
+      ],
+      "title": "Modeling and Velocity-Field Control of Autonomous Excavator with Main Control Valve - 요약",
+      "updatedAt": "2026-09-25T12:49:28.868Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/31igrw/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/jud2021-heap/",
