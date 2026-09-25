@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+  <title>유압 시뮬레이션의 10 ms를 되찾는 법 — 통합 적분과 다중 속도 비교</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      --paper: #f7f5ef;
+      --surface: #fffefa;
+      --ink: #202d29;
+      --muted: #68726b;
+      --green: #173f37;
+      --mint: #e6eee5;
+      --line: #d9ded3;
+      --accent: #b65335;
+      --sand: #eee7d8;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "Batang", Georgia, serif;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); line-height: 1.85; word-break: keep-all; overflow-wrap: anywhere; }
+    a { color: inherit; text-underline-offset: .23em; text-decoration-thickness: 1px; }
+    a:hover { color: var(--accent); }
+    a:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--accent); outline-offset: 5px; }
+    .skip { position: absolute; left: 16px; top: -100px; padding: 10px 18px; background: var(--surface); z-index: 10; }
+    .skip:focus { top: 16px; }
+    .shell { max-width: 1240px; margin: auto; padding: 0 52px; }
+    .masthead { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 25px 0 20px; border-bottom: 1px solid var(--ink); font-size: 12px; letter-spacing: .13em; }
+    .brand { font-weight: 800; color: var(--green); }
+    .masthead span:last-child { color: var(--muted); text-align: right; }
+    .hero { padding: 70px 0 44px; }
+    .eyebrow { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 0 0 24px; color: var(--accent); font-size: 12px; font-weight: 750; letter-spacing: .12em; }
+    .eyebrow::before { content: ""; width: 30px; height: 2px; background: currentColor; }
+    h1, h2, h3, p, figure, blockquote { margin-top: 0; }
+    h1 { max-width: 960px; margin-bottom: 25px; font-family: var(--serif); font-size: clamp(38px, 5.4vw, 68px); font-weight: 700; line-height: 1.3; letter-spacing: -.065em; }
+    h1 em { color: var(--green); font-style: normal; }
+    .deck { max-width: 770px; margin-bottom: 30px; color: #526158; font-size: 19px; line-height: 1.9; letter-spacing: -.025em; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px 22px; color: var(--muted); font-size: 12px; }
+    .hero-bottom { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 42px; background: var(--green); color: white; }
+    .metric { padding: 25px 30px; border-right: 1px solid #ffffff2b; }
+    .metric:last-child { border: 0; }
+    .metric .value { display: block; font-family: Georgia, serif; font-size: 43px; line-height: 1.2; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
+    .metric .value small { font-family: var(--sans); font-size: 18px; }
+    .metric strong { display: block; margin: 9px 0 4px; font-size: 14px; }
+    .metric p { margin: 0; color: #c6d7ce; font-size: 12px; line-height: 1.7; }
+    .layout { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 58px; align-items: start; padding-bottom: 65px; }
+    .rail { position: sticky; top: 30px; padding-top: 24px; }
+    .rail-label { margin-bottom: 15px; color: var(--muted); font-size: 10px; letter-spacing: .15em; font-weight: 800; }
+    .rail ol { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--line); }
+    .rail li { border-bottom: 1px solid var(--line); }
+    .rail a { display: block; padding: 11px 0; font-size: 12px; text-decoration: none; }
+    .rail a span { color: var(--accent); margin-right: 10px; font-family: Georgia, serif; }
+    .rail-note { margin-top: 24px; color: var(--muted); font-size: 11px; line-height: 1.85; }
+    .article-body { min-width: 0; }
+    .abstract { margin: 0 0 45px; padding: 28px 32px; background: var(--mint); border-top: 3px solid var(--green); }
+    .label { margin: 0 0 12px; color: var(--green); font-size: 11px; font-weight: 800; letter-spacing: .13em; }
+    .abstract p:last-child { margin-bottom: 0; font-size: 15px; }
+    section { margin-bottom: 58px; }
+    .section-head { display: flex; align-items: baseline; gap: 15px; margin-bottom: 23px; border-top: 1px solid var(--line); padding-top: 25px; }
+    .section-head .num { color: var(--accent); font-family: Georgia, serif; font-size: 23px; }
+    h2 { margin: 0; font-family: var(--serif); font-size: clamp(25px, 3vw, 32px); letter-spacing: -.045em; line-height: 1.5; }
+    h3 { margin: 29px 0 12px; font-size: 18px; line-height: 1.55; letter-spacing: -.025em; }
+    p { margin-bottom: 19px; font-size: 16px; }
+    strong { font-weight: 750; }
+    .findings { counter-reset: finding; display: grid; gap: 0; }
+    .finding { display: grid; grid-template-columns: 35px 1fr; gap: 14px; padding: 20px 0; border-bottom: 1px solid var(--line); }
+    .finding::before { counter-increment: finding; content: "0" counter(finding); color: var(--accent); font-family: Georgia, serif; font-size: 23px; }
+    .finding h3 { margin: 0 0 7px; }
+    .finding p { margin: 0; font-size: 14px; color: #59655d; }
+    .pullquote { margin: 34px 0; padding: 8px 0 8px 25px; border-left: 3px solid var(--accent); }
+    .pullquote p { margin: 0; font-family: var(--serif); font-size: 25px; line-height: 1.7; letter-spacing: -.04em; }
+    .pullquote cite { display: block; margin-top: 12px; font-size: 11px; color: var(--muted); font-style: normal; }
+    .figure { margin: 27px 0; }
+    .image-mat { display: flex; justify-content: center; align-items: center; padding: 26px; background: white; border: 1px solid var(--line); }
+    .image-mat img { display: block; max-width: 100%; height: auto; object-fit: contain; }
+    .schematic img { width: 360px; }
+    .mechanism img { width: 320px; }
+    .plot img { width: 560px; }
+    .original-table img { width: 480px; }
+    figcaption { margin-top: 10px; color: var(--muted); font-size: 12px; line-height: 1.75; }
+    .fig-id { color: var(--accent); margin-right: 7px; font-size: 10px; font-weight: 800; letter-spacing: .05em; }
+    .table-scroll { max-width: 100%; overflow-x: auto; margin: 22px 0; border: 1px solid var(--line); background: var(--surface); }
+    table { border-collapse: collapse; width: 100%; font-size: 13px; text-align: left; }
+    caption { padding: 14px 17px; color: var(--green); font-size: 12px; font-weight: 750; text-align: left; background: var(--mint); }
+    th, td { padding: 13px 17px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    thead th { background: #f0f1e9; font-size: 11px; color: #59665b; }
+    tbody th { font-weight: 650; }
+    tr:last-child td, tr:last-child th { border-bottom: 0; }
+    .highlight { background: #eaf1e7; }
+    .numeric { white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .note { margin: 18px 0; padding: 17px 20px; background: var(--sand); font-size: 13px; line-height: 1.8; }
+    .note strong { color: #78503e; }
+    .equation { margin: 23px 0; padding: 23px; overflow-x: auto; background: var(--surface); border: 1px solid var(--line); }
+    .math { min-width: max-content; margin: 9px 0; font-family: "Cambria Math", "Times New Roman", serif; font-size: 19px; line-height: 1.8; }
+    .eq-note { margin: 15px 0 0; color: var(--muted); font-family: var(--sans); font-size: 11px; }
+    .frac { display: inline-flex; flex-direction: column; text-align: center; vertical-align: middle; line-height: 1.35; margin: 0 .18em; }
+    .frac > span:first-child { border-bottom: 1px solid currentColor; padding: 0 .2em .08em; }
+    .frac > span:last-child { padding: .08em .2em 0; }
+    .method-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 25px 0; }
+    .method { padding: 20px; border: 1px solid var(--line); background: var(--surface); }
+    .method.featured { border-top: 3px solid var(--green); background: var(--mint); }
+    .method .method-id { color: var(--accent); font-size: 10px; letter-spacing: .1em; font-weight: 800; }
+    .method h3 { margin: 9px 0 13px; font-size: 16px; }
+    .method p { margin-bottom: 10px; font-size: 12px; }
+    .method .time { display: block; margin-top: 18px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--green); font-size: 12px; font-weight: 750; }
+    .flow { margin: 25px 0; padding: 24px; background: var(--green); color: white; }
+    .flow-title { margin-bottom: 19px; color: #bfd4c8; font-size: 11px; letter-spacing: .08em; }
+    .flow-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; }
+    .flow-node { padding: 17px 12px; text-align: center; border: 1px solid #83a294; }
+    .flow-node strong { display: block; font-size: 14px; }
+    .flow-node span { font-size: 12px; color: #d2e1d7; }
+    .flow-arrow { font-size: 25px; color: #dec6a5; }
+    .flow-solver { margin-top: 17px; padding: 14px; text-align: center; color: var(--green); background: #e6eee5; font-size: 13px; font-weight: 750; }
+    .flow figcaption { color: #c6d7ce; }
+    .result-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 24px 0; }
+    .result-strip div { padding: 18px; border-top: 2px solid var(--green); background: var(--mint); }
+    .result-strip strong { display: block; font-family: Georgia, serif; font-size: 26px; color: var(--green); }
+    .result-strip span { display: block; font-size: 11px; line-height: 1.7; color: #55675a; }
+    .cost { display: flex; align-items: center; gap: 10px; }
+    .cost span { min-width: 42px; }
+    .bar { height: 6px; width: var(--width); min-width: 5px; background: #8c9b88; display: block; }
+    .highlight .bar { background: var(--green); }
+    .scope-list { padding-left: 21px; font-size: 14px; }
+    .scope-list li { padding-left: 4px; margin-bottom: 11px; }
+    .perspective { padding: 29px; background: #efeee5; border: 1px solid var(--line); }
+    .perspective h3:first-of-type { margin-top: 15px; }
+    .perspective p { font-size: 14px; }
+    .perspective p:last-child { margin-bottom: 0; }
+    .checklist { list-style: none; padding: 0; margin: 22px 0 0; }
+    .checklist li { position: relative; padding: 12px 0 12px 28px; border-top: 1px solid var(--line); font-size: 13px; }
+    .checklist li::before { content: "□"; position: absolute; left: 0; color: var(--green); font-size: 18px; }
+    .ending { padding: 33px; background: var(--green); color: white; }
+    .ending .label { color: #c6d7ce; }
+    .ending h2 { margin-bottom: 20px; font-size: 29px; }
+    .ending p { color: #e0e9e1; font-size: 15px; }
+    .ending p:last-child { margin-bottom: 0; }
+    .share-block { padding: 23px 0; border-bottom: 1px solid var(--line); }
+    .share-block blockquote { margin: 0; padding: 0; font-size: 14px; }
+    .source-card { padding: 24px; background: var(--surface); border: 1px solid var(--line); }
+    .source-card cite { display: block; font-family: Georgia, var(--serif); font-size: 18px; font-style: normal; line-height: 1.6; }
+    .source-card p { margin: 12px 0; font-size: 12px; color: var(--muted); }
+    .source-card a { font-size: 12px; color: var(--green); }
+    .source-notes { margin-top: 22px; padding-left: 20px; color: var(--muted); font-size: 12px; }
+    .source-notes li { margin-bottom: 10px; padding-left: 4px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+    .tags span { padding: 4px 10px; border: 1px solid var(--line); color: var(--muted); font-size: 10px; }
+    footer { display: flex; justify-content: space-between; gap: 20px; padding: 23px 0 35px; border-top: 1px solid var(--ink); color: var(--muted); font-size: 11px; }
+    @media (max-width: 1000px) {
+      .shell { padding: 0 32px; }
+      .layout { grid-template-columns: 150px minmax(0, 1fr); gap: 30px; }
+      .method-grid { grid-template-columns: 1fr; }
+      .method { padding: 20px 23px; }
+      .method .time { margin-top: 12px; }
+    }
+    @media (max-width: 720px) {
+      .shell { padding: 0 22px; }
+      .masthead { font-size: 10px; letter-spacing: .06em; }
+      .hero { padding-top: 43px; }
+      .deck { font-size: 17px; }
+      .hero-bottom { grid-template-columns: 1fr; margin-top: 30px; }
+      .metric { display: grid; grid-template-columns: 108px 1fr; gap: 0 17px; padding: 20px 23px; border-right: 0; border-bottom: 1px solid #ffffff2b; }
+      .metric .value { grid-row: span 2; align-self: center; font-size: 36px; }
+      .metric strong { margin-top: 0; }
+      .layout { display: block; }
+      .rail { position: static; padding: 0; margin-bottom: 32px; }
+      .rail ol { display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 18px; }
+      .rail-note { display: none; }
+      .abstract, .perspective, .ending { padding: 23px; }
+      section { margin-bottom: 43px; }
+      p { font-size: 15px; }
+      .pullquote p { font-size: 22px; }
+      .image-mat { padding: 15px; }
+      .result-strip { gap: 7px; }
+      .result-strip div { padding: 13px 10px; }
+      .result-strip strong { font-size: 22px; }
+      .flow { padding: 18px; }
+      .flow-grid { gap: 9px; }
+      .flow-node { padding: 15px 8px; }
+      th, td { padding: 11px 13px; }
+      .comparison { min-width: 590px; }
+      footer { flex-direction: column; gap: 8px; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    @media print {
+      body { background: white; color: black; }
+      .shell { max-width: none; padding: 0; }
+      .rail, .skip, .back-top { display: none; }
+      .layout { display: block; }
+      .hero { padding-top: 25px; }
+      h1 { font-size: 36px; }
+      .hero-bottom, .flow, .ending { background: #eee; color: black; }
+      .hero-bottom p, .flow span, .flow figcaption, .flow-title, .ending p, .ending .label { color: #333; }
+      figure, .source-card, .finding, tr { break-inside: avoid; }
+      .table-scroll, .equation { overflow: visible; }
+      a { color: black; }
+      .comparison { min-width: 0; }
+      section { margin-bottom: 28px; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="An Efficient Unified Method for the Combined Simulation of Multibody and Hydraulic Dynamics - 요약">
+<meta property="og:description" content="An Efficient Unified Method for the Combined Simulation of Multibody and Hydraulic Dynamics 요약 한줄 요약 유압 실린더가 달린 기구를 시뮬레이션하는 세 방식 — (1) 실린더 길이를 기구학적으로 강제하는 단순화, (2) 기구 10 ms·유압 0.2 ms 로 따로 적분하는 다중 속도(co integration), (3) 기구 운동 방정식에 챔버 압력 미분 ">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/ppba8l/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/ppba8l/assets/figure1.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="An Efficient Unified Method for the Combined Simulation of Multibody and Hydraulic Dynamics - 요약">
+<meta name="twitter:description" content="An Efficient Unified Method for the Combined Simulation of Multibody and Hydraulic Dynamics 요약 한줄 요약 유압 실린더가 달린 기구를 시뮬레이션하는 세 방식 — (1) 실린더 길이를 기구학적으로 강제하는 단순화, (2) 기구 10 ms·유압 0.2 ms 로 따로 적분하는 다중 속도(co integration), (3) 기구 운동 방정식에 챔버 압력 미분 ">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/ppba8l/assets/figure1.png">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/naya2011-unified/">
+</head>
+<body>
+  <a class="skip" href="#article-content">본문 바로가기</a>
+  <div class="shell" id="top">
+    <header class="masthead">
+      <a class="brand" href="#top" aria-label="기사 처음으로">DYNAMICS / RESEARCH NOTES</a>
+      <span>논문 해설 · 2011 연구 다시 읽기</span>
+    </header>
+
+    <main>
+      <article aria-labelledby="article-title">
+        <header class="hero">
+          <p class="eyebrow">MULTIBODY × HYDRAULICS</p>
+          <h1 id="article-title">유압 시뮬레이션의<br><em>10 ms를 되찾는 법</em></h1>
+          <p class="deck">유압계의 강성은 작은 시간 간격을 요구한다. 그렇다면 적분 방식을 바꾸면 어떨까? 통합 적분과 다중 속도 접근의 비교에서, 계산 효율과 압력 해상도 사이의 선택을 읽는다.</p>
+          <div class="meta">
+            <span>연구: Miguel A. Naya 외 3인</span>
+            <span>출처: The Archive of Mechanical Engineering · 2011</span>
+            <span>노트 작성: <time datetime="2026-09-25">2026.09.25</time></span>
+          </div>
+          <div class="hero-bottom" aria-label="예제의 핵심 수치">
+            <div class="metric">
+              <span class="value">10 <small>ms</small></span>
+              <strong>통합 적분의 시간 간격</strong>
+              <p>기구 운동과 챔버 압력을 함께 계산</p>
+            </div>
+            <div class="metric">
+              <span class="value">15.2<small>배</small></span>
+              <strong>전진 오일러 다중 속도 대비 속도</strong>
+              <p>CPU 5.895 s ÷ 0.389 s · 해당 예제 기준</p>
+            </div>
+            <div class="metric">
+              <span class="value">&lt; 0.1 <small>mm</small></span>
+              <strong>비교된 해 사이의 위치 차이</strong>
+              <p>실측값에 대한 절대 오차를 뜻하지 않음</p>
+            </div>
+          </div>
+        </header>
+
+        <div class="layout">
+          <nav class="rail" aria-label="기사 목차">
+            <p class="rail-label">IN THIS REPORT</p>
+            <ol>
+              <li><a href="#findings"><span>01</span>핵심 발견</a></li>
+              <li><a href="#model"><span>02</span>문제와 유압 모델</a></li>
+              <li><a href="#methods"><span>03</span>세 가지 계산 전략</a></li>
+              <li><a href="#experiment"><span>04</span>비교 실험의 조건</a></li>
+              <li><a href="#evidence"><span>05</span>결과와 근거</a></li>
+              <li><a href="#implications"><span>06</span>선택 기준과 적용</a></li>
+              <li><a href="#sources"><span>07</span>출처와 읽기 범위</a></li>
+            </ol>
+            <p class="rail-note">단일 실린더 예제의 결과를 다룬 연구 해설입니다. 연구의 관찰과 HR35 적용에 대한 노트 작성자의 해석을 구분했습니다.</p>
+          </nav>
+
+          <div class="article-body" id="article-content">
+            <div class="abstract" role="note" aria-labelledby="abstract-label">
+              <p class="label" id="abstract-label">ABSTRACT / 초록</p>
+              <p>Naya 외(2011)는 유압 실린더가 구동하는 다물체계를 대상으로 <strong>기구학적 길이 강제, 다중 속도 적분, 통합 암묵 적분</strong>을 비교했다. 막대와 부가 질량을 움직이는 예제에서 통합 방식은 10 ms 간격으로 압력까지 계산하면서, 길이 강제 방식보다 약 15% 많은 CPU 시간을 사용했다. 전진 오일러 기반 다중 속도 방식보다는 약 15배 빨랐지만 압력에 작은 수치 진동이 남았다. 이 연구의 핵심은 큰 시간 간격의 가능성과 함께, <strong>안정적으로 계산되는 해와 매끄러운 압력 이력이 서로 다른 기준</strong>임을 보여준다는 데 있다.</p>
+            </div>
+
+            <section id="findings" aria-labelledby="findings-title">
+              <div class="section-head">
+                <span class="num">01</span>
+                <h2 id="findings-title">계산은 빨라졌다. 압력은 어떨까?</h2>
+              </div>
+              <div class="findings">
+                <div class="finding">
+                  <div>
+                    <h3>압력까지 풀어도 계산 비용의 증가는 작았다</h3>
+                    <p>통합 적분의 CPU 시간은 0.389 s, 유압을 풀지 않는 길이 강제 방식은 0.338 s였다. 이 예제에서는 유압 상태를 포함하는 비용이 비교적 작았다.</p>
+                  </div>
+                </div>
+                <div class="finding">
+                  <div>
+                    <h3>같은 기구 운동 뒤에 다른 압력 품질이 숨어 있다</h3>
+                    <p>운동 이력은 거의 겹쳤지만, 통합 적분 10 ms의 압력에는 미세 진동이 나타났다. 유압을 사다리꼴 규칙으로 5 ms마다 푸는 다중 속도 방식은 매끄러운 압력을 얻는 절충안이었다.</p>
+                  </div>
+                </div>
+                <div class="finding">
+                  <div>
+                    <h3>이득의 크기는 비교하는 적분기에 달려 있다</h3>
+                    <p>약 15배의 속도 차이는 유압을 전진 오일러 0.2 ms로 계산한 경우와의 비교다. 유압에도 암묵 사다리꼴 규칙을 사용하면 다중 속도 방식의 계산 비용 역시 크게 줄어든다.</p>
+                  </div>
+                </div>
+              </div>
+              <aside class="note">
+                <strong>수치 읽기.</strong> 제공된 노트는 통합 적분의 추가 비용을 “약 20%”로 표현한다. 제시된 CPU 값으로 직접 계산하면 (0.389 − 0.338) / 0.338 ≈ <strong>15.1%</strong>다. 이 글의 정량 비교는 표의 값을 기준으로 한다.
+              </aside>
+            </section>
+
+            <section id="model" aria-labelledby="model-title">
+              <div class="section-head">
+                <span class="num">02</span>
+                <h2 id="model-title">방정식은 몇 개, 시간 척도는 훨씬 빠르게</h2>
+              </div>
+              <p>연구진의 다물체 해석기는 자연 좌표, 지표-3 증강 라그랑지안 정식, 뉴마크·사다리꼴 적분, 속도·가속도 투영을 사용했다. 기존 굴착기 실시간 시뮬레이션에서는 10 ms 시간 간격을 사용해 왔다.</p>
+              <p>유압을 붙이면 상황이 달라진다. 챔버 압력은 소수의 1차 미분방정식으로 표현되지만, 최대 700 MPa에 이르는 체적탄성계수가 빠른 압력 응답을 만든다. 이 <strong>수치 강성</strong> 때문에 적분법과 모델 조건에 따라 10<sup>−6</sup>~10<sup>−4</sup> s 수준의 작은 간격이 요구될 수 있다.</p>
+
+              <figure class="figure">
+                <div class="image-mat schematic">
+                  <img src="assets/figure1.png" alt="유압 실린더의 두 챔버와 펌프·탱크를 연결하는 4오리피스 밸브의 구성" loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-id">FIG. 1</span>실린더와 4오리피스 밸브. 일반 모델에서는 스풀 변위 κ에 따른 비선형 면적 변화와 데드존을 고려한다. 아래 비교 예제에서는 선형 면적식을 사용한다.</figcaption>
+              </figure>
+
+              <h3>압력 변화는 체적 변화와 유량의 차이로 결정된다</h3>
+              <div class="equation" aria-label="챔버 압력, 체적탄성계수, 오리피스 유량 식">
+                <div class="math">
+                  ṗ<sub>A</sub> =
+                  <span class="frac"><span>β<sub>A</sub></span><span>V<sub>A</sub></span></span>
+                  (−V̇<sub>A</sub> + Q<sub>PA</sub> + Q<sub>TA</sub> + Q<sub>BA</sub>)
+                </div>
+                <div class="math">
+                  β(p) =
+                  <span class="frac"><span>1 + ap + bp²</span><span>a + 2bp</span></span>
+                </div>
+                <div class="math">
+                  Q = A<sub>orf</sub>C<sub>d</sub> √(2|Δp| / ρ) sgn(Δp),
+                  &nbsp; Δp = p<sub>in</sub> − p<sub>out</sub>
+                </div>
+                <p class="eq-note">노트에 제시된 식 (1), (3), (4)의 내용. 양방향 유동을 표현할 수 있도록 유량식의 제곱근 안에는 압력 차의 절댓값을 명시했다. 각 챔버 식의 유량은 정한 방향에 따른 부호를 포함한다.</p>
+              </div>
+
+              <div class="table-scroll" tabindex="0" role="region" aria-label="유압 모델 기호">
+                <table>
+                  <caption>모델을 읽는 데 필요한 네 가지 요소</caption>
+                  <thead><tr><th scope="col">기호</th><th scope="col">물리적 의미</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">V<sub>A</sub>, V̇<sub>A</sub></th><td>챔버 체적과 피스톤 운동에 따른 체적 변화율</td></tr>
+                    <tr><th scope="row">Q<sub>PA</sub>, Q<sub>TA</sub>, Q<sub>BA</sub></th><td>펌프·탱크 연결 유량과 챔버 간 누설 유량</td></tr>
+                    <tr><th scope="row">β(p)</th><td>압력에 따른 체적탄성계수. a, b는 유체 모델의 상수</td></tr>
+                    <tr><th scope="row">A<sub>orf</sub>, C<sub>d</sub>, ρ</th><td>오리피스 면적, 유량 계수, 유체 밀도</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section id="methods" aria-labelledby="methods-title">
+              <div class="section-head">
+                <span class="num">03</span>
+                <h2 id="methods-title">분리해서 자주 풀거나, 묶어서 함께 풀거나</h2>
+              </div>
+              <div class="method-grid">
+                <div class="method">
+                  <span class="method-id">APPROACH A</span>
+                  <h3>기구학적 길이 강제</h3>
+                  <p>실린더의 길이 이력을 구속조건으로 지정한다. 유압 압력은 계산하지 않는다.</p>
+                  <span class="time">기구: 10 ms</span>
+                </div>
+                <div class="method">
+                  <span class="method-id">APPROACH B</span>
+                  <h3>다중 속도 적분</h3>
+                  <p>기구와 유압을 나누어 적분한다. 빠른 유압계에 더 작은 시간 간격을 배정한다.</p>
+                  <span class="time">기구: 10 ms / 유압: 별도 간격</span>
+                </div>
+                <div class="method featured">
+                  <span class="method-id">APPROACH C</span>
+                  <h3>통합 암묵 적분</h3>
+                  <p>기구 좌표와 챔버 압력을 하나의 연립 문제로 구성해 함께 수렴시킨다.</p>
+                  <span class="time">기구 + 유압: 10 ms</span>
+                </div>
+              </div>
+
+              <h3>통합 정식: 압력을 추가 상태로 포함하기</h3>
+              <div class="equation" aria-label="다물체 운동과 유압 압력의 통합 방정식">
+                <div class="math">M q̈ + Φ<sub>q</sub><sup>T</sup> αΦ + Φ<sub>q</sub><sup>T</sup> λ* = Q(q, q̇, p)</div>
+                <div class="math">ṗ = h(p, q, q̇)</div>
+                <p class="eq-note">식 (17). q는 기구 좌표, p는 챔버 압력 벡터, Φ는 기구 구속조건, α는 벌칙 계수다.</p>
+              </div>
+              <p>압력 미분에도 사다리꼴 차분을 적용하고, 시간 간격의 제곱으로 스케일한 잔차를 뉴턴–랩슨 방법으로 푼다. 수렴 후에는 속도와 가속도를 제약 다양체에 투영한다.</p>
+
+              <figure class="flow" aria-labelledby="flow-caption">
+                <p class="flow-title">통합 적분의 결합 구조 · 개념도</p>
+                <div class="flow-grid">
+                  <div class="flow-node"><strong>기구 상태 q, q̇</strong><span>변위·속도 → 체적·체적 변화율</span></div>
+                  <div class="flow-arrow" aria-hidden="true">⇄</div>
+                  <div class="flow-node"><strong>유압 상태 p</strong><span>챔버 압력 → 실린더 힘</span></div>
+                </div>
+                <div class="flow-solver">같은 시간 단계에서 잔차 구성 → 뉴턴 반복 → 함께 수렴</div>
+                <figcaption id="flow-caption">상호 영향을 접선 행렬에 포함해 기구 운동과 압력을 동시에 갱신한다. 원문 그림이 아닌 설명용 도식이다.</figcaption>
+              </figure>
+
+              <p>구현 비용은 이 결합에서 발생한다. 근사 접선 행렬에 ∂Q/∂p, ∂h/∂q, ∂h/∂q̇, ∂h/∂p 블록이 추가되면서 행렬이 <strong>비대칭</strong>이 된다. 기존 대칭 행렬용 솔버를 그대로 활용하기 어렵고, 결합 미분항도 구현해야 한다.</p>
+              <blockquote class="pullquote">
+                <p>압력을 추가 상태로 넣어 함께 풀면,<br>강성이 큰 유압계도 더 큰 간격으로 계산할 여지가 생긴다.</p>
+                <cite>통합 정식에 대한 해설 · 원문 직접 인용 아님</cite>
+              </blockquote>
+            </section>
+
+            <section id="experiment" aria-labelledby="experiment-title">
+              <div class="section-head">
+                <span class="num">04</span>
+                <h2 id="experiment-title">하나의 실린더로 비교 조건을 맞추다</h2>
+              </div>
+              <p>예제는 길이 1 m, 질량 200 kg의 막대와 끝에 달린 250 kg 질량, 그리고 막대 중앙을 지지하는 실린더로 구성된다. 기구 좌표는 두 점의 x·y 좌표와 실린더 길이 s를 합쳐 5개이며, 통합 모델에는 챔버 압력 2개가 추가된다.</p>
+              <figure class="figure">
+                <div class="image-mat mechanism">
+                  <img src="assets/figure2.png" alt="중앙의 유압 실린더가 지지하는 1미터 막대와 끝단 250킬로그램 질량의 역학 모델" loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-id">FIG. 2</span>단일 실린더 벤치마크. 단순한 기구에서 결합 방식에 따른 수치 특성과 계산 비용을 비교한다.</figcaption>
+              </figure>
+              <div class="table-scroll" tabindex="0" role="region" aria-label="비교 실험의 주요 조건">
+                <table>
+                  <caption>실험 조건과 입력</caption>
+                  <thead><tr><th scope="col">항목</th><th scope="col">설정</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">피스톤 면적 / 실린더 길이</th><td>0.0065 m² / 0.442 m</td></tr>
+                    <tr><th scope="row">점성 마찰 계수</th><td>10<sup>5</sup> N·s/m</td></tr>
+                    <tr><th scope="row">펌프 / 탱크 압력</th><td>7.6 / 0.1 MPa · 상수</td></tr>
+                    <tr><th scope="row">유량 계수 / 밀도</th><td>0.67 / 850 kg/m³</td></tr>
+                    <tr><th scope="row">밸브 면적</th><td>A<sub>i</sub> = 0.0005κ, A<sub>o</sub> = 0.0005(1 − κ)</td></tr>
+                    <tr><th scope="row">스풀 입력</th><td>정적 평형 κ₀ 기준, 2~6 s에 −0.01, 6~10 s에 +0.01</td></tr>
+                    <tr><th scope="row">초기 상태</th><td>정적 평형식 (32)로 압력과 κ₀ 결정</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>먼저 통합 방식으로 길이 이력을 계산한 뒤, 이를 길이 강제 방식의 입력으로 사용했다. 전진 오일러 다중 속도 방식에서는 기구의 10 ms 단계에 대해 유압을 0.2 ms 간격으로 50회 갱신한다.</p>
+              <aside class="note"><strong>비교의 성격.</strong> 길이 강제 방식은 통합 해에서 얻은 운동을 입력받는다. 따라서 이 비교는 계산 비용의 기준선을 제공하지만, 통합 해의 물리적 정확도를 독립적으로 입증하는 실험은 아니다.</aside>
+            </section>
+
+            <section id="evidence" aria-labelledby="evidence-title">
+              <div class="section-head">
+                <span class="num">05</span>
+                <h2 id="evidence-title">운동은 겹치고, 압력은 차이를 드러낸다</h2>
+              </div>
+              <h3>운동 이력과 수치 일관성</h3>
+              <p>통합 방식과 다중 속도 방식의 실린더 길이·속도는 그림에서 거의 하나의 선처럼 겹친다. 노트에 정리된 위치 차이는 0.1 mm 미만이다. 에너지 관련 변동은 약 1 J로, 약 1,000 J 규모의 퍼텐셜 에너지 및 일 변화와 비교해 작았다.</p>
+              <figure class="figure">
+                <div class="image-mat plot">
+                  <img src="assets/figure3.png" alt="통합 적분과 다중 속도 적분의 실린더 길이 및 속도 시간 이력으로, 두 방식의 곡선이 거의 겹친다" loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-id">FIG. 3</span>실린더 길이와 속도 비교. 운동의 유사성만으로 압력 파형의 품질까지 판단할 수는 없다.</figcaption>
+              </figure>
+              <div class="result-strip" aria-label="수치 검증 지표">
+                <div><strong>&lt; 0.1 mm</strong><span>비교 해 사이의 위치 차이</span></div>
+                <div><strong>~1 J</strong><span>약 1,000 J 변화 대비 에너지 변동</span></div>
+                <div><strong>&lt; 10<sup>−7</sup></strong><span>노트에 보고된 제약 위반 크기</span></div>
+              </div>
+
+              <h3>압력의 작은 진동은 남는다</h3>
+              <figure class="figure">
+                <div class="image-mat plot">
+                  <img src="assets/figure5.png" alt="시뮬레이션 시간에 따른 두 실린더 챔버 압력 p1과 p2의 변화" loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-id">FIG. 5</span>두 챔버의 압력 이력. 스풀 입력 변화에 따른 압력 응답을 보여준다.</figcaption>
+              </figure>
+              <figure class="figure">
+                <div class="image-mat plot">
+                  <img src="assets/figure6.png" alt="챔버 압력 p1의 봉우리 확대. 검정 통합 적분 곡선에는 작은 진동이 있고 회색 다중 속도 곡선은 매끄럽다" loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-id">FIG. 6</span>p₁ 봉우리의 확대. 회색은 다중 속도 전진 오일러 0.2 ms, 검정은 통합 적분 10 ms다. 큰 간격의 통합 해에 미세 진동이 나타난다.</figcaption>
+              </figure>
+              <p>다중 속도 방식에 사다리꼴 적분을 적용해도 유압 간격이 10 ms이면 통합 방식과 유사한 압력 이력을 얻었다. 이 예제에서 <strong>매끄러운 압력을 얻을 수 있었던 최대 유압 간격은 5 ms</strong>였다. 적분의 안정성뿐 아니라 관심 신호의 품질을 별도로 확인해야 하는 이유다.</p>
+
+              <h3>CPU 시간: 암묵 적분끼리 비교하면 간격이 좁아진다</h3>
+              <div class="table-scroll" tabindex="0" role="region" aria-label="적분 방식별 CPU 시간 비교">
+                <table class="comparison">
+                  <caption>Matlab 구현의 CPU 시간 · 낮을수록 빠름</caption>
+                  <thead>
+                    <tr><th scope="col">방식</th><th scope="col">유압 간격</th><th scope="col">CPU [s]</th><th scope="col">관찰</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">기구학적 길이 강제</th><td>계산 안 함</td>
+                      <td class="numeric"><div class="cost"><span>0.338</span><i class="bar" aria-hidden="true"></i></div></td>
+                      <td>계산 비용의 기준선</td>
+                    </tr>
+                    <tr class="highlight">
+                      <th scope="row">통합 · 사다리꼴</th><td class="numeric">10 ms</td>
+                      <td class="numeric"><div class="cost"><span><strong>0.389</strong></span><i class="bar" aria-hidden="true"></i></div></td>
+                      <td>압력 미세 진동</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">다중 속도 · 전진 오일러</th><td class="numeric">0.2 ms</td>
+                      <td class="numeric"><div class="cost"><span>5.895</span><i class="bar" aria-hidden="true"></i></div></td>
+                      <td>해당 예제의 수렴 한계 간격</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">다중 속도 · 사다리꼴</th><td class="numeric">10 ms</td>
+                      <td class="numeric"><div class="cost"><span>0.672</span><i class="bar" aria-hidden="true"></i></div></td>
+                      <td>통합 방식과 유사한 압력</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">다중 속도 · 사다리꼴</th><td class="numeric">5 ms</td>
+                      <td class="numeric"><div class="cost"><span>1.021</span><i class="bar" aria-hidden="true"></i></div></td>
+                      <td>매끄러운 압력의 절충안</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>표의 값으로 계산하면 통합 방식은 사다리꼴 다중 속도 10 ms보다 약 <strong>1.73배</strong>, 5 ms보다 약 <strong>2.62배</strong> 빠르다. “15배”라는 결과에는 결합 구조뿐 아니라 유압 적분법과 시간 간격의 차이도 포함되어 있다.</p>
+              <figure class="figure">
+                <div class="image-mat original-table">
+                  <img src="assets/table1.png" alt="논문에 제시된 CPU 시간 비교표 원본 이미지" loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-id">TABLE 1</span>제공된 원문 표 이미지. 위 HTML 표는 노트의 수치를 재구성한 것이다. CPU 시간은 해당 구현의 상대 비교이며, 현재 하드웨어의 성능 보장은 아니다.</figcaption>
+              </figure>
+
+              <h3>큰 벌칙 계수와 결합 구현이라는 대가</h3>
+              <p>통합 방식에는 <strong>α = 10<sup>10</sup></strong>의 벌칙 계수가 필요했다. 노트에서 제시한 통상 범위 10<sup>7</sup>~10<sup>9</sup>보다 큰 값으로, 유압 강성이 기구의 제약 처리에도 영향을 준다는 관찰이다. 뉴턴 반복은 스풀 입력이 바뀌는 2 s와 6 s 근처에서 2~3회, 그 외에는 대체로 1회였다.</p>
+              <aside class="note"><strong>다른 솔버로 옮길 때.</strong> 이 α는 해당 증강 라그랑지안 정식의 파라미터다. 다른 엔진의 제약 컴플라이언스나 안정화 계수에 같은 숫자를 그대로 적용할 근거는 없다.</aside>
+            </section>
+
+            <section id="implications" aria-labelledby="implications-title">
+              <div class="section-head">
+                <span class="num">06</span>
+                <h2 id="implications-title">무엇을 보려는 시뮬레이션인가</h2>
+              </div>
+              <p>방법의 선택은 압력이 필요한지, 어떤 시간 척도의 압력 변화를 관찰해야 하는지, 기존 솔버를 얼마나 수정할 수 있는지에 달려 있다. 이 연구의 결과를 실무적인 선택 기준으로 옮기면 다음과 같다.</p>
+              <div class="table-scroll" tabindex="0" role="region" aria-label="시뮬레이션 목적에 따른 접근법">
+                <table>
+                  <caption>목적별 선택 가이드 · 이 예제에 근거한 해석</caption>
+                  <thead><tr><th scope="col">우선하는 목표</th><th scope="col">검토할 접근</th><th scope="col">확인할 조건</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">주어진 운동 재현</th><td>기구학적 길이 강제</td><td>길이 이력을 알고 있으며 유압 예측이 불필요한가?</td></tr>
+                    <tr><th scope="row">압력을 포함한 빠른 계산</th><td>통합 암묵 적분</td><td>결합 미분항 구현이 가능하고 압력 미세 진동을 허용할 수 있는가?</td></tr>
+                    <tr><th scope="row">매끄러운 압력과 모듈 분리</th><td>사다리꼴 다중 속도</td><td>유압 간격을 줄였을 때 관심 파형이 충분히 수렴하는가?</td></tr>
+                    <tr><th scope="row">단순한 유압 적분 구현</th><td>전진 오일러 다중 속도</td><td>작은 간격에 따른 계산 비용을 감당할 수 있는가?</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3>결과가 말해 주지 않는 것</h3>
+              <ul class="scope-list">
+                <li><strong>전체 굴착기에서의 성능:</strong> 검증 대상은 실린더 하나다. 여러 축의 결합이나 펌프 공유의 영향은 이 예제로 확인되지 않는다.</li>
+                <li><strong>상세 유압 회로의 거동:</strong> 예제는 일정한 펌프·탱크 압력, 무시한 누설, 선형 밸브 면적을 사용한다.</li>
+                <li><strong>보편적인 시간 간격:</strong> 10 ms와 5 ms는 해당 모델의 결과다. 다른 모델에서도 같은 안정성과 파형 품질을 얻는다는 뜻은 아니다.</li>
+              </ul>
+
+              <aside class="perspective" aria-labelledby="hr35-title">
+                <p class="label">APPLICATION NOTE / 노트 작성자의 관점</p>
+                <h3 id="hr35-title">HR35 트윈에서 검토할 연결점</h3>
+                <p>제공된 노트에는 HR35 트윈의 버킷 잔류 진동이 명시적 유압–기구 결합의 이산 불안정으로 판단되었고, 시간 간격을 10 ms에서 5 ms로 낮춰 검증을 통과했다는 내부 경험이 기록되어 있다. 이는 논문의 강성 문제와 연결해 볼 수 있지만, 이 글에는 해당 진단을 독립적으로 확인할 로그나 모델이 포함되어 있지 않다.</p>
+                <p><strong>첫 번째 가설은 적분 구조의 개선이다.</strong> 물리적 근거 없이 β를 낮추기 전에, 유압 암묵 적분이 계산 간격과 압력 품질을 개선하는지 비교할 가치가 있다. 유압을 별도로 암묵 계산하는 구성은 다중 속도 접근과 관련되지만, AGX 내 실제 결합 방식의 동등성은 확인이 필요하다.</p>
+                <p><strong>두 번째는 모델과 제약 설정의 점검이다.</strong> β(p)는 상수 체적탄성계수를 재검토할 후보이며, 특히 저압 영역의 물성 가정을 확인하는 데 유용하다. 다만 상수 β가 항상 과대 강성을 만든다고 단정할 수는 없다. 제약 컴플라이언스와 유압 강성의 상호작용도 별도로 평가해야 한다.</p>
+                <ul class="checklist" aria-label="HR35 적용 전 검증 항목">
+                  <li>동일한 물성으로 적분법과 시간 간격을 바꾸어 잔류 진동을 비교한다.</li>
+                  <li>운동 오차와 압력 파형의 수렴 기준을 각각 정한다.</li>
+                  <li>β(p)와 제약 설정을 바꿀 때 물리적 근거 및 민감도를 기록한다.</li>
+                  <li>3축 결합과 펌프 공유 조건에서 계산 비용과 안정성을 다시 검증한다.</li>
+                </ul>
+              </aside>
+            </section>
+
+            <section class="ending" aria-labelledby="ending-title">
+              <p class="label">TAKEAWAY</p>
+              <h2 id="ending-title">큰 시간 간격은 출발점이다.<br>끝은 관심 신호의 품질이다.</h2>
+              <p>이 단일 실린더 예제에서 통합 암묵 적분은 기구와 유압을 10 ms 간격으로 효율적으로 계산했다. 그러나 압력의 매끄러움까지 필요하다면 유압을 더 촘촘히 적분하는 선택이 남는다.</p>
+              <p>다음 모델에서 먼저 정할 것은 허용 가능한 운동 오차와 압력 파형의 품질이다. 그 기준을 세운 뒤 적분법과 시간 간격을 비교하면, 빠른 계산이 실제로 쓸 수 있는 계산인지 판단할 수 있다.</p>
+            </section>
+
+            <aside class="share-block" aria-labelledby="share-label">
+              <p class="label" id="share-label">공유용 한 문장</p>
+              <blockquote>유압 시뮬레이션의 10 ms를 되찾는 법: Naya 외(2011)의 단일 실린더 예제에서 통합 암묵 적분은 전진 오일러 다중 속도보다 약 15배 빨랐다. 다만 압력의 매끄러움은 별도의 검증 기준이다.</blockquote>
+            </aside>
+
+            <section id="sources" aria-labelledby="sources-title">
+              <div class="section-head">
+                <span class="num">07</span>
+                <h2 id="sources-title">출처와 읽기 범위</h2>
+              </div>
+              <div class="source-card">
+                <p class="label">PRIMARY PAPER</p>
+                <cite lang="en">An Efficient Unified Method for the Combined Simulation of Multibody and Hydraulic Dynamics: Comparison with Simplified and Co-Integration Approaches</cite>
+                <p>Miguel A. Naya, Javier Cuadrado, Daniel Dopico, Urbano Lugris<br>Laboratory of Mechanical Engineering, University of La Coruña</p>
+                <p><span lang="en">The Archive of Mechanical Engineering</span>, LVIII(2), 223–243, 2011.</p>
+                <a>원문 DOI: 10.2478/v10180-011-0016-4 ↗</a>
+              </div>
+              <ol class="source-notes">
+                <li>이 글은 제공된 Obsidian 논문 요약과 첨부 이미지에 근거해 재구성했다. 원문 전체에 대한 별도의 대조 검증이나 실험 재현을 수행한 보고서는 아니다.</li>
+                <li>그림 1·2·3·5·6과 표 1은 제공된 논문 이미지다. 번호는 원문 번호를 유지했다. 위치 차이의 근거로 노트가 언급한 그림 4는 제공되지 않아 수치 설명만 포함했다.</li>
+                <li>CPU 증가율 15.1%, 속도비 15.2배·1.73배·2.62배는 제공된 표의 값에서 계산했다. 연구 결과의 적용 범위는 해당 모델과 Matlab 구현에 한정된다.</li>
+                <li>HR35 경험과 AGX 적용 논의는 노트 작성자의 해석 및 검토 제안이다. 노트가 후속 참고로 언급한 “Casoli 2015”와 “서울대 MCV”는 상세 서지정보가 없어 이 글의 근거 문헌으로 사용하지 않았다.</li>
+              </ol>
+              <div class="tags" aria-label="핵심 키워드">
+                <span>다물체 동역학</span><span>유압 강성</span><span>통합 적분</span><span>다중 속도 적분</span><span>사다리꼴 규칙</span><span>벌칙 계수</span><span>β(p)</span>
+              </div>
+            </section>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <footer>
+      <span>DYNAMICS / RESEARCH NOTES · Naya et al., 2011</span>
+      <a class="back-top" href="#top">기사 처음으로 ↑</a>
+    </footer>
+  </div>
+</body>
+</html>

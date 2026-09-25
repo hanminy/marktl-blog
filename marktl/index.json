@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T12:49:28.868Z",
+  "updatedAt": "2026-09-25T12:54:13.130Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/naya2011-unified/",
+      "excerpt": "An Efficient Unified Method for the Combined Simulation of Multibody and Hydraulic Dynamics 요약 한줄 요약 유압 실린더가 달린 기구를 시뮬레이션하는 세 방식 — (1) 실린더 길이를 기구학적으로 강제하는 단순화, (2) 기구 10 ms·유압 0.2 ms 로 따로 적분하는 다중 속도(co integration), (3) 기구 운동 방정식에 챔버 압력 미분 ",
+      "shortId": "ppba8l",
+      "slug": "naya2011-unified",
+      "sourcePath": "02_research/필드로봇/시스템식별/naya2011-unified.md",
+      "tags": [
+        "논문요약",
+        "다물체동역학",
+        "유압동역학",
+        "통합적분",
+        "다중속도적분",
+        "강성문제"
+      ],
+      "title": "An Efficient Unified Method for the Combined Simulation of Multibody and Hydraulic Dynamics - 요약",
+      "updatedAt": "2026-09-25T12:54:13.130Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/ppba8l/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/snu2019-mcv/",
