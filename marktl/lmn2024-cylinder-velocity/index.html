@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>굴착기는 현장에서 배운다 — 국소 모델 네트워크와 온라인 적응 제어</title>
+  <style>
+    :root {
+      --paper: #f7f5ef;
+      --surface: #fffefa;
+      --ink: #202f2d;
+      --muted: #60706a;
+      --green: #173d3a;
+      --green-light: #e8eee7;
+      --accent: #b9462f;
+      --line: #d5dcd1;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "AppleMyungjo", "Batang", serif;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.85;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+    a:hover { color: var(--accent); }
+    a:focus-visible { outline: 3px solid var(--accent); outline-offset: 5px; }
+    ::selection { background: #dce7be; color: var(--green); }
+    .skip-link { position: absolute; left: 16px; top: -100px; z-index: 10; padding: 10px 18px; background: white; }
+    .skip-link:focus { top: 12px; }
+    .shell { width: min(1180px, calc(100% - 80px)); margin-inline: auto; }
+    .masthead {
+      display: flex; justify-content: space-between; align-items: center; gap: 24px;
+      padding-block: 24px; border-bottom: 1px solid var(--ink);
+      font-size: 12px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase;
+    }
+    .masthead .edition { color: var(--muted); font-weight: 500; letter-spacing: .04em; text-align: right; }
+    .hero { padding-block: 72px 42px; }
+    .eyebrow { margin: 0 0 22px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+    .hero-grid { display: grid; grid-template-columns: 1.35fr .65fr; gap: 54px; align-items: end; }
+    h1, h2, h3, p, figure, blockquote { margin-top: 0; }
+    h1 { margin-bottom: 26px; font-family: var(--serif); font-size: clamp(38px, 5.1vw, 65px); line-height: 1.3; letter-spacing: -.055em; font-weight: 700; }
+    h1 span { display: block; margin-top: 12px; font-family: var(--sans); font-size: .48em; line-height: 1.5; letter-spacing: -.04em; font-weight: 500; }
+    .dek { max-width: 700px; margin-bottom: 28px; font-size: 19px; line-height: 1.85; color: #475c55; }
+    .byline { color: var(--muted); font-size: 12px; line-height: 1.9; }
+    .hero-note { padding: 25px 0 4px 26px; border-left: 2px solid var(--accent); }
+    .hero-note .label { font-size: 11px; letter-spacing: .12em; font-weight: 800; color: var(--accent); }
+    .hero-note p { margin: 12px 0; font-family: var(--serif); font-size: 23px; line-height: 1.65; letter-spacing: -.035em; }
+    .hero-note small { color: var(--muted); font-size: 12px; }
+    .metrics { display: grid; grid-template-columns: 1.2fr 1fr 1fr; margin: 36px 0 0; background: var(--green); color: white; }
+    .metric { padding: 28px 30px; }
+    .metric + .metric { border-left: 1px solid #45635b; }
+    .metric .label { display: block; font-size: 12px; color: #cad7cf; }
+    .metric strong { display: block; margin: 9px 0 6px; font-size: clamp(27px, 3.3vw, 39px); font-weight: 600; line-height: 1.3; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+    .metric strong span { color: #bcd197; }
+    .metric small { display: block; font-size: 11px; color: #c7d6cc; line-height: 1.7; }
+    .reading-grid { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 62px; padding-top: 18px; }
+    .sidebar { min-width: 0; }
+    .toc { position: sticky; top: 28px; padding-top: 18px; border-top: 2px solid var(--green); }
+    .toc-title { font-size: 11px; letter-spacing: .16em; font-weight: 800; }
+    .toc ol { list-style: none; margin: 18px 0 26px; padding: 0; }
+    .toc li { border-bottom: 1px solid var(--line); }
+    .toc a { display: flex; gap: 12px; padding: 11px 0; text-decoration: none; font-size: 13px; line-height: 1.5; }
+    .toc a span { color: var(--accent); font-variant-numeric: tabular-nums; }
+    .toc .note { font-size: 11px; line-height: 1.9; color: var(--muted); }
+    .article-body { min-width: 0; }
+    section { margin-bottom: 64px; }
+    .abstract { padding: 30px 34px; background: var(--green-light); border-top: 3px solid var(--green); }
+    .abstract h2 { font-family: var(--sans); font-size: 13px; letter-spacing: .13em; margin-bottom: 16px; }
+    .abstract p { margin-bottom: 0; font-size: 16px; }
+    .section-kicker { display: flex; align-items: center; gap: 13px; color: var(--accent); font-size: 11px; letter-spacing: .14em; font-weight: 800; margin-bottom: 15px; text-transform: uppercase; }
+    .section-kicker::after { content: ""; height: 1px; flex: 1; background: var(--line); }
+    h2 { font-family: var(--serif); font-size: clamp(27px, 3vw, 35px); line-height: 1.5; letter-spacing: -.04em; margin-bottom: 24px; }
+    h3 { font-size: 19px; line-height: 1.6; letter-spacing: -.02em; margin-top: 32px; margin-bottom: 12px; }
+    p { margin-bottom: 21px; }
+    strong { font-weight: 750; }
+    .findings { list-style: none; margin: 25px 0 0; padding: 0; counter-reset: finding; }
+    .findings li { counter-increment: finding; display: grid; grid-template-columns: 42px 1fr; gap: 16px; padding: 23px 0; border-top: 1px solid var(--line); }
+    .findings li::before { content: "0" counter(finding); color: var(--accent); font-size: 22px; font-family: var(--serif); }
+    .findings strong { display: block; margin-bottom: 6px; font-size: 18px; }
+    .findings p { color: var(--muted); font-size: 15px; margin: 0; }
+    figure { margin: 30px 0; }
+    .image-frame { padding: 18px; background: white; border: 1px solid var(--line); }
+    img { display: block; width: 100%; height: auto; object-fit: contain; }
+    .machine-image img { max-width: 590px; margin-inline: auto; }
+    figcaption { padding-top: 12px; color: var(--muted); font-size: 12px; line-height: 1.85; }
+    .fig-no { color: var(--accent); font-size: 10px; letter-spacing: .08em; font-weight: 800; margin-right: 9px; }
+    .table-wrap { width: 100%; overflow-x: auto; margin: 25px 0; border-top: 2px solid var(--green); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.7; text-align: left; }
+    caption { text-align: left; padding: 14px 12px; font-size: 12px; font-weight: 700; background: var(--green-light); }
+    th, td { padding: 14px 13px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    thead th { color: var(--muted); background: #eef0e9; font-size: 12px; }
+    tbody th { font-weight: 650; }
+    td { font-variant-numeric: tabular-nums; }
+    .result-table { min-width: 570px; }
+    .result-table .adapted { background: #e9efe3; }
+    .result-table .best { color: #214b32; font-weight: 800; }
+    .table-note { font-size: 12px; color: var(--muted); margin-top: -11px; }
+    .pullquote { margin: 38px 0; padding: 25px 0 25px 28px; border-left: 3px solid var(--accent); }
+    .pullquote p { font-family: var(--serif); font-size: clamp(23px, 2.6vw, 29px); line-height: 1.7; letter-spacing: -.03em; margin-bottom: 12px; }
+    .pullquote footer { font-size: 11px; color: var(--muted); }
+    .equation { padding: 24px; margin: 25px 0; background: var(--surface); border: 1px solid var(--line); overflow-x: auto; }
+    .equation .formula { font-family: Georgia, "Times New Roman", serif; font-size: 19px; text-align: center; line-height: 2.1; min-width: 450px; }
+    .equation .formula + .formula { border-top: 1px solid var(--line); padding-top: 10px; margin-top: 10px; }
+    .equation .eq-label { font-family: var(--sans); font-size: 11px; color: var(--muted); margin-left: 10px; }
+    .equation p { font-size: 12px; color: var(--muted); margin: 17px 0 0; }
+    .process { display: grid; grid-template-columns: 1fr 40px 1fr; align-items: stretch; margin: 28px 0; }
+    .process-step { padding: 25px; border: 1px solid var(--line); background: var(--surface); }
+    .process-step.online { background: var(--green-light); border-color: #b9c9b5; }
+    .process-step .stage { font-size: 11px; letter-spacing: .1em; color: var(--accent); font-weight: 800; }
+    .process-step h3 { margin: 12px 0; font-size: 20px; }
+    .process-step p { font-size: 14px; line-height: 1.9; margin-bottom: 12px; }
+    .process-step small { font-size: 12px; color: var(--muted); }
+    .process-arrow { display: grid; place-items: center; font-size: 24px; color: var(--accent); }
+    .callout { padding: 23px 26px; margin: 25px 0; background: #efede4; border-left: 3px solid #9b977c; }
+    .callout strong { display: block; font-size: 14px; margin-bottom: 7px; }
+    .callout p { font-size: 14px; margin: 0; }
+    .evidence-stack { margin-top: 26px; }
+    .evidence-stack figure { margin: 0 0 26px; }
+    .evidence-label { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px; padding: 12px 16px; background: var(--green); color: white; }
+    .evidence-label span { color: #c2d59e; font-size: 11px; letter-spacing: .1em; font-weight: 700; }
+    .evidence-label strong { font-size: 14px; font-weight: 600; }
+    .limits { padding-left: 21px; }
+    .limits li { padding-left: 7px; margin: 16px 0; }
+    .limits li::marker { color: var(--accent); }
+    .application { padding: 33px; background: #e9eee6; }
+    .application .badge { display: inline-block; padding: 4px 9px; border: 1px solid #aabca4; font-size: 11px; margin-bottom: 16px; }
+    .application h2 { font-size: 29px; }
+    .checklist { list-style: none; padding: 0; margin: 26px 0 0; }
+    .checklist li { position: relative; padding: 18px 0 18px 29px; border-top: 1px solid #c8d3c2; font-size: 14px; }
+    .checklist li::before { content: "□"; position: absolute; left: 0; color: var(--green); font-size: 19px; }
+    .checklist strong { display: block; margin-bottom: 4px; font-size: 16px; }
+    .ending { padding-top: 8px; }
+    .share-block { background: var(--green); color: #f8f7ee; padding: 29px 32px; margin-top: 30px; }
+    .share-block .label { color: #c6d4a9; font-size: 11px; letter-spacing: .13em; font-weight: 700; }
+    .share-block blockquote { margin: 14px 0 0; font-size: 17px; line-height: 1.85; }
+    .source-notes { border-top: 1px solid var(--ink); padding-top: 28px; }
+    .source-notes h2 { font-family: var(--sans); font-size: 18px; letter-spacing: 0; }
+    .source-notes p, .source-notes li { font-size: 12px; color: var(--muted); line-height: 1.9; }
+    .source-notes .paper-title { font-size: 15px; font-weight: 650; color: var(--ink); }
+    .source-notes ol { padding-left: 20px; }
+    .source-notes li { padding-left: 4px; margin-bottom: 10px; }
+    .source-links { display: flex; flex-wrap: wrap; gap: 12px 24px; margin-block: 15px 22px; font-size: 13px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 24px; }
+    .tags span { padding: 4px 10px; border: 1px solid var(--line); font-size: 11px; color: var(--muted); }
+    .page-footer { border-top: 1px solid var(--ink); padding: 24px 0 40px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 14px; font-size: 11px; color: var(--muted); }
+    @media (max-width: 1000px) {
+      .shell { width: min(900px, calc(100% - 48px)); }
+      .hero-grid { grid-template-columns: 1fr; gap: 18px; }
+      .hero-note { max-width: 660px; padding-top: 4px; }
+      .hero-note p { font-size: 21px; }
+      .reading-grid { grid-template-columns: 160px minmax(0, 1fr); gap: 32px; }
+      .metric { padding: 24px 21px; }
+      .process { grid-template-columns: 1fr; }
+      .process-arrow { height: 38px; transform: rotate(90deg); }
+    }
+    @media (max-width: 720px) {
+      body { font-size: 16px; }
+      .shell { width: calc(100% - 36px); }
+      .masthead { padding-block: 18px; font-size: 10px; }
+      .masthead .edition { max-width: 130px; font-size: 10px; }
+      .hero { padding-block: 42px 30px; }
+      .dek { font-size: 17px; }
+      .metrics { grid-template-columns: 1fr; margin-top: 26px; }
+      .metric { padding: 23px 25px; }
+      .metric + .metric { border-left: 0; border-top: 1px solid #45635b; }
+      .metric strong { font-size: 35px; }
+      .reading-grid { display: block; }
+      .toc { position: static; margin-bottom: 34px; padding-top: 15px; }
+      .toc ol { display: flex; flex-wrap: wrap; gap: 0 19px; margin: 10px 0; }
+      .toc li { border: 0; }
+      .toc a { font-size: 12px; padding-block: 6px; gap: 6px; }
+      .toc .note { display: none; }
+      section { margin-bottom: 48px; }
+      .abstract, .application { padding: 24px; }
+      .abstract p { font-size: 15px; }
+      .image-frame { padding: 10px; }
+      .equation { padding: 17px; }
+      th, td { padding: 12px 10px; font-size: 12px; }
+      .pullquote { padding-left: 20px; }
+      .share-block { padding: 24px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+    @media print {
+      body { background: white; color: black; font-size: 11pt; }
+      .shell { width: 100%; }
+      .sidebar, .skip-link, .page-footer a { display: none; }
+      .reading-grid, .hero-grid { display: block; }
+      .hero { padding-top: 25px; }
+      h1 { font-size: 32pt; }
+      h2 { font-size: 22pt; }
+      section { margin-bottom: 28px; }
+      figure, tr, .process-step, .share-block { break-inside: avoid; }
+      .metrics, .share-block, .evidence-label { background: #eee; color: black; }
+      .metric .label, .metric small, .metric strong span, .share-block .label, .evidence-label span { color: #333; }
+      .table-wrap { overflow: visible; }
+      .result-table { min-width: 0; }
+      a { color: black; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Online Learning of Cylinder Velocity Controllers for Excavator Assistance Functions Using Local Model Networks - 요약">
+<meta property="og:description" content="Online Learning of Cylinder Velocity Controllers for Excavator Assistance Functions Using Local Model Networks 요약 한줄 요약 JCB Hydradig 굴착기의 붐·암·버킷 실린더에 대해 &quot;원하는 속도·가속도·시스템 압력차 → 조이스틱 신호&quot; 역모델을 국소 모델 네트워크(LoMoNet, 국소 선형 모델의 가중합) 로 만들어 피드포워드 제어기로">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/1j0m4xn/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/1j0m4xn/assets/figure1.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Online Learning of Cylinder Velocity Controllers for Excavator Assistance Functions Using Local Model Networks - 요약">
+<meta name="twitter:description" content="Online Learning of Cylinder Velocity Controllers for Excavator Assistance Functions Using Local Model Networks 요약 한줄 요약 JCB Hydradig 굴착기의 붐·암·버킷 실린더에 대해 &quot;원하는 속도·가속도·시스템 압력차 → 조이스틱 신호&quot; 역모델을 국소 모델 네트워크(LoMoNet, 국소 선형 모델의 가중합) 로 만들어 피드포워드 제어기로">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/1j0m4xn/assets/figure1.png">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/lmn2024-cylinder-velocity/">
+</head>
+<body>
+  <a class="skip-link" href="#article-content">본문으로 바로 가기</a>
+
+  <div class="shell">
+    <header class="masthead">
+      <div>FIELD NOTES / MACHINE LEARNING</div>
+      <div class="edition">Research report · 2024 연구<br>논문 해설 / 2026.09.25</div>
+    </header>
+
+    <main id="article-content">
+      <article aria-labelledby="article-title">
+        <header class="hero">
+          <p class="eyebrow">Hydraulics × Online Learning</p>
+          <div class="hero-grid">
+            <div>
+              <h1 id="article-title">굴착기는<br>현장에서 배운다<span>구조는 미리, 보정은 실시간으로</span></h1>
+              <p class="dek">기체마다 달라지는 유압 특성에 제어기는 어떻게 적응할 수 있을까. Bosch 연구진은 비선형 모델의 구조를 미리 학습하고, 실차에서는 작은 선형 모델의 가중치만 갱신했다. 국소 모델 네트워크가 보여주는 실용적인 학습의 분업이다.</p>
+              <div class="byline">
+                연구 · Ozan Demir 외 5인 / Robert Bosch GmbH · Bosch Rexroth AG<br>
+                출처 · River Publishers, 2024 / DOI: 10.13052/rp-9788770042222c50
+              </div>
+            </div>
+            <aside class="hero-note" aria-label="이 글의 핵심 질문">
+              <span class="label">THE CENTRAL QUESTION</span>
+              <p>비선형 구조를 다시 배우지 않고도,<br>달라진 기체에 적응할 수 있을까?</p>
+              <small>국소 모델 네트워크 · 온라인 재귀 최소제곱 · 실차 검증</small>
+            </aside>
+          </div>
+          <div class="metrics" aria-label="주요 결과와 구현 규모">
+            <div class="metric">
+              <span class="label">파워 모드 · 붐 RMSE</span>
+              <strong>6.52% <span>→ 1.99%</span></strong>
+              <small>적응 없음 → 온라인 적응 / 아래 성능표 기준</small>
+            </div>
+            <div class="metric">
+              <span class="label">온라인 학습 중 평탄화</span>
+              <strong>&lt; 3 <span>cm</span></strong>
+              <small>보고된 높이 오차 / 저부하 실험 조건</small>
+            </div>
+            <div class="metric">
+              <span class="label">실린더별 국소 모델 수</span>
+              <strong>51–110<span>개</span></strong>
+              <small>버킷 51 · 암 90 · 붐 110</small>
+            </div>
+          </div>
+        </header>
+
+        <div class="reading-grid">
+          <aside class="sidebar">
+            <nav class="toc" aria-label="본문 목차">
+              <div class="toc-title">IN THIS REPORT</div>
+              <ol>
+                <li><a href="#findings"><span>01</span> 핵심 발견</a></li>
+                <li><a href="#system"><span>02</span> 문제와 시스템</a></li>
+                <li><a href="#method"><span>03</span> 학습의 분업</a></li>
+                <li><a href="#evidence"><span>04</span> 실험과 근거</a></li>
+                <li><a href="#limits"><span>05</span> 적용의 경계</a></li>
+                <li><a href="#implications"><span>06</span> HR35에 주는 시사점</a></li>
+                <li><a href="#sources"><span>↗</span> 출처와 해석 범위</a></li>
+              </ol>
+              <p class="note">제공된 논문 요약 노트를 바탕으로 구성한 해설입니다. 실험 결과와 HR35 적용 가설을 구분해 읽을 수 있도록 정리했습니다.</p>
+            </nav>
+          </aside>
+
+          <div class="article-body">
+            <section class="abstract" aria-labelledby="abstract-title">
+              <h2 id="abstract-title">ABSTRACT / 연구 개요</h2>
+              <p>이 연구는 JCB Hydradig 굴착기의 붐·암·버킷 실린더에 대해, 목표 운동과 유압 상태로부터 조이스틱 신호를 계산하는 <strong>역모델 기반 피드포워드 제어기</strong>를 다룬다. 국소 모델 네트워크(LoMoNet)의 입력 공간 분할은 기준 기체인 ‘골든 샘플’의 데이터로 오프라인 학습하고, 국소 선형 모델의 가중치는 실차에서 재귀 최소제곱(RLS)으로 갱신한다. 파워 모드 전환으로 특성이 달라진 조건에서도 오차가 감소했고, 온라인 학습 중 평탄화 높이 오차는 3 cm 미만으로 보고됐다. 다만 저부하 작업의 결과이므로 고부하 굴착과 장기 운용으로의 확장은 별도 검증이 필요하다.</p>
+            </section>
+
+            <section id="findings" aria-labelledby="findings-title">
+              <div class="section-kicker">01 / Key findings</div>
+              <h2 id="findings-title">핵심은 모델의 크기보다<br>무엇을 현장에서 배울지에 있다</h2>
+              <ol class="findings">
+                <li>
+                  <div>
+                    <strong>비선형 구조와 선형 가중치를 나눠 학습한다.</strong>
+                    <p>영역을 나누는 복잡한 작업은 오프라인에서 끝낸다. 현장에서는 고정된 영역 안의 선형 모델만 갱신해 연산과 메모리 부담을 낮춘다.</p>
+                  </div>
+                </li>
+                <li>
+                  <div>
+                    <strong>특성이 바뀐 조건에서 적응 효과를 확인했다.</strong>
+                    <p>엔진 회전수와 조이스틱–유량 특성이 달라지는 파워 모드에서, 붐의 RMSE는 6.52%에서 1.99%로 감소했다. 여러 실제 기체 간 전이를 직접 입증한 실험과는 구분해야 한다.</p>
+                  </div>
+                </li>
+                <li>
+                  <div>
+                    <strong>현장 적용의 다음 과제는 학습 데이터의 선택이다.</strong>
+                    <p>반복적인 평탄화 작업에 적응하는 것은 유리하지만, 자극이 부족하거나 오염된 운전 데이터를 계속 학습해도 안정적인지는 남은 문제다.</p>
+                  </div>
+                </li>
+              </ol>
+            </section>
+
+            <section id="system" aria-labelledby="system-title">
+              <div class="section-kicker">02 / Problem &amp; system</div>
+              <h2 id="system-title">기체마다 다시 튜닝하는 비용</h2>
+              <p>평탄화와 경사 작업을 돕는 굴착기 보조 기능은 버킷 끝점이 목표 경로를 정확히 따라가야 한다. 그러나 기구와 유압 시스템의 비선형성이 크고, 기체의 생산 편차나 노화에 따라 제어 특성도 달라진다. 다품종 소량 생산 환경에서 기체마다 정교한 물리 모델을 만드는 일은 비용 부담이 크다.</p>
+              <p>데이터 기반 모델은 이 부담을 줄일 수 있다. 이 연구가 집중하는 지점은 <strong>한 번 학습한 제어기를 현장에서 어떻게 적응시킬 것인가</strong>다. 임베디드 제어 유닛에서 실행 가능한 온라인 적응 구조를 만들고, 실차 보조 작업에서 그 효과를 확인한다.</p>
+
+              <figure class="machine-image">
+                <div class="image-frame">
+                  <img src="assets/figure1.png" alt="시험 기체인 JCB Hydradig 굴착기와 작업 장치 구성" loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-no">FIG. 1</span>시험 기체 JCB Hydradig. 붐·탭·암·버킷의 4개 실린더 중 탭을 고정하고 나머지 3개를 제어한다. 그림 번호는 원문 기준이다.</figcaption>
+              </figure>
+
+              <h3>끝점 경로에서 조이스틱 신호까지</h3>
+              <p>최적화 기반 미분 역기구학이 버킷 끝점의 목표 운동을 관절 좌표로 변환한다. 학습된 피드포워드와 피드백 제어기는 이를 바탕으로 조이스틱 신호를 만든다. 기구학은 이미 알고 있다고 가정하며 학습 대상에서 제외한다.</p>
+
+              <figure>
+                <div class="image-frame">
+                  <img src="assets/figure2.png" alt="목표 끝점 운동을 역기구학으로 변환한 뒤 피드포워드와 피드백으로 조이스틱 신호를 만드는 제어 구조" loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-no">FIG. 2</span>전체 제어 구조. 실차 온라인 비교 실험에서는 학습된 피드포워드의 효과를 보기 위해 피드백을 끈다.</figcaption>
+              </figure>
+
+              <div class="table-wrap">
+                <table>
+                  <caption>시험 시스템과 구현 범위</caption>
+                  <tbody>
+                    <tr><th scope="row">제어 입력</th><td>수정된 조이스틱 신호(%). 기체 소프트웨어는 수정하지 않음.</td></tr>
+                    <tr><th scope="row">시험 하드웨어</th><td>dSpace MicroAutoBox II</td></tr>
+                    <tr><th scope="row">구현 도구</th><td>Matlab/Simulink 코드 생성</td></tr>
+                    <tr><th scope="row">학습 대상</th><td>실린더 운동·유압 상태에서 조이스틱 신호로 가는 역모델</td></tr>
+                    <tr><th scope="row">기구학</th><td>사전에 알려진 모델을 사용</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section id="method" aria-labelledby="method-title">
+              <div class="section-kicker">03 / Method</div>
+              <h2 id="method-title">작은 선형 모델을 섞어<br>비선형을 표현한다</h2>
+              <p>국소 모델 네트워크는 입력 공간의 각 영역에 작은 선형 모델을 놓는다. 현재 입력이 어느 영역에 가까운지에 따라 모델별 가중치를 정하고, 이들의 출력을 부드럽게 합친다. 각 모델은 단순하지만 전체 네트워크는 비선형 관계를 표현할 수 있다.</p>
+
+              <div class="equation" role="group" aria-label="국소 모델 네트워크의 출력과 정규화 가우시안 유효성 함수">
+                <div class="formula">
+                  ŷ = ∑<sub>i=1…M</sub> ŷ<sub>i</sub>(x) Φ<sub>i</sub>(z)<br>
+                  = ∑<sub>i=1…M</sub> (w<sub>i0</sub> + ∑<sub>j=1…nₓ</sub> w<sub>ij</sub>x<sub>j</sub>) Φ<sub>i</sub>(z)
+                  <span class="eq-label">(1)</span>
+                </div>
+                <div class="formula">
+                  μ<sub>i</sub>(z) = exp[−½ ∑<sub>j</sub> (z<sub>j</sub> − c<sub>ij</sub>)² / σ<sub>ij</sub>²]<br>
+                  Φ<sub>i</sub>(z) = μ<sub>i</sub>(z) / ∑<sub>k=1…M</sub> μ<sub>k</sub>(z), &nbsp; ∑<sub>i</sub> Φ<sub>i</sub> = 1
+                  <span class="eq-label">(3, 4)</span>
+                </div>
+                <p>출력은 ‘국소 선형 모델 × 해당 영역의 유효성’의 합이다. 유효성 함수는 정규화되므로 모든 모델의 혼합 비중을 더하면 1이 된다.</p>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <caption>수식을 읽는 데 필요한 기호</caption>
+                  <thead><tr><th scope="col">기호</th><th scope="col">역할</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">ŷ<sub>i</sub>, w<sub>i</sub></th><td>국소 선형 모델과 그 오프셋·기울기. 온라인 갱신 대상.</td></tr>
+                    <tr><th scope="row">Φ<sub>i</sub>(z)</th><td>현재 입력에서 각 모델이 얼마나 기여하는지 정하는 유효성 함수.</td></tr>
+                    <tr><th scope="row">x / z</th><td>선형 모델에 쓰는 입력 / 영역 분할에 쓰는 입력. 지연 입력을 사용한다면 x에만 포함.</td></tr>
+                    <tr><th scope="row">c<sub>ij</sub>, σ<sub>ij</sub></th><td>국소 모델의 중심과 폭. LoLiMoT의 축 직교 분할로 결정.</td></tr>
+                    <tr><th scope="row">M / 매끄러움</th><td>모델 수와 혼합의 매끄러움을 정하는 두 하이퍼파라미터. 매끄러운 혼합은 유효 파라미터 수를 줄이는 암묵적 정규화로 작용.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <figure>
+                <div class="image-frame">
+                  <img src="assets/figure4.png" alt="두 입력을 가진 국소 모델 네트워크의 유효성 함수, 국소 선형 모델, 혼합된 비선형 출력 예시" loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-no">FIG. 4</span>왼쪽의 유효성 함수가 가운데의 국소 선형 모델들을 섞어 오른쪽의 비선형 출력을 만든다.</figcaption>
+              </figure>
+
+              <blockquote class="pullquote">
+                <p>영역을 나누는 일은 미리 끝내고,<br>현장에서는 각 영역의 선형 모델을 고친다.</p>
+                <footer>학습 구조를 풀어 쓴 해설 · 원문 직접 인용 아님</footer>
+              </blockquote>
+
+              <h3>오프라인과 온라인의 역할 분담</h3>
+              <div class="process" aria-label="골든 샘플에서 실차로 이어지는 두 단계 학습">
+                <div class="process-step">
+                  <div class="stage">01 / OFFLINE</div>
+                  <h3>구조를 학습한다</h3>
+                  <p>골든 샘플 기체의 데이터로 LoLiMoT를 실행해 입력 공간을 분할하고, 선형 가중치의 초기값도 구한다.</p>
+                  <small>결정할 것: 중심 c, 폭 σ, 초기 가중치 w</small>
+                </div>
+                <div class="process-arrow" aria-hidden="true">→</div>
+                <div class="process-step online">
+                  <div class="stage">02 / ONLINE</div>
+                  <h3>가중치를 적응시킨다</h3>
+                  <p>유사 기체에 구조를 이식한 뒤, 예측 오차를 이용해 재귀 최소제곱으로 국소 선형 가중치를 갱신한다.</p>
+                  <small>유지할 것: 분할 구조 / 갱신할 것: w</small>
+                </div>
+              </div>
+              <p>분할은 비선형 최적화가 필요하지만, 분할을 고정한 뒤의 가중치 추정에는 최소제곱과 재귀 최소제곱을 적용할 수 있다. 메모리와 연산 부담을 낮출 수 있는 이유다. 분할 자체는 물리 지식으로 직접 정하는 것도 가능하다.</p>
+              <p>제공된 요약은 LoMoNet의 성능이 GP·MLP와 유사했다고 설명한다. 다만 이 글에 정리된 수치만으로 모델 계열 전반의 우열까지 판단할 수는 없다.</p>
+            </section>
+
+            <section id="evidence" aria-labelledby="evidence-title">
+              <div class="section-kicker">04 / Evidence</div>
+              <h2 id="evidence-title">특성이 달라지면,<br>온라인 적응이 차이를 만든다</h2>
+              <h3>학습 데이터와 실린더별 입력</h3>
+              <p>학습에는 단일·복수 실린더에 다중 사인과 진폭 변조 의사 무작위 이진 신호(APRBS)를 가한 데이터를 사용했다. 이는 논문의 선행 연구 [4]에서 가져온 데이터다. 검증은 부하가 작고 반복성이 높은 평탄화·경사 작업을 대상으로 했다.</p>
+
+              <div class="table-wrap">
+                <table>
+                  <caption>실린더별 역모델 설정 · 이 실험에서는 x = z</caption>
+                  <thead>
+                    <tr><th scope="col">실린더</th><th scope="col">입력 특징</th><th scope="col">모델 수</th><th scope="col">매끄러움</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><th scope="row">붐</th><td>속도, 가속도, Δp<sub>sys</sub></td><td>110</td><td>1.5</td></tr>
+                    <tr><th scope="row">암</th><td>속도, 가속도</td><td>90</td><td>1.2</td></tr>
+                    <tr><th scope="row">버킷</th><td>속도, Δp<sub>sys</sub></td><td>51</td><td>1.2</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="table-note">Δp<sub>sys</sub> = 펌프 압력 − 로드센싱(LS) 압력. 모든 실린더가 동일한 입력 특징을 쓰는 것은 아니다.</p>
+
+              <h3>파워 모드로 만든 특성 변화</h3>
+              <p>모델의 초기 학습은 일반 모드에서만 수행했다. 이후 엔진 회전수와 조이스틱 신호에서 유량으로 이어지는 특성이 달라지는 파워 모드로 전환했다. 같은 기체 안에서 ‘비슷하지만 다른 기체’를 모사한 시험이다.</p>
+
+              <div class="table-wrap" tabindex="0" role="region" aria-label="모드별 성능 비교 표. 좁은 화면에서는 가로로 스크롤할 수 있습니다.">
+                <table class="result-table">
+                  <caption>온라인 적응 전후 성능 · 각 셀은 RMSE(%) / R²</caption>
+                  <thead>
+                    <tr><th scope="col">실린더</th><th scope="col">온라인 적응</th><th scope="col">일반 모드</th><th scope="col">파워 모드</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><th scope="row">붐</th><td>없음</td><td>4.03 / 0.974</td><td>6.52 / 0.861</td></tr>
+                    <tr class="adapted"><th scope="row">붐</th><td>적용</td><td>2.14 / 0.992</td><td class="best">1.99 / 0.987</td></tr>
+                    <tr><th scope="row">암</th><td>없음</td><td>4.83 / 0.983</td><td>5.84 / 0.952</td></tr>
+                    <tr class="adapted"><th scope="row">암</th><td>적용</td><td>1.87 / 0.997</td><td>2.08 / 0.994</td></tr>
+                    <tr><th scope="row">버킷</th><td>없음</td><td>4.29 / 0.973</td><td>4.62 / 0.948</td></tr>
+                    <tr class="adapted"><th scope="row">버킷</th><td>적용</td><td>1.36 / 0.997</td><td>3.21 / 0.975</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="table-note">수치는 제공된 요약 노트의 성능표를 옮겼다. RMSE의 정규화 기준은 노트에 명시되어 있지 않으며, 이 백분율을 끝점 높이 오차와 동일한 지표로 읽어서는 안 된다.</p>
+
+              <p>온라인 적응은 파워 모드뿐 아니라 일반 모드에서도 오차를 줄였다. 이는 초기 모델이 반복적인 실제 작업에 더 잘 맞도록 바뀌었음을 보여준다. 동시에 <strong>특정 작업에 대한 적응과 더 넓은 운전 영역의 일반화는 별개의 평가 대상</strong>이라는 점도 드러낸다.</p>
+
+              <h3>실차에서는 무엇이 달라졌나</h3>
+              <p>다음 실험은 피드백을 끄고 피드포워드만 비교한다. 따라서 전체 제어기의 피드백 보정 효과와 구분해, 학습된 역모델과 온라인 적응의 영향을 살펴볼 수 있다.</p>
+
+              <div class="evidence-stack">
+                <figure>
+                  <div class="evidence-label"><span>A / BASELINE</span><strong>일반 모드에서의 평탄화</strong></div>
+                  <div class="image-frame">
+                    <img src="assets/figure5.png" alt="일반 모드 평탄화 실험에서 파란색 목표 속도와 빨간색 실측 속도를 비교한 그래프" loading="lazy" decoding="async">
+                  </div>
+                  <figcaption><span class="fig-no">FIG. 5</span>일반 모드의 속도 추종. 목표 속도는 파랑, 실측 속도는 빨강으로 표시된다.</figcaption>
+                </figure>
+                <figure>
+                  <div class="evidence-label"><span>B / SHIFT</span><strong>파워 모드 · 적응 없음</strong></div>
+                  <div class="image-frame">
+                    <img src="assets/figure6.png" alt="온라인 적응 없이 파워 모드로 운전했을 때 붐에서 큰 진동이 나타나는 속도 추종 그래프" loading="lazy" decoding="async">
+                  </div>
+                  <figcaption><span class="fig-no">FIG. 6</span>특성이 달라진 파워 모드에서는 붐에 허용하기 어려운 진동이 발생한다.</figcaption>
+                </figure>
+                <figure>
+                  <div class="evidence-label"><span>C / ADAPTATION</span><strong>파워 모드 · 온라인 적응 적용</strong></div>
+                  <div class="image-frame">
+                    <img src="assets/figure7.png" alt="파워 모드에서 온라인 적응을 켠 뒤 시간에 따라 속도 추종 오차가 감소하는 그래프" loading="lazy" decoding="async">
+                  </div>
+                  <figcaption><span class="fig-no">FIG. 7</span>온라인 적응을 적용하면 짧은 시간 안에 오차가 감소한다. 구체적인 수렴 시간은 제공된 노트에 수치로 제시되지 않았다.</figcaption>
+                </figure>
+                <figure>
+                  <div class="evidence-label"><span>D / TASK OUTCOME</span><strong>온라인 학습 중 평탄화 높이 오차</strong></div>
+                  <div class="image-frame">
+                    <img src="assets/figure8.png" alt="온라인 학습 중 평탄화 높이 오차가 3센티미터 미만으로 유지되는 실험 그래프" loading="lazy" decoding="async">
+                  </div>
+                  <figcaption><span class="fig-no">FIG. 8</span>보고된 평탄화 실험에서 높이 오차는 3 cm 미만으로 유지됐다.</figcaption>
+                </figure>
+              </div>
+
+              <aside class="callout">
+                <strong>구현 결과를 읽는 기준</strong>
+                <p>요약은 표준 제어 유닛에서의 실행 가능성을 강조하며, 시험 하드웨어로 dSpace MicroAutoBox II를 명시한다. 임베디드 구현의 실용성을 보여주는 근거이지만, 모든 양산 ECU에서 동일한 실행 시간과 메모리 여유를 보장한다는 의미는 아니다.</p>
+              </aside>
+            </section>
+
+            <section id="limits" aria-labelledby="limits-title">
+              <div class="section-kicker">05 / Boundaries</div>
+              <h2 id="limits-title">잘 배울 수 있는 조건도<br>제어 설계의 일부다</h2>
+              <p>이 연구는 온라인 적응의 가능성을 실차에서 보여준다. 실제 운용 범위를 넓히려면, 다음 경계를 함께 다뤄야 한다.</p>
+              <ul class="limits">
+                <li><strong>학습에 적합하지 않은 데이터.</strong> 자극이 부족하거나 오염된 운전 데이터에 대한 강인성은 후속 과제다. 상시 학습을 하려면 어떤 데이터를 갱신에 사용할지 판단하는 기능이 필요하다.</li>
+                <li><strong>저부하 작업 중심의 검증.</strong> 평탄화·경사 작업의 결과를 고부하 굴착으로 그대로 확장할 수 없다. 부하 변화와 압력 특징을 포함한 추가 검증이 필요하다.</li>
+                <li><strong>실제 기체 간 전이의 범위.</strong> 파워 모드 전환은 경제적인 특성 변화 시험이지만, 여러 기체의 생산 편차나 장기 노화를 직접 검증한 것과 같지는 않다.</li>
+                <li><strong>역모델에 집중된 학습.</strong> 제어기 설계에 활용할 순방향 모델의 학습은 아직 포함되지 않았다.</li>
+                <li><strong>작업 특화와 일반화.</strong> 평탄화에 적응한 뒤에도 다른 작업 영역의 성능이 유지되는지 별도로 평가해야 한다.</li>
+              </ul>
+            </section>
+
+            <section id="implications" class="application" aria-labelledby="implications-title">
+              <div class="section-kicker">06 / Implications</div>
+              <span class="badge">해석과 적용 가설 · 논문의 직접 검증 결과와 구분</span>
+              <h2 id="implications-title">HR35에서는 무엇부터 확인할까</h2>
+              <p>HR35 관점에서는 골든 샘플의 역할을 디지털 트윈 데이터로 일부 대체하는 구상을 생각할 수 있다. 트윈에서 비선형 분할을 만들고, 실차에서 선형 가중치를 맞추는 방식이다. 다만 <strong>골든 샘플과 트윈이 동등하다는 것은 이 논문이 입증한 결과가 아니다.</strong> 실차 시험 시간을 줄일 수 있을지는 데이터의 대표성과 전이 성능으로 확인해야 한다.</p>
+
+              <ul class="checklist" aria-label="HR35 적용 전 확인 항목">
+                <li>
+                  <strong>트윈의 분할이 실차 운전 영역을 덮는가</strong>
+                  노트의 ‘축 E’ 후보로 검토하되, 트윈과 실차의 입력 범위 및 유압 특성 차이를 먼저 확인한다. 고정된 분할 안에서 가중치 갱신만으로 보정 가능한지도 평가한다.
+                </li>
+                <li>
+                  <strong>펌프 압력과 LS 압력을 읽을 수 있는가</strong>
+                  Δp<sub>sys</sub>를 구성할 센서 채널과 로드센싱 마진의 관측 가능성을 실차 자료에서 확인한다.
+                </li>
+                <li>
+                  <strong>단일·복수 실린더 자극을 어떻게 설계할 것인가</strong>
+                  다중 사인과 APRBS를 ‘축 G’의 자극 후보에 넣는다. 노트에서 언급한 램프·처프 자극과 함께 시험 목적에 맞게 비교한다.
+                </li>
+                <li>
+                  <strong>엔진 모드 전환으로 민감도를 시험할 수 있는가</strong>
+                  모드 변경 전후의 적응 없는 성능과 적응 후 성능을 비교한다. 트윈–실차 차이에 대한 민감도를 탐색하는 시험으로 활용할 수 있다.
+                </li>
+                <li>
+                  <strong>부하가 커져도 같은 입력으로 충분한가</strong>
+                  저부하 보조 작업과 고부하 굴착을 나눠 검증한다. 굴착 조건에서는 압력 입력의 확장이 필요한지 살펴본다.
+                </li>
+              </ul>
+            </section>
+
+            <section class="ending" aria-labelledby="ending-title">
+              <div class="section-kicker">Takeaway / 연구가 남기는 것</div>
+              <h2 id="ending-title">현장에서 바꿀 부분을 작게 만든다</h2>
+              <p>이 연구의 설계 원칙은 명료하다. 비선형성을 표현하는 구조는 충분한 데이터와 시간을 쓸 수 있는 오프라인 단계에서 만들고, 기체의 현재 특성에 맞추는 일은 가벼운 온라인 갱신에 맡긴다. 이 분업은 데이터 기반 제어를 실차의 계산 자원 안으로 가져오는 한 가지 방법이다.</p>
+              <p>다음 단계의 질문은 오차를 더 줄이는 데서 끝나지 않는다. <strong>언제 학습하고, 어떤 데이터를 믿으며, 어디까지 성능이 유지되는가.</strong> 이 조건까지 확인할 때 온라인 적응은 반복 실험의 성과를 넘어 운용 가능한 보조 기능으로 이어질 수 있다.</p>
+
+              <aside class="share-block" aria-label="공유용 핵심 요약">
+                <div class="label">공유용 한 문단 / COPY-READY</div>
+                <blockquote>굴착기 제어기도 현장에서 배울 수 있다. Bosch의 2024년 연구는 국소 모델 네트워크의 구조를 오프라인에서 정하고, 실차에서는 선형 가중치만 갱신했다. 파워 모드의 붐 RMSE는 6.52%에서 1.99%로 감소했다. 핵심은 학습의 분업이며, 고부하 작업과 학습 데이터의 품질은 다음 검증 과제다.</blockquote>
+              </aside>
+            </section>
+
+            <section id="sources" class="source-notes" aria-labelledby="sources-title">
+              <h2 id="sources-title">출처와 해석 범위</h2>
+              <p class="paper-title" lang="en">Online Learning of Cylinder Velocity Controllers for Excavator Assistance Functions Using Local Model Networks</p>
+              <p>Ozan Demir, Benjamin Hartmann, Naresh Mandipalli, Frank Bender, Benjamin Ehlers, Michael Mehren<br>
+                Robert Bosch GmbH · Bosch Rexroth AG<br>
+                River Publishers 학회 논문집 장(章), 2024<br>
+                DOI: 10.13052/rp-9788770042222c50
+              </p>
+              <div class="source-links">
+                <a>원문 PDF 읽기 ↗</a>
+                <a>DOI로 출처 확인 ↗</a>
+              </div>
+              <ol>
+                <li>이 글은 제공된 Obsidian 요약 노트를 편집·재구성한 연구 해설이다. 원문을 독립적으로 재검증한 리뷰는 아니며, 표의 수치와 실험 설명은 해당 노트에 근거한다.</li>
+                <li>그림 1·2·4·5·6·7·8은 노트에 첨부된 논문 도판을 사용했다. 그림·수식 번호는 원문 번호를 유지했으며, 캡션은 한국어로 정리했다. 원 도판의 권리는 해당 권리자에게 있다.</li>
+                <li>RMSE(%)와 R²는 노트에 기재된 값을 유지했다. 높이 오차(cm)는 별도 작업 성능 지표다. 오차의 상세 정의·정규화 기준과 시험 조건은 원문에서 확인해야 한다.</li>
+                <li>‘선행 연구 [4]’는 원 논문의 참고문헌 번호다. 노트의 HR35 의견에 등장하는 ETH 2026, Casoli 2015, Egli, Nan 2024, Taheri 2022는 상세 서지정보가 제공되지 않아 이 글의 검증 근거로 사용하지 않았다.</li>
+                <li>HR35의 트윈 활용, 센서 확인 및 시험 제안은 노트 작성자의 적용 관점을 바탕으로 정리한 가설이다. ‘축 E’와 ‘축 G’는 해당 노트의 내부 분류를 유지한 표현이다.</li>
+              </ol>
+              <div class="tags" aria-label="주제 키워드">
+                <span>국소 모델 네트워크</span>
+                <span>LoLiMoT</span>
+                <span>골든 샘플</span>
+                <span>재귀 최소제곱</span>
+                <span>APRBS</span>
+                <span>Δp_sys</span>
+                <span>피드포워드</span>
+                <span>임베디드 제어</span>
+              </div>
+            </section>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <footer class="page-footer">
+      <span>FIELD NOTES · 논문에서 현장으로 / 연구 해설</span>
+      <a href="#article-title">처음으로 돌아가기 ↑</a>
+    </footer>
+  </div>
+</body>
+</html>

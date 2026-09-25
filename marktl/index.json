@@ -1,7 +1,27 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T11:47:57.146Z",
+  "updatedAt": "2026-09-25T11:52:26.421Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/lmn2024-cylinder-velocity/",
+      "excerpt": "Online Learning of Cylinder Velocity Controllers for Excavator Assistance Functions Using Local Model Networks 요약 한줄 요약 JCB Hydradig 굴착기의 붐·암·버킷 실린더에 대해 \"원하는 속도·가속도·시스템 압력차 → 조이스틱 신호\" 역모델을 국소 모델 네트워크(LoMoNet, 국소 선형 모델의 가중합) 로 만들어 피드포워드 제어기로",
+      "shortId": "1j0m4xn",
+      "slug": "lmn2024-cylinder-velocity",
+      "sourcePath": "02_research/필드로봇/시스템식별/lmn2024-cylinder-velocity.md",
+      "tags": [
+        "논문요약",
+        "시스템식별",
+        "굴착기",
+        "국소모델네트워크",
+        "온라인학습",
+        "피드포워드",
+        "Bosch"
+      ],
+      "title": "Online Learning of Cylinder Velocity Controllers for Excavator Assistance Functions Using Local Model Networks - 요약",
+      "updatedAt": "2026-09-25T11:52:26.421Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/1j0m4xn/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/tie2026-reversible-datadriven/",
