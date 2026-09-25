@@ -1,660 +1,691 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-
-<title>해양 너클붐 크레인 — 모델링 및 파라미터 식별 | 논문 노트</title>
-<style>
-:root{--paper:#fcfbf7;--surface:#fff;--ink:#222e35;--muted:#647178;--line:#dcded7;--accent:#1f655e;--soft:#edf4ef;--gold:#a27231;--warm:#fbf3e5;--blue:#edf3f8;--rose:#fbefeb;--serif:Georgia,"Noto Serif KR","Nanum Myeongjo",serif;--sans:"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:2rem}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.9;word-break:keep-all;overflow-wrap:anywhere}
-a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:.2em}
-a:hover{color:#123d38}
-a:focus-visible{outline:3px solid var(--gold);outline-offset:5px;border-radius:2px}
-.skip{position:absolute;left:1rem;top:-8rem;background:var(--ink);color:#fff;padding:.6rem 1rem;z-index:10}
-.skip:focus{top:1rem}
-.topbar{border-top:6px solid var(--accent);border-bottom:1px solid var(--line);padding:1rem max(5vw,1.25rem);display:flex;justify-content:space-between;gap:1rem;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.topbar strong{color:var(--accent)}
-.layout{display:grid;grid-template-columns:230px minmax(0,960px);gap:clamp(2rem,5vw,5.5rem);max-width:1380px;margin:auto;padding:3rem 2rem 5rem}
-.sidebar{align-self:start;position:sticky;top:1.5rem;max-height:calc(100vh - 3rem);overflow:auto;scrollbar-width:thin;font-size:.82rem;line-height:1.6}
-.nav-label{font-size:.7rem;font-weight:800;letter-spacing:.16em;color:var(--accent);margin:0 0 1rem}
-.sidebar ol{list-style:none;padding:0;margin:0}
-.sidebar li{margin:.15rem 0}
-.sidebar a{display:block;padding:.36rem .7rem;border-left:2px solid transparent;text-decoration:none;color:var(--muted)}
-.sidebar a:hover{border-left-color:var(--accent);background:var(--soft);color:var(--accent)}
-.sidebar .nav-group{border-top:1px solid var(--line);margin-top:1rem;padding-top:.8rem}
-.sidebar .subnav{font-size:.76rem;padding-left:.5rem}
-.sidebar .subnav a{padding-top:.25rem;padding-bottom:.25rem}
-.nav-foot{color:var(--muted);font-size:.7rem;border-top:1px solid var(--line);padding-top:1rem;margin-top:1.4rem}
-main{min-width:0}
-.eyebrow{font-size:.72rem;letter-spacing:.14em;font-weight:800;color:var(--accent);text-transform:uppercase}
-h1{font-family:var(--serif);font-size:clamp(2.3rem,4.2vw,3.75rem);font-weight:500;line-height:1.13;letter-spacing:-.04em;margin:1.2rem 0 1.5rem;word-break:normal;overflow-wrap:normal}
-h1 span{display:block;font-size:.58em;line-height:1.3;letter-spacing:-.025em;margin-top:.6em;color:var(--muted)}
-.byline{font-size:.91rem;margin:.3rem 0;color:var(--muted)}
-.byline strong{color:var(--ink);font-weight:600}
-.metadata{margin:1.5rem 0 2rem;border:1px solid var(--line);background:#f5f5ee;border-radius:8px;overflow:hidden}
-.metadata summary{padding:.8rem 1rem;cursor:pointer;font-size:.8rem;font-weight:700;color:var(--accent)}
-.metadata dl{display:grid;grid-template-columns:145px minmax(0,1fr);margin:0;padding:0 1.2rem 1rem;font-size:.78rem;line-height:1.7}
-.metadata dt,.metadata dd{margin:0;padding:.55rem 0;border-top:1px solid var(--line)}
-.metadata dt{color:var(--muted);padding-right:1rem}
-.tags{display:flex;gap:.4rem;flex-wrap:wrap;margin:1rem 0}
-.tag{background:var(--soft);color:var(--accent);padding:.15rem .6rem;border-radius:4px;font-size:.73rem}
-section{margin-top:3.8rem}
-section>h2{font-size:1.65rem;line-height:1.45;letter-spacing:-.035em;border-top:2px solid var(--ink);padding-top:1.2rem;margin:0 0 1.7rem}
-h3{font-size:1.16rem;line-height:1.6;letter-spacing:-.02em;margin:2.7rem 0 1rem}
-p{margin:1rem 0}
-strong{font-weight:750}
-ul,ol{padding-left:1.45rem;margin:1rem 0}
-li{padding-left:.15rem;margin:.42rem 0}
-li::marker{color:var(--accent)}
-hr{border:0;border-top:1px solid var(--line);margin:2.5rem 0}
-.lead{background:var(--soft);border-left:4px solid var(--accent);padding:1.5rem 1.8rem;border-radius:0 8px 8px 0;font-size:1.08rem;line-height:2}
-.lead p{margin:0}
-.callout{border:1px solid #d4e1de;border-left:4px solid var(--accent);background:var(--soft);border-radius:0 8px 8px 0;padding:1.1rem 1.4rem;margin:1.8rem 0;font-size:.92rem}
-.callout.info{background:var(--blue);border-color:#cedce7;border-left-color:#587d99}
-.callout.example{background:#f3f2e9;border-color:#dfdfcf;border-left-color:#929067}
-.callout.important,.callout.warning{background:var(--warm);border-color:#ead7b8;border-left-color:var(--gold)}
-.callout-title{display:block;font-size:.78rem;font-weight:800;letter-spacing:.02em;margin-bottom:.45rem}
-.callout p{margin:.4rem 0}
-.callout ul{margin:.5rem 0 0}
-figure{margin:2rem 0;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:clamp(.8rem,2.5vw,1.6rem);overflow:hidden}
-figure img{display:block;width:auto;max-width:100%;height:auto;margin:0 auto}
-figcaption{border-top:1px solid #eceee8;padding-top:1rem;margin-top:1.2rem;color:var(--muted);font-size:.82rem;line-height:1.8}
-figcaption strong{color:var(--accent)}
-.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;margin:1.4rem 0 1.8rem;background:var(--surface);scrollbar-width:thin}
-table{border-collapse:collapse;width:100%;font-size:.83rem;line-height:1.75;text-align:left}
-th,td{padding:.85rem 1rem;border-bottom:1px solid var(--line);vertical-align:top;min-width:105px}
-thead th{background:#eaf0eb;color:#214f48;font-size:.78rem;font-weight:750}
-tbody th{font-weight:650;background:#f7f8f3}
-tbody tr:nth-child(even){background:#f8f9f5}
-tbody tr:last-child td,tbody tr:last-child th{border-bottom:0}
-.wide table{min-width:820px}
-.xwide table{min-width:1060px}
-.eq{position:relative;background:#f2f4f0;border:1px solid #e2e6de;border-radius:7px;margin:1.4rem 0;padding:1rem 1.3rem;overflow-x:auto}
-.formula{font-family:"Cambria Math","STIX Two Math",Cambria,var(--serif);font-size:1.08rem;line-height:2;white-space:nowrap}
-.formula+.formula{margin-top:.4rem}
-.eqno{font-family:var(--sans);font-size:.73rem;color:var(--muted);display:inline-block;margin-left:1.6rem}
-.cases{display:inline-grid;grid-template-columns:auto auto;column-gap:1.5rem;vertical-align:middle;border-left:2px solid #9cab9f;padding:.15rem 0 .15rem .8rem;margin:.3rem .4rem}
-.case-row{display:contents}
-sub,sup{font-size:.73em;line-height:0}
-code{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;font-size:.85em;background:#edf0ea;padding:.12rem .33rem;border-radius:4px;word-break:break-word}
-.flow{margin:1.7rem 0;padding:1.4rem;background:#f2f3ed;border:1px solid var(--line);border-radius:9px}
-.flow-caption{font-size:.71rem;letter-spacing:.08em;color:var(--muted);margin:0 0 1rem;font-weight:700}
-.flow-sources{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
-.flow-node{background:white;border:1px solid #d7ded5;border-radius:7px;padding:1rem 1.2rem;font-size:.88rem;line-height:1.8;text-align:center}
-.flow-node strong{display:block;color:var(--accent)}
-.flow-node.amber{background:#fff0ce;border-color:#e8d4a1}
-.flow-node.blue{background:#e4f0fa;border-color:#c6dce9}
-.flow-node.green{background:#e8f3e1;border-color:#cfe0c4}
-.flow-arrow{text-align:center;color:var(--accent);font-size:1.3rem;line-height:1.5;padding:.3rem}
-.mapping{display:grid;grid-template-columns:1fr auto 1fr;gap:.8rem;align-items:stretch}
-.mapping .flow-arrow{align-self:center}
-.question{padding-top:.1rem;border-top:1px solid var(--line);margin-top:2.8rem}
-.question h3{margin-top:1.5rem}
-.quote{border-left:3px solid var(--accent);margin:1.5rem 0;padding:1rem 1.6rem;background:var(--soft);font-size:1.02rem;line-height:2}
-.keyword-list{display:flex;flex-wrap:wrap;gap:.5rem}
-.keyword-list code{padding:.35rem .65rem}
-footer{border-top:1px solid var(--line);margin-top:3rem;padding-top:1.1rem;display:flex;justify-content:space-between;gap:1rem;font-size:.75rem;color:var(--muted)}
-:target{scroll-margin-top:2rem}
-@media(min-width:1450px){body{font-size:17px}}
-@media(max-width:1000px){.layout{grid-template-columns:185px minmax(0,1fr);gap:2rem;padding:2rem 1.3rem}.sidebar{font-size:.77rem}h1{font-size:2.65rem}}
-@media(max-width:760px){.layout{display:block;padding:1.6rem 1rem 3rem}.sidebar{position:static;max-height:none;margin-bottom:2rem;padding:1rem;border:1px solid var(--line);border-radius:8px}.sidebar>ol{display:grid;grid-template-columns:1fr 1fr;gap:.15rem .5rem}.sidebar .nav-group{grid-column:1/-1}.sidebar .subnav{display:grid;grid-template-columns:1fr 1fr}.nav-foot{display:none}h1{font-size:2.3rem}.topbar{padding:.8rem 1rem;letter-spacing:.08em;font-size:.64rem}.metadata dl{grid-template-columns:110px 1fr}section{margin-top:2.8rem}section>h2{font-size:1.45rem}.lead{padding:1.2rem;font-size:1rem}.callout{padding:1rem}.flow{padding:.85rem}.mapping{grid-template-columns:1fr}.mapping .flow-arrow{padding:0;transform:rotate(90deg)}th,td{padding:.7rem .8rem}.formula{font-size:1rem}}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-@media print{body{background:white;color:#111;font-size:10.5pt;line-height:1.7}.topbar,.sidebar,.skip,footer a{display:none}.layout{display:block;max-width:none;padding:0}h1{font-size:28pt}section>h2{font-size:18pt}h3{font-size:13pt}h2,h3{break-after:avoid}figure,.callout,.eq{break-inside:avoid}figure img{max-height:650px;object-fit:contain}.table-wrap{overflow:visible}.wide table,.xwide table{min-width:0;font-size:8pt}th,td{min-width:0;padding:.4rem}.eq{overflow:visible}.formula{white-space:normal}.metadata{display:none}a{color:inherit;text-decoration:none}section{margin-top:2rem}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>크레인 모델은 어디까지 물리여야 할까 — 해양 너클붐 크레인 연구 리뷰</title>
+  <style>
+    :root {
+      --paper: #f7f5ef;
+      --white: #fffefb;
+      --ink: #202e32;
+      --muted: #617075;
+      --line: #d9dfd9;
+      --teal: #116861;
+      --teal-soft: #e8f0eb;
+      --orange: #b65b33;
+      --orange-soft: #f7ede4;
+      --navy: #19383e;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "Batang", Georgia, serif;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 2rem; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.9;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--teal); text-underline-offset: .22em; text-decoration-thickness: 1px; }
+    a:hover { color: var(--orange); }
+    a:focus-visible { outline: 3px solid var(--orange); outline-offset: 5px; }
+    img { display: block; max-width: 100%; height: auto; }
+    p { margin: 0 0 1.15rem; }
+    h1, h2, h3, h4 { line-height: 1.4; letter-spacing: -.045em; }
+    h1, h2 { text-wrap: balance; }
+    h1 { margin: 1.3rem 0 1.6rem; font-size: clamp(2.7rem, 5.4vw, 5rem); font-weight: 750; line-height: 1.2; }
+    h2 { margin: .75rem 0 1.5rem; font-size: clamp(1.9rem, 3.5vw, 2.7rem); }
+    h3 { margin: 2.8rem 0 1rem; font-size: 1.4rem; }
+    h4 { margin: 0 0 .55rem; font-size: 1.08rem; }
+    strong { font-weight: 730; }
+    ul, ol { margin: 1rem 0 1.5rem; padding-left: 1.4rem; }
+    li { margin-bottom: .55rem; }
+    sub, sup { line-height: 0; }
+    figure { margin: 2rem 0; }
+    figcaption { color: var(--muted); font-size: .83rem; line-height: 1.7; margin-top: .8rem; }
+    figcaption strong { color: var(--teal); }
+    .wrap { width: min(1220px, calc(100% - 80px)); margin-inline: auto; }
+    .skip { position: absolute; left: 1rem; top: -6rem; z-index: 5; background: var(--white); padding: .7rem 1rem; }
+    .skip:focus { top: 1rem; }
+    .masthead { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.6rem 0; border-bottom: 1px solid var(--ink); font-size: .75rem; letter-spacing: .11em; }
+    .brand { font-weight: 800; }
+    .eyebrow { color: var(--teal); font-size: .73rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+    .hero { display: grid; grid-template-columns: 1.18fr .82fr; gap: 4rem; padding: 5rem 0 3.5rem; align-items: center; }
+    .hero .dek { font-size: 1.15rem; line-height: 1.85; color: var(--muted); max-width: 37rem; }
+    .hero figure { margin: 0; }
+    .hero-art { padding: 2rem; background: white; border: 1px solid var(--line); position: relative; }
+    .hero-art::before { content: ""; position: absolute; top: -1px; left: -1px; width: 68px; height: 5px; background: var(--orange); }
+    .hero-art img { width: 100%; }
+    .hero-note { margin-top: 1.2rem; display: flex; justify-content: space-between; gap: 1rem; font: .69rem var(--mono); color: var(--muted); }
+    .meta { display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; padding-top: 1rem; font-size: .78rem; color: var(--muted); }
+    .hero-tags { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.2rem; }
+    .tag { border: 1px solid var(--line); border-radius: 3px; padding: .18rem .6rem; font-size: .72rem; color: var(--muted); }
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-bottom: 4rem; }
+    .metric { padding: 1.8rem 2rem; }
+    .metric + .metric { border-left: 1px solid var(--line); }
+    .metric b { display: block; font-size: 2.55rem; font-weight: 650; line-height: 1.3; letter-spacing: -.055em; color: var(--teal); }
+    .metric b small { font-size: 1rem; letter-spacing: 0; }
+    .metric span { display: block; font-size: .82rem; color: var(--muted); margin-top: .5rem; }
+    .layout { display: grid; grid-template-columns: 190px minmax(0, 850px); gap: 4.5rem; justify-content: space-between; }
+    .sidebar { align-self: start; position: sticky; top: 2rem; font-size: .8rem; }
+    .sidebar .nav-title { font-size: .65rem; letter-spacing: .15em; color: var(--muted); margin-bottom: 1rem; }
+    .sidebar ol { list-style: none; padding: 0; margin: 0; }
+    .sidebar li { margin: 0; border-top: 1px solid var(--line); }
+    .sidebar a { display: block; padding: .7rem 0; text-decoration: none; color: var(--muted); }
+    .sidebar a:hover { color: var(--teal); }
+    .sidebar a span { font-family: var(--mono); font-size: .7rem; color: var(--teal); margin-right: .65rem; }
+    .sidebar .side-note { font-size: .7rem; color: var(--muted); line-height: 1.8; margin-top: 1.8rem; }
+    .article-section { padding: 3.9rem 0; border-bottom: 1px solid var(--line); }
+    .article-section:first-child { padding-top: 0; }
+    .section-no { font: .73rem var(--mono); color: var(--teal); letter-spacing: .11em; }
+    .lead { font-size: 1.16rem; line-height: 1.95; }
+    .abstract { border-left: 3px solid var(--teal); padding: .1rem 0 .1rem 1.5rem; margin: 1.7rem 0 2rem; }
+    .abstract p:last-child { margin-bottom: 0; }
+    .findings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2rem; }
+    .finding { padding: 1.5rem; background: var(--white); border: 1px solid var(--line); }
+    .finding .index { display: block; margin-bottom: .9rem; font: .75rem var(--mono); color: var(--orange); }
+    .finding p { font-size: .88rem; margin-bottom: 0; line-height: 1.8; color: var(--muted); }
+    .finding h3 { font-size: 1.05rem; margin: 0 0 .7rem; }
+    .pullquote { margin: 3rem 0; padding: 1.5rem 0 1.5rem 1.8rem; border-left: 3px solid var(--orange); }
+    .pullquote p { font-family: var(--serif); font-size: clamp(1.4rem, 2.3vw, 1.9rem); line-height: 1.7; letter-spacing: -.025em; margin: 0; }
+    .pullquote footer { font-size: .72rem; color: var(--muted); margin-top: .7rem; }
+    .callout { background: var(--teal-soft); padding: 1.5rem 1.7rem; margin: 1.8rem 0; border-radius: 3px; font-size: .94rem; }
+    .callout p:last-child { margin-bottom: 0; }
+    .callout .label { display: block; color: var(--teal); font-size: .7rem; font-weight: 800; letter-spacing: .07em; margin-bottom: .6rem; }
+    .callout.warm { background: var(--orange-soft); }
+    .callout.warm .label { color: var(--orange); }
+    .figure-box { background: white; border: 1px solid var(--line); padding: 1.4rem; }
+    .figure-box img { max-height: 650px; width: auto; margin-inline: auto; object-fit: contain; }
+    .figure-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+    .figure-grid figure { margin: 0; min-width: 0; }
+    .figure-grid .figure-box { height: 300px; display: flex; align-items: center; justify-content: center; }
+    .figure-grid .figure-box img { max-height: 250px; }
+    .compact-figure { max-width: 620px; margin-inline: auto; }
+    .table-scroll { overflow-x: auto; margin: 1.6rem 0; border: 1px solid var(--line); background: var(--white); }
+    table { border-collapse: collapse; width: 100%; font-size: .86rem; line-height: 1.75; }
+    caption { text-align: left; padding: .8rem 1rem; color: var(--muted); font-size: .76rem; background: #f0f2ec; }
+    th, td { padding: .95rem 1rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+    thead th { font-weight: 700; font-size: .77rem; color: var(--teal); background: #edf2ed; }
+    tbody th { font-weight: 650; min-width: 90px; }
+    tbody tr:last-child > * { border-bottom: 0; }
+    .equation { overflow-x: auto; padding: 1.15rem 1.4rem; background: var(--white); border: 1px solid var(--line); margin: 1.4rem 0; }
+    .math { font-family: Georgia, "Times New Roman", var(--sans); font-size: 1.1rem; line-height: 2.2; white-space: nowrap; }
+    .eq-line { display: flex; justify-content: space-between; gap: 1.7rem; align-items: baseline; min-width: max-content; }
+    .eq-no { color: var(--muted); font: .72rem var(--mono); }
+    .eq-note { font-family: var(--sans); font-size: .8rem; color: var(--muted); }
+    .note { font-size: .82rem; color: var(--muted); line-height: 1.8; }
+    .diagram { padding: 1.7rem; background: var(--navy); color: #f0f4eb; margin: 2rem 0; }
+    .diagram-label { font-size: .67rem; letter-spacing: .13em; color: #a8c8be; margin-bottom: 1.2rem; }
+    .flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .8rem; }
+    .flow-node { padding: 1rem .8rem; border: 1px solid #6d8a89; border-top: 3px solid #99c5b1; position: relative; }
+    .flow-node h4 { color: white; font-size: 1rem; }
+    .flow-node p { margin: 0; font-size: .72rem; line-height: 1.75; color: #c7d7d0; }
+    .flow-node + .flow-node::before { content: "→"; position: absolute; left: -.8rem; top: 43%; background: var(--navy); font-size: .8rem; color: #c7d7d0; }
+    .diagram-end { border-top: 1px solid #567275; padding-top: 1rem; margin: 1.2rem 0 0; font-size: .77rem; color: #c7d7d0; }
+    .stages { list-style: none; padding: 0; margin: 2rem 0; counter-reset: stage; }
+    .stages li { display: grid; grid-template-columns: 45px 1fr; gap: 1rem; padding: 1.5rem 0; margin: 0; border-bottom: 1px solid var(--line); counter-increment: stage; }
+    .stages li::before { content: "0" counter(stage); color: var(--teal); font: 1.25rem var(--mono); padding-top: .2rem; }
+    .stages h3 { margin: 0 0 .5rem; font-size: 1.15rem; }
+    .stages p { margin: 0; font-size: .91rem; color: var(--muted); }
+    .status { display: inline-block; padding: .1rem .5rem; border-radius: 3px; font-size: .73rem; white-space: nowrap; color: var(--teal); background: var(--teal-soft); }
+    .status.partial { color: #97421d; background: var(--orange-soft); }
+    .checklist { list-style: none; padding: 0; }
+    .checklist li { padding: 1rem 0 1rem 1.9rem; border-bottom: 1px solid var(--line); position: relative; margin: 0; }
+    .checklist li::before { content: "□"; position: absolute; left: 0; color: var(--teal); font-size: 1.15rem; }
+    .checklist strong { display: block; margin-bottom: .3rem; }
+    .checklist span { color: var(--muted); font-size: .9rem; }
+    .closing { margin: 3rem 0 0; padding: 2rem; background: var(--navy); color: #ecf1ec; }
+    .closing h3 { color: white; margin: 0 0 1rem; font-size: 1.55rem; }
+    .closing p:last-child { margin-bottom: 0; }
+    .share-copy { margin: 2rem 0 0; padding: 1.5rem 0; border-top: 1px solid var(--line); }
+    .share-copy p { font-size: .98rem; }
+    .sources { font-size: .88rem; }
+    .sources cite { font-style: normal; }
+    .source-card { padding: 1.5rem; border: 1px solid var(--line); background: var(--white); margin: 1.5rem 0; }
+    .source-card p:last-child { margin-bottom: 0; }
+    .keywords { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: 1.5rem; }
+    .keywords span { font-size: .69rem; padding: .3rem .65rem; border: 1px solid var(--line); color: var(--muted); }
+    .page-footer { margin-top: 4rem; padding: 1.7rem 0 2.5rem; border-top: 1px solid var(--ink); display: flex; justify-content: space-between; gap: 1rem; color: var(--muted); font-size: .73rem; }
+    @media (max-width: 1050px) {
+      .wrap { width: min(100% - 48px, 950px); }
+      .hero { gap: 2rem; }
+      .layout { grid-template-columns: 150px minmax(0, 1fr); gap: 2rem; }
+      .findings { grid-template-columns: 1fr; }
+      .finding { padding: 1.2rem 1.5rem; }
+      .finding .index { margin-bottom: .5rem; }
+      .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .flow-node + .flow-node::before { content: none; }
+    }
+    @media (max-width: 760px) {
+      body { font-size: 16px; }
+      .wrap { width: calc(100% - 36px); }
+      .masthead { font-size: .63rem; letter-spacing: .06em; }
+      .hero { grid-template-columns: 1fr; padding: 3rem 0 2rem; }
+      .hero figure { max-width: 480px; width: 100%; margin-inline: auto; }
+      .hero-art { padding: 1.4rem; }
+      .hero .dek { font-size: 1.05rem; }
+      .metrics { margin-bottom: 2.5rem; }
+      .metric { padding: 1.3rem .6rem; }
+      .metric b { font-size: 1.8rem; }
+      .metric b small { font-size: .73rem; }
+      .metric span { font-size: .7rem; }
+      .layout { display: block; }
+      .sidebar { position: static; padding-bottom: 2rem; }
+      .sidebar ol { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 1rem; }
+      .sidebar .side-note { display: none; }
+      .article-section { padding: 3rem 0; }
+      .figure-grid { grid-template-columns: 1fr; }
+      .figure-grid .figure-box { height: auto; min-height: 220px; }
+      .figure-grid .figure-box img { max-height: 440px; }
+      .figure-box { padding: 1rem; }
+      .callout, .closing { padding: 1.3rem; }
+      .diagram { padding: 1.2rem; }
+      .pullquote { padding-left: 1.2rem; }
+      .math { font-size: 1rem; }
+      th, td { padding: .75rem; }
+      .page-footer { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+    @media print {
+      body { background: white; color: black; font-size: 10pt; }
+      .wrap { width: 100%; }
+      .sidebar, .skip, .share-copy, .page-footer a { display: none; }
+      .layout { display: block; }
+      .hero { padding: 1rem 0; gap: 2rem; }
+      h1 { font-size: 30pt; }
+      h2 { font-size: 21pt; }
+      .article-section { padding: 1.5rem 0; }
+      figure, .callout, .finding, .equation, tr { break-inside: avoid; }
+      .diagram, .closing { background: #edf1ed; color: black; border: 1px solid #aaa; }
+      .diagram *, .closing * { color: black; }
+      .table-scroll, .equation { overflow: visible; }
+      a { color: inherit; }
+    }
+  </style>
 <meta property="og:type" content="article">
-<meta property="og:title" content="Analysis of Offshore Knuckle Boom Crane — Part One: Modeling and Parameter Identification">
-<meta property="og:description" content="[!info] 관련 자료 공개 원문: https://doi.org/10.4173/mic.2013.4.1 (MIC 저널, OA) Part Two(같은 저자, 제어·해석)는 미확보. 밸브 주파수응답 시험은 Bak &amp; Hansen 2012 (FPNI PhD Symposium) 참조 — 미확보. 마찰 5 파라미터 모델의 출처 Ottestad et al. 2012 — 미확보. 유효 체적탄성계수 상한의 출처 Merritt 1967 &quot;Hy">
+<meta property="og:title" content="Analysis of Offshore Knuckle Boom Crane — Part One: Modeling and Parameter Identification - 요약">
+<meta property="og:description" content="Analysis of Offshore Knuckle Boom Crane — Part One: Modeling and Parameter Identification 요약 한줄 요약 해양 시추선의 파이프 취급용 유압 너클붐 크레인(공급압 210 bar, 실린더 3개)을 유연 세그먼트 다물체 + 회색상자 전기유압 모델로 만들고, 부품 자료가 없는 현장 엔지니어의 처지에서 시운전 데이터만으로 ① 정상상태 힘 → 질량·질량중심·실린더 마">
 <meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/6bfdf8/">
 <meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/6bfdf8/assets/figure1.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Analysis of Offshore Knuckle Boom Crane — Part One: Modeling and Parameter Identification">
-<meta name="twitter:description" content="[!info] 관련 자료 공개 원문: https://doi.org/10.4173/mic.2013.4.1 (MIC 저널, OA) Part Two(같은 저자, 제어·해석)는 미확보. 밸브 주파수응답 시험은 Bak &amp; Hansen 2012 (FPNI PhD Symposium) 참조 — 미확보. 마찰 5 파라미터 모델의 출처 Ottestad et al. 2012 — 미확보. 유효 체적탄성계수 상한의 출처 Merritt 1967 &quot;Hy">
+<meta name="twitter:title" content="Analysis of Offshore Knuckle Boom Crane — Part One: Modeling and Parameter Identification - 요약">
+<meta name="twitter:description" content="Analysis of Offshore Knuckle Boom Crane — Part One: Modeling and Parameter Identification 요약 한줄 요약 해양 시추선의 파이프 취급용 유압 너클붐 크레인(공급압 210 bar, 실린더 3개)을 유연 세그먼트 다물체 + 회색상자 전기유압 모델로 만들고, 부품 자료가 없는 현장 엔지니어의 처지에서 시운전 데이터만으로 ① 정상상태 힘 → 질량·질량중심·실린더 마">
 <meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/6bfdf8/assets/figure1.png">
 <link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/mic2013-knuckle-crane-id/">
 </head>
-<body id="top">
-<a class="skip" href="#content">본문으로 바로 가기</a>
-<div class="topbar"><strong>Research Notes · Hydraulics</strong><span>MIC 2013 · Deep-reviewed · 2026.09.25</span></div>
-<div class="layout">
-<nav class="sidebar" aria-label="문서 목차">
-<p class="nav-label">CONTENTS / 읽기 안내</p>
-<ol>
-<li><a href="#paper">논문 정보</a></li>
-<li><a href="#one-line">한줄 요약</a></li>
-<li><a href="#background">01 · 연구 배경</a></li>
-<li><a href="#methods">02 · 시스템 및 방법론</a></li>
-<li><a href="#technology">03 · 핵심 기술</a>
-<ol class="subnav"><li><a href="#orifice">밸브 오리피스</a></li><li><a href="#dcv">방향제어밸브 DCV</a></li><li><a href="#cbv">카운터밸런스밸브 CBV</a></li><li><a href="#cylinder">실린더</a></li></ol></li>
-<li><a href="#identification">04 · 파라미터 식별 절차</a>
-<ol class="subnav"><li><a href="#steady-force">정상상태 힘</a></li><li><a href="#steady-pressure">정상상태 압력</a></li><li><a href="#dynamics">동특성</a></li></ol></li>
-<li><a href="#results">05 · 실험 결과 요약</a></li>
-<li><a href="#limits">06 · 한계 및 향후 연구</a></li>
-<li><a href="#hr35">07 · HR35 적용 대조</a>
-<ol class="subnav"><li><a href="#tasks">후속 검증 과제</a></li><li><a href="#warning">경고</a></li></ol></li>
-<li><a href="#recap">한마디로 정리</a></li>
-<li class="nav-group"><a href="#deep-dive">심화 탐구 기록</a>
-<ol class="subnav">
-<li><a href="#q1">Q1 · 모델의 색</a></li>
-<li><a href="#q2">Q2 · 유량계수 검산</a></li>
-<li><a href="#q3">Q3 · DCV와 불감대</a></li>
-<li><a href="#q4">Q4 · 크래킹 조건</a></li>
-<li><a href="#q5">Q5 · CBV 정합성</a></li>
-<li><a href="#q6">Q6 · 실린더 마찰</a></li>
-<li><a href="#q7">Q7 · 체적탄성계수</a></li>
-<li><a href="#q8">Q8 · 질량·COG</a></li>
-<li><a href="#q9">Q9 · 파라미터 상쇄</a></li>
-<li><a href="#q10">Q10 · 강성·감쇠 검산</a></li>
-<li><a href="#q11">Q11 · 개루프 시험</a></li>
-<li><a href="#q12">Q12 · 실린더 면적비</a></li>
-</ol></li>
-<li class="nav-group"><a href="#extraction">S · 시스템 식별 추출표</a></li>
-<li><a href="#keywords">핵심 키워드</a></li>
-<li><a href="#opinion">나의 의견</a></li>
-</ol>
-<p class="nav-foot">Modeling, Identification and Control<br>34(4), 157–174 · 2013<br><a href="#top">문서 맨 위로 ↑</a></p>
-</nav>
+<body>
+  <a class="skip" href="#article">본문으로 바로 가기</a>
+  <div class="wrap">
+    <header class="masthead" id="top">
+      <span class="brand">ENGINEERING / RESEARCH NOTES</span>
+      <span>논문 리뷰 · 유압 시스템 식별 · 2013</span>
+    </header>
 
-<main id="content">
-<article>
-<header id="paper">
-<p class="eyebrow">논문 심화 노트 · B / 유압 구성요소·계통 식별</p>
-<details class="metadata">
-<summary>문서 메타데이터 · 출처 및 검토 이력</summary>
-<dl>
-<dt>paper_id</dt><dd><code>mic2013-knuckle-crane-id</code></dd>
-<dt>paper_title</dt><dd>Analysis of Offshore Knuckle Boom Crane — Part One: Modeling and Parameter Identification</dd>
-<dt>authors</dt><dd>Morten K. Bak<br>Michael R. Hansen</dd>
-<dt>affiliation</dt><dd>University of Agder, Department of Engineering Sciences, Norway</dd>
-<dt>journal</dt><dd>Modeling, Identification and Control 34(4), 157–174, 2013 — DOI 10.4173/mic.2013.4.1 (OpenAlex/Crossref 확인 2026-09-25)</dd>
-<dt>year</dt><dd>2013</dd>
-<dt>doi</dt><dd><a>10.4173/mic.2013.4.1</a></dd>
-<dt>read_version</dt><dd>출판사 OA PDF(18쪽). 식·그림·표 번호는 출판판 기준</dd>
-<dt>status</dt><dd>deep-reviewed</dd>
-<dt>source_file</dt><dd>(로컬 보관 PDF) <code>sources/mic2013-knuckle-crane-id.pdf</code></dd>
-<dt>source_sha256</dt><dd>(내부 manifest 참조)</dd>
-<dt>axis</dt><dd>B (유압 구성요소·계통 식별) — A(질량·COG)·F(부하 방향 전환)·E(개루프 시험) 겹침</dd>
-<dt>created</dt><dd>2026-09-25</dd>
-<dt>updated</dt><dd>2026-09-25 (심화 탐구·HR35 대조·후속 과제 추가)</dd>
-<dt>tags</dt><dd>논문요약 · 시스템식별 · 유압크레인 · 회색상자 · 체적탄성계수 · 카운터밸런스밸브 · 압력보상밸브</dd>
-</dl>
-</details>
-<aside class="callout info">
-<span class="callout-title">INFO · 관련 자료</span>
-<ul>
-<li>공개 원문: <a>https://doi.org/10.4173/mic.2013.4.1</a> (MIC 저널, OA)</li>
-<li>Part Two(같은 저자, 제어·해석)는 미확보. 밸브 주파수응답 시험은 Bak &amp; Hansen 2012 (FPNI PhD Symposium) 참조 — 미확보.</li>
-<li>마찰 5-파라미터 모델의 출처 Ottestad et al. 2012 — 미확보.</li>
-<li>유효 체적탄성계수 상한의 출처 Merritt 1967 "Hydraulic Control Systems".</li>
-<li>이 요약의 그림: <code>attachments/mic2013-knuckle-crane-id/figure1~19.png, table1~8.png</code></li>
-</ul>
-</aside>
-<h1>Analysis of Offshore Knuckle Boom Crane <span>— Part One: Modeling and Parameter Identification</span></h1>
-<p class="byline"><strong>Morten K. Bak · Michael R. Hansen</strong><br>University of Agder, Department of Engineering Sciences, Norway</p>
-<p class="byline">Modeling, Identification and Control · 34(4), 157–174 · 2013</p>
-<div class="tags"><span class="tag">시스템식별</span><span class="tag">유압크레인</span><span class="tag">회색상자</span><span class="tag">HR35 적용 검토</span></div>
-</header>
+    <main>
+      <header class="hero">
+        <div>
+          <div class="hero-tags">
+            <span class="tag">RESEARCH REPORT</span>
+            <span class="tag">회색상자 모델</span>
+            <span class="tag">해양 너클붐 크레인</span>
+          </div>
+          <h1>크레인 모델은<br>어디까지<br>물리여야 할까</h1>
+          <p class="dek">부품 자료가 없는 현장에서 출발한 해양 유압 크레인 연구. <strong>힘 → 압력 → 진동</strong>을 차례로 맞추는 식별 전략은 실제 거동을 얼마나 설명했고, 무엇을 설명하지 못했을까.</p>
+          <div class="meta">
+            <span>논문 · Morten K. Bak &amp; Michael R. Hansen</span>
+            <span>노트 작성 · <time datetime="2026-09-25">2026.09.25</time></span>
+            <span><a href="#sources">원문 및 출처 안내 ↗</a></span>
+          </div>
+        </div>
+        <figure>
+          <div class="hero-art">
+            <img src="assets/figure1.png" alt="페데스탈, 회전부, 내부·중간·외부 지브와 그리핑 요크로 구성된 해양 너클붐 크레인의 기계 구조">
+            <div class="hero-note"><span>OFFSHORE KNUCKLE BOOM CRANE</span><span>FIG. 01</span></div>
+          </div>
+          <figcaption><strong>그림 1.</strong> 해양 시추선의 파이프 취급용 크레인. 내부 지브 7.2 m, 중간 지브 2.3 m, 외부 지브 12.1 m와 그리핑 요크로 구성된다.</figcaption>
+        </figure>
+      </header>
 
-<section id="one-line">
-<h2>한줄 요약</h2>
-<div class="lead"><p>해양 시추선의 파이프 취급용 유압 너클붐 크레인(공급압 210 bar, 실린더 3개, 지브 길이 7~12 m)을 <strong>다물체(유연 세그먼트 포함) + 회색상자 전기유압</strong> 모델로 만들고, 부품 자료가 부족한 현장 엔지니어의 처지에서 시운전 데이터만으로 ① 정상상태 실린더 힘 → 질량·질량중심 미세조정과 실린더 마찰(정지 + 압력 비례), ② 정상상태 압력 → 카운터밸런스밸브 블랙박스 계수, ③ 압력 진동 주파수 → 구조 강성 배율(0.55)·감쇠·<strong>유효 체적탄성계수(5500 bar)</strong> 를 차례로 식별해 검증한 연구다.</p></div>
-</section>
+      <div class="metrics" aria-label="연구에서 보고한 주요 보정 결과">
+        <div class="metric">
+          <b>3 <small>단계</small></b>
+          <span>정상 힘 → 정상 압력 → 동특성</span>
+        </div>
+        <div class="metric">
+          <b>5,500 <small>bar</small></b>
+          <span>식별한 유효 체적탄성계수</span>
+        </div>
+        <div class="metric">
+          <b>0.55 <small>×</small></b>
+          <span>초기 구조 강성에 적용한 배율</span>
+        </div>
+      </div>
 
-<section id="background">
-<h2>1. 연구 배경</h2>
-<h3 id="problem">1.1 문제 정의 (§1, p.1~2)</h3>
-<ul>
-<li>해양 시추 장비는 고가·복잡·소량 생산이라 시제품을 만들어 시험하기 어렵다 → 시간 영역 시뮬레이션이 설계 도구가 됐지만, <strong>실제 거동을 재현하는 모델</strong>을 만드는 것이 난제.</li>
-<li>특히 유압 부품 제조사는 시뮬레이션에 필요한 자료(밸브 특성, 보상기, 마찰)를 주지 않는다. 물리 모델은 세우기 어렵고 세워도 검증이 안 된다(p.1~2).</li>
-<li>크레인 구조 유연성이 전체 동특성에 크게 영향(Henriksen 2011, Bak 2011)하지만 실험 검증 사례가 없었다.</li>
-</ul>
-<h3>1.2 기존 연구 분류 (p.2)</h3>
-<div class="table-wrap wide" tabindex="0" role="region" aria-label="기존 연구 분류 표">
-<table><thead><tr><th scope="col">분류</th><th scope="col">대표</th><th scope="col">특징</th><th scope="col">한계</th></tr></thead><tbody>
-<tr><th scope="row">크레인 일반 모델링·제어</th><td>Hiller 1996, Abdel-Rahman 2003</td><td>모델링 기법·제어 개념 정리</td><td>해양 크레인 실험 없음</td></tr>
-<tr><th scope="row">이동식(트럭) 크레인</th><td>Ellman 1996, Mikkola &amp; Handroos 1996, Esque 1999/2003, Hansen 2001, Nielsen 2003</td><td>동특성 잘 문서화·실험 검증</td><td>유연성 큰 이동식 크레인 특유</td></tr>
-<tr><th scope="row">해양 붐 크레인</th><td>Than 2002, Bak 2011</td><td>구조 유연성 포함 모델</td><td><strong>실험 검증 없음</strong></td></tr>
-<tr><th scope="row">유압 부품 모델링</th><td>일반 문헌</td><td>잘 정립</td><td>자료 부족·물리 불완전으로 검증 난항 → 일부 부품은 새 접근 필요</td></tr>
-</tbody></table>
-</div>
-<h3>1.3 연구 기여 (p.2, §6)</h3>
-<ol>
-<li>유연 세그먼트(finite segment) 다물체 + 회색상자 유압 모델의 <strong>적정 상세도</strong>를 제시하고 실험으로 검증.</li>
-<li>카운터밸런스밸브(CBV)를 두 압력비(μ<sub>x</sub>, μ<sub>L</sub>)로 유량을 계산하는 <strong>블랙박스 모델</strong>(식 15~22) 제안.</li>
-<li>시운전 데이터로 <strong>3단계 보정</strong>(정상 힘 → 정상 압력 → 동특성)을 시연하고, 앞 두 단계는 최적화·마지막은 스케일링으로 푸는 실용 절차 제시.</li>
-</ol>
-<aside class="callout example"><span class="callout-title">EXAMPLE · 🔧 HR35 대조 — 같은 처지</span><p>HR35 도 실린더 사양서·펌프·밸브 제원이 없다(원문 요청 목록 C 항). 이 논문의 전제 "부품 자료가 없는 엔지니어"가 정확히 우리 상황이다. 다만 이 크레인은 <strong>정압 공급원(210 bar HPU)</strong> 이고 HR35 는 엔진 구동 펌프의 유량 한계·다축 공급 경쟁이 있어 공급 쪽은 다르다.</p></aside>
-</section>
+      <div class="layout">
+        <nav class="sidebar" aria-label="목차">
+          <p class="nav-title">IN THIS REPORT</p>
+          <ol>
+            <li><a href="#abstract"><span>00</span>초록과 핵심 발견</a></li>
+            <li><a href="#context"><span>01</span>왜 회색상자인가</a></li>
+            <li><a href="#system"><span>02</span>시스템과 모델 구조</a></li>
+            <li><a href="#hydraulics"><span>03</span>유압 모델의 선택</a></li>
+            <li><a href="#identification"><span>04</span>세 단계의 식별</a></li>
+            <li><a href="#evidence"><span>05</span>성과와 증거의 범위</a></li>
+            <li><a href="#implications"><span>06</span>디지털 트윈에 적용</a></li>
+            <li><a href="#sources"><span>07</span>출처와 읽기 안내</a></li>
+          </ol>
+          <p class="side-note">Bak &amp; Hansen (2013)<br>Modeling, Identification and Control<br>34(4), 157–174<br><br>제공된 논문 요약 노트를 바탕으로 재구성한 연구 해설.</p>
+        </nav>
 
-<section id="methods">
-<h2>2. 시스템 및 방법론</h2>
-<h3 id="crane">2.1 대상 크레인 (§2, p.2~3)</h3>
-<figure id="fig1"><img src="assets/figure1.png" width="400" alt="Fig. 1. 해양 너클붐 크레인의 기계 시스템 구성" loading="lazy"><figcaption><strong>Fig. 1.</strong> 기계 시스템 구성: 페데스탈 위의 회전부(king), 내부 지브(7.2 m), 중간 지브(2.3 m), 외부 지브(12.1 m), 그리핑 요크. 선회 자유도와 요크 내부 자유도는 이번 모델에서 제외한다.</figcaption></figure>
-<ul>
-<li>공급: HPU 정압 p<sub>S</sub> = 210 bar, 리턴 p<sub>R</sub> = 0.</li>
-<li>유압 회로 3개(지브당 1개). 내부 지브는 <strong>서보밸브 + 외부 배출 CBV 1개</strong>, 중간·외부 지브는 <strong>압력보상 비례밸브(LS) + 비배출 CBV 2개</strong>(Fig. 2, 3).</li>
-<li>제어: 조이스틱 u<sub>JS</sub> → 제어기 → 밸브 신호 u<sub>V</sub>, 실린더 내장 위치센서. <strong>개루프 모드</strong>(조이스틱이 밸브로 직결)와 폐루프 모드가 있고, 식별은 개루프로 한다.</li>
-</ul>
-<figure id="fig2"><img src="assets/figure2.png" width="400" alt="Fig. 2. 내부 지브의 방향제어밸브와 외부 배출형 CBV 유압 회로" loading="lazy"><figcaption><strong>Fig. 2.</strong> 내부 지브 회로 개략도. 방향제어밸브(DCV)가 두 챔버로 유량을 보내고, 실린더 수축(하중 하강, 음의 부하) 시 피스톤측 압력 p₂ 를 외부 배출형 CBV 가 파일럿 압력 p₃ 의 도움으로 조절한다. 압력은 p₁, p₂, p₃ 세 곳에서 잰다.</figcaption></figure>
-<figure id="fig3"><img src="assets/figure3.png" width="400" alt="Fig. 3. 중간·외부 지브의 압력보상기, LS 및 두 CBV 회로" loading="lazy"><figcaption><strong>Fig. 3.</strong> 중간·외부 지브 회로. 압력보상기(p<sub>comp</sub>)와 부하감지(LS) 라인이 있어 주 스풀 미터링 에지의 압력 강하를 일정하게 유지하므로 유량이 부하압과 무관하고 스풀 위치에 비례한다. 부하가 양방향이라 CBV 가 두 개이며, 내부 오리피스 두 개가 파일럿 압력 p<sub>x,1</sub>·p<sub>x,2</sub> 를 조정한다. 이 회로에선 p₂·p₃ 만 잴 수 있다.</figcaption></figure>
-<figure id="table1"><img src="assets/table1.png" width="500" alt="Table 1. 세 유압 회로의 입력·출력·상태와 측정 가능 여부" loading="lazy"><figcaption><strong>Table 1.</strong> 세 회로의 입력(u<sub>JS</sub>)·출력(l<sub>cyl</sub>)·상태(p₁~p₄, p<sub>x</sub>)와 측정 여부. 내부 지브는 p₁·p₂·p₃, 중간·외부 지브는 p₂·p₃ 만 측정 — 나머지 압력은 모델로 추정해야 한다.</figcaption></figure>
+        <article id="article">
+          <section class="article-section" id="abstract" aria-labelledby="abstract-title">
+            <span class="section-no">00 / ABSTRACT</span>
+            <h2 id="abstract-title">모든 부품을 알지 못해도,<br>거동은 설명할 수 있을까</h2>
+            <div class="abstract">
+              <p>이 연구는 공급압 210 bar, 실린더 3개를 사용하는 해양 너클붐 크레인을 <strong>유연 세그먼트 다물체 모델과 회색상자 전기유압 모델</strong>로 구성한다. 제조사가 공개하지 않는 밸브 특성과 마찰을 모두 물리식으로 풀기보다, 확보한 부품 자료와 시운전 측정을 연결해 필요한 파라미터를 식별한다.</p>
+              <p>보정 순서는 정상상태 힘, 정상상태 압력, 압력 진동이다. 정상상태 응답과 신장 시 동특성은 측정과 잘 맞았지만, 수축 시에는 과감쇠가 남았다. <strong>실용적인 모델 적합에는 성공했으나, 파라미터의 유일성과 새로운 운전 조건에서의 예측력까지 입증한 것은 아니다.</strong></p>
+            </div>
+            <div class="findings">
+              <div class="finding">
+                <span class="index">FINDING 01</span>
+                <h3>식별에는 순서가 있다</h3>
+                <p>먼저 하중과 마찰을 맞추고, 이어 밸브와 압력을 맞춘다. 동특성 보정은 그다음이다.</p>
+              </div>
+              <div class="finding">
+                <span class="index">FINDING 02</span>
+                <h3>물리식과 실험식을 나눈다</h3>
+                <p>CBV가 열리는 조건은 압력 평형으로, 열린 뒤의 유량은 실험 계수로 표현한다.</p>
+              </div>
+              <div class="finding">
+                <span class="index">FINDING 03</span>
+                <h3>잘 맞는 값도 묶음일 수 있다</h3>
+                <p>강성·감쇠·유효 체적탄성계수를 함께 조정했으므로 각 값의 독립적 해석에는 한계가 있다.</p>
+              </div>
+            </div>
+          </section>
 
-<h3 id="mechanical">2.2 기계 모델 (§3, p.4~6)</h3>
-<figure id="fig4"><img src="assets/figure4.png" width="400" alt="Fig. 4. 12개 강체와 관절로 구성된 다물체 모델의 위상" loading="lazy"><figcaption><strong>Fig. 4.</strong> 다물체 모델의 위상. 강체 12개(페데스탈·킹·지브 3·요크·실린더 배럴/피스톤 3쌍), 회전 관절 B~E, 배럴 핀은 구면 관절, 피스톤 핀은 유니버설 관절, 배럴-피스톤은 프리즘 관절. 국소 좌표계 x₃z₃~x₆z₆ 이 COG 위치의 기준이다.</figcaption></figure>
-<div class="eq" id="eq1"><div class="formula">n<sub>DOF</sub> = 6n<sub>bodies</sub> − 6n<sub>fixtures</sub> − 5n<sub>PJ</sub> − 5n<sub>RJ</sub> − 4n<sub>UJ</sub> − 3n<sub>SJ</sub><br>= 72 − 12 − 15 − 20 − 12 − 9 = 4 <span class="eqno">(1)</span></div></div>
-<p>자유도 4 = 실린더 구동 지브 3 + 요크 회전 1(유압 모터, 이번엔 고정용).</p>
-<p><strong>유연성 — 유연 세그먼트법(§3.2):</strong> 유연 부재를 강체 조각으로 나누고 조각 사이를 회전 관절 + 회전 스프링(·댐퍼)으로 잇는다.</p>
-<figure id="fig5"><img src="assets/figure5.png" width="500" alt="Fig. 5. 유연 세그먼트의 스프링 연결 개념" loading="lazy"><figcaption><strong>Fig. 5.</strong> 유연 세그먼트 개념. 한 조각의 양 끝에 강성 k<sub>S</sub> 스프링, 두 조각을 이으면 직렬 스프링 k<sub>C</sub>.</figcaption></figure>
-<div class="eq"><div class="formula" id="eq2">k<sub>C</sub> = 1 / (1/k<sub>S,1</sub> + 1/k<sub>S,2</sub>) <span class="eqno">(2)</span></div><div class="formula" id="eq3">k<sub>S</sub> = 2EI / L <span class="eqno">(3)</span></div></div>
-<figure id="fig6"><img src="assets/figure6.png" width="400" alt="Fig. 6. 페데스탈·내부 지브·외부 지브의 유연 세그먼트 배치" loading="lazy"><figcaption><strong>Fig. 6.</strong> 페데스탈 2조각, 내부 지브 5조각, 외부 지브 4조각으로 나눈 세그먼트 배치. 지브 양 끝 조각은 강체로 두고 이웃 조각의 k<sub>S</sub> 를 연결 강성으로 쓴다. 단면이 선형으로 변하므로 조각별 평균 단면 2차모멘트를 CAD 에서 뽑는다.</figcaption></figure>
-<figure id="table2"><img src="assets/table2.png" width="400" alt="Table 2. 각 부재의 조각 및 연결 강성" loading="lazy"><figcaption><strong>Table 2.</strong> 조각·연결 강성(N·m/rad). 페데스탈 5.75×10⁹, 내부 지브 1.96×10⁹→4.05×10⁸, 외부 지브 2.08×10⁸→1.39×10⁸. 이 값들은 "불확실한(soft) 파라미터"로 §5 에서 배율로 조정된다.</figcaption></figure>
-<p><strong>감쇠(§3.3):</strong> 강성 비례 감쇠.</p>
-<div class="eq"><div class="formula" id="eq4">c = β<sub>k</sub> k <span class="eqno">(4)</span></div><div class="formula" id="eq5">β<sub>k</sub> = 2ζ<sub>S</sub> / ω<sub>S</sub> <span class="eqno">(5)</span></div></div>
-<p>ζ<sub>S</sub> 는 용접·볼트 이음이 있는 금속 구조에서 0.03~0.07(Adams &amp; Askenazi 1999). ω<sub>S</sub> 는 각 부재를 외팔보로 고정하고 충격을 준 무감쇠 시뮬레이션에서 읽는다.</p>
-<figure id="table3"><img src="assets/table3.png" width="500" alt="Table 3. 부재별 고유진동수와 강성 비례 감쇠 계수 범위" loading="lazy"><figcaption><strong>Table 3.</strong> 부재별 고유진동수(페데스탈 94, 내부 지브 60, 외부 지브 35 rad/s)와 그에 따른 β<sub>k</sub> 범위. 우리 검산: 2×0.03/94 = 0.00064, 2×0.07/94 = 0.00149 → 표의 0.0006~0.0015 와 일치.</figcaption></figure>
-<aside class="callout example"><span class="callout-title">EXAMPLE · 🔧 HR35 대조 — 구조 유연성</span><p>HR35 트윈은 링크를 강체로, 차체를 트랙 접촉으로 지지한다. 이 논문은 구조 유연성이 압력 진동 주파수를 지배한다는 것을 보였고, 우리 3 Hz 계통 모드도 "기름 + 구조 + 접촉" 이 섞인 값일 가능성이 크다(<a href="#q9">심화 Q9</a>).</p></aside>
+          <section class="article-section" id="context" aria-labelledby="context-title">
+            <span class="section-no">01 / THE PROBLEM</span>
+            <h2 id="context-title">현장에는 완전한 데이터시트가 없다</h2>
+            <p class="lead">고가이고 복잡하며 소량 생산되는 해양 시추 장비는 시제품 시험을 반복하기 어렵다. 그래서 시뮬레이션이 중요하지만, 바로 그 모델을 만드는 데 필요한 정보가 부족하다.</p>
+            <p>유압 부품 제조사가 제공하는 자료만으로는 밸브의 실제 유량 특성, 압력보상기의 응답, 실린더 마찰을 충분히 알기 어렵다. 여기에 크레인의 구조 유연성까지 더해지면, 기계와 유압을 따로 정교하게 만드는 것만으로 실제 동작이 재현되지는 않는다.</p>
+            <div class="table-scroll">
+              <table>
+                <caption>연구 배경에서 비교한 선행 접근 — 제공된 노트의 정리</caption>
+                <thead><tr><th scope="col">분류</th><th scope="col">대표 연구</th><th scope="col">남아 있던 과제</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">이동식 크레인</th><td>Ellman 1996<br>Hansen 2001<br>Esque 2003</td><td>검증된 사례가 있으나, 트럭 크레인 특유의 유연성을 다룬다.</td></tr>
+                  <tr><th scope="row">해양 붐 크레인</th><td>Than 2002<br>Bak 2011</td><td>유연성을 포함했지만, 해당 모델의 실험 검증이 부족했다.</td></tr>
+                  <tr><th scope="row">유압 부품 모델</th><td>일반 부품 모델링 문헌</td><td>자료 부족과 불완전한 물리 정보가 검증을 어렵게 한다.</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>이 논문의 기여는 현장에서 확보할 수 있는 자료로 <strong>어느 정도의 상세도가 충분한지</strong> 실험적으로 확인한 데 있다. 유연 부재는 분할 모델로, 유압계는 회색상자로, 카운터밸런스밸브의 유량은 압력비를 이용한 블랙박스로 표현했다.</p>
+            <blockquote class="pullquote">
+              <p>알 수 있는 물리는 남기고,<br>알 수 없는 특성은 측정으로 채운다.</p>
+              <footer>연구 접근을 요약한 해설 문장 · 원문 직접 인용 아님</footer>
+            </blockquote>
+          </section>
 
-<h3 id="hydraulic-overview">2.3 유압 모델 개요 (§4, p.6~10)</h3>
-<p>기계는 백색상자(물리), 유압은 <strong>반물리(회색상자)</strong>. 이유: 부품 자료 부족 + 물리 모델은 계산량 과다. 신호는 −1..1 정규화, 부품 동특성은 전달함수.</p>
-<div class="flow" role="group" aria-label="유압 모델 신호 및 동력 흐름">
-<p class="flow-caption">유압 모델 · 입력 → 밸브 → 실린더 → 다물체 → 출력</p>
-<div class="flow-sources"><div class="flow-node">조이스틱 u<sub>JS</sub>(−1..1)<br>개루프</div><div class="flow-node">HPU p<sub>S</sub>=210 bar, p<sub>R</sub>=0</div></div>
-<div class="flow-arrow" aria-hidden="true">↓</div>
-<div class="flow-node"><strong>DCV: 2차 지연(ω<sub>V</sub>, ζ<sub>V</sub>) 식(9)</strong>스풀 4 에지 오리피스 식(6) + 오버랩/언더랩 Fig.8<br>압력보상기 식(10), LS 식(11)</div>
-<div class="flow-arrow" aria-hidden="true">↓</div>
-<div class="flow-node amber"><strong>CBV 블랙박스</strong>μ<sub>x</sub>=p<sub>x</sub>/p<sub>L</sub>, μ<sub>L</sub> 식(15~17)<br>Q=A(μ<sub>x</sub>)·s<sup>n(μ<sub>x</sub>)</sup> 식(19~22)</div>
-<div class="flow-arrow" aria-hidden="true">↓</div>
-<div class="flow-node blue"><strong>실린더: 챔버 압축성 식(24)(25)</strong>힘 식(23), 마찰 F<sub>S</sub>+C<sub>p</sub>|F<sub>p</sub>| 식(26)</div>
-<div class="flow-arrow" aria-hidden="true">↓</div>
-<div class="flow-node"><strong>다물체 12 강체 + 유연 세그먼트</strong>k<sub>S</sub>=2EI/L, c=β<sub>k</sub>k</div>
-<div class="flow-arrow" aria-hidden="true">↓</div>
-<div class="flow-node">l<sub>cyl</sub>, p1~p4</div>
-</div>
-</section>
+          <section class="article-section" id="system" aria-labelledby="system-title">
+            <span class="section-no">02 / SYSTEM ARCHITECTURE</span>
+            <h2 id="system-title">기계의 유연성과 유압의 압축성을 함께</h2>
+            <p>크레인은 페데스탈, 회전부인 킹, 세 지브, 그리핑 요크와 세 쌍의 실린더 배럴·피스톤으로 구성된다. 기본 다물체 구성은 <strong>12개 강체, 자유도 4</strong>이며, 주요 부재를 추가로 나누어 굽힘 유연성을 표현한다.</p>
 
-<section id="technology">
-<h2>3. 핵심 기술</h2>
-<h3 id="orifice">3.1 밸브 오리피스와 유량계수 (§4, p.6~7)</h3>
-<div class="eq"><div class="formula" id="eq6">Q = ξ C<sub>V</sub> √Δp <span class="eqno">(6)</span></div><div class="formula" id="eq7">C<sub>V</sub> = C<sub>d</sub>A<sub>d</sub> √(2/ρ<sub>oil</sub>) <span class="eqno">(7)</span></div><div class="formula" id="eq8">C<sub>V</sub> = Q<sub>nom</sub> / √Δp<sub>nom</sub> <span class="eqno">(8)</span></div></div>
-<div class="table-wrap" tabindex="0" role="region" aria-label="밸브 오리피스 기호">
-<table><thead><tr><th scope="col">기호</th><th scope="col">뜻</th></tr></thead><tbody>
-<tr><th scope="row">ξ ∈ [0,1]</th><td>상대 열림. 신호로 제어되거나(DCV) 압력 평형으로 정해짐(체크·릴리프)</td></tr>
-<tr><th scope="row">C<sub>V</sub></th><td>유량계수. 데이터시트 특성곡선의 공칭 유량·공칭 압력강하로 얻음</td></tr>
-<tr><th scope="row">C<sub>d</sub>, A<sub>d</sub></th><td>방출계수·방출 면적 — 보통 미공개라 C<sub>V</sub> 로 대체. C<sub>d</sub> 상수·A<sub>d</sub> 만 열림에 비례 가정</td></tr>
-</tbody></table></div>
-<p>이 접근은 스풀 위치 폐루프·디더가 있는 DCV 엔 잘 맞지만, 압력제어밸브(CBV)엔 마찰·히스테리시스·비선형 면적·유량힘 때문에 자주 실패 → 블랙박스(<a href="#cbv">§3.3</a>).</p>
+            <div class="figure-grid">
+              <figure>
+                <div class="figure-box"><img src="assets/figure2.png" loading="lazy" alt="내부 지브의 방향제어밸브와 외부 배출형 카운터밸런스밸브 회로 및 p1, p2, p3 측정점"></div>
+                <figcaption><strong>그림 2.</strong> 내부 지브 회로. DCV와 외부 배출형 CBV를 사용하며 p₁·p₂·p₃를 측정한다.</figcaption>
+              </figure>
+              <figure>
+                <div class="figure-box"><img src="assets/figure3.png" loading="lazy" alt="중간 및 외부 지브의 압력보상기, 부하감지 라인과 두 개의 비배출 카운터밸런스밸브 회로"></div>
+                <figcaption><strong>그림 3.</strong> 중간·외부 지브 회로. 압력보상기, 부하감지(LS) 라인, 비배출 CBV 두 개가 있으며 측정 압력은 p₂·p₃다.</figcaption>
+              </figure>
+            </div>
 
-<h3 id="dcv">3.2 방향제어밸브 DCV (§4.1, p.7~8)</h3>
-<figure id="fig7"><img src="assets/figure7.png" width="400" alt="Fig. 7. 파일럿, 주 스풀 4 에지, 압력보상기와 LS를 포함한 DCV 모델" loading="lazy"><figcaption><strong>Fig. 7.</strong> DCV 모델 구조. 파일럿(스풀 동특성) + 주 스풀 4 에지(PA, PB, AT, BT) + 압력보상기 + LS 회로. 파랑은 단일 신호, 빨강은 압력·유량 두 상태를 나르는 유압 연결.</figcaption></figure>
-<div class="eq" id="eq9"><div class="formula">u<sub>spool</sub> / u<sub>V</sub> = 1 / (s²/ω<sub>V</sub>² + 2ζ<sub>V</sub>s/ω<sub>V</sub> + 1) <span class="eqno">(9)</span></div></div>
-<ul>
-<li>서보밸브(내부 지브): 대역폭은 데이터시트 Bode 선도에서(진폭 의존 비선형이지만 2차로 충분).</li>
-<li>압력보상 DCV(PVG32): 데이터시트에 대역폭이 없어 <strong>별도 주파수응답 시험</strong>(Bak &amp; Hansen 2012)으로 ω<sub>V</sub> = 30 rad/s, ζ<sub>V</sub> = 0.8. 이 값은 파일럿·주 스풀·LS·보상기를 합친 "명령→유량" 전체 동특성이다.</li>
-</ul>
-<figure id="fig8"><img src="assets/figure8.png" width="500" alt="Fig. 8. 미터링 에지의 오버랩과 리턴 에지의 언더랩 열림 함수" loading="lazy"><figcaption><strong>Fig. 8.</strong> 스풀 에지 열림 함수. 미터링 에지(PA, PB)는 오버랩(중립 부근 데드밴드), 리턴 에지(AT, BT)는 언더랩(중립에서 약간 열림)을 구간 선형으로 표현. 이 형태가 HR35 밸브의 불감대 모델과 대응된다.</figcaption></figure>
-<p>압력보상기와 LS:</p>
-<div class="eq">
-<div class="formula" id="eq10">p<sub>comp</sub> =
-<span class="cases"><span class="case-row"><span>p<sub>LS</sub> + p₀</span><span>p₀ ≤ p<sub>S</sub> − p<sub>LS</sub></span></span><span class="case-row"><span>p<sub>S</sub> − p<sub>LS</sub></span><span>0 &lt; p<sub>S</sub> − p<sub>LS</sub> &lt; p₀</span></span><span class="case-row"><span>p<sub>LS</sub></span><span>p<sub>S</sub> − p<sub>LS</sub> ≤ 0</span></span></span><span class="eqno">(10)</span></div>
-<div class="formula" id="eq11">p<sub>LS</sub> =
-<span class="cases"><span class="case-row"><span>p<sub>A</sub></span><span>u<sub>spool</sub> &lt; 0</span></span><span class="case-row"><span>p<sub>B</sub></span><span>0 &lt; u<sub>spool</sub></span></span><span class="case-row"><span>0</span><span>otherwise</span></span></span><span class="eqno">(11)</span></div>
-</div>
-<p>첫 경우가 정상(미터링 에지 압력강하 p₀ 유지), 둘째는 부하압이 공급압에 가까워 p₀ 를 못 지키는 <strong>압력 포화</strong>, 셋째는 역류 방지 체크밸브 기능.</p>
-<figure id="table4"><img src="assets/table4.png" width="500" alt="Table 4. 서보밸브와 PVG32의 DCV 파라미터" loading="lazy"><figcaption><strong>Table 4.</strong> DCV 파라미터. 서보밸브 250 rad/s(40 Hz)·오버랩 5 %·C<sub>V</sub> 111.8 l/(min·√bar); PVG32 30 rad/s(5 Hz)·ζ 0.8·오버랩 10 %·언더랩 5 %·C<sub>V</sub> 37.8·p₀ 7 bar. 우리 검산: 37.8×√7 = 100.0 l/min — PVG32 의 공칭 유량과 정합.</figcaption></figure>
+            <figure class="compact-figure">
+              <div class="figure-box"><img src="assets/table1.png" loading="lazy" alt="세 유압 회로의 입력, 출력, 상태변수와 각 변수의 측정 여부를 정리한 원문 표 1"></div>
+              <figcaption><strong>원문 표 1.</strong> 세 회로의 입력·출력·상태변수와 측정 여부. 관측되지 않는 압력은 이후 회로 모델을 통해 추정한다.</figcaption>
+            </figure>
 
-<h3 id="cbv">3.3 카운터밸런스밸브 CBV (§4.2, p.8~9)</h3>
-<p>체크밸브(식 6 + 열림 (12)):</p>
-<div class="eq" id="eq12"><div class="formula">ξ<sub>CV</sub> = (p₁ − p₂ − p<sub>cr,CV</sub>) / k<sub>s,CV</sub> <span class="eqno">(12)</span></div></div>
-<p>크래킹(열리기 시작) 조건:</p>
-<div class="eq"><div class="formula" id="eq13">p₂ + ψp<sub>x</sub> = p<sub>cr,CBV</sub> &nbsp; (외부 배출) <span class="eqno">(13)</span></div><div class="formula" id="eq14">p₂ + ψp<sub>x</sub> = p<sub>cr,CBV</sub> + (1+ψ)p₁ &nbsp; (비배출) <span class="eqno">(14)</span></div></div>
-<p>블랙박스: 두 압력비로 상태를 표현.</p>
-<div class="eq">
-<div class="formula" id="eq15">μ<sub>x</sub> = p<sub>x</sub> / p<sub>L</sub> <span class="eqno">(15)</span></div>
-<div class="formula" id="eq16">μ<sub>L</sub> = p<sub>L</sub> / p<sub>cr,CBV</sub> &nbsp; (외부 배출) <span class="eqno">(16)</span></div>
-<div class="formula" id="eq17">μ<sub>L</sub> = Δp / p<sub>cr,CBV</sub> &nbsp; (비배출) <span class="eqno">(17)</span></div>
-<div class="formula" id="eq18">μ<sub>L,cr</sub> = 1 / (1+ψμ<sub>x</sub>) <span class="eqno">(18)</span></div>
-<div class="formula" id="eq19">s = μ<sub>L</sub> − μ<sub>L,cr</sub> <span class="eqno">(19)</span></div>
-<div class="formula" id="eq20">Q<sub>CBV</sub> = A<sub>CBV</sub> s<sup>n<sub>CBV</sub></sup> &nbsp; (s &gt; 0; s ≤ 0 ⇒ Q = 0) <span class="eqno">(20)</span></div>
-<div class="formula" id="eq21">A<sub>CBV</sub> = A₀ + A₁μ<sub>x</sub> <span class="eqno">(21)</span></div>
-<div class="formula" id="eq22">n<sub>CBV</sub> = n₀ + n₁μ<sub>x</sub> <span class="eqno">(22)</span></div>
-</div>
-<div class="table-wrap" tabindex="0" role="region" aria-label="CBV 모델 기호">
-<table><thead><tr><th scope="col">기호</th><th scope="col">뜻</th></tr></thead><tbody>
-<tr><th scope="row">p<sub>L</sub>, p<sub>x</sub></th><td>부하(실린더측) 압력, 파일럿 압력</td></tr>
-<tr><th scope="row">p<sub>cr</sub>, ψ</th><td>크래킹 압력(250 bar), 파일럿 면적비(기하 3 / 6)</td></tr>
-<tr><th scope="row">s</th><td>크래킹선에서의 거리(양수면 열림)</td></tr>
-<tr><th scope="row">A₀, A₁, n₀, n₁</th><td>실험 식별 계수(유량 지도 또는 §5.2 식별)</td></tr>
-</tbody></table></div>
-<figure id="fig9"><img src="assets/figure9.png" width="400" alt="Fig. 9. 파일럿 면적비 3인 CBV의 압력비 평면과 크래킹선" loading="lazy"><figcaption><strong>Fig. 9.</strong> ψ = 3 인 CBV 의 μ<sub>L</sub>–μ<sub>x</sub> 평면. 실선이 크래킹선(유량 0), 위쪽 점선들이 유량이 있는 상태. 실제 운전점이 크래킹선에서 얼마나 떨어졌는지(s)가 유량을 결정한다.</figcaption></figure>
-<figure id="table5"><img src="assets/table5.png" width="400" alt="Table 5. CBV 및 체크밸브의 알려진 파라미터" loading="lazy"><figcaption><strong>Table 5.</strong> CBV·체크밸브 알려진 파라미터: C<sub>V</sub> 89.4 / 63.2 l/(min·√bar), 체크 크래킹 1 bar, 정규화 스프링 1 bar, CBV 크래킹 250 bar, ψ 3 / 6.</figcaption></figure>
-<aside class="callout"><span class="callout-title">TIP · 직관 — 왜 블랙박스인가</span><p>CBV 는 "실린더측 압력 + ψ배 파일럿 압력 = 스프링 힘"에서 열리기 시작하지만, 열린 뒤 유량은 마찰·히스테리시스·유량힘 때문에 물리식대로 가지 않는다. 그래서 <strong>어디서 열리는지(크래킹선)만 물리로 두고, 열린 뒤 얼마나 흐르는지는 실험 계수</strong>로 둔다. n ≈ 0.5 면 오리피스의 √ 법칙과 같다 — 실제 식별값 n₀ = 0.47 (Table 8) 이 그 근처다.</p></aside>
+            <div class="diagram" role="group" aria-label="조이스틱 및 공급압에서 밸브, 실린더, 다물체 모델로 이어지는 모델 구조">
+              <div class="diagram-label">MODEL FLOW / 입력: 조이스틱 u_JS · HPU 공급압 210 bar</div>
+              <div class="flow">
+                <div class="flow-node"><h4>01 · DCV</h4><p>2차 지연<br>오리피스 유량<br>압력보상기</p></div>
+                <div class="flow-node"><h4>02 · CBV</h4><p>크래킹 조건<br>압력비 기반<br>블랙박스 유량</p></div>
+                <div class="flow-node"><h4>03 · 실린더</h4><p>유체 압축성<br>피스톤 압력힘<br>마찰</p></div>
+                <div class="flow-node"><h4>04 · 다물체</h4><p>기본 12개 강체<br>유연 세그먼트<br>하중과 운동</p></div>
+              </div>
+              <p class="diagram-end">출력: 실린더 길이 l<sub>cyl</sub>, 압력 p₁–p₄ · 도식은 신호 흐름을 단순화했으며 실제 계산에서는 기계와 유압이 결합된다.</p>
+            </div>
 
-<h3 id="cylinder">3.4 실린더 (§4.3, p.9~10)</h3>
-<div class="eq">
-<div class="formula" id="eq23">F<sub>cyl</sub> =
-<span class="cases"><span class="case-row"><span>F<sub>p</sub> − F<sub>fr</sub></span><span>v<sub>cyl</sub> &gt; v₀</span></span><span class="case-row"><span>F<sub>p</sub> − F<sub>fr</sub> v<sub>cyl</sub>/v₀</span><span>|v<sub>cyl</sub>| ≤ v₀</span></span><span class="case-row"><span>F<sub>p</sub> + F<sub>fr</sub></span><span>v<sub>cyl</sub> &lt; −v₀</span></span></span><span class="eqno">(23)</span></div>
-<div class="formula">F<sub>p</sub> = p₁A<sub>p</sub> − p₂φA<sub>p</sub>, &emsp; φ = (D<sub>p</sub>² − D<sub>r</sub>²) / D<sub>p</sub>²</div>
-<div class="formula" id="eq24">ṗ₁ = (β<sub>oil</sub>/V₁)(Q₁ − v<sub>cyl</sub>A<sub>p</sub>) <span class="eqno">(24)</span></div>
-<div class="formula" id="eq25">ṗ₂ = (β<sub>oil</sub>/V₂)(v<sub>cyl</sub>A<sub>a</sub> − Q₂) <span class="eqno">(25)</span></div>
-<div class="formula" id="eq26">F<sub>fr</sub> = F<sub>S</sub> + C<sub>p</sub>|F<sub>p</sub>| <span class="eqno">(26)</span></div>
-</div>
-<div class="table-wrap" tabindex="0" role="region" aria-label="실린더 모델 기호 및 값">
-<table><thead><tr><th scope="col">기호</th><th scope="col">뜻</th><th scope="col">값</th></tr></thead><tbody>
-<tr><th scope="row">A<sub>p</sub>, φA<sub>p</sub></th><td>피스톤 면적, 로드측 환형 면적</td><td>Table 6: D<sub>p</sub> 0.30/0.25 m, D<sub>r</sub> 0.18/0.125 m → φ = 0.64 / 0.75</td></tr>
-<tr><th scope="row">v₀</th><td>0 속도 부근 마찰 전이 속도(수치 안정용)</td><td>미기재</td></tr>
-<tr><th scope="row">β<sub>oil</sub></th><td>유효 체적탄성계수</td><td>초기 추정 → 식별 5500 bar</td></tr>
-<tr><th scope="row">F<sub>S</sub></th><td>정지 마찰. 초기값 = 피스톤측 1 bar 상당 A<sub>p</sub>·10⁵</td><td>외부 지브 4.9 kN → 식별 6.4 kN</td></tr>
-<tr><th scope="row">C<sub>p</sub></th><td>압력 비례 마찰 계수(2~3 % 상당)</td><td>초기 0.02 → 식별 0.029</td></tr>
-</tbody></table></div>
-<figure id="table6"><img src="assets/table6.png" width="400" alt="Table 6. 내부·중간·외부 지브 실린더의 치수와 질량" loading="lazy"><figcaption><strong>Table 6.</strong> 실린더 치수. 내부 지브 D<sub>p</sub> 0.3 m·D<sub>r</sub> 0.18 m·행정 1.755 m·질량 1500 kg, 중간·외부 D<sub>p</sub> 0.25·D<sub>r</sub> 0.125·행정 1.33 m·750 kg.</figcaption></figure>
-<aside class="callout important"><span class="callout-title">IMPORTANT · 원문 오식</span><p>식 (23) 세 번째 조건이 원문에 "v<sub>cyl</sub> &lt; v₀" 로 인쇄돼 있는데 첫 조건(v &gt; v₀)과 겹친다. 문맥상 <strong>v<sub>cyl</sub> &lt; −v₀</strong> 다.</p></aside>
-<p>Ottestad 2012 의 5-파라미터 마찰(정지·쿨롱·속도·압력 의존)은 "실린더 전용 광범위 실험 없이는 못 정한다"고 보고 정지 + 압력 비례 두 항으로 축소했다(p.10).</p>
-</section>
+            <div class="table-scroll">
+              <table>
+                <thead><tr><th scope="col">구성</th><th scope="col">모델링 선택</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">유연 부재</th><td>페데스탈 2조각, 내부 지브 5조각, 외부 지브 4조각. 회전 스프링 강성 k<sub>S</sub> = 2EI/L.</td></tr>
+                  <tr><th scope="row">구조 감쇠</th><td>강성 비례 감쇠 c = β<sub>k</sub>k, β<sub>k</sub> = 2ζ<sub>S</sub>/ω<sub>S</sub>. 금속 구조의 감쇠비 범위로 ζ = 0.03–0.07을 사용.</td></tr>
+                  <tr><th scope="row">방향제어밸브</th><td>내부 지브는 서보밸브, 중간·외부 지브는 압력보상 비례밸브 PVG32.</td></tr>
+                  <tr><th scope="row">실린더 치수</th><td>노트에 제시된 피스톤 지름 D<sub>p</sub> = 0.30 / 0.25 m, 로드 지름 D<sub>r</sub> = 0.18 / 0.125 m.</td></tr>
+                </tbody>
+              </table>
+            </div>
 
-<section id="identification">
-<h2>4. 파라미터 식별 절차 (§5, p.10~16)</h2>
-<figure id="fig10"><img src="assets/figure10.png" width="400" alt="Fig. 10. 시험에 사용한 실제 Aker Solutions 크레인" loading="lazy"><figcaption><strong>Fig. 10.</strong> 시험에 쓴 실제 크레인(Aker Solutions).</figcaption></figure>
-<figure id="fig11"><img src="assets/figure11.png" width="400" alt="Fig. 11. 실계와 모델에 같은 입력을 가하는 검증 원리" loading="lazy"><figcaption><strong>Fig. 11.</strong> 검증 원리. 같은 입력을 실계와 모델에 넣고, 출력(실린더 길이)뿐 아니라 측정 가능한 상태변수(압력)까지 비교해 불확실 파라미터를 조정한다.</figcaption></figure>
-<p>시험은 <strong>개루프 모드</strong>, 한 자유도씩(다른 실린더는 정지), 절차가 같으므로 외부 지브만 보고한다.</p>
-<figure id="fig12"><img src="assets/figure12.png" width="700" alt="Fig. 12. 150초 외부 지브 램프 왕복 시험의 입력과 실린더 길이" loading="lazy"><figcaption><strong>Fig. 12.</strong> 외부 지브 시험 입력과 출력. 조이스틱 +0.5 로 약 80 s 신장, −0.5 로 약 65 s 수축하는 느린 램프 왕복(총 150 s). 다른 두 실린더 길이(빨강·파랑)가 움직이지 않는 것도 함께 확인한다.</figcaption></figure>
-<div class="flow" role="group" aria-label="시운전 데이터에 기반한 3단계 식별 절차">
-<p class="flow-caption">단계별 식별 · 정상 힘 → 정상 압력 → 동특성</p>
-<div class="flow-node"><strong>시운전 데이터</strong>개루프·한 축씩·램프 왕복 150 s</div>
-<div class="flow-arrow" aria-hidden="true">↓</div>
-<div class="flow-node green"><strong>① 정상상태 힘 (§5.1)</strong>측정 l<sub>cyl</sub> 을 강체 정적 모델에 넣어 F<sub>cyl</sub> 계산<br>fmincon (F̃<sub>p</sub> − F<sub>p</sub>)² 식(27)(28)<br>→ m<sub>i</sub>, COG<sub>i</sub> 미세조정 + F<sub>S</sub>, C<sub>p</sub></div>
-<div class="flow-arrow" aria-hidden="true">↓</div>
-<div class="flow-node amber"><strong>② 정상상태 압력 (§5.2)</strong>측정 운동으로 CBV 유량 Q1,Q2 계산, p2·p3 측정, p1·p4 추정<br>fmincon (Q̃ − Q)² 식(34) → A0,A1,n0,n1 (+C1,C2)</div>
-<div class="flow-arrow" aria-hidden="true">↓</div>
-<div class="flow-node blue"><strong>③ 동특성 (§5.3)</strong>DCV C<sub>V</sub> 수동 조정으로 운동 일치(Fig.17)<br>구조 강성 ×0.55, β<sub>k</sub> 0.002/0.003/0.007, β<sub>oil</sub>=5500 bar<br>압력 진동 주파수 일치(Fig.19)</div>
-</div>
+            <div class="figure-grid">
+              <figure>
+                <div class="figure-box"><img src="assets/figure4.png" loading="lazy" alt="회전, 구면, 유니버설 및 프리즘 관절로 연결된 크레인 다물체 모델의 위상"></div>
+                <figcaption><strong>그림 4.</strong> 다물체 모델의 위상. B–E는 회전 관절, 배럴 핀은 구면, 피스톤 핀은 유니버설, 배럴–피스톤 연결은 프리즘 관절이다.</figcaption>
+              </figure>
+              <figure>
+                <div class="figure-box"><img src="assets/figure6.png" loading="lazy" alt="페데스탈 2개, 내부 지브 5개, 외부 지브 4개 세그먼트로 나눈 유연 부재 모델"></div>
+                <figcaption><strong>그림 6.</strong> 유연 부재의 분할. 킹·중간 지브·기초의 유연성은 이 분할에 명시적으로 포함되지 않는다.</figcaption>
+              </figure>
+            </div>
+          </section>
 
-<h3 id="steady-force">4.1 정상상태 힘 (§5.1, p.11~12)</h3>
-<p>강체 정적 모델에 측정 실린더 운동(Fig. 12)을 넣어 정상 힘을 계산하고, 측정 압력힘과 비교한다.</p>
-<div class="eq">
-<div class="formula" id="eq27">min f = (F̃<sub>p</sub> − F<sub>p</sub>)² <span class="eqno">(27)</span></div>
-<div class="formula" id="eq28">F<sub>p</sub> =
-<span class="cases"><span class="case-row"><span>F<sub>cyl</sub> − F<sub>S</sub> − C<sub>p</sub>|F̃<sub>p</sub>|</span><span>v<sub>cyl</sub> &lt; 0</span></span><span class="case-row"><span>F<sub>cyl</sub> + F<sub>S</sub> + C<sub>p</sub>|F̃<sub>p</sub>|</span><span>0 ≤ v<sub>cyl</sub></span></span></span><span class="eqno">(28)</span></div>
-</div>
-<p>fmincon 으로 마찰(F<sub>S</sub>, C<sub>p</sub>)과 질량·COG(CAD 값을 제약 안에서 조정)를 동시에 푼다. CAD 는 조립체의 모든 부품을 담지 못하므로 조정 여지를 둔다는 논리.</p>
-<figure id="fig14"><img src="assets/figure14.png" width="700" alt="Fig. 14. 측정 압력힘, 시뮬레이션 실린더 힘 및 마찰을 포함한 압력힘 비교" loading="lazy"><figcaption><strong>Fig. 14.</strong> 측정 압력힘(빨강), 시뮬레이션 실린더 힘(파랑), 마찰을 더한 시뮬레이션 압력힘(초록). 신장(0~83 s)에선 힘이 −200 → +350 kN 으로 올라가고, 방향 전환(83 s)에서 마찰 부호가 바뀌어 계단이 생긴다. 정상 수준이 거의 일치해 기계 모델·마찰을 "신뢰 가능"으로 판단.</figcaption></figure>
-<figure id="table7"><img src="assets/table7.png" width="400" alt="Table 7. 식별 전후의 질량·질량중심과 마찰 파라미터" loading="lazy"><figcaption><strong>Table 7.</strong> 식별 전후 기계 파라미터. 질량은 0.4~4.5 % 만 변했지만 요크(강체 6) COG x₆ 은 1.0 → 1.57 m 로 57 % 변했다. 정상 힘은 질량×팔길이 곱만 보므로 조정이 COG 로 몰린 것이다(<a href="#q8">심화 Q8</a>). 마찰 F<sub>S</sub> 6.4 kN, C<sub>p</sub> 0.029.</figcaption></figure>
+          <section class="article-section" id="hydraulics" aria-labelledby="hydraulics-title">
+            <span class="section-no">03 / GREY-BOX HYDRAULICS</span>
+            <h2 id="hydraulics-title">상세함보다 중요한 것은<br>식별할 수 있는 형태다</h2>
+            <p>회색상자 모델은 물리 구조를 유지하면서 일부 계수를 데이터로 정한다. 이 연구에서는 공칭 유량을 오리피스 계수로 바꾸고, 밸브 응답을 저차 전달함수로 표현하며, 실린더 마찰을 식별 가능한 두 항으로 줄였다.</p>
 
-<h3 id="steady-pressure">4.2 정상상태 압력 — CBV 식별 (§5.2, p.12~13)</h3>
-<p>측정 운동에서 CBV 유량 Q₁, Q₂ 를 계산하고, 측정 p₂·p₃ 와 정상상태 회로 모델로 p₁·p₄ 를 추정한 뒤 (19)(20) 으로 A₀, A₁, n₀, n₁ 을 푼다.</p>
-<p>유효 파일럿 면적비: 기하 ψ = 6 이지만 내부 오리피스 두 개가 파일럿 압력을 낮춰 유효 ψ ≈ 1.95(난류·배압 0 가정). 실제로는 배압이 있고 난류가 아닐 수 있어 크래킹선을 보정:</p>
-<div class="eq" id="eq29"><div class="formula">μ<sub>L,cr</sub> = 1 / (1 + C₁μ<sub>x</sub> + C₂μ<sub>x</sub>²) <span class="eqno">(29)</span></div></div>
-<p>신장(CBV₂ 활성): μ<sub>L,2</sub> = (p₃ − p₄)/p<sub>cr</sub> (30), μ<sub>x,2</sub> = p₁/p₃ (31). 수축(CBV₁ 활성): μ<sub>L</sub> = (p₂ − p₁)/p<sub>cr</sub> (32), μ<sub>x</sub> = p₄/p₂ (33).</p>
-<div class="eq" id="eq34"><div class="formula">min f = (Q̃<sub>CBV</sub> − Q<sub>CBV</sub>)² <span class="eqno">(34)</span></div></div>
-<figure id="fig15"><img src="assets/figure15.png" width="400" alt="Fig. 15. 외부 지브 CBV 압력비 관계와 보정한 크래킹선" loading="lazy"><figcaption><strong>Fig. 15.</strong> 외부 지브 CBV 의 μ<sub>L</sub>–μ<sub>x</sub> 관계. 기하 ψ 크래킹선(회색 점선)과 측정 μ<sub>L</sub>(빨강·파랑)이 크게 어긋나고, C₁·C₂ 로 보정한 선(검정 실선)이 측정 하한을 따라간다.</figcaption></figure>
-<figure id="fig16"><img src="assets/figure16.png" width="400" alt="Fig. 16. 두 CBV의 측정 및 시뮬레이션 정상 유량 비교" loading="lazy"><figcaption><strong>Fig. 16.</strong> 식별 후 CBV 두 개의 측정·시뮬레이션 유량(μ<sub>x</sub>, μ<sub>L</sub> 평면 위 3차원). 정상 유량 30~65 l/min 이 겹친다.</figcaption></figure>
-<figure id="table8"><img src="assets/table8.png" width="400" alt="Table 8. 외부 지브 CBV의 6개 식별 계수" loading="lazy"><figcaption><strong>Table 8.</strong> 외부 지브 CBV 식별값: C₁ 1.6267, C₂ 0.2452, A₀ 27.84, A₁ 146.2, n₀ 0.4707, n₁ 0.0359. n₀ ≈ 0.47 은 오리피스 √ 법칙(0.5)에 가깝고, A 가 μ<sub>x</sub> 에 강하게 비례(A₁ ≫ A₀)해 파일럿이 열림 면적을 키운다는 물리와 맞는다.</figcaption></figure>
-<figure id="fig17"><img src="assets/figure17.png" width="500" alt="Fig. 17. DCV 유량계수 조정 후 측정 및 시뮬레이션 실린더 길이" loading="lazy"><figcaption><strong>Fig. 17.</strong> DCV 유량계수를 수동 조정한 뒤의 실린더 길이 — 측정과 시뮬레이션이 겹친다. 이 일치가 다음 압력 비교의 전제다.</figcaption></figure>
-<figure id="fig18"><img src="assets/figure18.png" width="700" alt="Fig. 18. 신장과 수축에서 정상상태 압력 측정 및 시뮬레이션 비교" loading="lazy"><figcaption><strong>Fig. 18.</strong> 정상상태 압력 검증. p₂(초록/빨강)·p₃(보라/파랑)의 측정·시뮬레이션 수준이 신장·수축 모두 일치. 83 s 방향 전환에서 압력이 급변한다.</figcaption></figure>
+            <h3>3.1 · 공칭 유량 한 점에서 시작하는 오리피스</h3>
+            <div class="equation" aria-label="밸브 오리피스 유량식">
+              <div class="eq-line"><span class="math">Q = ξ C<sub>V</sub> √Δp</span><span class="eq-no">(6)</span></div>
+              <div class="eq-line"><span class="math">C<sub>V</sub> = Q<sub>nom</sub> / √Δp<sub>nom</sub></span><span class="eq-no">(8)</span></div>
+            </div>
+            <p>ξ ∈ [0, 1]은 상대 열림이고, C<sub>V</sub>는 데이터시트의 공칭 유량과 공칭 압력강하에서 계산하는 유량계수다. 방출계수나 실제 개구 면적이 공개되지 않아도, 열림에 따라 유효 면적이 변한다고 가정하면 모델을 구성할 수 있다.</p>
+            <div class="callout">
+              <span class="label">수치로 읽는 직관</span>
+              <p>PVG32의 C<sub>V</sub> = 37.8 L/(min·√bar)에 압력강하 7 bar를 대입하면, 완전 열림에서 유량은 약 100 L/min이다. 공칭값을 모델의 출발점으로 삼는 방식이다.</p>
+            </div>
 
-<h3 id="dynamics">4.3 동특성 (§5.3, p.14~16)</h3>
-<p>정상 수준은 맞지만 <strong>모델이 실제보다 뻣뻣</strong>했다. 남은 불확실 파라미터(구조 강성·감쇠·β<sub>oil</sub>)를 압력 진동 <strong>주파수</strong>가 맞도록 조정(진폭은 불확실 요인이 더 많아 후순위).</p>
-<ul>
-<li>구조 강성 전부 <strong>55 %</strong> 로, 감쇠 배율 β<sub>k</sub> = 0.002 / 0.003 / 0.007 로 <strong>올림</strong>, β<sub>oil</sub> = <strong>5500 bar</strong>(초기 추정의 약 절반).</li>
-<li>신장 구간: 주파수·진폭 모두 일치(시작 가속 구간 제외). 수축 구간(CBV 활성·음의 부하): 주파수만 일부 일치, 진폭은 시뮬이 과감쇠.</li>
-<li>원인 후보(p.15): 실린더 엔드스톱 미모델, 가속 유량에서 CBV 모델 부정확, 0 속도 부근 마찰 단순화.</li>
-</ul>
-<figure id="fig19"><img src="assets/figure19.png" width="700" alt="Fig. 19. 동특성 보정 후 신장·수축 시작 구간의 압력 진동 비교" loading="lazy"><figcaption><strong>Fig. 19.</strong> 동특성 보정 후 압력. 왼쪽 확대(신장 시작): 진동 주파수·감쇠가 측정과 겹침. 오른쪽 확대(수축 시작): 측정은 오래 울리는데 시뮬은 빨리 죽는다. 세 파라미터를 동시에 배율로 맞춘 결과라 어느 하나가 원인인지는 이 그림으로 못 가른다.</figcaption></figure>
-<p><strong>저자의 해석(p.15~16):</strong> 강성을 반으로 줄여야 했던 것은 유연화하지 않은 부재(킹·중간 지브·기초)와 연결부의 유연성이 흡수된 것. β 5500 bar 는 순수 기름값보다 훨씬 낮지만 배관·호스 컴플라이언스를 포함한 유효값으로 Merritt 상한 100,000 psi(≈6900 bar) 아래라 타당. 감쇠 배율이 (5) 의 예측과 반대로 올라간 것은 모델 밖 부재·연결부 마찰 감쇠 때문.</p>
-</section>
+            <h3>3.2 · DCV: 스풀의 지연과 압력보상</h3>
+            <div class="equation" aria-label="방향제어밸브 스풀의 2차 전달함수">
+              <div class="eq-line"><span class="math">u<sub>spool</sub> / u<sub>V</sub> = 1 / (s²/ω<sub>V</sub>² + 2ζ<sub>V</sub>s/ω<sub>V</sub> + 1)</span><span class="eq-no">(9)</span></div>
+            </div>
+            <p>스풀 응답은 2차 지연으로 표현한다. 압력보상 DCV는 데이터시트에 대역폭 정보가 없어 <strong>별도 주파수응답 시험</strong>으로 ω<sub>V</sub> = 30 rad/s, ζ<sub>V</sub> = 0.8을 얻었다. 따라서 전체 모델 구축에 사용된 정보가 시운전 로그만인 것은 아니다.</p>
 
-<section id="results">
-<h2>5. 실험 결과 요약</h2>
-<div class="table-wrap wide" tabindex="0" role="region" aria-label="단계별 실험 결과 요약">
-<table><thead><tr><th scope="col">단계</th><th scope="col">지표</th><th scope="col">결과</th><th scope="col">검산·비고</th></tr></thead><tbody>
-<tr><th scope="row">①</th><td>정상상태 힘</td><td>측정·시뮬 수준 거의 일치(Fig. 14)</td><td>φ 검산 0.75/0.64 ✓; F<sub>S</sub> 6.4 kN = 1.3 bar 상당(초기 1 bar)</td></tr>
-<tr><th scope="row">②</th><td>CBV 유량</td><td>정상 유량 일치(Fig. 16)</td><td>n₀ 0.47 ≈ √ 법칙</td></tr>
-<tr><th scope="row">②</th><td>실린더 운동</td><td>일치(Fig. 17, DCV C<sub>V</sub> 수동)</td><td>개루프 운동 재현</td></tr>
-<tr><th scope="row">②</th><td>정상 압력</td><td>일치(Fig. 18)</td><td>—</td></tr>
-<tr><th scope="row">③</th><td>압력 동특성</td><td>신장 ○, 수축 △(과감쇠)</td><td>세 파라미터 상쇄 가능</td></tr>
-<tr><th scope="row">③</th><td>식별 β<sub>oil</sub></td><td>5500 bar = 0.55 GPa</td><td>광유 1.4~1.7 GPa 의 1/3; Merritt 상한 아래</td></tr>
-<tr><th scope="row">③</th><td>구조 강성 배율</td><td>0.55</td><td>모델 밖 부재 유연성 흡수</td></tr>
-<tr><th scope="row">③</th><td>β<sub>k</sub></td><td>0.002 / 0.003 / 0.007</td><td>(5) 예측 0.0006~0.004 보다 큼</td></tr>
-</tbody></table></div>
-</section>
+            <div class="figure-grid">
+              <figure>
+                <div class="figure-box"><img src="assets/figure8.png" loading="lazy" alt="스풀 변위에 따른 미터링 에지와 리턴 에지의 구간 선형 열림 함수"></div>
+                <figcaption><strong>그림 8.</strong> 미터링 에지의 오버랩은 중립 부근 데드밴드를, 리턴 에지의 언더랩은 중립 부근 열림을 나타낸다.</figcaption>
+              </figure>
+              <figure>
+                <div class="figure-box"><img src="assets/table4.png" loading="lazy" alt="서보밸브와 PVG32의 응답 주파수, 감쇠비, 오버랩, 언더랩 및 압력보상 파라미터를 정리한 원문 표 4"></div>
+                <figcaption><strong>원문 표 4.</strong> 서보밸브는 250 rad/s·오버랩 5%. PVG32는 30 rad/s·ζ 0.8·오버랩 10%·언더랩 5%, 보상 압력 p₀는 7 bar다.</figcaption>
+              </figure>
+            </div>
+            <p>압력보상 모델은 공급압의 여유가 충분한 경우, 부하압이 공급압에 가까운 포화 구간, 역류를 막는 구간을 구분한다. 제공 노트의 식 (10) 표기는 다음과 같다.</p>
+            <div class="equation" aria-label="제공 노트에 기재된 압력보상 식 10">
+              <div class="math">p<sub>comp</sub> =</div>
+              <div class="math">① p<sub>LS</sub> + p₀ <span class="eq-note">　p₀ ≤ p<sub>S</sub> − p<sub>LS</sub></span></div>
+              <div class="math">② p<sub>S</sub> − p<sub>LS</sub> <span class="eq-note">　0 &lt; p<sub>S</sub> − p<sub>LS</sub> &lt; p₀</span></div>
+              <div class="eq-line"><span class="math">③ p<sub>LS</sub> <span class="eq-note">　p<sub>S</sub> − p<sub>LS</sub> ≤ 0</span></span><span class="eq-no">(10)</span></div>
+            </div>
+            <p class="note">전사 확인 사항: 위 둘째 분기는 첫째·셋째 분기와 압력 기준이 일관되는지 확인이 필요하다. 노트 표기를 보존했으며, 구현에 사용할 때는 원문의 변수 정의와 식 (10)을 대조해야 한다.</p>
 
-<section id="limits">
-<h2>6. 한계 및 향후 연구</h2>
-<p><strong>논문이 명시한 것(원문 위치):</strong></p>
-<ul>
-<li>선회·요크 자유도 제외(§2). 평면 기구.</li>
-<li>마찰 2-파라미터 축소, 0 속도 부근 단순(§4.3, §5.3).</li>
-<li>엔드스톱 미모델, CBV 가속 유량 부정확(§5.3).</li>
-<li>강성·감쇠·β 를 수동 스케일링(§5.3, §6).</li>
-<li>유연화 안 한 부재·연결부 유연성이 강성 배율에 흡수됨(§5.3).</li>
-</ul>
-<p><strong>요약자 판단:</strong></p>
-<ul>
-<li>표본율·동기화·센서 정확도 미기재. 외부 지브 회로는 압력 두 개만 측정(p₁·p₄ 추정).</li>
-<li>보정 데이터로 검증(홀드아웃 없음). 불확실성·신뢰구간 없음. 반복 횟수 미기재.</li>
-<li>질량·COG 동시 조정은 정상 힘만으로 곱만 식별되는 문제를 "CAD 근처 제약"으로 우회 — Table 7 의 x₆ +57 % 가 그 흔적.</li>
-<li>강성·감쇠·β 는 주파수 하나로 세 묶음을 맞춘 것이라 서로 상쇄될 수 있음을 저자도 인정 — 우리 β 문제와 같은 구조(<a href="#q9">심화 Q9</a>).</li>
-</ul>
-<div class="flow" role="group" aria-label="한계와 후속 연구의 대응">
-<p class="flow-caption">한계 → 후속 연구</p>
-<div class="mapping">
-<div class="flow-node">엔드스톱·가속 유량 CBV 부정확</div><div class="flow-arrow" aria-hidden="true">→</div><div class="flow-node">엔드스톱 모델·CBV 동적 시험(Part Two)</div>
-<div class="flow-node">강성·감쇠·β 상쇄</div><div class="flow-arrow" aria-hidden="true">→</div><div class="flow-node">부재별 진동 시험 또는 FE 식별로 분리</div>
-<div class="flow-node">홀드아웃 없음</div><div class="flow-arrow" aria-hidden="true">→</div><div class="flow-node">다른 하중·자세 데이터로 예측 검증</div>
-<div class="flow-node">마찰 2-파라미터</div><div class="flow-arrow" aria-hidden="true">→</div><div class="flow-node">실린더 단독 시험으로 5-파라미터</div>
-</div>
-</div>
-</section>
+            <h3>3.3 · CBV: 열리는 조건은 물리, 유량은 실험</h3>
+            <p>카운터밸런스밸브(CBV)는 부하압과 파일럿 압력이 스프링 힘을 이기는 조건에서 열리기 시작한다. 하지만 열린 이후의 유량 특성은 마찰과 히스테리시스 때문에 단순한 물리식으로 충분히 설명하기 어렵다.</p>
+            <div class="equation" aria-label="카운터밸런스밸브의 크래킹 조건과 압력비">
+              <div class="eq-line"><span class="math">p₂ + ψp<sub>x</sub> = p<sub>cr</sub> <span class="eq-note">　외부 배출형</span></span><span class="eq-no">(13)</span></div>
+              <div class="eq-line"><span class="math">μ<sub>x</sub> = p<sub>x</sub>/p<sub>L</sub>,　μ<sub>L</sub> = p<sub>L</sub>/p<sub>cr</sub></span><span class="eq-no">(15–18)</span></div>
+              <div class="math">μ<sub>L,cr</sub> = 1 / (1 + ψμ<sub>x</sub>)</div>
+            </div>
+            <div class="equation" aria-label="크래킹선으로부터의 거리를 이용하는 CBV 블랙박스 유량식">
+              <div class="math">s = μ<sub>L</sub> − μ<sub>L,cr</sub></div>
+              <div class="math">Q<sub>CBV</sub> = A<sub>CBV</sub> s<sup>n<sub>CBV</sub></sup></div>
+              <div class="eq-line"><span class="math">A = A₀ + A₁μ<sub>x</sub>,　n = n₀ + n₁μ<sub>x</sub></span><span class="eq-no">(19–22)</span></div>
+            </div>
+            <p>p<sub>L</sub>은 실린더 측 부하압, p<sub>x</sub>는 파일럿 압력이다. 크래킹 압력 p<sub>cr</sub>은 250 bar, 기하학적 파일럿 면적비 ψ는 밸브에 따라 3 또는 6이다. A₀·A₁·n₀·n₁은 실험으로 식별한다.</p>
+            <p class="note">이 절의 s는 크래킹선에서의 거리이며, DCV 전달함수의 라플라스 변수 s와 다른 기호다. 유량의 거듭제곱 식은 밸브가 열린 영역인 s &gt; 0을 대상으로 읽는다.</p>
 
-<section id="hr35">
-<h2>7. HR35 적용 대조와 후속 검증 과제</h2>
-<aside class="callout"><span class="callout-title">TIP · 이 절의 용도</span><p>트윈 담당자·실차팀에 넘길 작업 명세. ⓐ 무엇을 ⓑ 판정 기준 ⓒ 하지 말 것. 안전 관련 숫자(램프 속도·하중)는 확정하지 않았다.</p></aside>
-<h3 id="comparison">7.1 구성요소 대조</h3>
-<div class="table-wrap wide" tabindex="0" role="region" aria-label="논문 구성요소와 HR35 대조">
-<table><thead><tr><th scope="col">논문 요소</th><th scope="col">HR35 실차 / 트윈</th><th scope="col">판정</th><th scope="col">비고</th></tr></thead><tbody>
-<tr><th scope="row">공급: 정압 HPU 210 bar</th><td>엔진 구동 펌프, 릴리프 250 bar(실차 문서) vs 205.9 bar(트윈, iX35e 제원)</td><td>🔴 상충·유량 한계 미모델</td><td>원문 요청 C 항</td></tr>
-<tr><th scope="row">DCV: 서보/압력보상 비례밸브, 2차 30 rad/s</th><td>MCV + 솔레노이드 비례밸브, 트윈 파일럿 시정수 0.05 s(assumed)</td><td>🟡 구조 유사·수치 미측</td><td>밸브 단독 주파수응답 시험 후보</td></tr>
-<tr><th scope="row">스풀 오버랩/언더랩(Fig. 8)</th><td>트윈 <code>spool_deadband</code> 0.34/0.355/0.132(현장 측정), 언더랩 없음</td><td>🟡</td><td>리턴 에지 언더랩 유무 미확인</td></tr>
-<tr><th scope="row">CBV(홀딩·하중 유지)</th><td>HR35 홀딩밸브 유무 미확인(정적 처짐 35 s 6 µm 관측은 있음)</td><td>🔴 미확인</td><td>압력 유지 특성 시험</td></tr>
-<tr><th scope="row">실린더 면적비 φ</th><td>Bak 0.64 / 0.75</td><td>트윈 <strong>세 축 모두 0.7826</strong>(로드/보어 0.466 일괄 가정)</td><td>🔴 로드 지름 실측</td></tr>
-<tr><th scope="row">마찰: F<sub>S</sub> + C<sub>p</sub>·|F<sub>p</sub>|</th><td>트윈: 쿨롱 F<sub>c</sub> + 점성 b</td><td>🟡 구조 다름</td><td>Werner 2025 도 하중 비례</td></tr>
-<tr><th scope="row">β<sub>oil</sub> 5500 bar(식별)</th><td>트윈 1000 bar(assumed, 붐 3.3 Hz 맞춤)</td><td>🔴 1/5</td><td><a href="#q7">심화 Q7</a>·<a href="#q9">Q9</a></td></tr>
-<tr><th scope="row">구조 유연성 55 %</th><td>트윈 링크 강체, 차체 트랙 접촉</td><td>🟡</td><td>3 Hz 모드의 정체와 직결</td></tr>
-<tr><th scope="row">개루프 램프 시험</th><td>현장 S1~S6 은 수동 폐루프</td><td>🔴 전용 시험 필요</td><td>현장 식별 README 도 같은 권고</td></tr>
-</tbody></table></div>
+            <figure class="compact-figure">
+              <div class="figure-box"><img src="assets/figure9.png" loading="lazy" alt="정규화 부하압과 파일럿 압력비 평면에 표시된 카운터밸런스밸브 크래킹선 및 유량 등고선"></div>
+              <figcaption><strong>그림 9.</strong> μ<sub>L</sub>–μ<sub>x</sub> 평면의 크래킹선과 유량 등고선. 운전점이 열림 경계에서 얼마나 떨어져 있는지가 유량을 결정한다.</figcaption>
+            </figure>
 
-<h3 id="tasks">7.2 후속 검증 과제</h3>
-<div class="table-wrap xwide" tabindex="0" role="region" aria-label="HR35 후속 검증 과제, 판정 기준 및 선행 조건">
-<table><thead><tr><th scope="col">#</th><th scope="col">할 일</th><th scope="col">판정 기준</th><th scope="col">하지 말 것</th><th scope="col">비용</th><th scope="col">선행</th></tr></thead><tbody>
-<tr><th scope="row">①</th><td><strong>로드 지름 실측</strong>(붐·암·버킷) → φ 갱신</td><td>트윈 0.466 가정과 차이 &gt; 10 % 면 장부 area_b 전부 재계산</td><td>보어를 로드에서 역산하지 말 것</td><td>현장 10분</td><td>—</td></tr>
-<tr><th scope="row">②</th><td><strong>릴리프 압력 확정</strong>: 250 vs 205.9 bar. 정지 상태에서 실린더를 끝까지 밀어 최대 압력 카운트 확인(압력 변환식 선행)</td><td>두 값 중 하나에 ±5 % 안이면 채택; 둘 다 아니면 사양 재조사</td><td>카운트 상태로 판정하지 말 것</td><td>현장 30분</td><td>압력 변환식</td></tr>
-<tr><th scope="row">③</th><td><strong>개루프 램프 왕복 시험</strong>(한 축씩, 느린 램프, 신장→수축): 정상 힘 계단(마찰)과 정상 압력 확보</td><td>Fig. 14 형태로 방향 전환 계단이 보이고, 계단 폭을 하중에 대해 1차 적합했을 때 기울기 유의(95 % 신뢰구간이 0 제외)하면 C<sub>p</sub> 항 채택</td><td>폐루프 자동 모드로 대체 금지; 두 축 동시 구동 금지</td><td>현장 1시간</td><td>① 압력 변환식</td></tr>
-<tr><th scope="row">④</th><td><strong>압력 유지(홀딩) 특성</strong>: 하중을 든 채 명령 0 으로 두고 압력·길이 시간이력</td><td>처짐률과 압력 감소 시정수 기록; CBV/홀딩밸브 유무를 회로도·실물로 확인</td><td>처짐이 없다고 홀딩밸브가 있다고 단정하지 말 것(마찰일 수 있음)</td><td>현장 20분</td><td>압력 변환식</td></tr>
-<tr><th scope="row">⑤</th><td><strong>밸브 단독 주파수응답</strong>: 명령 정현파 스윕(작은 진폭) → 실린더 속도 응답, 대역폭·ζ 식별</td><td>2차 모델 적합 잔차 &lt; 10 %; 결과 ω<sub>V</sub> 를 트윈 파일럿 시정수와 대조</td><td>통신 지연(CAN·ROS)을 밸브 지연에 섞지 말 것 — 명령 타임스탬프 별도 기록</td><td>현장 40분 + 분석 반나절</td><td>③</td></tr>
-<tr><th scope="row">⑥</th><td><strong>β 분리 시험</strong>: 차체를 고정(잭업·받침)한 상태와 접지 상태에서 같은 급정지 압력 진동 주파수 비교</td><td>두 조건 주파수 차 &gt; 10 % 면 3 Hz 모드에 접촉·구조 강성이 들어 있음 → β 는 재계산</td><td>한 조건 결과로 β 를 확정하지 말 것</td><td>현장 1시간(안전 검토 필수)</td><td>안전 승인</td></tr>
-<tr><th scope="row">⑦</th><td>오프라인: 트윈 β 를 5.5e8 로 바꾸고 붐 모드가 어디로 가는지, 그 차이를 접촉 강성으로 메꿀 수 있는지 감도 계산</td><td>모드 주파수 변화율과 필요한 접촉 강성 값을 표로</td><td>이 계산으로 값을 바꾸지 말 것(가역성 실험 설계용)</td><td>오프라인 반나절</td><td>—</td></tr>
-</tbody></table></div>
-<p><strong>순서</strong>: ⑦ → ① → 압력 변환식(Werner 요약 §7 ②) → ②③④ → ⑤ → ⑥.</p>
-<h3 id="warning">7.3 경고</h3>
-<aside class="callout warning"><span class="callout-title">WARNING · "주파수 하나로 세 개를 맞추면" 생기는 일</span><p>이 논문은 압력 진동 주파수 하나로 구조 강성·감쇠·β 를 동시에 조정했고, 저자 스스로 상쇄를 인정했다. HR35 트윈은 붐 3.3 Hz 하나로 β 를 정했다. 같은 함정이다. β = 1000 bar 는 Bak 의 유효값(5500 bar)의 1/5, Merritt 상한의 1/7 이다 — 기름이 그렇게 무를 수는 없으므로 <strong>다른 강성(구조·접촉)이 β 에 흡수됐다</strong>고 보는 것이 맞다. β 를 "실측했다"고 쓰지 말고 "계통 강성 대용 묶음"으로 표기한다.</p></aside>
-</section>
+            <h3>3.4 · 실린더: 압축성과 두 항의 마찰</h3>
+            <div class="equation" aria-label="실린더 압력힘, 압력 동역학 및 마찰 모델">
+              <div class="eq-line"><span class="math">F<sub>p</sub> = p₁A<sub>p</sub> − p₂φA<sub>p</sub>,　φ = (D<sub>p</sub>² − D<sub>r</sub>²)/D<sub>p</sub>²</span><span class="eq-no">(23)</span></div>
+              <div class="eq-line"><span class="math">dp₁/dt = (β<sub>oil</sub>/V₁)(Q₁ − v<sub>cyl</sub>A<sub>p</sub>)</span><span class="eq-no">(24)</span></div>
+              <div class="eq-line"><span class="math">dp₂/dt = (β<sub>oil</sub>/V₂)(v<sub>cyl</sub>A<sub>a</sub> − Q₂)</span><span class="eq-no">(25)</span></div>
+              <div class="eq-line"><span class="math">F<sub>fr</sub> = F<sub>S</sub> + C<sub>p</sub>|F<sub>p</sub>|</span><span class="eq-no">(26)</span></div>
+            </div>
+            <p>A<sub>p</sub>는 피스톤 면적, A<sub>a</sub>는 로드 측 환상 면적이며 φ = A<sub>a</sub>/A<sub>p</sub>다. V₁·V₂는 각 챔버의 유체 체적이다. 마찰식은 크기를 나타내며 운동 방향에 따라 저항 방향이 달라진다.</p>
+            <div class="table-scroll">
+              <table>
+                <thead><tr><th scope="col">파라미터</th><th scope="col">의미</th><th scope="col">노트에 정리된 값</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">φ</th><td>로드 측 / 피스톤 측 면적비</td><td>내부 0.64 / 외부 0.75</td></tr>
+                  <tr><th scope="row">β<sub>oil</sub></th><td>유효 체적탄성계수</td><td>식별 후 5500 bar</td></tr>
+                  <tr><th scope="row">F<sub>S</sub></th><td>정지 마찰 항</td><td>초기: 피스톤 측 1 bar 상당<br>식별 후: 6.4 kN</td></tr>
+                  <tr><th scope="row">C<sub>p</sub></th><td>압력힘 비례 마찰 계수</td><td>0.02 → 0.029</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>Ottestad 2012의 5-파라미터 마찰 모델은 정지·쿨롱·속도·압력 효과를 포함하지만, 실린더 전용 실험 없이는 계수를 정하기 어렵다. 이 연구는 <strong>정지 마찰과 압력 비례 마찰의 두 항</strong>으로 복잡도를 낮췄다.</p>
+          </section>
 
-<section id="recap">
-<h2>한마디로 정리</h2>
-<ul>
-<li><strong>핵심 방법은?</strong> — 자료 없는 부품은 회색/블랙박스로 두고, 개루프 램프 시험 하나로 정상 힘 → 정상 압력 → 동특성 순서로 식별.</li>
-<li><strong>핵심 결과는?</strong> — 정상상태는 잘 맞고, 동특성은 신장 구간만 일치; 유효 β 5500 bar, 구조 강성 55 %, 마찰 F<sub>S</sub> 6.4 kN·C<sub>p</sub> 0.029.</li>
-<li><strong>한계는?</strong> — 홀드아웃·불확실성 없음, 강성·감쇠·β 상쇄, 수축(음의 부하) 과감쇠.</li>
-<li><strong>HR35 에 주는 것은?</strong> — β 1000 bar 가 비물리적이라는 근거, 개루프 램프 시험 설계, 하중 비례 마찰의 두 번째 증거, 실린더 면적비 가정(0.466)의 점검 필요.</li>
-</ul>
-</section>
+          <section class="article-section" id="identification" aria-labelledby="identification-title">
+            <span class="section-no">04 / STAGED IDENTIFICATION</span>
+            <h2 id="identification-title">힘을 먼저, 압력을 다음에,<br>진동을 마지막에</h2>
+            <p class="lead">한 축씩 천천히 왕복시키면, 정상상태 하중과 운동 시작 시의 진동을 같은 시험에서 관찰할 수 있다. 연구는 이 정보를 한꺼번에 최적화하지 않고 세 단계로 나누어 사용한다.</p>
 
-<section id="deep-dive">
-<h2>심화 탐구 기록</h2>
-<aside class="callout info"><span class="callout-title">INFO · 탐구 일자: 2026-09-25</span><p>B 과제 관점에서 수식을 유도하고 HR35 트윈 장부 값으로 검산한 기록.</p></aside>
+            <figure>
+              <div class="figure-box"><img src="assets/figure12.png" loading="lazy" alt="외부 지브의 조이스틱 입력, 실린더 길이와 측정 압력을 보여주는 개루프 왕복 시험 시계열"></div>
+              <figcaption><strong>그림 12.</strong> 외부 지브 시험의 입력과 출력. 조이스틱 +0.5로 약 80초 신장하고, −0.5로 약 65초 수축한다. 한 축만 구동하는 개루프 왕복 시험이다.</figcaption>
+            </figure>
 
-<div class="question" id="q1">
-<h3>Q1. 백색·회색·블랙박스 — 이 논문은 무엇을 어디에 두었나</h3>
-<div class="table-wrap wide" tabindex="0" role="region" aria-label="구성별 백색·회색·블랙박스 모델 분류">
-<table><thead><tr><th scope="col">구성</th><th scope="col">색</th><th scope="col">이유</th><th scope="col">HR35 트윈은</th></tr></thead><tbody>
-<tr><th scope="row">강체 다물체·기구학</th><td>백색(물리)</td><td>CAD 에서 질량·관성·기하 확보</td><td>백색(URDF·AGX)</td></tr>
-<tr><th scope="row">구조 유연성·감쇠</th><td>회색(물리식 + 배율)</td><td>k<sub>S</sub>=2EI/L 은 물리이나 조각 수·연결부는 근사</td><td>없음(강체)</td></tr>
-<tr><th scope="row">DCV</th><td>회색(2차 지연 + 오리피스 + 구간선형 열림)</td><td>데이터시트에 C<sub>V</sub> 는 있고 대역폭은 별도 시험</td><td>회색(파일럿 1차 + 오리피스 + 불감대)</td></tr>
-<tr><th scope="row">압력보상기·LS</th><td>회색(구간 함수 (10)(11))</td><td>보상기 자료 없음, p₀ 만 앎</td><td>없음(HR35 회로 종류 미확인)</td></tr>
-<tr><th scope="row">CBV</th><td><strong>블랙박스</strong></td><td>열린 뒤 유량이 물리식대로 안 감</td><td>없음(홀딩밸브 미확인)</td></tr>
-<tr><th scope="row">실린더</th><td>회색(압축성 물리 + 마찰 2항)</td><td>5-파라미터 마찰은 실험 부담</td><td>회색(압축성 + 쿨롱/점성)</td></tr>
-</tbody></table></div>
-<p>교훈: "물리 모델을 더 정교하게" 가 아니라 <strong>"검증 가능한 상세도"</strong> 를 택했다. HR35 도 밸브·펌프 자료가 없으면 회색상자로 두고 실험 계수로 채우는 편이 검증 가능하다.</p>
-</div>
+            <ol class="stages" aria-label="세 단계 파라미터 식별 순서">
+              <li><div><h3>정상상태 힘 → 하중과 마찰</h3><p>질량·질량중심을 미세 조정하고 F<sub>S</sub>, C<sub>p</sub>를 식별한다. 압력힘 오차를 fmincon으로 최소화한다.</p></div></li>
+              <li><div><h3>정상상태 압력 → CBV 특성</h3><p>운동에서 계산한 유량과 압력비를 이용해 A₀·A₁·n₀·n₁ 및 크래킹선 보정 계수 C₁·C₂를 식별한다.</p></div></li>
+              <li><div><h3>동특성 → 강성·감쇠·압축성</h3><p>압력 진동을 비교하며 구조 강성 배율, 강성 비례 감쇠, 유효 체적탄성계수를 수동 조정한다.</p></div></li>
+            </ol>
 
-<div class="question" id="q2">
-<h3>Q2. 유량계수 C<sub>V</sub> 검산 — 데이터시트 숫자가 맞는가</h3>
-<p>식 (8): C<sub>V</sub> = Q<sub>nom</sub>/√Δp<sub>nom</sub>. PVG32 의 C<sub>V</sub> = 37.8 l/(min·√bar), 보상기 설정 p₀ = 7 bar. 완전 열림에서 Q = 37.8×√7 = 100.0 l/min — PVG32 계열의 공칭 유량(100 l/min 급)과 일치한다. 서보밸브 111.8 l/(min·√bar) 는 35 bar 강하에서 661 l/min 급 대형 밸브다.</p>
-<p>HR35 적용: 트윈 <code>valve_cda_m2</code> 는 assumed 다. MCV 사양(정격 유량·정격 압력강하)만 있으면 (8) 로 C<sub>V</sub> 를 바로 얻는다 → 원문 요청 C 항에 "정격 유량·정격 압력강하" 를 넣었다.</p>
-</div>
+            <h3>4.1 · 정상상태 힘: 질량과 질량중심은 분리되는가</h3>
+            <div class="equation" aria-label="정상상태 힘 식별 목적함수와 마찰 보정">
+              <div class="eq-line"><span class="math">min (F̃<sub>p</sub> − F<sub>p</sub>)²</span><span class="eq-no">(27)</span></div>
+              <div class="eq-line"><span class="math">F<sub>p</sub> = F<sub>cyl</sub> ∓ (F<sub>S</sub> + C<sub>p</sub>|F̃<sub>p</sub>|)</span><span class="eq-no">(28)</span></div>
+            </div>
+            <p>측정 압력으로부터 얻은 압력힘 F̃<sub>p</sub>와 모델의 압력힘을 비교한다. 신장과 수축에서는 마찰 부호가 달라지므로, 방향 전환 부근의 힘 차이가 마찰 식별에 정보를 제공한다.</p>
+            <figure>
+              <div class="figure-box"><img src="assets/figure14.png" loading="lazy" alt="외부 지브에서 측정한 압력힘과 식별 후 시뮬레이션 압력힘을 비교한 시계열"></div>
+              <figcaption><strong>그림 14.</strong> 측정 압력힘(빨강)과 보정 후 시뮬레이션(초록). 약 83초의 방향 전환에서 마찰 부호가 바뀌며 계단 형태가 나타난다.</figcaption>
+            </figure>
+            <figure class="compact-figure">
+              <div class="figure-box"><img src="assets/table7.png" loading="lazy" alt="식별 전후 질량, 질량중심 및 마찰 파라미터를 비교한 원문 표 7"></div>
+              <figcaption><strong>원문 표 7.</strong> 질량 변화는 약 0.4–4.5%인 반면, 요크 질량중심 x₆은 1.0 m에서 1.57 m로 이동했다.</figcaption>
+            </figure>
+            <div class="callout">
+              <span class="label">해석의 핵심 · 식별 가능성</span>
+              <p>정상상태 힘은 주로 <strong>질량 × 모멘트 팔길이</strong>의 조합을 본다. 질량을 CAD 값 가까이에 묶어 두면 보정이 질량중심으로 몰릴 수 있다. 따라서 이 데이터만으로 개별 질량과 질량중심을 유일하게 분리했다고 보기는 어렵다.</p>
+            </div>
 
-<div class="question" id="q3">
-<h3>Q3. DCV 2차 모델과 열림 함수 — HR35 불감대와의 대응</h3>
-<ul>
-<li>(9) 는 파일럿·주 스풀·보상기를 합친 <strong>명령→유량 전체</strong>의 2차 근사다. 30 rad/s(5 Hz), ζ 0.8 이면 계단 응답 상승 시간 ≈ 0.1 s 급. HR35 현장 총지연 0.15 s(명령→운동, CAN·ROS 포함)와 자릿수가 같다.</li>
-<li>Fig. 8 의 오버랩(미터링 에지가 중립 부근에서 닫혀 있는 구간 5~10 %)이 곧 <strong>불감대</strong>다. HR35 스택의 불감대 보상값(붐 0.28·암 0.30·버킷 0.132)과 현장 측정(0.27~0.41)이 이 오버랩에 해당한다.</li>
-<li>언더랩(리턴 에지가 중립에서 조금 열림)은 중립에서 실린더 양 챔버가 탱크로 새는 구조라 <strong>하중 유지 능력</strong>에 직결된다. HR35 밸브에 언더랩이 있는지는 미확인 — 과제 ④ 의 홀딩 시험이 답한다.</li>
-</ul>
-</div>
+            <h3>4.2 · 정상상태 압력: 기하학적 파일럿비의 한계</h3>
+            <p>측정한 운동에서 CBV 유량을 계산하고, 측정 압력 p₂·p₃와 회로 모델을 이용해 p₁·p₄를 추정한다. 그 후 유량 오차를 최소화하도록 블랙박스 계수를 맞춘다.</p>
+            <p>외부 지브 CBV의 기하학적 파일럿비는 ψ = 6이지만, 내부 오리피스의 영향이 포함된 유효값은 약 1.95였다. 배압 효과까지 반영하기 위해 크래킹선을 다음과 같이 보정한다.</p>
+            <div class="equation" aria-label="보정된 CBV 크래킹선과 유량 식별 목적함수">
+              <div class="eq-line"><span class="math">μ<sub>L,cr</sub> = 1 / (1 + C₁μ<sub>x</sub> + C₂μ<sub>x</sub>²)</span><span class="eq-no">(29)</span></div>
+              <div class="eq-line"><span class="math">min (Q̃ − Q)²</span><span class="eq-no">(34)</span></div>
+            </div>
 
-<div class="question" id="q4">
-<h3>Q4. CBV 크래킹 조건 (13)(14)(18) 유도</h3>
-<p>CBV 포핏에 작용하는 힘: 실린더측 압력 p₂ 가 시트 면적 A 에, 파일럿 압력 p<sub>x</sub> 가 파일럿 면적 ψA 에, 스프링 예압이 반대로. 열리기 직전 평형: p₂A + p<sub>x</sub>ψA = F<sub>spring</sub>. 스프링 예압을 "파일럿 없이 열리는 압력" p<sub>cr</sub> 로 정의하면 F<sub>spring</sub> = p<sub>cr</sub>A → <strong>(13)</strong> p₂ + ψp<sub>x</sub> = p<sub>cr</sub>.</p>
-<p>비배출형은 스프링실이 밸브 출구(p₁)에 연결돼 출구 압력이 포핏을 닫는 방향으로 (1+ψ)A 에 작용 → <strong>(14)</strong> p₂ + ψp<sub>x</sub> = p<sub>cr</sub> + (1+ψ)p₁.</p>
-<p>정규화: μ<sub>x</sub> = p<sub>x</sub>/p<sub>L</sub>, μ<sub>L</sub> = p<sub>L</sub>/p<sub>cr</sub> 를 (13) 에 넣으면 p<sub>L</sub>(1 + ψμ<sub>x</sub>) = p<sub>cr</sub> → μ<sub>L,cr</sub> = 1/(1+ψμ<sub>x</sub>) <strong>(18)</strong>. ✓ 파일럿이 클수록(μ<sub>x</sub>↑) 낮은 부하압에서 열린다.</p>
-<p><strong>유효 ψ.</strong> 내부 오리피스가 파일럿 압력을 낮추면 같은 외부 압력에서 실제 파일럿 힘이 작아지므로 ψ 가 작아 보인다(6 → 1.95). 배압·층류가 섞이면 μ<sub>x</sub> 에 대한 비선형이 생겨 (29) 의 2차항 C₂ 가 필요했다.</p>
-</div>
+            <div class="figure-grid">
+              <figure>
+                <div class="figure-box"><img src="assets/figure15.png" loading="lazy" alt="기하학적 파일럿비로 계산한 크래킹선과 실험으로 보정한 크래킹선을 외부 지브 CBV 측정값과 비교한 그래프"></div>
+                <figcaption><strong>그림 15.</strong> 기하 ψ에 따른 크래킹선(점선)은 측정과 어긋난다. 보정선(실선)은 측정값의 하한을 따른다.</figcaption>
+              </figure>
+              <figure>
+                <div class="figure-box"><img src="assets/figure16.png" loading="lazy" alt="두 외부 지브 CBV의 측정 기반 유량과 식별 후 시뮬레이션 유량 비교"></div>
+                <figcaption><strong>그림 16.</strong> 두 CBV의 측정 기반·시뮬레이션 유량 비교. 약 30–65 L/min 범위에서 곡선이 겹친다.</figcaption>
+              </figure>
+            </div>
+            <figure class="compact-figure">
+              <div class="figure-box"><img src="assets/table8.png" loading="lazy" alt="카운터밸런스밸브의 블랙박스 유량 계수와 크래킹선 보정 계수를 정리한 원문 표 8"></div>
+              <figcaption><strong>원문 표 8.</strong> CBV 식별 계수. n₀ = 0.47은 오리피스의 제곱근 지수 0.5에 가깝다. A₁이 A₀보다 큰 결과는 파일럿 압력이 열림 면적을 키운다는 해석과 부합한다.</figcaption>
+            </figure>
+            <figure>
+              <div class="figure-box"><img src="assets/figure18.png" loading="lazy" alt="외부 지브 신장과 수축 구간에서 측정 및 시뮬레이션 압력 p2와 p3를 비교한 결과"></div>
+              <figcaption><strong>그림 18.</strong> 정상상태 압력 비교. 신장·수축 모두에서 p₂·p₃의 측정 수준과 시뮬레이션 수준이 맞는다.</figcaption>
+            </figure>
 
-<div class="question" id="q5">
-<h3>Q5. CBV 블랙박스의 물리적 정합성 — Table 8 값 읽기</h3>
-<ul>
-<li>Q = A s<sup>n</sup> 에서 s 는 "크래킹선 위로 얼마나 올라왔나"(무차원 압력 여유). n = 0.5 면 오리피스 Q ∝ √Δp 와 같다. 식별값 n₀ = 0.4707 은 그 근처이고 n₁ = 0.036 은 파일럿에 따라 지수가 약간 커진다는 뜻.</li>
-<li>A = 27.84 + 146.2 μ<sub>x</sub>: 파일럿 비 μ<sub>x</sub> 가 0→1 로 갈 때 A 가 6배 커진다. 파일럿이 포핏을 더 열어 면적을 키우는 물리와 정합.</li>
-<li>식별 데이터는 정상상태 유량 30~65 l/min(Fig. 16). 그 밖(가속 유량)에서 부정확한 것은 저자도 인정 — 블랙박스는 <strong>데이터 범위 밖으로 외삽하지 않는다</strong>는 원칙.</li>
-</ul>
-</div>
+            <h3>4.3 · 동특성: 모델은 실제보다 뻣뻣했다</h3>
+            <p>힘과 압력의 정상 수준을 맞춘 뒤에도 진동은 달랐다. 연구는 압력 진동의 주파수와 감쇠 양상이 맞도록 구조 강성, 구조 감쇠, 유효 체적탄성계수를 함께 조정했다.</p>
+            <div class="table-scroll">
+              <table>
+                <thead><tr><th scope="col">파라미터</th><th scope="col">초기 기준</th><th scope="col">조정 후</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">구조 강성</th><td>원문 Table 2의 값</td><td>전체에 0.55배 적용</td></tr>
+                  <tr><th scope="row">감쇠 배율 β<sub>k</sub></th><td>0.0006–0.004</td><td>0.002 / 0.003 / 0.007</td></tr>
+                  <tr><th scope="row">β<sub>oil</sub></th><td>초기 추정값*</td><td>5500 bar = 0.55 GPa</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="note">* 제공 노트의 초기 β<sub>oil</sub> 항목은 배수 관계가 모호해 수치로 재구성하지 않았다. 최종 식별값 5500 bar를 기준으로 정리한다.</p>
 
-<div class="question" id="q6">
-<h3>Q6. 실린더 마찰 — 두 항으로 줄인 근거와 HR35 트윈 비교</h3>
-<div class="table-wrap wide" tabindex="0" role="region" aria-label="Bak, Werner, HR35의 실린더 마찰 모델 비교">
-<table><thead><tr><th scope="col"><span aria-label="비교 항목"></span></th><th scope="col">Bak (26)</th><th scope="col">Werner 2025 (20)</th><th scope="col">HR35 트윈</th></tr></thead><tbody>
-<tr><th scope="row">형태</th><td>F<sub>S</sub> + C<sub>p</sub>|F<sub>p</sub>|</td><td>π₁τ<sub>m</sub> + π₂ (방향별)</td><td>F<sub>c</sub> sat(v/v<sub>s</sub>) + bv</td></tr>
-<tr><th scope="row">하중 의존</th><td>압력힘에 비례(C<sub>p</sub> 0.029)</td><td>토크에 비례</td><td>없음</td></tr>
-<tr><th scope="row">속도 의존</th><td>없음(0 부근 전이만)</td><td>없음</td><td>점성 b</td></tr>
-<tr><th scope="row">방향 비대칭</th><td>없음(대칭)</td><td>있음</td><td>없음</td></tr>
-<tr><th scope="row">식별</th><td>정상 힘 fmincon</td><td>상하 간격 1차 적합</td><td>ζ 역산</td></tr>
-</tbody></table></div>
-<p>두 독립 문헌이 <strong>하중 비례·속도 무관</strong>을 보고했다. 트윈은 반대 구조다. F<sub>S</sub> 초기값 "피스톤측 1 bar 상당"은 실용적 어림(외부 지브 4.9 kN)이고 식별값 6.4 kN 은 1.3 bar 상당. HR35 붐(Ø100 가정, 78.5 cm²)이면 1 bar 상당 F<sub>S</sub> ≈ 0.8 kN — 트윈 쿨롱 271 N 의 3배다. 어느 쪽이 맞는지는 과제 ③ 의 계단 폭으로 잰다.</p>
-</div>
+            <figure>
+              <div class="figure-box"><img src="assets/figure19.png" loading="lazy" alt="동특성 보정 후 신장 및 수축 시작 시 압력 진동의 측정과 시뮬레이션을 확대한 비교 그래프"></div>
+              <figcaption><strong>그림 19.</strong> 동특성 보정 후 압력. 신장 시작 구간은 진동 주파수와 감쇠가 잘 맞지만, 수축 시작 구간은 시뮬레이션이 과감쇠 상태다.</figcaption>
+            </figure>
+            <p>구조 강성을 0.55배로 낮춘 것은 명시적으로 유연화하지 않은 킹·중간 지브·기초의 영향을 모델이 대신 흡수한 것으로 해석할 수 있다. 이 배율을 개별 부재의 실제 강성이 절반이라는 뜻으로 읽어서는 안 된다.</p>
+            <div class="callout">
+              <span class="label">5500 BAR의 의미</span>
+              <p>여기서 β<sub>oil</sub>은 순수 오일의 물성만을 뜻하지 않는다. 배관·호스의 영향을 포함하는 <strong>계통의 유효값</strong>이다. 5500 bar는 노트가 비교한 광유의 1.5 GPa보다 낮으며, 노트에서 Merritt를 통해 인용한 6900 bar 상한보다도 낮다. 다만 이 비교값을 모든 유압계의 보편적인 범위로 적용할 수는 없다.</p>
+            </div>
+          </section>
 
-<div class="question" id="q7">
-<h3>Q7. 유효 체적탄성계수 — 왜 5500 bar 가 "타당"하고 1000 bar 는 아닌가</h3>
-<p>유효 컴플라이언스는 기름·공기·배관이 직렬로 더해진다(Merritt 1967, 보충 수식):</p>
-<div class="eq"><div class="formula">1/β<sub>eff</sub> = 1/β<sub>oil</sub> + (V<sub>hose</sub>/V)(1/β<sub>hose</sub>) + (V<sub>air</sub>/V)(1/β<sub>air</sub>)<br><span class="eqno">(보충: 표준 유효 체적탄성계수 식)</span></div></div>
-<p>Bak: 1/β<sub>eff</sub> − 1/β<sub>oil</sub> = 1/5.5×10⁸ − 1/1.5×10⁹ = 1.15×10⁻⁹ Pa⁻¹ 이 배관·공기 몫. 크레인은 긴 호스가 있어 그럴 만하다.</p>
-<p>HR35 트윈 β = 1×10⁸ Pa: 1/β = 1.0×10⁻⁸ Pa⁻¹ 로 Bak 총 컴플라이언스의 <strong>5.5배</strong>, Merritt 상한(6.9×10⁸)의 <strong>6.9배</strong>. 소형 굴착기의 짧은 배관에서 이런 값은 나오지 않는다. 남는 설명은 하나 — 붐 3.3 Hz 를 β 로만 맞추면서 <strong>실린더 밖의 유연성(구조·핀 유격·트랙-지면 접촉)</strong> 을 β 가 떠안았다.</p>
-<aside class="callout important"><span class="callout-title">IMPORTANT · 트윈 장부 표기 제안</span><p><code>bulk_modulus_pa</code> 의 provenance 를 <code>assumed</code> 에서 <code>lumped_system_stiffness_proxy</code> 로 바꾸고, 문헌 범위(5.5~6.9×10⁸)를 병기한다. 값을 지금 바꾸라는 뜻은 아니다 — 과제 ⑥⑦ 결과 전엔 가역성 없는 변경이 된다.</p></aside>
-</div>
+          <section class="article-section" id="evidence" aria-labelledby="evidence-title">
+            <span class="section-no">05 / EVIDENCE &amp; LIMITS</span>
+            <h2 id="evidence-title">적합은 확인했다.<br>예측력은 아직 열려 있다.</h2>
+            <p>결과의 강점은 정상상태 힘과 압력, 그리고 일부 동특성을 하나의 결합 모델에서 설명했다는 점이다. 다만 아래 평가는 제공 노트의 곡선 비교와 서술에 기반하며, 정량 오차나 신뢰구간을 새로 산출한 결과는 아니다.</p>
 
-<div class="question" id="q8">
-<h3>Q8. 정상 힘으로 질량·COG 를 같이 조정하면 무엇이 식별되나</h3>
-<p>정상상태에서 실린더 힘은 각 강체의 <strong>중력 모멘트 합</strong>이다. 강체 i 의 기여는 m<sub>i</sub>g (x<sub>i</sub>cosθ − z<sub>i</sub>sinθ) 꼴이라, 데이터가 θ 를 훑어도 얻는 것은 m<sub>i</sub>x<sub>i</sub> 와 m<sub>i</sub>z<sub>i</sub> 두 곱뿐이다(Werner 2025 요약 Q3 과 같은 결론). Table 7 이 그 증거: 질량은 0.4~4.5 % 만 움직이고 x₆ 이 57 % 움직였다 — fmincon 이 "질량 제약 안에서" 곱을 맞추려니 COG 로 몰린 것. 만약 m₆ 제약을 풀었다면 다른 조합이 같은 잔차를 냈을 것이다.</p>
-<p>HR35: 트윈 질량 182/122/92 kg(아주대 자료)을 정상 힘 데이터로 "보정"하려 하면 같은 일이 생긴다. 곱을 제약으로 쓰고 개별값은 사전값·물리 일관성(Wensing 2018)으로 정한다.</p>
-</div>
+            <div class="table-scroll">
+              <table>
+                <caption>무엇이 맞았고, 어디까지 확인됐는가</caption>
+                <thead><tr><th scope="col">평가 대상</th><th scope="col">주요 결과</th><th scope="col">증거의 범위</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">정상상태 힘</th><td><span class="status">수준 일치</span><br>F<sub>S</sub> = 6.4 kN, 약 1.3 bar 상당<br>C<sub>p</sub> = 0.029</td><td>보정 데이터의 압력힘 곡선 비교</td></tr>
+                  <tr><th scope="row">CBV 유량·압력</th><td><span class="status">수준 일치</span><br>n₀ = 0.47</td><td>시험 운전 범위의 유량·압력 비교</td></tr>
+                  <tr><th scope="row">신장 동특성</th><td><span class="status">양호한 일치</span><br>진동 주파수·감쇠 재현</td><td>운동 시작 구간의 압력 진동</td></tr>
+                  <tr><th scope="row">수축 동특성</th><td><span class="status partial">잔여 불일치</span><br>시뮬레이션 과감쇠</td><td>방향에 따른 모델 한계가 남음</td></tr>
+                  <tr><th scope="row">다른 하중·자세</th><td><span class="status partial">미검증</span></td><td>독립 홀드아웃 검증 없음</td></tr>
+                </tbody>
+              </table>
+            </div>
 
-<div class="question" id="q9">
-<h3>Q9. 주파수 하나로 세 파라미터를 맞추는 문제 — HR35 3 Hz 모드와의 대응</h3>
-<p>1자유도로 보면 ω² = k<sub>total</sub>/m<sub>eff</sub>, k<sub>total</sub> 은 기름 스프링(βA²/V)·구조·접촉 강성의 <strong>직렬 합성</strong>이다. 측정은 ω 하나(주파수)와 감쇠 하나(진폭 감소율). 미지수는 셋(β, 구조 배율, 감쇠 배율) + m<sub>eff</sub>. 한 실험으로는 못 가른다. Bak 은 세 값을 동시에 움직여 맞췄고 "다른 부재 유연성이 흡수됐다"고 썼다.</p>
-<p>HR35 에서 갈라내는 방법:</p>
-<ul>
-<li><strong>접촉 강성 제거</strong>: 차체를 받침으로 고정(과제 ⑥) → 트랙-지면 강성이 빠진 주파수. 두 조건 차이가 접촉 몫.</li>
-<li><strong>기름 강성만 바꾸기</strong>: 같은 자세에서 실린더 위치(챔버 체적 V)를 바꾸면 βA²/V 만 변한다. 체적을 2배로 하면 기름 강성은 절반 — 주파수가 그만큼 안 떨어지면 기름이 지배 강성이 아니다.</li>
-<li><strong>자세 스윕</strong>: 유효질량 m<sub>eff</sub> 가 자세에 따라 변하는 것을 기하로 계산해 넣고 ω 변화를 보면 k<sub>total</sub> 의 자세 의존성이 나온다.</li>
-</ul>
-<p>이 셋은 새 센서 없이(압력·경사계) 가능하다. 단, 잭업은 안전 검토가 먼저다.</p>
-</div>
+            <blockquote class="pullquote">
+              <p>한 주파수를 맞추는 여러 조합이 있다면,<br>잘 맞는 파라미터가 유일한 파라미터는 아니다.</p>
+              <footer>강성·감쇠·압축성의 동시 보정에 대한 해석</footer>
+            </blockquote>
 
-<div class="question" id="q10">
-<h3>Q10. 유연 세그먼트 강성·감쇠 검산</h3>
-<ul>
-<li>(3) k<sub>S</sub> = 2EI/L: 길이 L 외팔보 양 끝에 반씩 회전 스프링을 두어 굽힘 강성 EI/L 을 재현하는 배치(두 스프링 직렬이 EI/L). 조각을 잘게 나눌수록 연속 보에 가까워진다.</li>
-<li>(5) β<sub>k</sub> 검산: 페데스탈 94 rad/s 에서 0.00064~0.00149 ✓, 내부 지브 60 에서 0.0010~0.0023(표 0.001~0.002 ✓), 외부 지브 35 에서 0.0017~0.0040(표 0.002~0.004 ✓).</li>
-<li>식별 후 β<sub>k</sub> 0.002/0.003/0.007 은 표 범위의 상단 또는 초과 → ζ 0.03~0.07 가정보다 실제 감쇠가 크다(연결부 마찰). HR35 트윈 링크는 강체라 이 항이 아예 없다 — 3 Hz 모드의 감쇠(현장 ζ 0.08~0.13)를 유압 감쇠만으로 내려 하면 점성 마찰이 과대해질 수 있다(메모리 <code>hr35-hydraulics-integration</code> 의 "점성만으로 ζ 맞추면 과다 감쇠" 와 같은 현상).</li>
-</ul>
-</div>
+            <h3>남은 불확실성은 다음 시험을 가리킨다</h3>
+            <div class="table-scroll">
+              <table>
+                <thead><tr><th scope="col">한계</th><th scope="col">왜 중요한가</th><th scope="col">후속 확인 방향</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">계측 정보 부족</th><td>노트에는 표본율·동기화·센서 정확도가 기재되지 않았다. 외부 지브에서 직접 측정한 압력은 두 개다.</td><td>계측 사양과 시간 정렬을 기록하고, 추정 압력의 오차를 평가한다.</td></tr>
+                  <tr><th scope="row">홀드아웃·불확실성 없음</th><td>보정에 사용한 데이터의 재현만으로 새로운 조건의 예측력을 판단하기 어렵다.</td><td>다른 하중·자세의 데이터를 분리해 검증한다.</td></tr>
+                  <tr><th scope="row">파라미터 상쇄</th><td>강성·감쇠·β를 주파수에 맞춰 함께 조정해 각 효과가 섞일 수 있다.</td><td>부재별 진동 시험으로 구조 특성을 분리한다.</td></tr>
+                  <tr><th scope="row">생략된 동작</th><td>엔드스톱, CBV 가속 유량, 영속도 부근 마찰을 충분히 모델링하지 않았다.</td><td>CBV 동적 시험과 실린더 단독 시험으로 보완한다. CBV 동특성은 Part Two와 연결되는 과제다.</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>수축 구간의 과감쇠는 모델의 적용 범위를 보여주는 관찰이다. 생략한 효과는 원인 후보지만, 이 결과만으로 어느 한 항이 원인이라고 확정할 수는 없다.</p>
+          </section>
 
-<div class="question" id="q11">
-<h3>Q11. 왜 개루프·한 축·느린 램프인가</h3>
-<ul>
-<li><strong>개루프</strong>: 폐루프면 제어기가 마찰·중력 오차를 명령으로 상쇄해 버려 압력·힘의 계단이 흐려진다(폐루프 편향). 조이스틱이 밸브로 직결되는 모드에서만 "명령→응답" 인과가 깨끗하다.</li>
-<li><strong>한 축</strong>: 다른 실린더가 움직이면 공급 유량·압력 경쟁이 생기고 다물체 모델의 잔차가 어느 축 탓인지 못 가른다.</li>
-<li><strong>느린 램프(±0.5)</strong>: 관성·유량 과도가 작아 정상상태 힘·압력이 그대로 읽힌다. 방향 전환 한 번(83 s)이 마찰 부호 반전과 CBV 전환을 모두 보여준다.</li>
-</ul>
-<p>HR35 현장 로그(S1~S6)는 수동 폐루프·다축 동시·불규칙 속도라 이 셋 모두 어긋난다. 그래서 그 로그로 얻은 불감대·지연·ζ 는 "범위" 로만 쓰고, 전용 개루프 램프 시험(과제 ③)이 필요하다.</p>
-</div>
+          <section class="article-section" id="implications" aria-labelledby="implications-title">
+            <span class="section-no">06 / IMPLICATIONS</span>
+            <h2 id="implications-title">디지털 트윈에는<br>숫자보다 식별 전략을 가져온다</h2>
+            <div class="callout warm">
+              <span class="label">노트 작성자의 적용 의견 · 논문의 직접 결과와 구분</span>
+              <p>이하의 HR35 수치와 모델 구성은 제공 노트에 담긴 프로젝트 맥락이다. 이 논문이 HR35를 시험하거나, 해당 트윈의 파라미터를 검증한 것은 아니다.</p>
+            </div>
+            <p>노트의 HR35 트윈은 붐의 3.3 Hz 응답을 맞추기 위해 체적탄성계수 1000 bar를 사용했다. 이 논문의 유효값 5500 bar와 큰 차이가 있다는 사실은 재점검의 출발점이다. 그러나 <strong>1000 bar를 곧바로 5500 bar로 교체할 근거는 아니다.</strong> 두 모델이 서로 다른 구조·접촉·배관 효과를 하나의 파라미터에 담고 있을 수 있기 때문이다.</p>
 
-<div class="question" id="q12">
-<h3>Q12. 트윈 실린더 면적비 — 세 축이 같은 0.7826 인 이유와 문제</h3>
-<p>트윈 장부: 붐 A=78.54/B=61.47 cm², 암 63.62/49.79, 버킷 50.27/39.34 → φ = 0.7826 <strong>셋 다 동일</strong>. 이는 로드 지름을 보어의 46.6 % 로 일괄 가정했다는 뜻(붐 Ø100 → 로드 46.6 mm, 암 Ø90 → 42.0, 버킷 Ø80 → 37.3).</p>
-<p>Bak 의 실물은 0.64(내부 지브, 로드/보어 0.60)와 0.75(외부, 0.50). 소형 굴착기 실린더는 로드/보어 0.5~0.7 이 흔하다(제조사 카탈로그 일반 범위, 개별 확인 필요). 0.466 이면 로드가 가늘어 <strong>수축 방향 힘이 실제보다 크게</strong> 계산된다(환형 면적 22 % 대 실제 30~50 %). 로드 지름은 노출 부위를 줄자로 재면 끝나는 값이다 → 과제 ①.</p>
-</div>
-</section>
+            <ul class="checklist" aria-label="HR35 모델에 적용하기 위한 후속 검토 항목">
+              <li>
+                <strong>β를 바꾸기 전에 진동의 출처를 분리한다</strong>
+                <span>약 3 Hz 모드에 붐 구조와 트랙 접촉 강성이 함께 들어가는지 확인한다. 차체 고정 조건과 접지 조건의 진동 비교가 분리 실험의 후보가 된다.</span>
+              </li>
+              <li>
+                <strong>한 축씩, 느린 개루프 왕복 데이터를 확보한다</strong>
+                <span>수동 폐루프·다축 동시 운전 로그는 이 논문의 단계별 식별 조건과 다르다. 같은 전략을 적용하려면 한 축씩 하중·압력·방향 전환을 해석할 수 있는 시험이 필요하다.</span>
+              </li>
+              <li>
+                <strong>마찰의 하중 의존성을 확인한다</strong>
+                <span>쿨롱+점성 마찰만 사용하는 트윈이라면 압력힘 비례 항이 필요한지 점검한다. 노트는 Werner 2025와의 공통점을 언급하지만, 해당 문헌의 상세 서지는 제공하지 않는다.</span>
+              </li>
+              <li>
+                <strong>실린더 면적비를 실측 치수로 다시 계산한다</strong>
+                <span>노트의 트윈은 세 축에 로드/보어 지름비 0.466을 일괄 가정한다. 이 논문의 지름비는 0.50–0.60이다. 지름비 r과 면적비 φ는 다르며, φ = 1 − r²로 연결된다.</span>
+              </li>
+            </ul>
 
-<section id="extraction">
-<h2>S. 시스템 식별 추출표 (B 과제 필수)</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-label="시스템 식별 추출표">
-<table><thead><tr><th scope="col">항목</th><th scope="col">내용 (출판판 쪽/식/그림/표)</th></tr></thead><tbody>
-<tr><th scope="row">문제·장비·운전 범위</th><td>해양 너클붐 크레인(지브 7.2/2.3/12.1 m, 실린더 D<sub>p</sub> 0.25~0.30 m), 시운전 조건, 개루프 램프, 선회 제외</td></tr>
-<tr><th scope="row">입력 → 상태 → 출력</th><td>u<sub>JS</sub> → DCV 스풀(2차) → 유량 → CBV → 챔버 압력 → 실린더 힘 → 다물체 → l<sub>cyl</sub>; 상태 p₁~p₄, p<sub>x</sub></td></tr>
-<tr><th scope="row">추정 대상 / 고정 가정 / 측정값</th><td>추정: m<sub>i</sub>, COG<sub>i</sub>(4 강체), F<sub>S</sub>, C<sub>p</sub>, CBV 6계수, 강성 배율, β<sub>k</sub> 3, β<sub>oil</sub>. 고정: DCV ω<sub>V</sub>·ζ<sub>V</sub>·C<sub>V</sub>·오버랩(데이터시트/별도 시험), p<sub>S</sub> 210 bar, p<sub>cr</sub> 250 bar, 실린더 치수. 측정: u<sub>JS</sub>, l<sub>cyl</sub>×3, 압력 7</td></tr>
-<tr><th scope="row">단위·부호·좌표·센서 위치</th><td>정규화 신호 −1..1, 압력 bar, 힘 kN; 압력은 회로 포트(p₂ 실린더측, p₃ DCV측); COG 는 Fig. 4 국소 좌표</td></tr>
-<tr><th scope="row">개별 vs 묶음 / 식별 가능성</th><td>질량·COG: 정상 힘만으로 곱만 식별 → CAD 근처 한 해. 마찰 F<sub>S</sub>·C<sub>p</sub>: 방향 전환 계단·하중 비례로 실용 식별. CBV 6계수: 정상 유량으로 식별. β·강성·감쇠: 주파수 하나로 묶음(상쇄)</td></tr>
-<tr><th scope="row">센서 종류·정확도·주기·동기화</th><td>실린더 내장 위치센서, 압력계 7; 표본율·정확도·동기화 미기재</td></tr>
-<tr><th scope="row">입력 자극·부하·자세·반복·제외 규칙</th><td>한 축씩, 램프 ±0.5, 150 s, 신장→수축(부하 방향 전환 포함); 제외 규칙·반복 수 미기재</td></tr>
-<tr><th scope="row">추정식 / 비용함수 / 제약 / 최적화</th><td>① fmincon (27)(28) ② fmincon (34) ③ 수동 스케일</td></tr>
-<tr><th scope="row">노이즈·폐루프 편향 처리</th><td><strong>개루프 모드</strong>로 시험해 제어기 편향 회피(p.11)</td></tr>
-<tr><th scope="row">데이터 분할·보류 실험·오차·불확실성</th><td>없음 / 없음 / 그림 일치 판단 / 없음</td></tr>
-<tr><th scope="row">코드/데이터 공개 여부</th><td>없음</td></tr>
-<tr><th scope="row">HR35 재사용 / 재식별 / 추가 센서 / 비용</th><td><a href="#hr35">§7</a></td></tr>
-</tbody></table></div>
+            <div class="closing">
+              <h3>좋은 모델은 다음 실험을 분명하게 만든다</h3>
+              <p>이 연구가 남기는 가장 실용적인 방법은 부족한 부품 정보를 억지로 채우지 않고, 관측 가능한 정상 힘·정상 압력·진동으로 나누어 식별하는 것이다.</p>
+              <p>다음 단계는 다른 하중과 자세에서도 같은 파라미터가 설명력을 유지하는지 확인하는 일이다. <strong>한 번의 적합을 넘어설 때, 보정된 모델은 예측하는 모델이 된다.</strong></p>
+            </div>
 
-<h3 id="s1">S-1. 네 칸 분리</h3>
-<div class="table-wrap wide" tabindex="0" role="region" aria-label="논문 주장·독립 검산·추론·미확인 구분">
-<table><thead><tr><th scope="col">논문 주장</th><th scope="col">독립 검산(계산 경로)</th><th scope="col">우리의 추론</th><th scope="col">미확인</th></tr></thead><tbody>
-<tr><th scope="row">φ (Table 6)</th><td>0.75 / 0.64 ✓</td><td>—</td><td>—</td></tr>
-<tr><th scope="row">F<sub>S</sub> 초기값 = A<sub>p</sub>·1e5</th><td>4.9 kN; 식별 6.4 kN = 1.3 bar</td><td>정지마찰이 가정보다 30 % 큼</td><td>내부 지브 값</td></tr>
-<tr><th scope="row">C<sub>V</sub> 37.8, p₀ 7 bar</th><td>100.0 l/min ✓</td><td>공칭 유량 정합</td><td>데이터시트 원본</td></tr>
-<tr><th scope="row">β<sub>k</sub> 범위 (Table 3)</th><td>(5) 로 재계산 일치 ✓</td><td>—</td><td>—</td></tr>
-<tr><th scope="row">β<sub>oil</sub> 5500 bar 타당</th><td>0.55 GPa, Merritt 상한 아래 ✓; 배관 몫 1.15e-9 Pa⁻¹</td><td>유효값 범위 0.5~0.7 GPa</td><td>초기 추정값 정확값</td></tr>
-<tr><th scope="row">식 (23) 조건</th><td>오식(v &lt; −v₀)</td><td>—</td><td>정오표</td></tr>
-<tr><th scope="row">강성 55 %</th><td>재현 불가</td><td>모델 밖 부재 흡수</td><td>—</td></tr>
-<tr><th scope="row">x₆ +57 %</th><td>Table 7</td><td>곱만 식별 → COG 로 몰림</td><td>—</td></tr>
-<tr><th scope="row">n₀ 0.47</th><td>√ 법칙 근접</td><td>물리 정합</td><td>—</td></tr>
-<tr><th scope="row">DCV 30 rad/s</th><td>별도 논문</td><td>HR35 파일럿 0.05 s 와 자릿수 동일</td><td>원문 미확보</td></tr>
-</tbody></table></div>
-<h3 id="s2">S-2. 검산 기록</h3>
-<p>손계산 + 파이썬 산술(C<sub>V</sub>, φ, F<sub>S</sub>, β<sub>k</sub>, 컴플라이언스, 트윈 φ). 그림 추출 figure1~19, table1~8 전부 사용.</p>
-</section>
+            <div class="share-copy">
+              <span class="eyebrow">공유용 요약 · 복사해 사용할 문장</span>
+              <p>부품 자료가 부족한 유압 크레인은 힘 → 압력 → 진동 순서로 식별할 수 있다. 다만 유효 체적탄성계수 5500 bar와 구조 강성 0.55배는 해당 모델의 보정 결과다. 다른 장비에 가져갈 것은 숫자보다 실험과 식별의 순서다.</p>
+              <a href="#abstract">핵심 발견 다시 보기 ↑</a>
+            </div>
+          </section>
 
-<section id="keywords">
-<h2>핵심 키워드</h2>
-<div class="keyword-list"><code>grey-box hydraulics</code><code>counterbalance valve black-box</code><code>effective bulk modulus</code><code>pressure-dependent friction</code><code>open-loop ramp test</code><code>finite segment flexibility</code><code>staged calibration</code><code>pressure-compensated valve</code></div>
-</section>
+          <section class="article-section sources" id="sources" aria-labelledby="sources-title">
+            <span class="section-no">07 / SOURCE NOTES</span>
+            <h2 id="sources-title">출처와 읽기 안내</h2>
+            <div class="source-card">
+              <p class="eyebrow">검토 대상 논문</p>
+              <p><strong>Morten K. Bak · Michael R. Hansen</strong><br>University of Agder, Norway</p>
+              <p><cite>Analysis of Offshore Knuckle Boom Crane — Part One: Modeling and Parameter Identification</cite></p>
+              <p><em>Modeling, Identification and Control</em>, 34(4), 157–174, 2013.<br><a>DOI: 10.4173/mic.2013.4.1 ↗</a></p>
+            </div>
+            <ol>
+              <li><strong>작성 범위.</strong> 이 글은 제공된 Obsidian 논문 요약 노트를 편집·재구성한 연구 해설이다. 원문 전체나 별도 실험 데이터를 독립적으로 재검증한 보고서는 아니다.</li>
+              <li><strong>그림과 표.</strong> 원문 번호로 표시한 도판은 노트에 첨부된 이미지를 사용했다. 이미지의 번호와 본문의 식 번호는 논문 참조를 유지하며, 설명 문장은 노트에 기반한 해설이다.</li>
+              <li><strong>결과의 해석.</strong> “일치”는 노트가 보고한 곡선·수준의 일치를 뜻한다. RMSE, 오차율, 파라미터 신뢰구간이나 독립 예측 검증 결과는 제공되지 않았다.</li>
+              <li><strong>표기 확인.</strong> 압력보상 식 (10)의 둘째 분기와 초기 체적탄성계수의 배수 표현은 노트만으로 확정하기 어려워 본문에 확인 사항을 남겼다.</li>
+              <li><strong>간접 언급 문헌.</strong> Ellman 1996, Hansen 2001, Esque 2003, Than 2002, Bak 2011, Ottestad 2012, Merritt, Werner 2025는 제공 노트의 언급을 따른다. 정확한 서지와 인용 맥락은 각 원자료에서 확인해야 한다.</li>
+              <li><strong>의견의 구분.</strong> HR35에 대한 비교, 후속 시험 제안, 일부 식별 가능성 해석은 노트 작성자의 적용 의견 또는 이를 정리한 해설이며, 논문의 직접 검증 결과와 구분한다.</li>
+            </ol>
+            <div class="keywords" aria-label="핵심 키워드">
+              <span>grey-box hydraulics</span>
+              <span>counterbalance valve</span>
+              <span>effective bulk modulus</span>
+              <span>pressure-dependent friction</span>
+              <span>open-loop ramp test</span>
+              <span>finite segment flexibility</span>
+              <span>staged calibration</span>
+            </div>
+          </section>
+        </article>
+      </div>
+    </main>
 
-<section id="opinion">
-<h2>나의 의견 (HR35 적용)</h2>
-<blockquote class="quote"><p>이 논문이 HR35 에 주는 가장 큰 것은 <strong>체적탄성계수에 대한 경고</strong>다. 트윈의 1000 bar 는 문헌 유효값의 1/5 이고, 그 값이 나온 경로(붐 3.3 Hz 맞춤)는 Bak 이 "세 파라미터를 주파수 하나로 맞췄다"고 인정한 것과 같은 구조다. 두 번째는 <strong>개루프 램프 시험 설계</strong>다. 현장 S1~S6 로는 이 논문의 ①②③ 어느 단계도 재현할 수 없다. 세 번째는 트윈 실린더 면적비가 세 축 모두 같은 가정값(로드/보어 0.466)이라는 발견인데, 로드 지름은 줄자로 잴 수 있다. §7 과제 ①이 가장 싸고 빠르다.</p></blockquote>
-</section>
-<footer><span>mic2013-knuckle-crane-id · 2026-09-25</span><a href="#top">맨 위로 ↑</a></footer>
-</article>
-</main>
-</div>
+    <footer class="page-footer">
+      <span>ENGINEERING / RESEARCH NOTES · Bak &amp; Hansen 2013 논문 리뷰</span>
+      <span><time datetime="2026-09-25">2026.09.25</time> · <a href="#top">맨 위로 ↑</a></span>
+    </footer>
+  </div>
 </body>
 </html>

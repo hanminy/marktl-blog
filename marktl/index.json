@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T10:34:36.433Z",
+  "updatedAt": "2026-09-25T10:40:51.439Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/mic2013-knuckle-crane-id/",
+      "excerpt": "Analysis of Offshore Knuckle Boom Crane — Part One: Modeling and Parameter Identification 요약 한줄 요약 해양 시추선의 파이프 취급용 유압 너클붐 크레인(공급압 210 bar, 실린더 3개)을 유연 세그먼트 다물체 + 회색상자 전기유압 모델로 만들고, 부품 자료가 없는 현장 엔지니어의 처지에서 시운전 데이터만으로 ① 정상상태 힘 → 질량·질량중심·실린더 마",
+      "shortId": "6bfdf8",
+      "slug": "mic2013-knuckle-crane-id",
+      "sourcePath": "02_research/필드로봇/시스템식별/mic2013-knuckle-crane-id.md",
+      "tags": [
+        "논문요약",
+        "시스템식별",
+        "유압크레인",
+        "회색상자",
+        "체적탄성계수",
+        "카운터밸런스밸브"
+      ],
+      "title": "Analysis of Offshore Knuckle Boom Crane — Part One: Modeling and Parameter Identification - 요약",
+      "updatedAt": "2026-09-25T10:40:51.439Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/6bfdf8/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/werner2025-calibrated/",
@@ -20,26 +39,6 @@
       "title": "Calibrated Dynamic Modeling for Force and Payload Estimation in Hydraulic Machinery - 요약",
       "updatedAt": "2026-09-25T10:34:36.433Z",
       "url": "https://hanminy.github.io/marktl-blog/marktl/s/lm0m9n/"
-    },
-    {
-      "artifactType": "faithful-note",
-      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/mic2013-knuckle-crane-id/",
-      "excerpt": "[!info] 관련 자료 공개 원문: https://doi.org/10.4173/mic.2013.4.1 (MIC 저널, OA) Part Two(같은 저자, 제어·해석)는 미확보. 밸브 주파수응답 시험은 Bak & Hansen 2012 (FPNI PhD Symposium) 참조 — 미확보. 마찰 5 파라미터 모델의 출처 Ottestad et al. 2012 — 미확보. 유효 체적탄성계수 상한의 출처 Merritt 1967 \"Hy",
-      "shortId": "6bfdf8",
-      "slug": "mic2013-knuckle-crane-id",
-      "sourcePath": "02_research/필드로봇/시스템식별/mic2013-knuckle-crane-id.md",
-      "tags": [
-        "논문요약",
-        "시스템식별",
-        "유압크레인",
-        "회색상자",
-        "체적탄성계수",
-        "카운터밸런스밸브",
-        "압력보상밸브"
-      ],
-      "title": "Analysis of Offshore Knuckle Boom Crane — Part One: Modeling and Parameter Identification",
-      "updatedAt": "2026-09-25T10:26:14.023Z",
-      "url": "https://hanminy.github.io/marktl-blog/marktl/s/6bfdf8/"
     },
     {
       "artifactType": "faithful-note",
