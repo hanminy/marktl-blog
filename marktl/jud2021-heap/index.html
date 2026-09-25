@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>12톤 굴착기를 로봇으로 만드는 법 — HEAP가 드러낸 유압 자동화의 현실</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      --paper: #f6f3ec;
+      --surface: #fffdf8;
+      --ink: #202d30;
+      --muted: #5e6b6d;
+      --line: #d6dcd5;
+      --accent: #b6452c;
+      --teal: #28645e;
+      --tint: #e8eee7;
+      --dark: #1c3335;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "AppleMyungjo", "Batang", serif;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.85;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: #e8c5a9; color: var(--ink); }
+    a { color: var(--teal); text-underline-offset: .22em; text-decoration-thickness: 1px; }
+    a:hover { color: var(--accent); }
+    a:focus-visible { outline: 3px solid var(--accent); outline-offset: 5px; }
+    img { display: block; max-width: 100%; height: auto; }
+    figure, blockquote { margin: 0; }
+    p { margin: 0 0 1.2em; }
+    strong { font-weight: 750; }
+    abbr[title] { text-decoration: underline dotted; text-underline-offset: .2em; }
+    .wrap { width: min(1200px, calc(100% - 96px)); margin-inline: auto; }
+    .skip-link {
+      position: absolute; top: -100px; left: 16px; z-index: 10;
+      padding: 10px 18px; background: var(--surface);
+    }
+    .skip-link:focus { top: 12px; }
+    .masthead {
+      display: flex; align-items: center; justify-content: space-between; gap: 24px;
+      padding: 25px 0 20px; border-bottom: 1px solid var(--ink);
+      font-size: 12px; font-weight: 700; letter-spacing: .12em;
+    }
+    .masthead .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark { width: 15px; height: 15px; background: var(--accent); }
+    .masthead a { color: var(--ink); text-decoration: none; }
+    .masthead .issue { color: var(--muted); text-align: right; }
+    .hero { padding: 64px 0 0; }
+    .eyebrow {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+      color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .12em;
+      margin-bottom: 26px;
+    }
+    .eyebrow .rule { width: 44px; height: 2px; background: var(--accent); }
+    h1 {
+      margin: 0; max-width: 1050px;
+      font-family: var(--serif); font-size: clamp(40px, 5.6vw, 72px);
+      font-weight: 800; line-height: 1.3; letter-spacing: -.055em;
+      text-wrap: balance;
+    }
+    h1 span { display: block; color: var(--teal); }
+    .dek {
+      max-width: 790px; margin: 30px 0;
+      font-size: clamp(18px, 2vw, 22px); line-height: 1.8; color: #48585a;
+      letter-spacing: -.025em;
+    }
+    .byline {
+      display: flex; flex-wrap: wrap; gap: 8px 22px;
+      padding: 18px 0; border-top: 1px solid var(--line);
+      font-size: 12px; color: var(--muted);
+    }
+    .byline strong { color: var(--ink); }
+    .hero-visual {
+      margin-top: 20px; padding: 30px;
+      border: 1px solid var(--line); background: var(--surface);
+    }
+    .hero-visual .figure-top {
+      display: flex; justify-content: space-between; gap: 20px;
+      font-size: 11px; letter-spacing: .1em; color: var(--muted); margin-bottom: 20px;
+    }
+    .hero-visual img { width: min(100%, 940px); margin-inline: auto; }
+    figcaption { font-size: 13px; line-height: 1.75; color: var(--muted); margin-top: 17px; }
+    figcaption strong { color: var(--ink); font-weight: 700; }
+    .metrics {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      margin-top: 28px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink);
+    }
+    .metric { padding: 25px 26px 24px 0; }
+    .metric + .metric { padding-left: 30px; border-left: 1px solid var(--line); }
+    .metric .value { display: block; font-size: clamp(30px, 3.5vw, 46px); font-weight: 750; letter-spacing: -.055em; line-height: 1.3; }
+    .metric .value small { font-size: .45em; letter-spacing: 0; font-weight: 600; }
+    .metric .label { display: block; margin-top: 8px; font-size: 13px; color: var(--muted); }
+    .metric .detail { display: block; margin-top: 3px; font-size: 11px; color: var(--muted); }
+    .reading-layout {
+      display: grid; grid-template-columns: 190px minmax(0, 1fr);
+      gap: 64px; padding-top: 70px;
+    }
+    .sidebar { min-width: 0; }
+    .toc { position: sticky; top: 30px; font-size: 12px; line-height: 1.65; }
+    .toc-title { margin: 0 0 18px; font-size: 11px; letter-spacing: .14em; color: var(--muted); }
+    .toc ol { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--ink); }
+    .toc li { border-bottom: 1px solid var(--line); }
+    .toc a { display: flex; gap: 12px; padding: 12px 0; text-decoration: none; color: var(--ink); }
+    .toc a:hover { color: var(--accent); }
+    .toc .num { color: var(--accent); font-variant-numeric: tabular-nums; }
+    .sidebar-note { margin-top: 24px; font-size: 11px; color: var(--muted); line-height: 1.85; }
+    .article-body { min-width: 0; }
+    .section { padding: 0 0 58px; margin-bottom: 54px; border-bottom: 1px solid var(--line); }
+    .section-label { margin: 0 0 12px; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .13em; }
+    h2 {
+      margin: 0 0 26px; font-family: var(--serif);
+      font-size: clamp(27px, 3vw, 37px); line-height: 1.45; letter-spacing: -.04em;
+      text-wrap: balance;
+    }
+    h3 { margin: 32px 0 13px; font-size: 20px; line-height: 1.55; letter-spacing: -.035em; }
+    .lead { font-size: 19px; line-height: 1.95; }
+    .abstract {
+      border-left: 3px solid var(--teal); padding: 3px 0 3px 25px;
+      margin: 26px 0 32px;
+    }
+    .abstract p:last-child { margin-bottom: 0; }
+    .small-label { font-size: 11px; font-weight: 800; letter-spacing: .12em; color: var(--teal); margin-bottom: 12px; }
+    .findings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 30px; }
+    .finding { padding: 22px 20px; background: var(--tint); border-top: 3px solid var(--teal); }
+    .finding .index { color: var(--teal); font-size: 11px; font-weight: 800; letter-spacing: .1em; }
+    .finding h3 { margin: 12px 0 10px; font-size: 17px; }
+    .finding p { font-size: 14px; line-height: 1.8; margin: 0; }
+    .article-figure { margin: 30px 0; padding: 22px; background: #fff; border: 1px solid var(--line); }
+    .article-figure img { max-height: 680px; width: auto; margin-inline: auto; object-fit: contain; }
+    .figure-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 28px 0; }
+    .figure-grid .article-figure { margin: 0; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; }
+    .figure-grid img { width: 100%; height: auto; }
+    .table-wrap { overflow-x: auto; margin: 25px 0; border: 1px solid var(--line); background: var(--surface); }
+    .table-wrap:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.75; }
+    caption { padding: 16px 18px; text-align: left; color: var(--muted); font-size: 12px; border-bottom: 1px solid var(--line); }
+    th, td { text-align: left; padding: 15px 18px; vertical-align: top; border-bottom: 1px solid var(--line); }
+    thead th { background: var(--dark); color: #fff; font-size: 12px; font-weight: 650; }
+    tbody th { font-weight: 700; }
+    tbody tr:last-child > * { border-bottom: 0; }
+    .specs th { width: 105px; color: var(--teal); }
+    .comparison { min-width: 570px; font-variant-numeric: tabular-nums; }
+    .comparison .highlight { background: var(--tint); }
+    .comparison td strong { color: var(--teal); }
+    .note {
+      background: #eceee7; padding: 19px 22px; margin: 24px 0;
+      font-size: 14px; line-height: 1.85; border-left: 3px solid var(--teal);
+    }
+    .note p:last-child { margin: 0; }
+    .note.warm { background: #f2e8dc; border-left-color: var(--accent); }
+    .pullquote {
+      margin: 38px 0; padding: 30px 0 30px 28px;
+      border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink);
+      position: relative;
+    }
+    .pullquote::before {
+      content: "“"; position: absolute; left: 0; top: 15px;
+      font-family: Georgia, serif; font-size: 53px; color: var(--accent);
+    }
+    .pullquote p { margin: 0; font-family: var(--serif); font-size: clamp(23px, 2.5vw, 30px); line-height: 1.65; letter-spacing: -.04em; }
+    .pullquote footer { margin-top: 14px; font-size: 11px; color: var(--muted); }
+    .paths { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 24px 0; }
+    .path { border: 1px solid var(--line); padding: 20px; background: var(--surface); }
+    .path .path-num { color: var(--accent); font-size: 11px; font-weight: 800; }
+    .path h3 { margin: 7px 0 10px; font-size: 17px; }
+    .path p { font-size: 13px; margin-bottom: 0; }
+    .control-map {
+      padding: 24px; margin: 28px 0; background: var(--dark); color: #f4f4e9;
+      border: 1px solid var(--dark);
+    }
+    .control-map .map-intro { text-align: center; padding-bottom: 18px; margin-bottom: 20px; border-bottom: 1px solid #567073; font-size: 14px; }
+    .map-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .map-node { padding: 18px 14px; border: 1px solid #64807e; text-align: center; }
+    .map-node strong { display: block; font-size: 17px; color: #fff; }
+    .map-node span { display: block; color: #cbd8d2; font-size: 12px; margin-top: 7px; }
+    .control-map figcaption { color: #cbd8d2; }
+    .hierarchy { list-style: none; padding: 0; margin: 22px 0; counter-reset: level; }
+    .hierarchy li {
+      counter-increment: level; display: grid; grid-template-columns: 30px 1fr; gap: 14px;
+      padding: 14px 0; border-bottom: 1px solid var(--line); font-size: 14px;
+    }
+    .hierarchy li::before {
+      content: counter(level, decimal-leading-zero);
+      color: var(--accent); font-size: 12px; padding-top: 2px; font-weight: 800;
+    }
+    .hierarchy strong { display: block; font-size: 15px; }
+    .formula {
+      padding: 22px; background: var(--tint); text-align: center;
+      font-size: 18px; font-weight: 700; line-height: 1.7; margin: 24px 0;
+    }
+    .formula small { display: block; font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 9px; }
+    .missions { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 26px; }
+    .mission { padding: 24px; border: 1px solid var(--line); background: var(--surface); }
+    .mission .tag { font-size: 11px; letter-spacing: .12em; color: var(--accent); font-weight: 750; }
+    .mission h3 { margin: 9px 0 12px; }
+    .mission .result { font-size: 30px; font-weight: 750; color: var(--teal); letter-spacing: -.04em; line-height: 1.5; margin-bottom: 10px; }
+    .mission .result small { font-size: 13px; font-weight: 500; letter-spacing: 0; }
+    .mission p { font-size: 14px; margin: 0; }
+    .lessons { display: grid; gap: 0; margin: 26px 0 0; }
+    .lesson { display: grid; grid-template-columns: 46px 1fr; gap: 16px; padding: 23px 0; border-top: 1px solid var(--line); }
+    .lesson-num { color: var(--accent); font-family: Georgia, serif; font-size: 30px; line-height: 1.4; }
+    .lesson h3 { margin: 0 0 10px; font-size: 18px; }
+    .lesson p { font-size: 15px; margin: 0; }
+    .implications { min-width: 620px; }
+    .implications th:first-child { width: 24%; }
+    .implications td { width: 38%; }
+    .checklist { list-style: none; padding: 0; margin: 20px 0 0; }
+    .checklist li { position: relative; padding: 10px 0 10px 28px; font-size: 14px; border-bottom: 1px solid var(--line); }
+    .checklist li::before { content: "□"; position: absolute; left: 0; color: var(--teal); font-size: 19px; top: 5px; }
+    .closing { background: var(--dark); color: #e2e8df; padding: 35px; margin: 0 0 50px; }
+    .closing .section-label { color: #eeb99b; }
+    .closing h2 { color: #fffdf5; font-size: clamp(26px, 3vw, 34px); }
+    .closing p { font-size: 16px; }
+    .closing p:last-child { margin-bottom: 0; }
+    .share-copy { padding: 26px; border: 1px solid var(--line); background: var(--surface); margin-bottom: 48px; }
+    .share-copy h3 { margin: 0 0 12px; font-size: 15px; }
+    .share-copy p { font-size: 15px; margin-bottom: 12px; }
+    .share-copy .copy-text { user-select: all; }
+    .share-copy .share-hint { font-size: 11px; color: var(--muted); margin-bottom: 0; }
+    .source-notes { font-size: 13px; line-height: 1.9; padding-bottom: 35px; }
+    .source-notes h2 { font-size: 25px; margin-bottom: 20px; }
+    .source-notes h3 { font-size: 14px; margin-top: 24px; }
+    .source-notes ol { padding-left: 21px; }
+    .source-notes li { margin-bottom: 12px; }
+    .citation { padding: 20px 24px; border: 1px solid var(--line); background: var(--surface); }
+    .citation p:last-child { margin-bottom: 0; }
+    .keywords { display: flex; flex-wrap: wrap; gap: 8px; margin: 25px 0 0; }
+    .keywords span { padding: 4px 10px; border: 1px solid var(--line); font-size: 11px; color: var(--muted); }
+    .site-footer {
+      display: flex; justify-content: space-between; gap: 20px;
+      padding: 22px 0 35px; margin-top: 30px; border-top: 1px solid var(--ink);
+      font-size: 11px; color: var(--muted);
+    }
+    @media (min-width: 1500px) { body { font-size: 18px; } }
+    @media (max-width: 1000px) {
+      .wrap { width: calc(100% - 56px); }
+      .reading-layout { grid-template-columns: 150px minmax(0, 1fr); gap: 34px; }
+      .findings, .paths { grid-template-columns: 1fr; }
+      .finding { padding: 18px 20px; }
+      .finding h3 { margin-top: 7px; }
+      .paths { gap: 10px; }
+      .path { padding: 17px 20px; }
+    }
+    @media (max-width: 760px) {
+      body { font-size: 16px; line-height: 1.9; }
+      .wrap { width: calc(100% - 36px); }
+      .masthead { padding: 19px 0; font-size: 10px; gap: 12px; letter-spacing: .06em; }
+      .hero { padding-top: 38px; }
+      .eyebrow { margin-bottom: 18px; font-size: 10px; }
+      h1 { font-size: clamp(35px, 8.3vw, 57px); }
+      .dek { margin: 24px 0; font-size: 18px; }
+      .byline { gap: 5px 16px; }
+      .hero-visual { padding: 16px; }
+      .hero-visual .figure-top { font-size: 9px; }
+      .metrics { grid-template-columns: 1fr; margin-top: 22px; }
+      .metric, .metric + .metric {
+        padding: 17px 0; border-left: 0;
+        display: grid; grid-template-columns: 140px 1fr; gap: 0 16px; align-items: center;
+      }
+      .metric + .metric { border-top: 1px solid var(--line); }
+      .metric .value { font-size: 32px; grid-row: span 2; }
+      .metric .label, .metric .detail { margin: 0; }
+      .reading-layout { display: block; padding-top: 36px; }
+      .sidebar { margin-bottom: 44px; }
+      .toc { position: static; }
+      .toc ol { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+      .toc a { padding: 10px 0; }
+      .sidebar-note { margin-top: 12px; }
+      .section { padding-bottom: 37px; margin-bottom: 38px; }
+      h2 { font-size: 28px; margin-bottom: 20px; }
+      .lead { font-size: 18px; }
+      .figure-grid, .missions { grid-template-columns: 1fr; }
+      .article-figure { padding: 15px; margin: 25px 0; }
+      .map-columns { grid-template-columns: 1fr; gap: 10px; }
+      .map-node { padding: 12px; }
+      .control-map { padding: 20px; }
+      .map-node span { margin-top: 2px; }
+      th, td { padding: 12px 14px; }
+      .specs th { width: 80px; }
+      .closing { padding: 27px 23px; }
+      .share-copy { padding: 23px; }
+      .site-footer { flex-direction: column; gap: 7px; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    @media print {
+      body { background: #fff; font-size: 10pt; color: #000; }
+      .wrap { width: 100%; }
+      .sidebar, .skip-link, .share-copy, .site-footer a { display: none; }
+      .reading-layout { display: block; padding-top: 25px; }
+      .hero { padding-top: 20px; }
+      h1 { font-size: 32pt; }
+      h2 { font-size: 22pt; break-after: avoid; }
+      h3 { break-after: avoid; }
+      .section { margin-bottom: 25px; padding-bottom: 25px; }
+      .article-figure, .mission, .finding, .lesson, tr { break-inside: avoid; }
+      .table-wrap { overflow: visible; }
+      table { min-width: 0 !important; font-size: 9pt; }
+      .closing, .control-map { background: #f2f2ed; color: #000; border: 1px solid #aaa; }
+      .closing h2, .closing .section-label, .map-node strong, .map-node span, .control-map figcaption { color: #000; }
+      a { color: #000; }
+      .hero-visual img { max-height: 330px; object-fit: contain; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="HEAP - The autonomous walking excavator - 요약">
+<meta property="og:description" content="HEAP The autonomous walking excavator 요약 한줄 요약 12 t 보행 굴착기 Menzi Muck M545 를 자율 로봇 HEAP 으로 바꾼 5년의 시스템 논문. 팔 구동 방식 세 가지(조이스틱 구동 기구 / 전기 파일럿 밸브 / 서보 밸브)를 같은 기체에서 정량 비교 했고(속도 제어 상승 시간 35 ms vs 680 850 ms, 대역 2 Hz vs 0.5 Hz), 바퀴 다리 로봇용 상태 추정기, ">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/8jq9r8/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/8jq9r8/assets/figure2.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="HEAP - The autonomous walking excavator - 요약">
+<meta name="twitter:description" content="HEAP The autonomous walking excavator 요약 한줄 요약 12 t 보행 굴착기 Menzi Muck M545 를 자율 로봇 HEAP 으로 바꾼 5년의 시스템 논문. 팔 구동 방식 세 가지(조이스틱 구동 기구 / 전기 파일럿 밸브 / 서보 밸브)를 같은 기체에서 정량 비교 했고(속도 제어 상승 시간 35 ms vs 680 850 ms, 대역 2 Hz vs 0.5 Hz), 바퀴 다리 로봇용 상태 추정기, ">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/8jq9r8/assets/figure2.png">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/jud2021-heap/">
+</head>
+<body>
+  <a class="skip-link" href="#abstract">본문으로 건너뛰기</a>
+
+  <div class="wrap">
+    <header class="masthead" id="top">
+      <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>FIELD NOTES / ROBOTICS</a>
+      <span class="issue">RESEARCH REVIEW · 2021 PAPER</span>
+    </header>
+
+    <main>
+      <article aria-labelledby="article-title">
+        <header class="hero">
+          <div class="eyebrow"><span class="rule" aria-hidden="true"></span>건설 로봇 · 유압 시스템 · 현장 자동화</div>
+          <h1 id="article-title">12톤 굴착기를<br>로봇으로 만드는 법<span>HEAP가 드러낸 유압 자동화의 현실</span></h1>
+          <p class="dek">같은 기체, 세 가지 구동 방식. 35 ms와 850 ms의 응답 차이는 어디에서 오는가? ETH Zürich의 자율 보행 굴착기 HEAP는 빠른 밸브부터 느리게 흔들리는 차체까지, 상용 중장비를 로봇으로 바꾸는 데 필요한 연결고리를 보여 준다.</p>
+          <div class="byline">
+            <span><strong>논문 리뷰</strong> · Jud 외, 2021</span>
+            <span>Automation in Construction 129 · 103783</span>
+            <span>정리 <time datetime="2026-09-25">2026.09.25</time></span>
+            <a href="#sources">출처 및 해석 범위</a>
+          </div>
+
+          <figure class="hero-visual">
+            <div class="figure-top"><span>THE PLATFORM / MENZI MUCK M545</span><span>12 t · HEAP</span></div>
+            <img src="assets/figure2.png" alt="Menzi Muck M545에 장착한 팔 IMU, 드로와이어 센서, LiDAR, GNSS 안테나, 서보 밸브 및 제어 PC의 위치를 보여 주는 HEAP 시스템 구성도" fetchpriority="high">
+            <figcaption><strong>원 논문 Fig. 2 · 상용 장비에서 자율 로봇으로.</strong> 표준 M545에 팔 IMU와 실린더 위치 센서, LiDAR 2대, GNSS 안테나 2개, 붐 및 차체 서보 밸브, 제어 PC를 추가했다. 이미지: Jud 외(2021), CC BY.</figcaption>
+          </figure>
+
+          <div class="metrics" aria-label="논문의 핵심 수치">
+            <div class="metric">
+              <span class="value">35 <small>ms</small></span>
+              <span class="label">서보 밸브 속도 제어 t90</span>
+              <span class="detail">파일럿 밸브는 680 / 850 ms</span>
+            </div>
+            <div class="metric">
+              <span class="value">&gt; 2 <small>Hz</small></span>
+              <span class="label">서보 밸브 속도 제어 대역</span>
+              <span class="detail">기체 공진으로 측정 중단 · 상한 미확인</span>
+            </div>
+            <div class="metric">
+              <span class="value">3–5 <small>cm</small></span>
+              <span class="label">제방 굴착 평균 오차</span>
+              <span class="detail">논문에서 보고한 두 굴착 사례</span>
+            </div>
+          </div>
+        </header>
+
+        <div class="reading-layout">
+          <aside class="sidebar">
+            <nav class="toc" aria-label="기사 목차">
+              <p class="toc-title">IN THIS REPORT</p>
+              <ol>
+                <li><a href="#abstract"><span class="num">01</span>초록과 핵심 발견</a></li>
+                <li><a href="#system"><span class="num">02</span>기체와 센서 설계</a></li>
+                <li><a href="#actuation"><span class="num">03</span>세 구동 방식의 비교</a></li>
+                <li><a href="#control"><span class="num">04</span>상태 추정과 제어</a></li>
+                <li><a href="#field"><span class="num">05</span>네 가지 현장 임무</a></li>
+                <li><a href="#lessons"><span class="num">06</span>개발이 남긴 교훈</a></li>
+                <li><a href="#implications"><span class="num">07</span>HR35에 주는 시사점</a></li>
+                <li><a href="#sources"><span class="num">08</span>출처와 자료 주석</a></li>
+              </ol>
+              <p class="sidebar-note">2021년 논문을 정리한 연구 리뷰다. 논문에서 보고한 결과와 HR35 적용을 위한 작성자의 가설을 구분했다.</p>
+            </nav>
+          </aside>
+
+          <div class="article-body">
+            <section class="section" id="abstract" aria-labelledby="abstract-title">
+              <p class="section-label">01 / ABSTRACT &amp; KEY FINDINGS</p>
+              <h2 id="abstract-title">자율성은 알고리즘만으로 완성되지 않는다</h2>
+              <p class="lead">HEAP는 12 t급 보행 굴착기 Menzi Muck M545를 자율 로봇으로 바꾼 약 5년의 시스템 개발을 담은 연구다. 핵심은 하나의 제어기보다, 기계·유압·센서·계산·현장 임무를 연결한 전체 설계에 있다.</p>
+              <div class="abstract">
+                <p class="small-label">초록</p>
+                <p>연구진은 조이스틱 구동 기구, 전기 파일럿 밸브, 서보 밸브를 같은 기체에 구현해 속도와 힘 제어 응답을 정량 비교했다. 여기에 바퀴와 다리를 함께 가진 기체의 상태 추정, 주행·차체·팔 제어, 펌프 유량 한계를 포함한 계층 최적화를 결합했다. 제방 굴착, 돌담 조립, 임업, 반자율 원격 조작은 이 설계가 현장 작업으로 이어질 수 있음을 보여 준다. 동시에 밸브 성능만으로 해결되지 않는 펌프 응답, 기름 오염, 호스 압축성, 차체 진동의 영향을 드러낸다.</p>
+              </div>
+              <div class="findings">
+                <div class="finding">
+                  <span class="index">FINDING 01</span>
+                  <h3>명령 경로가 응답을 결정한다</h3>
+                  <p>파일럿 밸브와 조이스틱 구동의 속도 대역은 약 0.5 Hz로 비슷하다. 주요 지연을 이해하려면 주 밸브와 압력 형성 과정까지 보아야 한다.</p>
+                </div>
+                <div class="finding">
+                  <span class="index">FINDING 02</span>
+                  <h3>빠른 센서와 정확한 센서는 다르다</h3>
+                  <p>실린더 위치 센서는 빠른 유압 제어에, 링크 IMU는 세계 좌표계 기준 말단 자세와 정밀도에 기여한다. HEAP는 두 센서의 역할을 나눴다.</p>
+                </div>
+                <div class="finding">
+                  <span class="index">FINDING 03</span>
+                  <h3>현장 성능은 물리적 제약에서 나온다</h3>
+                  <p>펌프 유량, 실린더 한계, 충돌 회피를 작업 목표보다 우선한다. 유압 동력원과 지면까지 고려해야 빠른 제어가 실제 작업 성능이 된다.</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="section" id="system" aria-labelledby="system-title">
+              <p class="section-label">02 / PLATFORM &amp; SENSING</p>
+              <h2 id="system-title">기존 굴착기를 활용하되,<br>관측 방식은 새로 설계한다</h2>
+              <p>상용 기계를 자율화하면 기체 자체를 새로 개발하는 데 드는 시간과 비용을 줄일 수 있다. 그러나 사람이 감각적으로 보완하던 유격, 지연, 흔들림을 이제 센서와 제어기가 다뤄야 한다. HEAP의 장비 구성은 이 간극을 메우기 위한 선택이다.</p>
+
+              <div class="table-wrap" tabindex="0" role="region" aria-label="HEAP 센서 및 계산 구성 표">
+                <table class="specs">
+                  <caption>플랫폼 구성 — 측정 대상과 제어 목적의 연결</caption>
+                  <tbody>
+                    <tr><th scope="row">측위</th><td>Leica iCON iXE3 GNSS-RTK 안테나 2개와 캐빈·차체 IMU(SBG Ellipse2-A)를 사용한다.</td></tr>
+                    <tr><th scope="row">관절</th><td>Sick 드로와이어 센서로 실린더 위치를, 링크 IMU로 세계 기준 자세를 측정한다. 빠른 유압 제어와 말단 정밀도를 함께 확보하기 위한 이중 구성이다.</td></tr>
+                    <tr><th scope="row">지각</th><td>Velodyne VLP-16 LiDAR 2대를 사용한다. 먼지가 있는 작업 환경을 고려한 선택이다.</td></tr>
+                    <tr><th scope="row">계산</th><td>캐빈의 i7 PC에서 저수준 제어·추정기·상위 제어를 운용한다. CAN 통신과 제어 주기는 100 Hz이며, ROS는 비실시간 영역을 담당한다.</td></tr>
+                    <tr><th scope="row">차체</th><td>실린더 14개에 서보 밸브를 내장한 모듈(ICM)을 적용했다. 오염으로 막히던 1세대 노즐–플래퍼 방식에서 2세대 직접 구동 밸브(DDV)로 전환했다.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3>실린더 길이와 링크 자세를 함께 측정하는 이유</h3>
+              <p>실린더 길이는 낮은 지연으로 읽을 수 있어 유압 제어에 유리하다. 하지만 이를 관절각과 말단 위치로 변환하는 과정에서 기구학 오차와 관절 유격의 영향이 누적된다. 링크 IMU는 상대적으로 느리더라도 세계 기준 자세를 제공하므로 말단의 기하학적 정확도를 높이는 데 도움이 된다.</p>
+              <aside class="note">
+                <p><strong>설계의 핵심:</strong> 센서 하나의 우열을 정하는 대신, 빠른 폐루프 제어에 필요한 측정과 작업 공간 정확도에 필요한 측정을 구분한다. 이 구분은 뒤에서 살펴볼 HR35의 센서 선택에도 직접 연결된다.</p>
+              </aside>
+            </section>
+
+            <section class="section" id="actuation" aria-labelledby="actuation-title">
+              <p class="section-label">03 / COMPARATIVE EVIDENCE</p>
+              <h2 id="actuation-title">같은 기체에서 비교한<br>세 가지 자동화 경로</h2>
+              <p>굴착기의 팔을 자동으로 움직이는 방법은 유압 회로에 얼마나 깊이 개입하는가에 따라 달라진다. 이 논문의 중요한 기여는 세 방식을 하나의 기체에 구현해 비교했다는 점이다.</p>
+
+              <div class="paths">
+                <div class="path">
+                  <span class="path-num">A / MECHANICAL INPUT</span>
+                  <h3>조이스틱 구동 기구</h3>
+                  <p>기계 장치가 기존 조이스틱을 움직인다. 유압 회로를 수정하지 않고 운전자의 입력을 대체한다.</p>
+                </div>
+                <div class="path">
+                  <span class="path-num">B / LOW-PRESSURE CIRCUIT</span>
+                  <h3>전기 파일럿 밸브</h3>
+                  <p>저압 파일럿 회로에 개입한다. 기존 주 밸브를 활용하는, 널리 쓰이는 저비용 후장착 경로다.</p>
+                </div>
+                <div class="path">
+                  <span class="path-num">C / HIGH-PRESSURE CIRCUIT</span>
+                  <h3>서보 밸브</h3>
+                  <p>고압 회로에 직접 개입한다. HEAP의 구성에서는 별도 펌프와 축압기를 함께 사용한다.</p>
+                </div>
+              </div>
+
+              <figure class="article-figure">
+                <img src="assets/figure3.png" alt="조이스틱 구동은 주황색, 파일럿 밸브는 파란색, 서보 밸브는 빨간색으로 구분한 세 가지 유압 구동 경로" loading="lazy" decoding="async">
+                <figcaption><strong>원 논문 Fig. 3 · 개입 위치가 다르면 제어 대상도 달라진다.</strong> 조이스틱은 기존 입력부, 파일럿 밸브는 저압 회로, 서보 밸브는 고압 회로에 연결된다.</figcaption>
+              </figure>
+
+              <h3>파일럿 밸브는 어떻게 제어했나</h3>
+              <p>Hawe PMZ 비례 감압 밸브를 조이스틱과 병렬로 연결했다. 피스톤 속도 제어는 목표 속도를 전류로 바꾸는 <strong>13점 룩업 표 기반 피드포워드와 100 Hz PI 제어</strong>를 결합한다. 로드센싱 특성을 이용해 부하가 달라져도 같은 표를 사용한다. 힘 제어에는 PI와 데드존 보상을 적용했다.</p>
+
+              <div class="table-wrap" tabindex="0" role="region" aria-label="세 가지 구동 방식의 속도 및 힘 제어 성능 비교 표">
+                <table class="comparison">
+                  <caption>논문 보고값 재구성 · t90은 목표 변화량의 90%에 도달하는 시간</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">구동 방식</th>
+                      <th scope="col">속도 t90</th>
+                      <th scope="col">속도 대역</th>
+                      <th scope="col">힘 t90</th>
+                      <th scope="col">힘 대역</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="highlight">
+                      <th scope="row">서보 밸브</th>
+                      <td><strong>35 ms</strong></td>
+                      <td><strong>&gt; 2 Hz</strong></td>
+                      <td><strong>40 ms</strong></td>
+                      <td><strong>&gt; 20 Hz</strong></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">파일럿 밸브</th>
+                      <td>680 / 850 ms</td>
+                      <td>0.50 Hz</td>
+                      <td>650 ms</td>
+                      <td>0.85 Hz</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">조이스틱 구동</th>
+                      <td>600 ms</td>
+                      <td>0.45 Hz</td>
+                      <td>720 ms</td>
+                      <td>0.73 Hz</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <aside class="note warm">
+                <p><strong>측정 조건과 읽는 법.</strong> 속도 응답은 0.05–10 Hz 처프, 진폭 0.03 m/s로, 힘 응답은 0.05–20 Hz 처프, 진폭 10 kN으로 식별했다. 스텝 입력은 각각 0.03 m/s와 20 kN이다. 서보 밸브의 속도 시험은 기체 공진으로 중단했으므로 <strong>“&gt; 2 Hz”를 정확한 차단 주파수로 해석하면 안 된다.</strong> 힘 대역의 “&gt; 20 Hz” 역시 확정된 상한값이 아니다.</p>
+              </aside>
+
+              <div class="figure-grid">
+                <figure class="article-figure">
+                  <img src="assets/table2.png" alt="세 구동 방식의 속도 제어 응답을 비교한 원 논문 표 2" loading="lazy" decoding="async">
+                  <figcaption><strong>원 논문 Table 2 · 속도 제어.</strong> 파일럿단의 응답은 중력 방향으로 움직이는 디퍼에서 680 ms, 중력 반대 방향의 붐·셔블에서 850 ms로 보고됐다.</figcaption>
+                </figure>
+                <figure class="article-figure">
+                  <img src="assets/table3.png" alt="세 구동 방식의 힘 제어 응답을 비교한 원 논문 표 3" loading="lazy" decoding="async">
+                  <figcaption><strong>원 논문 Table 3 · 힘 제어.</strong> 파일럿단은 영점 부근 데드존의 영향을 받으며, t90은 650 ms, 대역은 0.85 Hz다.</figcaption>
+                </figure>
+              </div>
+
+              <h3>지연의 원인은 조이스틱보다 깊은 곳에 있다</h3>
+              <p>조이스틱 구동과 파일럿 밸브의 속도 응답이 비슷하다는 것은, 지연의 상당 부분이 입력 장치보다 <strong>주 밸브와 계통 압력 형성 과정</strong>에서 발생한다는 해석을 뒷받침한다. 파일럿단의 680 ms와 850 ms 차이도 중력 방향과 압력이 차오르는 과정에 연결된다.</p>
+              <p>논문은 파일럿단 압력 센서와 steer-by-wire를 갖춘 일부 기체라면 주 밸브가 열리기 전에 계통을 가압할 수 있다고 설명한다. 시험에 사용한 M545에서는 이 기능을 이용할 수 없었다.</p>
+
+              <div class="figure-grid">
+                <figure class="article-figure">
+                  <img src="assets/figure6.png" alt="조이스틱 구동, 파일럿 밸브, 서보 밸브의 속도 제어 주파수 응답을 비교한 보드 선도" loading="lazy" decoding="async">
+                  <figcaption><strong>원 논문 Fig. 6 · 속도 응답.</strong> 조이스틱과 파일럿 밸브의 유사한 응답은 기존 주 밸브 계통의 영향을 보여 준다.</figcaption>
+                </figure>
+                <figure class="article-figure">
+                  <img src="assets/figure7.png" alt="세 구동 방식의 힘 제어 주파수 응답을 비교한 보드 선도" loading="lazy" decoding="async">
+                  <figcaption><strong>원 논문 Fig. 7 · 힘 응답.</strong> 서보 밸브의 1–15 Hz 이득 감소는 힘을 가할 때 관절이 함께 움직이는 현상과 연결된다.</figcaption>
+                </figure>
+              </div>
+
+              <blockquote class="pullquote">
+                <p>빠른 밸브를 붙이면,<br>그동안 보이지 않던 기계의 동역학이 드러난다.</p>
+                <footer>논문의 구동 비교와 개발 통찰을 종합한 편집 요약 · 직접 인용 아님</footer>
+              </blockquote>
+            </section>
+
+            <section class="section" id="control" aria-labelledby="control-title">
+              <p class="section-label">04 / ESTIMATION &amp; CONTROL</p>
+              <h2 id="control-title">잘 추정하고, 지켜야 할 한계부터 정한다</h2>
+
+              <h3>상태 추정: 측정값을 많이 넣는다고 좋아지지 않는다</h3>
+              <p>연구진은 잔차 기반 필터(TSIF)에 IMU 예측, GNSS 갱신, 바퀴 굴림 예측, 다리 오도메트리를 통합하는 구조를 설계했다. 그러나 시뮬레이션에서는 <strong>바퀴 미끄럼 때문에 굴림·다리 잔차가 오히려 추정을 악화</strong>시켰다. 실차에서는 IMU와 GNSS만 사용했으며, 나머지 잔차는 향후 미끄럼 검출과 GNSS 단절 대응을 위한 가능성으로 남았다.</p>
+              <p>선회각 측정에도 보완이 필요했다. 기어 이 98개를 읽는 유도 센서의 분해능은 0.92°였고, 이를 캐빈과 차체 IMU의 각속도 차를 이용한 상보 필터로 보완했다.</p>
+
+              <figure class="control-map" aria-labelledby="control-map-caption">
+                <div class="map-intro">추정된 기체 상태 + 작업 목표</div>
+                <div class="map-columns">
+                  <div class="map-node"><strong>팔 제어</strong><span>말단 자세·위치·힘<br>7개 관절 구성</span></div>
+                  <div class="map-node"><strong>차체 제어</strong><span>높이·롤·피치<br>굴신 실린더 4개</span></div>
+                  <div class="map-node"><strong>주행 제어</strong><span>바퀴 속도·조향<br>4개 바퀴</span></div>
+                </div>
+                <figcaption id="control-map-caption">제어 구조의 개념 요약. 팔의 역동역학 제어에는 이 중 5개 관절을 사용하는 별도 구성이 적용된다.</figcaption>
+              </figure>
+
+              <figure class="article-figure">
+                <img src="assets/figure10.png" alt="HEAP의 팔 제어, 차체 제어, 주행 제어와 각 제어 대상 사이의 관계를 나타낸 원 논문 제어 구조도" loading="lazy" decoding="async">
+                <figcaption><strong>원 논문 Fig. 10 · 세 제어기의 분업.</strong> 팔의 작업 목표, 차체 자세, 바퀴 주행을 각 제어기가 담당한다.</figcaption>
+              </figure>
+
+              <h3>팔 제어: 목표보다 먼저 오는 제약</h3>
+              <p>계층 최적화는 모든 목표를 동등하게 취급하지 않는다. 물리적 제약을 먼저 만족시키고, 그 범위 안에서 작업 목표를 달성한다. 역동역학 구성은 관절 5개와 작업 공간 4차원을 사용하며, 우선순위는 다음과 같다.</p>
+
+              <ol class="hierarchy">
+                <li><div><strong>운동 방정식</strong>관성·코리올리·중력뿐 아니라 점성 마찰, 정지 마찰, 말단 힘을 포함한다.</div></li>
+                <li><div><strong>펌프 유량 한계</strong>여러 실린더가 동시에 요구하는 유량을 펌프의 공급 한계 안에 둔다.</div></li>
+                <li><div><strong>실린더 힘 한계</strong>기체 자세에 따라 달라지는 힘의 한계를 반영한다.</div></li>
+                <li><div><strong>실린더 속도 한계</strong>실린더가 낼 수 있는 속도 범위를 지킨다.</div></li>
+                <li><div><strong>위치 한계</strong>관절과 실린더의 허용 이동 범위를 넘지 않는다.</div></li>
+                <li><div><strong>자기 충돌 회피</strong>기체 구성 요소 사이의 충돌을 피한다.</div></li>
+                <li><div><strong>말단 자세</strong>버킷의 방향을 위치 추종보다 우선한다.</div></li>
+                <li><div><strong>말단 위치</strong>상위 제약과 자세 목표를 만족하는 범위에서 위치를 추종한다.</div></li>
+                <li><div><strong>관절 감쇠</strong>남은 자유도에서 관절 움직임을 안정화한다.</div></li>
+              </ol>
+
+              <div class="formula" role="note" aria-label="펌프 유량 제약의 개념식">
+                실린더 면적 × 피스톤 속도로 계산한 요구 유량의 합 ≤ Q<sub>max</sub>
+                <small>원 논문 식 19–20의 개념 요약. 실제 구현에서는 이동 방향별 유효 면적과 유량 정의를 따라야 한다.</small>
+              </div>
+
+              <p>자세가 위치보다 우선인 이유는 작업 의미에 있다. 충돌을 피하는 과정에서 버킷이 기울어 흙을 쏟으면, 위치 오차를 줄여도 임무는 실패할 수 있다. 이 우선순위는 단순한 수학적 선택이 아니라 작업의 성공 조건을 표현한다.</p>
+              <p>역기구학 구성은 관절 7개와 작업 공간 6차원을 사용한다. 유량·속도·위치·충돌 제약 이후 자세와 위치를 추종하고, 마지막으로 관절 속도를 최소화한다. 목표 속도는 궤적 속도에 PID 보정을 더해 만든다.</p>
+            </section>
+
+            <section class="section" id="field" aria-labelledby="field-title">
+              <p class="section-label">05 / FIELD DEMONSTRATIONS</p>
+              <h2 id="field-title">네 가지 임무가 보여 준<br>성능과 적용 조건</h2>
+              <p>HEAP는 굴착뿐 아니라 무거운 돌의 배치, 숲속 작업, 위험 지역 원격 조작에 사용됐다. 각 사례는 서로 다른 성능 지표와 센서 조건을 가진다. 따라서 아래 수치를 하나의 공통된 ‘로봇 정확도’로 읽어서는 안 된다.</p>
+
+              <figure class="article-figure">
+                <img src="assets/figure12.png" alt="HEAP의 네 가지 현장 응용: 자유 형상 제방 굴착, 돌담 조립, 임업, 반자율 원격 조작" loading="lazy" decoding="async">
+                <figcaption><strong>원 논문 Fig. 12 · 실험실 밖의 HEAP.</strong> (a) 자유 형상 제방 굴착, (b) 돌담 조립, (c) 임업, (d) 반자율 원격 조작.</figcaption>
+              </figure>
+
+              <div class="missions">
+                <section class="mission" aria-labelledby="mission-earth">
+                  <span class="tag">A / EARTHWORK</span>
+                  <h3 id="mission-earth">자유 형상 제방 굴착</h3>
+                  <p class="result">3–5 cm <small>평균 오차</small></p>
+                  <p>2020년 6월 시연에서 두 면 제방은 0.03 m, 30 m³ 규모의 S자 제방은 0.05 m의 평균 오차를 기록했다. 힘 제어가 필요한 굴착 중에는 역동역학을, 공중 이동에는 역기구학을 사용했다.</p>
+                </section>
+                <section class="mission" aria-labelledby="mission-stone">
+                  <span class="tag">B / STONE ASSEMBLY</span>
+                  <h3 id="mission-stone">돌담 조립</h3>
+                  <p class="result">109개 <small>평균 돌 무게 1,030 kg</small></p>
+                  <p>돌의 배치 오차는 0.128 m, 돌 하나의 작업 시간은 700–1,300초였다. 팔 IMU는 돌의 형상을 다루는 데 필요한 메시 정밀도에 기여했다.</p>
+                </section>
+                <section class="mission" aria-labelledby="mission-forest">
+                  <span class="tag">C / FORESTRY</span>
+                  <h3 id="mission-forest">숲속 작업</h3>
+                  <p class="result">30 / 40 cm <small>그리퍼 / 차체 오차 이내</small></p>
+                  <p>숲에서는 GNSS가 불안정해 LiDAR 측위를 사용했다. 관절 측정 구성에서도 드로와이어를 제거하고 IMU만 사용해, 작업 환경에 맞게 센서 구성을 바꿨다.</p>
+                </section>
+                <section class="mission" aria-labelledby="mission-remote">
+                  <span class="tag">D / TELEOPERATION</span>
+                  <h3 id="mission-remote">반자율 원격 조작</h3>
+                  <p class="result">200 m <small>참호 작업</small></p>
+                  <p>제2차 세계대전 불발탄 지역에서 약 100 ms 지연의 영상으로 원격 운전했다. 차체 자세 자동 제어는 운전자가 원격으로 작업을 수행하는 데 중요한 요소였다.</p>
+                </section>
+              </div>
+            </section>
+
+            <section class="section" id="lessons" aria-labelledby="lessons-title">
+              <p class="section-label">06 / ENGINEERING LESSONS</p>
+              <h2 id="lessons-title">현장에서 드러난 진짜 모델</h2>
+              <p>논문의 개발 통찰은 유압 기체를 이상적인 강체 로봇으로 다루기 어려운 이유를 설명한다. 제어 대역을 높이면 그동안 상대적으로 작게 보였던 오차와 진동이 새로운 한계가 된다.</p>
+
+              <div class="lessons">
+                <div class="lesson">
+                  <span class="lesson-num" aria-hidden="true">01</span>
+                  <div>
+                    <h3>굴착기는 정밀 로봇이 아니다</h3>
+                    <p>관절 유격은 노후화와 함께 커지고, 기름 오염은 고성능 밸브를 막으며, 온도 변화는 링크 길이에도 영향을 준다. 실린더 길이만으로 말단 위치를 계산하면 이 효과를 놓칠 수 있다. 링크 자세를 직접 측정하는 센서가 필요한 이유다.</p>
+                  </div>
+                </div>
+                <div class="lesson">
+                  <span class="lesson-num" aria-hidden="true">02</span>
+                  <div>
+                    <h3>펌프는 빠른 밸브를 따라가지 못할 수 있다</h3>
+                    <p>서보 밸브가 만드는 급격한 유량 요구는 압력 강하와 피크를 유발한다. 기존 펌프와 제어기가 이를 따라가지 못하면 엔진이 꺼질 수도 있다. HEAP는 축압기를 이용해 급격한 요구를 완충했다. 더 발전된 제어에는 유압 동력원의 동역학을 포함할 필요가 있다.</p>
+                  </div>
+                </div>
+                <div class="lesson">
+                  <span class="lesson-num" aria-hidden="true">03</span>
+                  <div>
+                    <h3>유압은 완전히 뻣뻣하지 않다</h3>
+                    <p>기름의 압축성과 긴 호스의 팽창은 압력 진동을 만든다. 고온에서는 호스의 영향도 커진다. 실린더가 거의 움직이지 않는데 압력만 진동할 수 있으며, 연구에서는 노치 필터로 해당 성분을 제거했다. 일반 굴착기에서는 압력 동역학이 제어 대역보다 약 한 자릿수 빠르기 때문에 이 문제가 덜 두드러진다.</p>
+                  </div>
+                </div>
+                <div class="lesson">
+                  <span class="lesson-num" aria-hidden="true">04</span>
+                  <div>
+                    <h3>12톤의 무게가 안정을 보장하지 않는다</h3>
+                    <p>타이어는 스프링처럼 작동한다. 팔 제어 대역이 차체 흔들림의 고유진동수에 가까워지면 기체 전체가 응답에 관여한다. 궤도식 장비도 무른 지면에서는 비슷한 문제를 겪을 수 있다. 작업기가 지면에 접촉하면 지지 조건이 달라져 흔들림이 완화될 수 있다.</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="section" id="implications" aria-labelledby="implications-title">
+              <p class="section-label">07 / IMPLICATIONS FOR HR35</p>
+              <h2 id="implications-title">HR35에 옮겨 갈 것은<br>성능 수치보다 검증 질문이다</h2>
+              <p>원 노트는 HEAP의 결과를 3.5 t급 궤도식 HR35와 디지털 트윈 개발에 연결한다. 유압 구동 경로가 유사하다면 HEAP의 파일럿단 결과는 유용한 비교 기준이 된다. 다만 기체, 밸브, 부하와 동력원이 다르므로 <strong>0.5 Hz와 680–850 ms를 HR35의 확정 성능으로 사용할 수는 없다.</strong></p>
+              <aside class="note warm">
+                <p><strong>이 절의 성격:</strong> 아래 내용은 HEAP 논문의 추가 실험 결과가 아니라, 원 노트 작성자의 HR35 적용 해석과 검증 제안이다. 특히 유효 체적탄성계수 β = 1,000 bar는 원 노트에 제시된 트윈 설정값이며, HEAP에서 확인된 물성값이 아니다.</p>
+              </aside>
+
+              <div class="table-wrap" tabindex="0" role="region" aria-label="HEAP 연구 결과의 HR35 적용 가설과 검증 방법">
+                <table class="implications">
+                  <caption>논문에서 가져올 관점 → HR35에서 확인할 사항</caption>
+                  <thead>
+                    <tr><th scope="col">주제</th><th scope="col">적용 가설</th><th scope="col">관측·검증 방법</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">파일럿단 응답</th>
+                      <td>조이스틱 명령이 비례 밸브와 기존 주 밸브를 거치는 HR35라면, HEAP의 파일럿단이 응답 비교의 출발점이 된다.</td>
+                      <td>실차와 트윈의 스텝 응답을 비교하고 t90·지연·대역을 식별한다. 2차계와 데드타임 모델의 적합성을 검토한다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">방향별 비대칭</th>
+                      <td>중력 방향과 반대 방향에서 압력 축적 과정과 응답 지연이 달라질 수 있다.</td>
+                      <td>올림·내림을 분리해 시험한다. HEAP의 680 / 850 ms 차이와 같은 비대칭이 존재하는지, 트윈이 이를 재현하는지 확인한다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">유효 압축성</th>
+                      <td>트윈의 β는 기름뿐 아니라 호스 팽창 등을 묶은 유효 파라미터로 해석할 수 있다.</td>
+                      <td>압력 진동을 측정하고 모델과 비교한다. 주파수만으로 β를 단정하지 않고 유체 체적, 부하와 호스 특성의 영향도 구분한다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">펌프 공급 한계</th>
+                      <td>논문 식 19–20의 유량 제약은 트윈에 펌프 한계를 추가하는 간결한 출발점이다.</td>
+                      <td>여러 축을 동시에 구동할 때 요구 유량의 합과 속도 저하를 비교한다. 정적 유량 제한과 펌프의 과도 응답을 구분한다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">센서 역할 분리</th>
+                      <td>경사계·링크 자세 센서는 말단 정확도에, 실린더 센서는 빠른 제어에 유리할 수 있다.</td>
+                      <td>센서 지연과 말단 오차를 따로 평가한다. 절대 자세 측정의 이점과 유압 폐루프의 지연 요구를 함께 확인한다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">차체와 지면</th>
+                      <td>HR35는 궤도식이어도 무른 지면에서 차체 흔들림이 팔 제어에 영향을 줄 수 있다.</td>
+                      <td>팔 제어 대역과 차체 고유진동수를 별도로 측정한다. 원 노트가 지목한 F·G축도 접지 조건에 따라 비교한다.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3>다음 실험을 위한 체크리스트</h3>
+              <ul class="checklist" aria-label="HR35 검증 준비 체크리스트">
+                <li>명령에서 주 밸브까지의 실제 구동 경로와 센서 구성을 기록한다.</li>
+                <li>상승·하강 시험을 나누고, 자세·부하·유온·접지 조건을 함께 남긴다.</li>
+                <li>실차와 트윈에 동일한 입력을 주고 지연, t90, 정상상태 오차를 비교한다.</li>
+                <li>압력 진동과 차체 흔들림을 구분할 수 있도록 압력·위치·자세를 함께 기록한다.</li>
+                <li>단일 축 결과에 더해 여러 축 동시 구동에서 펌프 유량 한계를 확인한다.</li>
+              </ul>
+            </section>
+
+            <section class="closing" aria-labelledby="closing-title">
+              <p class="section-label">THE TAKEAWAY</p>
+              <h2 id="closing-title">다음 알고리즘을 고르기 전에,<br>기계가 어떻게 응답하는지 측정하자</h2>
+              <p>HEAP의 성과는 서보 밸브의 35 ms 응답이나 제방의 3–5 cm 오차 하나로 설명되지 않는다. 센서마다 역할을 나누고, 유압 공급 한계를 제약으로 표현하며, 현장의 흔들림과 오염을 설계에 되돌려 넣은 결과다.</p>
+              <p>새로운 기체에 적용할 때 가장 먼저 가져올 것은 이 접근법이다. 명령이 움직임이 되기까지의 지연을 재고, 정확도가 무너지는 위치를 찾고, 실제 작업에 필요한 우선순위를 정한다. 자율 굴착기의 설계는 그 측정에서 시작된다.</p>
+            </section>
+
+            <aside class="share-copy" aria-labelledby="share-title">
+              <p class="small-label">SHARE THIS IDEA</p>
+              <h3 id="share-title">공유용 한 문단</h3>
+              <p class="copy-text">12톤 굴착기를 자율 로봇으로 바꾼 HEAP. 같은 기체에서 서보 밸브의 속도 응답 t90은 35 ms, 파일럿 밸브는 680–850 ms였다. 그러나 더 큰 교훈은 속도 밖에 있다. 펌프 유량, 센서 지연, 호스 압축성, 차체 흔들림까지 이해해야 제어 성능이 현장 성능으로 이어진다.</p>
+              <p class="share-hint">문단을 선택해 복사할 수 있습니다. 연구 출처: <a>Jud 외, 「HEAP – The autonomous walking excavator」</a></p>
+            </aside>
+
+            <section class="source-notes" id="sources" aria-labelledby="sources-title">
+              <p class="section-label">08 / SOURCES &amp; NOTES</p>
+              <h2 id="sources-title">출처와 해석 범위</h2>
+              <div class="citation">
+                <p><strong>HEAP – The autonomous walking excavator</strong></p>
+                <p>Dominic Jud, Simon Kerscher, Martin Wermelinger, Edo Jelavic, Pascal Egli, Philipp Leemann, Gabriel Hottiger, Marco Hutter.</p>
+                <p>ETH Zürich Robotic Systems Lab · Moog Industrial Group<br><cite>Automation in Construction</cite>, 129, 103783, 2021.<br>DOI: <a>10.1016/j.autcon.2021.103783</a> · 원 논문 라이선스: CC BY.</p>
+              </div>
+              <ol>
+                <li><strong>작성 범위.</strong> 이 글은 제공된 한국어 Obsidian 논문 요약을 공개용 연구 리뷰로 재구성한 문서다. 원 논문을 새로 대조하거나 독립적으로 재현한 검증 보고서는 아니다. 본문의 수치와 실험 조건은 제공된 요약에 근거한다.</li>
+                <li><strong>그림과 표.</strong> Fig. 2, 3, 6, 7, 10, 12 및 Table 2, 3은 제공된 원 논문 이미지다. 모든 이미지의 출처는 Jud 외(2021), 위 DOI의 CC BY 논문이다. 한국어 캡션은 요약·재작성했으며, HTML 비교표와 제어 개념도는 제공된 노트를 바탕으로 재구성했다.</li>
+                <li><strong>수치의 적용 범위.</strong> 제어 응답은 해당 기체와 시험 구성의 결과다. 굴착 평균 오차, 돌 배치 오차, 임업 위치 오차는 서로 다른 작업에서 얻은 지표로 직접 비교할 수 없다. “&gt;”가 붙은 대역은 정확한 상한값을 뜻하지 않는다.</li>
+                <li><strong>HR35 해석.</strong> HR35와 디지털 트윈에 대한 제안은 노트 작성자의 응용 관점이다. HEAP의 측정 결과가 HR35에서 재현된다는 증거로 제시하지 않았다.</li>
+                <li><strong>추가 문헌 표기.</strong> 원 노트에는 “ETH 2026”, “ANZCC 2020”, “Casoli”, “서울대 MCV”가 관련 연구의 약칭으로 등장한다. 완전한 서지 정보가 제공되지 않아 이 글에서는 독립적인 근거로 인용하지 않았다. 상태 의존 지연, 2차계·데드타임 식별, 유압 모델 비교는 후속 검토 항목이다.</li>
+              </ol>
+              <div class="keywords" aria-label="핵심 키워드">
+                <span>자율 굴착기</span>
+                <span>파일럿 밸브와 서보 밸브</span>
+                <span>t90·제어 대역</span>
+                <span>상태 추정</span>
+                <span>펌프 유량 제약</span>
+                <span>호스 압축성</span>
+                <span>디지털 트윈</span>
+              </div>
+            </section>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <span>FIELD NOTES / ROBOTICS · HEAP 논문 리뷰 · 2026.09.25</span>
+      <span><a>원 논문 읽기 ↗</a> &nbsp; · &nbsp; <a href="#top">맨 위로 ↑</a></span>
+    </footer>
+  </div>
+</body>
+</html>

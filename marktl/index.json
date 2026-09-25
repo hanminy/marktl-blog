@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T12:38:45.480Z",
+  "updatedAt": "2026-09-25T12:43:51.709Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/jud2021-heap/",
+      "excerpt": "HEAP The autonomous walking excavator 요약 한줄 요약 12 t 보행 굴착기 Menzi Muck M545 를 자율 로봇 HEAP 으로 바꾼 5년의 시스템 논문. 팔 구동 방식 세 가지(조이스틱 구동 기구 / 전기 파일럿 밸브 / 서보 밸브)를 같은 기체에서 정량 비교 했고(속도 제어 상승 시간 35 ms vs 680 850 ms, 대역 2 Hz vs 0.5 Hz), 바퀴 다리 로봇용 상태 추정기, ",
+      "shortId": "8jq9r8",
+      "slug": "jud2021-heap",
+      "sourcePath": "02_research/필드로봇/시스템식별/jud2021-heap.md",
+      "tags": [
+        "논문요약",
+        "굴착기자동화",
+        "유압액추에이터",
+        "상태추정",
+        "계층최적화",
+        "ETH"
+      ],
+      "title": "HEAP - The autonomous walking excavator - 요약",
+      "updatedAt": "2026-09-25T12:43:51.709Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/8jq9r8/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/chis2011-si-comparison/",
