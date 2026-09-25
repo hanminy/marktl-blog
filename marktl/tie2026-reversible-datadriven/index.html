@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+  <title>39톤 굴착기, 경로 오차 5.7cm — 물리 구조와 가역 학습으로 만든 정밀 제어</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      --paper: #f6f4ee;
+      --surface: #fffefa;
+      --ink: #222b29;
+      --muted: #626d66;
+      --forest: #183e37;
+      --green: #326b59;
+      --pale: #e8eee6;
+      --gold: #bd7336;
+      --sand: #f3e9d9;
+      --line: #d9ddd3;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "Batang", Georgia, serif;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 28px; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.85;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: #d9e6c7; color: var(--forest); }
+    a { color: var(--forest); text-underline-offset: 4px; text-decoration-thickness: 1px; }
+    a:hover { color: var(--gold); }
+    a:focus-visible { outline: 3px solid var(--gold); outline-offset: 5px; border-radius: 2px; }
+    .skip {
+      position: absolute;
+      top: -100px;
+      left: 16px;
+      z-index: 10;
+      padding: 10px 18px;
+      background: var(--surface);
+    }
+    .skip:focus { top: 12px; }
+    .wrap { width: min(1160px, calc(100% - 80px)); margin-inline: auto; }
+    .masthead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 24px 0 20px;
+      border-bottom: 1px solid var(--ink);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+    .masthead-brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark { width: 14px; height: 14px; background: var(--forest); box-shadow: 5px -5px 0 #b9c6aa; }
+    .masthead-right { color: var(--muted); text-align: right; }
+    .hero { padding: 68px 0 44px; }
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .1em;
+    }
+    .eyebrow::before { content: ""; width: 28px; height: 2px; background: var(--gold); }
+    .hero h1 {
+      max-width: 1010px;
+      margin: 24px 0 24px;
+      font-family: var(--serif);
+      font-size: clamp(38px, 5.5vw, 70px);
+      line-height: 1.27;
+      letter-spacing: -.055em;
+      font-weight: 700;
+      text-wrap: balance;
+    }
+    .hero h1 .accent { color: var(--green); }
+    .hero-deck {
+      max-width: 780px;
+      margin: 0 0 28px;
+      font-size: clamp(18px, 2vw, 22px);
+      line-height: 1.85;
+      color: #536159;
+      letter-spacing: -.025em;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 22px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .hero-bottom {
+      margin-top: 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag {
+      display: inline-block;
+      border: 1px solid #cbd3c7;
+      border-radius: 24px;
+      padding: 3px 12px;
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .text-link { font-size: 12px; font-weight: 700; }
+    .hero-visual {
+      margin: 0;
+      padding: 24px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+    }
+    .hero-visual img { display: block; width: 100%; max-height: 590px; object-fit: contain; }
+    figcaption {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.8;
+      text-align: left;
+    }
+    .fig-no { color: var(--green); font-weight: 800; margin-right: 7px; }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      margin: 24px 0 0;
+      background: var(--forest);
+      color: #fffef6;
+      border-radius: 4px;
+      padding: 28px 10px;
+    }
+    .metric { padding: 4px 28px; border-right: 1px solid #557368; }
+    .metric:last-child { border-right: 0; }
+    .metric dt { font-size: 12px; color: #d4ded0; }
+    .metric dd { margin: 5px 0 4px; font-size: clamp(34px, 4vw, 48px); font-weight: 600; letter-spacing: -.055em; line-height: 1.3; }
+    .metric dd span { font-size: 19px; margin-left: 5px; font-weight: 400; letter-spacing: 0; }
+    .metric p { margin: 5px 0 0; font-size: 11px; color: #d4ded0; }
+    .layout {
+      display: grid;
+      grid-template-columns: 190px minmax(0, 1fr);
+      gap: 66px;
+      padding-top: 62px;
+    }
+    .sidebar { align-self: start; position: sticky; top: 28px; padding-bottom: 30px; }
+    .side-title { margin: 0 0 18px; font-size: 11px; font-weight: 800; letter-spacing: .15em; color: var(--muted); }
+    .toc { list-style: none; padding: 0; margin: 0; }
+    .toc li { border-top: 1px solid var(--line); }
+    .toc li:last-child { border-bottom: 1px solid var(--line); }
+    .toc a { display: flex; gap: 12px; padding: 12px 0; text-decoration: none; font-size: 12px; line-height: 1.7; }
+    .toc span { color: var(--gold); font-family: var(--mono); font-size: 10px; padding-top: 2px; }
+    .side-note { margin: 24px 0 0; font-size: 11px; color: var(--muted); line-height: 1.9; }
+    main { min-width: 0; }
+    .abstract {
+      padding: 30px 32px;
+      border-top: 3px solid var(--forest);
+      background: var(--pale);
+      border-radius: 0 0 4px 4px;
+    }
+    .small-label { display: block; color: var(--green); font-size: 11px; letter-spacing: .14em; font-weight: 800; text-transform: uppercase; }
+    .abstract h2 { margin: 10px 0 16px; font-size: 24px; letter-spacing: -.035em; }
+    .abstract p { font-size: 15px; line-height: 1.95; margin: 0; }
+    .abstract .abstract-caution { margin-top: 16px; padding-top: 16px; border-top: 1px solid #cbd6c7; font-size: 12px; color: #526254; }
+    .section { padding: 56px 0 0; }
+    .section + .section { margin-top: 48px; border-top: 1px solid var(--line); }
+    .section-head { margin-bottom: 26px; }
+    .section-index { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: .12em; color: var(--gold); margin-bottom: 10px; }
+    h2 { font-size: clamp(26px, 3vw, 34px); line-height: 1.45; letter-spacing: -.04em; text-wrap: balance; }
+    .section-head h2 { margin: 0; }
+    .section-intro { margin: 12px 0 0; font-size: 15px; color: var(--muted); }
+    h3 { margin: 34px 0 12px; font-size: 20px; letter-spacing: -.025em; line-height: 1.55; }
+    p { margin: 0 0 20px; }
+    strong { font-weight: 750; color: var(--forest); }
+    .findings { counter-reset: finding; display: grid; gap: 0; margin-top: 26px; }
+    .finding { counter-increment: finding; display: grid; grid-template-columns: 38px 1fr; gap: 18px; padding: 22px 0; border-bottom: 1px solid var(--line); }
+    .finding::before { content: "0" counter(finding); font-family: var(--mono); font-size: 14px; color: var(--gold); padding-top: 3px; }
+    .finding h3 { margin: 0 0 7px; font-size: 18px; }
+    .finding p { margin: 0; font-size: 14px; color: var(--muted); }
+    .pullquote { margin: 38px 0; padding: 6px 0 6px 26px; border-left: 3px solid var(--gold); }
+    .pullquote p { margin: 0; font-family: var(--serif); font-size: clamp(23px, 2.8vw, 30px); font-weight: 600; line-height: 1.65; letter-spacing: -.04em; color: var(--forest); }
+    .pullquote footer { margin-top: 12px; font-family: var(--sans); font-size: 11px; color: var(--muted); }
+    .table-wrap { width: 100%; overflow-x: auto; margin: 22px 0; border-top: 2px solid var(--forest); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; line-height: 1.85; text-align: left; }
+    caption { text-align: left; padding: 12px 0; font-size: 12px; color: var(--muted); caption-side: bottom; }
+    th, td { padding: 13px 15px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    thead th { color: var(--forest); background: var(--pale); font-weight: 700; white-space: nowrap; }
+    tbody th { font-weight: 600; color: var(--forest); }
+    tbody tr:nth-child(even) { background: #eeeee6; }
+    .result-table { min-width: 550px; }
+    .result-table .best { background: #e1eadd; color: var(--forest); font-weight: 800; }
+    figure { margin: 30px 0; }
+    .paper-figure { padding: 20px; background: #fff; border: 1px solid var(--line); border-radius: 4px; }
+    .paper-figure img { display: block; width: 100%; height: auto; object-fit: contain; }
+    .paper-figure.narrow img { max-width: 620px; margin-inline: auto; }
+    .callout { margin: 26px 0; padding: 23px 26px; border-radius: 3px; background: var(--sand); border-left: 3px solid var(--gold); }
+    .callout h3 { margin: 0 0 8px; font-size: 16px; }
+    .callout p { margin: 0; font-size: 14px; line-height: 1.9; }
+    .callout.green { background: var(--pale); border-left-color: var(--green); }
+    .chain {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 22px;
+      margin: 28px 0;
+      padding: 25px 0;
+    }
+    .chain-step { position: relative; border-top: 2px solid var(--forest); padding: 18px 10px 10px 0; }
+    .chain-step:not(:last-child)::after { content: "→"; position: absolute; right: -19px; top: 24px; color: var(--gold); font-size: 20px; }
+    .chain-step small { display: block; font-family: var(--mono); color: var(--muted); font-size: 10px; letter-spacing: .02em; }
+    .chain-step b { display: block; font-size: 17px; margin: 6px 0 4px; color: var(--forest); }
+    .chain-step span { display: block; font-size: 11px; line-height: 1.8; color: var(--muted); }
+    .equation {
+      margin: 22px 0;
+      padding: 22px 24px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+    }
+    .eq-label { color: var(--green); font-family: var(--sans); font-weight: 750; font-size: 11px; letter-spacing: .06em; margin-bottom: 13px; }
+    .math-scroll { overflow-x: auto; padding: 3px 0 6px; }
+    .math { font-family: "Cambria Math", "STIX Two Math", Georgia, serif; font-size: 18px; line-height: 2; white-space: nowrap; }
+    .math sub, .math sup { font-size: .72em; }
+    .eq-note { margin: 10px 0 0; font-size: 11px; color: var(--muted); line-height: 1.85; }
+    .model-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 24px 0; }
+    .model-pair .equation { margin: 0; min-width: 0; padding: 20px; }
+    .model-pair .math { font-size: 17px; }
+    .process { list-style: none; margin: 24px 0; padding: 0; display: grid; gap: 12px; }
+    .process li { display: flex; align-items: flex-start; gap: 15px; background: var(--surface); border: 1px solid var(--line); padding: 17px 20px; font-size: 14px; }
+    .process .step { color: var(--gold); font-family: var(--mono); font-size: 11px; padding-top: 4px; flex: 0 0 22px; }
+    .note { color: var(--muted); font-size: 12px; line-height: 1.9; }
+    .comparison { margin: 28px 0; padding: 28px; background: var(--surface); border: 1px solid var(--line); }
+    .comparison h3 { margin: 0 0 22px; font-size: 17px; }
+    .bar-row { margin: 18px 0; }
+    .bar-label { display: flex; align-items: baseline; justify-content: space-between; gap: 15px; font-size: 12px; margin-bottom: 7px; }
+    .bar-label b { font-family: var(--mono); font-size: 14px; font-weight: 600; }
+    .bar-track { height: 13px; background: #edf0e8; border-radius: 2px; overflow: hidden; }
+    .bar { display: block; height: 100%; border-radius: 2px; }
+    .bar-hybrid { width: 20.8029%; background: var(--green); }
+    .bar-compensated { width: 38.6861%; background: #9ba995; }
+    .bar-pd { width: 100%; background: #bc906a; }
+    .delta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 26px; }
+    .delta { background: var(--pale); padding: 18px; }
+    .delta span { display: block; font-size: 11px; color: var(--muted); }
+    .delta strong { display: block; font-size: 30px; line-height: 1.5; letter-spacing: -.04em; }
+    .limit-list { padding-left: 21px; font-size: 15px; }
+    .limit-list li { margin: 13px 0; padding-left: 5px; }
+    .application-table { min-width: 660px; }
+    .application-table td { width: 33.333%; }
+    .checklist { list-style: none; padding: 0; margin: 22px 0; }
+    .checklist li { position: relative; padding: 14px 0 14px 31px; border-bottom: 1px solid var(--line); font-size: 14px; }
+    .checklist li::before { content: "□"; position: absolute; left: 0; top: 13px; color: var(--green); font-size: 20px; line-height: 1.6; }
+    .ending { margin-top: 50px; padding: 36px; color: #e7eee5; background: var(--forest); border-radius: 4px; }
+    .ending .small-label { color: #c9d7b0; }
+    .ending h2 { color: #fffdf4; font-family: var(--serif); font-size: 29px; margin: 15px 0 20px; line-height: 1.6; }
+    .ending p { font-size: 15px; margin: 0; }
+    .ending strong { color: #fffdf4; }
+    .share { margin-top: 28px; border: 1px solid var(--line); padding: 25px 28px; }
+    .share h3 { font-size: 15px; margin: 0 0 12px; }
+    .share blockquote { margin: 0; padding: 0; font-size: 14px; line-height: 1.95; }
+    .share .share-foot { font-size: 11px; color: var(--muted); margin: 14px 0 0; }
+    .sources { margin-top: 48px; padding-top: 30px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+    .sources h2 { margin: 0 0 20px; font-family: var(--sans); font-size: 19px; }
+    .sources ol { padding-left: 20px; margin: 0; }
+    .sources li { margin: 16px 0; padding-left: 5px; }
+    .paper-title { color: var(--ink); font-style: normal; font-weight: 650; }
+    .footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; border-top: 1px solid var(--ink); margin-top: 64px; padding: 23px 0 34px; font-size: 11px; color: var(--muted); }
+    .footer p { margin: 0; }
+    @media (max-width: 1050px) {
+      .layout { grid-template-columns: 155px minmax(0, 1fr); gap: 38px; }
+      .model-pair { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 800px) {
+      .wrap { width: min(680px, calc(100% - 40px)); }
+      .hero { padding-top: 44px; }
+      .layout { display: block; padding-top: 36px; }
+      .sidebar { position: static; padding-bottom: 30px; }
+      .toc { display: grid; grid-template-columns: 1fr 1fr; column-gap: 22px; }
+      .toc li:last-child { border-bottom: 0; }
+      .side-note { display: none; }
+      .metric { padding: 4px 18px; }
+      .metric dd { font-size: 35px; }
+      .hero-visual { padding: 16px; }
+      .section { padding-top: 42px; }
+      .section + .section { margin-top: 36px; }
+    }
+    @media (max-width: 480px) {
+      body { font-size: 16px; line-height: 1.9; }
+      .wrap { width: calc(100% - 32px); }
+      .masthead { font-size: 9px; letter-spacing: .09em; }
+      .masthead-right { max-width: 130px; }
+      .hero h1 { font-size: 39px; }
+      .hero-deck { font-size: 18px; }
+      .metrics { padding: 14px 0; }
+      .metric { padding: 5px 11px; }
+      .metric dt { font-size: 10px; }
+      .metric dd { font-size: 28px; }
+      .metric dd span { display: inline; font-size: 12px; margin-left: 3px; }
+      .metric p { font-size: 10px; line-height: 1.7; }
+      .abstract { padding: 24px 21px; }
+      .abstract h2 { font-size: 22px; }
+      .chain { grid-template-columns: 1fr 1fr; gap: 16px 26px; }
+      .chain-step:nth-child(2)::after { content: ""; }
+      .paper-figure { padding: 12px; }
+      .equation { padding: 18px; }
+      .callout { padding: 20px; }
+      .comparison { padding: 20px; }
+      .delta-grid { gap: 10px; }
+      .delta { padding: 14px; }
+      .ending { padding: 28px 23px; }
+      .ending h2 { font-size: 26px; }
+      .share { padding: 23px; }
+      th, td { padding: 11px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+    @media print {
+      body { background: white; color: black; font-size: 11pt; }
+      .wrap { width: 100%; }
+      .sidebar, .skip, .hero-bottom, .footer a { display: none; }
+      .layout { display: block; padding-top: 25px; }
+      .hero { padding-top: 25px; }
+      .hero h1 { font-size: 34pt; }
+      .hero-deck { font-size: 14pt; }
+      .section { padding-top: 24px; }
+      .section + .section { margin-top: 24px; }
+      figure, .equation, .callout, .finding, .metrics, .ending { break-inside: avoid; }
+      h2, h3 { break-after: avoid; }
+      .table-wrap, .math-scroll { overflow: visible; }
+      .application-table, .result-table { min-width: 0; }
+      .metrics, .ending { background: #eef2eb; color: black; }
+      .metric dt, .metric p, .ending h2, .ending strong, .ending .small-label { color: black; }
+      a { color: black; }
+      .footer { margin-top: 30px; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="A Data-Driven Modeling and Motion Control of Heavy-Load Hydraulic Manipulators via Reversible Transformation - 요약">
+<meta property="og:description" content="A Data Driven Modeling and Motion Control of Heavy Load Hydraulic Manipulators via Reversible Transformation 요약 한줄 요약 39 t 상용 굴착기(경사계 + 실린더 압력센서, 20 Hz 원격)에 대해, 유압 매니퓰레이터가 &quot;각도 → 각속도 → 각가속도 → 입력&quot; 3차 적분기 사슬 이라는 물리 구조를 먼저 유도해 두고 그 위에 MLP 비선형 항">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/1ng2w8a/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/1ng2w8a/assets/figure1.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="A Data-Driven Modeling and Motion Control of Heavy-Load Hydraulic Manipulators via Reversible Transformation - 요약">
+<meta name="twitter:description" content="A Data Driven Modeling and Motion Control of Heavy Load Hydraulic Manipulators via Reversible Transformation 요약 한줄 요약 39 t 상용 굴착기(경사계 + 실린더 압력센서, 20 Hz 원격)에 대해, 유압 매니퓰레이터가 &quot;각도 → 각속도 → 각가속도 → 입력&quot; 3차 적분기 사슬 이라는 물리 구조를 먼저 유도해 두고 그 위에 MLP 비선형 항">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/1ng2w8a/assets/figure1.png">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/tie2026-reversible-datadriven/">
+</head>
+<body>
+  <a class="skip" href="#main">본문으로 바로 가기</a>
+  <div class="wrap">
+    <header class="masthead" id="top">
+      <div class="masthead-brand"><span class="brand-mark" aria-hidden="true"></span>FIELDNOTES / ROBOTICS</div>
+      <div class="masthead-right">Research Review · 2026.09.25</div>
+    </header>
+
+    <article aria-labelledby="article-title">
+      <header class="hero">
+        <div class="eyebrow">유압 로봇 · 시스템 식별 · 모션 제어</div>
+        <h1 id="article-title">39톤 굴착기,<br>경로 오차 <span class="accent">5.7cm</span><br>물리 구조를 아는 학습의 힘</h1>
+        <p class="hero-deck">
+          밸브 입력에서 관절각까지, 세 번의 적분을 모델의 뼈대로 삼았다.
+          그 위에 되돌릴 수 있는 신경망을 얹자, 하나의 모델이 움직임을 예측하고 필요한 제어 입력까지 계산한다.
+        </p>
+        <div class="meta">
+          <span>논문 리뷰 · RevNM</span>
+          <span>연구: Dexian Ma · Yirong Liu · Wenbo Liu · Bo Zhou</span>
+          <span>정리: <time datetime="2026-09-25">2026년 9월 25일</time></span>
+        </div>
+        <div class="hero-bottom">
+          <div class="tags" aria-label="주제">
+            <span class="tag">가역 비선형 모델</span>
+            <span class="tag">물리 기반 구조</span>
+            <span class="tag">39 t 실차 검증</span>
+          </div>
+          <a class="text-link" href="#results">실차 결과 먼저 보기 ↗</a>
+        </div>
+      </header>
+
+      <figure class="hero-visual">
+        <img src="assets/figure1.png" alt="연구에 사용된 39톤 상용 굴착기와 관절각·유압 측정을 위한 센서 구성" fetchpriority="high" decoding="async">
+        <figcaption><span class="fig-no">FIG. 1</span>실험 플랫폼. 붐·암·버킷에는 경사계, 선회에는 내장 각도센서, 실린더·유압 모터에는 압력센서를 사용한다. 이 글에서 다루는 실차 제어 검증 범위는 붐·암이다.</figcaption>
+      </figure>
+
+      <dl class="metrics" aria-label="연구의 대표 수치">
+        <div class="metric">
+          <dt>실차 원 궤적 · 경로 RMSE</dt>
+          <dd>5.7<span>cm</span></dd>
+          <p>RevNM 역모델 + PD 하이브리드</p>
+        </div>
+        <div class="metric">
+          <dt>원격 통신 주기</dt>
+          <dd>20<span>Hz</span></dd>
+          <p>UDP · 약 50 ms 간격</p>
+        </div>
+        <div class="metric">
+          <dt>실차 학습 데이터</dt>
+          <dd>4.2<span>시간</span></dd>
+          <p>약 30만 스텝의 추종 데이터</p>
+        </div>
+      </dl>
+
+      <div class="layout">
+        <aside class="sidebar" aria-label="목차">
+          <p class="side-title">IN THIS REPORT</p>
+          <nav aria-label="글의 순서">
+            <ol class="toc">
+              <li><a href="#overview"><span>00</span>초록과 핵심 발견</a></li>
+              <li><a href="#problem"><span>01</span>상용 굴착기의 난제</a></li>
+              <li><a href="#physics"><span>02</span>왜 3차 구조인가</a></li>
+              <li><a href="#revnm"><span>03</span>되돌릴 수 있는 모델</a></li>
+              <li><a href="#control"><span>04</span>역모델과 PD의 결합</a></li>
+              <li><a href="#results"><span>05</span>시뮬레이션과 실차</a></li>
+              <li><a href="#implications"><span>06</span>한계와 HR35 시사점</a></li>
+              <li><a href="#sources"><span>REF</span>출처와 판본 안내</a></li>
+            </ol>
+          </nav>
+          <p class="side-note">논문이 보고한 결과와<br>HR35 적용을 위한 해석을<br>구분해 읽는 기술 리포트.</p>
+        </aside>
+
+        <main id="main">
+          <section id="overview" aria-labelledby="abstract-title">
+            <div class="abstract">
+              <span class="small-label">Abstract / 초록</span>
+              <h2 id="abstract-title">구조는 물리에서, 복잡성은 데이터에서</h2>
+              <p>
+                이 연구는 상용 대형 굴착기의 유압 동역학을 <strong>3차 적분기 사슬</strong>로 정리하고,
+                그 구조 위에 신경망 비선형 항을 결합한 <strong>가역 비선형 모델(RevNM)</strong>을 제안한다.
+                순방향 예측과 역방향 입력 계산에 같은 학습 파라미터를 사용하며,
+                백스테핑 역모델 제어기와 PD를 결합해 실제 장비를 제어한다.
+                AMESim–Simulink 공동 시뮬레이션과 39톤 굴착기 실험에서 검증했고,
+                실차 원 궤적 시험의 경로 RMSE는 5.7cm, 궤적 RMSE는 13.5cm로 보고됐다.
+              </p>
+              <p class="abstract-caution">
+                읽은 판은 arXiv:2411.13856v1(2024-11-21)이다. 원 노트의 2026년 저널 서지 정보는 별도로 표기한다.
+                아래 식 번호·그림 번호·결과 수치는 제공된 논문 노트를 기준으로 정리했다.
+              </p>
+            </div>
+
+            <div class="findings" aria-label="핵심 발견 세 가지">
+              <div class="finding">
+                <div>
+                  <h3>예측과 제어가 하나의 모델을 공유한다</h3>
+                  <p>순방향·역방향 모델을 각각 만드는 대신, 대수적으로 되돌릴 수 있는 구조를 학습해 두 계산을 연결한다.</p>
+                </div>
+              </div>
+              <div class="finding">
+                <div>
+                  <h3>성능 개선 폭은 비교 대상과 지표에 따라 다르다</h3>
+                  <p>데드존 보상 PD 대비 경로 RMSE는 약 46.2%, 궤적 RMSE는 약 52.1% 감소했다. “50% 이상 개선”이라는 표현에는 지표 구분이 필요하다.</p>
+                </div>
+              </div>
+              <div class="finding">
+                <div>
+                  <h3>안정성 보장은 조건부 유계성이다</h3>
+                  <p>적합 오차와 외란이 유계라는 가정 아래 UUB를 보인다. 모든 운전 조건에서 오차가 0으로 수렴한다는 뜻은 아니다.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="section" id="problem" aria-labelledby="problem-title">
+            <header class="section-head">
+              <span class="section-index">01 / THE PROBLEM</span>
+              <h2 id="problem-title">유압 회로를 몰라도<br>정밀하게 움직일 수 있을까</h2>
+            </header>
+            <p>
+              상용 굴착기는 사람의 조작을 전제로 설계된다. 자동 제어에 필요한 유압 회로 정보는 공개되지 않는 경우가 많고,
+              기름의 압축성, 서보밸브의 데드존과 히스테리시스, 내부 누설, 공유 펌프에 의한 결합이 움직임에 함께 영향을 준다.
+              같은 크기의 명령이라도 상태와 직전 동작에 따라 반응이 달라질 수 있다.
+            </p>
+            <p>
+              순수 블랙박스 학습은 이런 복잡성을 흡수할 수 있지만, 예측 모델과 제어용 역모델을 별도로 학습하면
+              두 모델의 일관성이 자동으로 확보되지 않는다. 학습 데이터 밖에서의 거동과 폐루프 안정성도 따로 다뤄야 한다.
+              이 연구의 선택은 <strong>알 수 있는 물리 구조를 먼저 고정하고, 알기 어려운 비선형 항을 학습하는 것</strong>이다.
+            </p>
+
+            <div class="table-wrap">
+              <table>
+                <caption>실험 장비의 센서·통신·명령 구성. 센서 탑재 범위와 실차 제어 시험 범위는 구분해야 한다.</caption>
+                <thead><tr><th scope="col">항목</th><th scope="col">구성</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">관절각</th><td>붐·암·버킷 경사계, 선회 내장 각도센서</td></tr>
+                  <tr><th scope="row">압력</th><td>실린더 및 유압 모터 압력센서</td></tr>
+                  <tr><th scope="row">통신</th><td>캐빈 전송 컴퓨터 ↔ 제어 컴퓨터, UDP, 약 50ms 간격</td></tr>
+                  <tr><th scope="row">제어 명령</th><td>비례 솔레노이드 밸브 스풀 명령, 범위 [−200, 200]</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="section" id="physics" aria-labelledby="physics-title">
+            <header class="section-head">
+              <span class="section-index">02 / PHYSICAL STRUCTURE</span>
+              <h2 id="physics-title">입력과 각도 사이에 놓인<br>세 번의 적분</h2>
+              <p class="section-intro">기구의 운동 방정식과 압력 동역학을 연결하면, 입력이 각도의 3차 미분에 나타난다.</p>
+            </header>
+
+            <div class="chain" role="img" aria-label="밸브 입력 u가 각가속도 변화율에 영향을 주고, 적분을 거쳐 각가속도, 각속도, 관절각으로 이어지는 3차 구조">
+              <div class="chain-step"><small>INPUT → JERK</small><b>입력 u</b><span>유량·압력 변화를 통해<br>각가속도 변화율에 작용</span></div>
+              <div class="chain-step"><small>INTEGRATION 01</small><b>각가속도</b><span>x₃ = q̈<br>힘이 만드는 운동 변화</span></div>
+              <div class="chain-step"><small>INTEGRATION 02</small><b>각속도</b><span>x₂ = q̇<br>각가속도의 적분</span></div>
+              <div class="chain-step"><small>INTEGRATION 03</small><b>관절각</b><span>x₁ = q<br>각속도의 적분</span></div>
+            </div>
+
+            <h3>기구에서 실린더로</h3>
+            <p>
+              실린더 변위 <i>y</i>에 대한 운동 방정식은 관성·코리올리 항·중력과 실린더 힘의 관계를 표현한다.
+              실린더 힘은 두 챔버의 압력과 유효 면적, 마찰력으로 정해진다.
+            </p>
+            <div class="equation">
+              <div class="eq-label">기구 동역학 · 식 (3), (5)</div>
+              <div class="math-scroll">
+                <div class="math">M<sub>y</sub>(y)ÿ + C<sub>y</sub>(y, ẏ)ẏ + G<sub>y</sub>(y) = F − F<sub>e</sub></div>
+                <div class="math">F = P<sub>1</sub>A<sub>1</sub> − P<sub>2</sub>A<sub>2</sub> − F<sub>f</sub></div>
+              </div>
+              <p class="eq-note">P₁·P₂: 챔버 압력 · A₁·A₂: 유효 면적 · F<sub>f</sub>: 마찰력 · F<sub>e</sub>: 외력 항</p>
+            </div>
+
+            <h3>실린더에서 밸브로</h3>
+            <p>
+              압력은 즉시 바뀌지 않는다. 유입·유출 유량, 피스톤 운동, 내부 누설에 따라 시간적으로 변한다.
+              이 압력 동역학을 기구의 운동 방정식과 결합하는 것이 3차 구조의 핵심이다.
+            </p>
+            <div class="equation">
+              <div class="eq-label">압력과 유량 · 식 (6), (7)</div>
+              <div class="math-scroll">
+                <div class="math">Ṗ<sub>1</sub> = (β<sub>e</sub>/V<sub>1</sub>)[Q<sub>1</sub> − A<sub>1</sub>ẏ − C<sub>t</sub>(P<sub>1</sub> − P<sub>2</sub>)]</div>
+                <div class="math">Ṗ<sub>2</sub> = (β<sub>e</sub>/V<sub>2</sub>)[A<sub>2</sub>ẏ + C<sub>t</sub>(P<sub>1</sub> − P<sub>2</sub>) − Q<sub>2</sub>]</div>
+                <div class="math">Q<sub>i</sub> = (C<sub>di</sub>ω<sub>i</sub>/√ρ)y<sub>v</sub>φ<sub>i</sub>(P<sub>i</sub>, sign y<sub>v</sub>), &nbsp; i ∈ {1, 2}</div>
+                <div class="math">y<sub>v</sub> = k<sub>v</sub>σ(u)</div>
+              </div>
+              <p class="eq-note">
+                β<sub>e</sub>: 유효 체적탄성계수 · C<sub>t</sub>: 내부 누설 계수 · C<sub>di</sub>: 유량 계수 ·
+                ω<sub>i</sub>: 스풀 면적 기울기 · ρ: 유체 밀도. 밸브 시정수는 유압 동역학보다 충분히 작다고 보고 무시한다.
+              </p>
+            </div>
+
+            <figure class="paper-figure narrow">
+              <img src="assets/figure2.png" alt="밸브 입력에 대한 데드존과 히스테리시스의 결합 특성. 좌우 데드존과 히스테리시스 폭을 나타낸다." loading="lazy" decoding="async">
+              <figcaption><span class="fig-no">FIG. 2</span>전기 명령에서 밸브 위치로 전달되는 비선형 σ(u). 데드존의 좌우 경계 D<sub>l</sub>·D<sub>r</sub>와 히스테리시스 폭 D<sub>w</sub>를 함께 고려한다.</figcaption>
+            </figure>
+
+            <p>
+              관절각을 <i>q</i>라 하고 x₁ = q, x₂ = q̇, x₃ = q̈로 두면,
+              노트가 정리한 상태공간 표현은 다음과 같다. 압력의 시간 변화가 각가속도 변화율,
+              즉 <strong>각도의 3차 미분인 jerk</strong>에 연결된다.
+            </p>
+            <div class="equation">
+              <div class="eq-label">3차 비선형 적분기 사슬 · 식 (12)</div>
+              <div class="math-scroll">
+                <div class="math">ẋ<sub>1</sub> = x<sub>2</sub>, &nbsp; ẋ<sub>2</sub> = x<sub>3</sub></div>
+                <div class="math">ẋ<sub>3</sub> = f(x<sub>1</sub>, x<sub>2</sub>, x<sub>3</sub>) + g(x<sub>1</sub>, x<sub>2</sub>, x<sub>3</sub>)u</div>
+              </div>
+            </div>
+
+            <blockquote class="pullquote">
+              <p>복잡한 유압계를 모두 알아내기보다,<br>입력이 운동에 닿는 순서를 먼저 안다.</p>
+              <footer>논문의 모델링 접근을 풀어쓴 편집 요약</footer>
+            </blockquote>
+          </section>
+
+          <section class="section" id="revnm" aria-labelledby="revnm-title">
+            <header class="section-head">
+              <span class="section-index">03 / REVERSIBLE MODEL</span>
+              <h2 id="revnm-title">앞으로는 예측하고,<br>뒤로는 입력을 계산한다</h2>
+              <p class="section-intro">RevNM · Reversible Nonlinear Model</p>
+            </header>
+            <p>
+              RevNM은 물리에서 얻은 사슬의 각 단계에 MLP 비선형 항 T<sub>i</sub>를 더한다.
+              입력에 곱해지는 항은 e<sup>S</sup>로 표현한다.
+              이 항이 0이 되지 않도록 구성하면, 순방향 계산을 뺄셈과 역수 곱셈으로 되돌릴 수 있다.
+            </p>
+
+            <div class="model-pair">
+              <div class="equation">
+                <div class="eq-label">FORWARD · 순방향 / 식 (14)</div>
+                <div class="math-scroll">
+                  <div class="math">ẋ<sub>1</sub> = T<sub>1</sub>(h) + x<sub>2</sub></div>
+                  <div class="math">ẋ<sub>2</sub> = T<sub>2</sub>(h) + x<sub>3</sub></div>
+                  <div class="math">ẋ<sub>3</sub> = T<sub>3</sub>(h) + e<sup>S(h)</sup>u</div>
+                </div>
+                <p class="eq-note">상태·이력과 입력으로 상태 변화율을 계산한다.</p>
+              </div>
+              <div class="equation">
+                <div class="eq-label">INVERSE · 역방향 / 식 (15)</div>
+                <div class="math-scroll">
+                  <div class="math">x<sub>2</sub> = ẋ<sub>1</sub> − T<sub>1</sub>(h)</div>
+                  <div class="math">x<sub>3</sub> = ẋ<sub>2</sub> − T<sub>2</sub>(h)</div>
+                  <div class="math">u = e<sup>−S(h)</sup>[ẋ<sub>3</sub> − T<sub>3</sub>(h)]</div>
+                </div>
+                <p class="eq-note">같은 학습 항을 사용해 필요한 입력을 역산한다.</p>
+              </div>
+            </div>
+
+            <figure class="paper-figure">
+              <img src="assets/figure3.png" alt="RevNM의 가역 구조. 물리 적분기 사슬에 학습된 덧셈 항과 지수 곱셈 항을 결합해 순방향과 역방향 계산을 연결한다." loading="lazy" decoding="async">
+              <figcaption><span class="fig-no">FIG. 3</span>하나의 구조, 두 방향의 계산. 원 노트의 설명에 따르면 위로 읽으면 상태 변화율 예측, 아래로 읽으면 필요한 입력의 역산이다.</figcaption>
+            </figure>
+
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th scope="col">구성 요소</th><th scope="col">역할과 구현</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">이력 입력 h</th><td>시간 간격 Δt와 현재·과거 상태를 묶어 입력한다. 예: [Δt, x₁(t), x₁(t−Δt), …, x₃(t−Δt), …].</td></tr>
+                  <tr><th scope="row">T<sub>i</sub>(h)</th><td>각 단계의 비선형 보정 항. 노트 기준 2층, 64유닛 ReLU MLP를 사용한다.</td></tr>
+                  <tr><th scope="row">S(h)</th><td>MLP 출력을 atan과 clamp로 제한한다. e<sup>S(h)</sup>의 크기를 제어하고 역산 가능한 곱셈 항을 만든다.</td></tr>
+                  <tr><th scope="row">학습</th><td>PyTorch·Adam, min-max 정규화와 잡음 필터링. 순방향 손실 LossY와 역방향 손실 LossX를 함께 최소화한다.</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>
+              발상은 NICE·RealNVP 계열의 가역 변환과 닿아 있지만, 여기서는 물리 사슬에 맞춰 구조를 만든다.
+              따라서 일반적인 동일 차원 입출력 가역망의 형태를 그대로 따를 필요가 없다.
+              <strong>별도 역모델을 추가로 학습하지 않아도 같은 파라미터로 두 방향을 계산한다</strong>는 점이 핵심이다.
+            </p>
+            <div class="callout green">
+              <h3>가역성과 모델 정확도는 별개의 조건</h3>
+              <p>
+                식을 되돌릴 수 있다는 것은 모델 내부의 계산 구조에 대한 성질이다.
+                실제 장비를 정확히 표현한다는 보장은 학습 데이터, 상태 추정, 모델 오차에 달려 있다.
+                역산이 가능하다는 사실만으로 임의의 목표 운동이 장비에서 실현되는 것은 아니다.
+              </p>
+            </div>
+          </section>
+
+          <section class="section" id="control" aria-labelledby="control-title">
+            <header class="section-head">
+              <span class="section-index">04 / HYBRID CONTROL</span>
+              <h2 id="control-title">역모델의 정밀함에<br>PD의 피드백을 더하다</h2>
+            </header>
+            <p>
+              실제 제어기는 RevNM 역모델과 PD를 결합한다. PD는 큰 오차에 대한 수렴과 강인성을 담당하고,
+              역모델은 유압계의 비선형성을 보상한다. 신경망 적합 오차의 영향을 줄이기 위해
+              역모델의 입출력도 제한한다.
+            </p>
+            <figure class="paper-figure">
+              <img src="assets/figure4.png" alt="궤적 생성기, PD 제어기, RevNM 역모델 제어기, 굴착기로 이어지는 하이브리드 제어 블록도" loading="lazy" decoding="async">
+              <figcaption><span class="fig-no">FIG. 4</span>하이브리드 제어 구조. 순방향 예측 모델은 관측용으로 사용되며, MPC와의 결합은 향후 연구 방향이다.</figcaption>
+            </figure>
+
+            <ol class="process">
+              <li><span class="step">01</span><div><strong>목표 운동을 만든다.</strong><br>궤적 생성기가 추종할 관절 운동의 기준을 제공한다.</div></li>
+              <li><span class="step">02</span><div><strong>가상 제어를 순차적으로 설계한다.</strong><br>백스테핑으로 α₂, α₃를 구성하고 상태 오차를 연결한다.</div></li>
+              <li><span class="step">03</span><div><strong>역모델과 피드백을 결합한다.</strong><br>학습한 비선형 항을 보상하면서 PD와 함께 장비를 구동한다.</div></li>
+            </ol>
+
+            <div class="equation">
+              <div class="eq-label">백스테핑 역모델 제어 법칙 · 식 (21)</div>
+              <div class="math-scroll">
+                <div class="math">u = e<sup>−S</sup>[ẋ<sub>3</sub><sup>ref</sup> − T<sub>3</sub> − Ṫ<sub>2</sub> − T̈<sub>1</sub> − R<sub>1</sub>z<sub>1</sub> − R<sub>2</sub>ż<sub>1</sub> − R<sub>3</sub>z̈<sub>1</sub>]</div>
+                <div class="math">R<sub>1</sub> = k<sub>1</sub>k<sub>2</sub>k<sub>3</sub> + k<sub>1</sub> + k<sub>3</sub></div>
+                <div class="math">R<sub>2</sub> = k<sub>1</sub>k<sub>2</sub> + k<sub>1</sub>k<sub>3</sub> + k<sub>2</sub>k<sub>3</sub> + 2</div>
+                <div class="math">R<sub>3</sub> = k<sub>1</sub> + k<sub>2</sub> + k<sub>3</sub></div>
+              </div>
+              <p class="eq-note">z₁은 위치 추종 오차, kᵢ는 설계 이득이다. 식에서는 h 의존성을 생략했다. 실제 구현에서는 상태와 미분 항을 어떻게 안정적으로 얻을지가 중요하다.</p>
+            </div>
+
+            <div class="callout">
+              <h3>UUB: 오차가 일정한 범위 안에 머문다는 보장</h3>
+              <p>
+                정리 1은 적합 오차와 외란이 유계(‖dᵢ‖ ≤ d<sub>max</sub>)이고 kᵢ &gt; 0.5일 때,
+                Lyapunov 분석과 Young 부등식을 통해 오차 신호의 균일 궁극 유계성
+                (uniform ultimate boundedness, UUB)을 보인다.
+                식 (24)–(32)의 경계는 오차·외란과 설계 이득에 의존한다.
+                이는 아래 실험에서 얻은 5.7cm를 이론적으로 보장하는 주장과는 구분된다.
+              </p>
+            </div>
+          </section>
+
+          <section class="section" id="results" aria-labelledby="results-title">
+            <header class="section-head">
+              <span class="section-index">05 / EXPERIMENTAL EVIDENCE</span>
+              <h2 id="results-title">모델의 설득력은<br>실제 움직임에서 확인된다</h2>
+              <p class="section-intro">시뮬레이션으로 비선형 응답을 검증하고, 상용 장비의 원 궤적 추종으로 비교했다.</p>
+            </header>
+
+            <h3>검증 A · AMESim–Simulink 공동 시뮬레이션</h3>
+            <p>
+              붐·암 2자유도 모델에서 데드존, 히스테리시스, 누설을 포함한 유압계를 구성했다.
+              무작위 사인 입력 10,000회로 약 50시간의 데이터를 만들었으며,
+              샘플링 간격은 1–10ms 범위에서 무작위로 설정했다.
+            </p>
+            <div class="table-wrap">
+              <table>
+                <caption>시뮬레이션 주요 파라미터. 슬래시로 구분한 쌍은 붐 / 암 순서다.</caption>
+                <thead><tr><th scope="col">항목</th><th scope="col">설정</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">펌프</th><td>압력 200bar · 최대 유량 600L/min</td></tr>
+                  <tr><th scope="row">피스톤 / 로드 지름</th><td>피스톤 0.35 / 0.18m · 로드 0.22 / 0.125m</td></tr>
+                  <tr><th scope="row">행정 / 링크 길이</th><td>행정 1.8 / 1.7m · 링크 7.2 / 2.9m</td></tr>
+                  <tr><th scope="row">질량 / 관성</th><td>8,000 / 2,920kg · 38,500 / 3,600kg·m²</td></tr>
+                  <tr><th scope="row">점성 마찰 / 누설</th><td>10⁵N/(m/s) · 0.005L/min/bar</td></tr>
+                  <tr><th scope="row">데드존 [D<sub>l</sub>, D<sub>r</sub>]</th><td>붐 [−0.2, 0.1] · 암 [−0.1, 0.2]</td></tr>
+                  <tr><th scope="row">히스테리시스 폭</th><td>0.05</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <figure class="paper-figure">
+              <img src="assets/figure7.png" alt="시뮬레이션의 붐·암 관절각 추종 결과. 하이브리드 제어와 데드존 보상 PD를 비교한다." loading="lazy" decoding="async">
+              <figcaption><span class="fig-no">FIG. 7</span>붐·암 관절각 추종. 노트에서 하이브리드는 실선, 데드존 보상 PD는 점선으로 설명하며, 하이브리드의 더 작은 추종 오차를 보고한다.</figcaption>
+            </figure>
+
+            <figure class="paper-figure">
+              <img src="assets/figure9.png" alt="RevNM이 예측한 관절각 변화량과 실제 관절각 변화량의 비교 결과" loading="lazy" decoding="async">
+              <figcaption><span class="fig-no">FIG. 9</span>예측 Δq와 실제 Δq의 비교. 노트가 기록한 정확도 기대값은 붐 0.95, 암 0.90이다. 지표의 세부 정의는 원문을 확인해야 하며, 이 값을 곧바로 백분율 정확도로 해석하지 않는다.</figcaption>
+            </figure>
+
+            <h3>검증 B · 39톤 상용 굴착기 실험</h3>
+            <p>
+              실차 데이터는 제조사 PD로 무작위 3차 스플라인을 추종하며 수집했다.
+              붐의 이득은 k<sub>P</sub> = 300, k<sub>D</sub> = 3,
+              암은 k<sub>P</sub> = 200, k<sub>D</sub> = 1.8이다.
+              수집량은 약 30만 스텝, 약 4.2시간이다.
+            </p>
+            <div class="equation">
+              <div class="eq-label">시험 궤적 · 작업공간의 원</div>
+              <div class="math-scroll">
+                <div class="math">x(t) = 6.77 + cos(0.1πt)</div>
+                <div class="math">y(t) = 1.39 + sin(0.1πt)</div>
+              </div>
+              <p class="eq-note">위치를 m, 시간을 s로 읽으면 반지름 1m, 주기 20초의 원이다. 실차 제어 대상은 붐·암이다.</p>
+            </div>
+
+            <figure class="paper-figure">
+              <img src="assets/figure10.png" alt="실차 붐·암의 관절각 추종과 입력 명령. 입력이 있어도 유량이 발생하지 않는 구간이 강조돼 있다." loading="lazy" decoding="async">
+              <figcaption><span class="fig-no">FIG. 10</span>관절각 추종과 제어 입력. 노란 구간은 입력 명령이 있지만 유량이 나오지 않는 구간이다. 노트는 밸브 명령이 펌프 사판각까지 바꾸는 장비 내장 논리와 연결해 설명한다.</figcaption>
+            </figure>
+
+            <figure class="paper-figure">
+              <img src="assets/figure11.png" alt="실차 작업공간에서 목표 원 궤적과 하이브리드, 데드존 보상 PD, 제조사 PD의 추종 경로 비교" loading="lazy" decoding="async">
+              <figcaption><span class="fig-no">FIG. 11</span>작업공간에서의 추종 결과. 제조사 PD의 큰 이탈과 하이브리드 제어의 개선을 비교할 수 있다.</figcaption>
+            </figure>
+
+            <div class="table-wrap">
+              <table class="result-table">
+                <caption>원 노트의 표 II. 모든 수치는 cm 단위의 RMSE이며 작을수록 좋다.</caption>
+                <thead>
+                  <tr><th scope="col">평가 지표</th><th scope="col" class="best">하이브리드</th><th scope="col">데드존 보상 PD</th><th scope="col">제조사 PD</th></tr>
+                </thead>
+                <tbody>
+                  <tr><th scope="row">경로 RMSE</th><td class="best">5.7</td><td>10.6</td><td>27.4</td></tr>
+                  <tr><th scope="row">궤적 RMSE</th><td class="best">13.5</td><td>28.2</td><td>48.7</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="comparison" aria-labelledby="comparison-title">
+              <h3 id="comparison-title">경로 RMSE · 같은 시험에서의 비교</h3>
+              <div class="bar-row">
+                <div class="bar-label"><span>RevNM + PD 하이브리드</span><b>5.7 cm</b></div>
+                <div class="bar-track" aria-hidden="true"><span class="bar bar-hybrid"></span></div>
+              </div>
+              <div class="bar-row">
+                <div class="bar-label"><span>데드존 보상 PD</span><b>10.6 cm</b></div>
+                <div class="bar-track" aria-hidden="true"><span class="bar bar-compensated"></span></div>
+              </div>
+              <div class="bar-row">
+                <div class="bar-label"><span>제조사 PD</span><b>27.4 cm</b></div>
+                <div class="bar-track" aria-hidden="true"><span class="bar bar-pd"></span></div>
+              </div>
+              <div class="delta-grid">
+                <div class="delta"><span>데드존 보상 PD 대비 · 경로 오차 감소</span><strong>46.2%</strong></div>
+                <div class="delta"><span>데드존 보상 PD 대비 · 궤적 오차 감소</span><strong>52.1%</strong></div>
+              </div>
+              <p class="note">감소율은 표의 수치로 계산했다: (비교값 − 하이브리드값) / 비교값. 막대 길이는 제조사 PD의 경로 RMSE 27.4cm를 기준으로 한다.</p>
+            </div>
+
+            <div class="callout">
+              <h3>5.7cm가 말하는 것과 말하지 않는 것</h3>
+              <p>
+                5.7cm는 이 원 궤적 시험의 <strong>경로 RMSE</strong>다. 궤적 RMSE는 13.5cm이며,
+                두 지표를 섞어 쓰면 성능을 과장할 수 있다.
+                일반적으로 경로 평가는 공간상의 이탈, 궤적 평가는 시간에 맞춘 추종까지 다루지만,
+                이 연구의 정확한 계산 정의는 원문을 기준으로 확인해야 한다.
+                이 결과만으로 굴삭 작업 전체나 다른 하중·속도에서 같은 정밀도를 보장하지는 않는다.
+              </p>
+            </div>
+          </section>
+
+          <section class="section" id="implications" aria-labelledby="implications-title">
+            <header class="section-head">
+              <span class="section-index">06 / LIMITS &amp; IMPLICATIONS</span>
+              <h2 id="implications-title">HR35에 가져올 것은<br>숫자보다 설계의 순서다</h2>
+            </header>
+
+            <h3>먼저, 검증의 경계를 확인한다</h3>
+            <ul class="limit-list">
+              <li><strong>실차 검증은 붐·암에 한정된다.</strong> 선회·버킷을 포함한 전체 자유도와 실제 굴삭 작업에 대한 확장은 남아 있다.</li>
+              <li><strong>통신 지연은 모델 밖에 있다.</strong> 20Hz 운용에서의 성공을 지연·지터에 대한 일반적 강인성 보장으로 읽을 수는 없다.</li>
+              <li><strong>압력 자체를 예측하지 않는다.</strong> 압력 동역학은 3차 운동 구조에 흡수된다.</li>
+              <li><strong>예측 모델의 MPC 결합은 향후 과제다.</strong> 슬라이딩 모드 등 다른 제어기와의 결합, 실제 작업 적용도 후속 방향으로 제시된다.</li>
+            </ul>
+
+            <h3>HR35 관점의 해석과 검증 과제</h3>
+            <p class="note">
+              아래는 원 노트 작성자의 적용 의견을 정리한 내용이다.
+              HR35의 센서·트윈 구성에 관한 설명은 노트의 전제를 따르며,
+              해당 장비에서 검증된 결과를 뜻하지 않는다.
+            </p>
+
+            <div class="table-wrap">
+              <table class="application-table">
+                <caption>논문에서 얻는 단서 → 적용 해석 → 실제로 확인할 항목</caption>
+                <thead><tr><th scope="col">논문의 단서</th><th scope="col">HR35에 주는 의미</th><th scope="col">다음 검증</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td><strong>경사계·압력센서·20Hz</strong><br>노트상 HR35와 유사한 구성</td>
+                    <td>20Hz가 정밀 제어를 원천적으로 불가능하게 하는 조건은 아니라는 사례다.</td>
+                    <td>지연·지터·센서 잡음·동작 속도가 유사한지 측정한다.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>각가속도와 상태 이력</strong><br>3차 구조에 필요한 상태 정보</td>
+                    <td>저주기 경사계 신호의 미분과 필터 지연이 구현의 핵심 과제가 된다.</td>
+                    <td>스플라인·여과 회귀 등 상태 추정 방법의 잡음과 지연을 비교한다.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>데드존 + 히스테리시스</strong><br>입력 방향에 따른 응답 차이</td>
+                    <td>데드밴드만 있는 밸브 모델에 폭 D<sub>w</sub>를 추가할 근거가 될 수 있다.</td>
+                    <td>조이스틱 왕복 시험으로 방향별 응답과 히스테리시스 폭을 식별한다.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>입력은 있지만 유량은 없음</strong><br>펌프와 밸브 명령의 결합</td>
+                    <td>명령 전달계에 장비 고유의 펌프 제어 논리가 포함될 수 있다.</td>
+                    <td>조이스틱·밸브 명령과 펌프 제어의 결합 여부를 확인한다.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>물리 사슬 + 학습 항</strong><br>구조를 가진 데이터 모델</td>
+                    <td>기존 트윈을 기반으로 보정 항을 학습하는 변형을 검토할 수 있다.</td>
+                    <td>트윈의 f, g와 T<sub>i</sub>, S를 어떻게 연결할지 설계하고, 가역성 조건을 재검토한다.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="callout green">
+              <h3>상태 이력은 미분 문제를 자동으로 없애지 않는다</h3>
+              <p>
+                과거 상태를 입력하는 h는 이력 의존성을 표현하는 데 도움을 줄 수 있다.
+                그러나 제시된 모델은 각속도·각가속도를 포함하고, 제어 법칙에도 미분 항이 등장한다.
+                이력을 넣는 것만으로 상태 추정이나 필터링이 불필요해진다고 해석해서는 안 된다.
+              </p>
+            </div>
+
+            <h3>적용 전에 답해야 할 네 가지 질문</h3>
+            <ul class="checklist" aria-label="후속 검증 체크리스트">
+              <li>20Hz 신호에서 각속도·각가속도를 추정할 때 잡음과 지연을 얼마나 허용할 수 있는가?</li>
+              <li>왕복 입력에서 데드존과 히스테리시스를 구분해 식별할 수 있는가?</li>
+              <li>밸브 명령과 펌프 제어가 결합하는 구간을 데이터에 충분히 포함했는가?</li>
+              <li>하중·속도·작업 조건을 바꿔도 경로 오차와 시간 추종 오차가 함께 개선되는가?</li>
+            </ul>
+
+            <div class="ending">
+              <span class="small-label">The Takeaway</span>
+              <h2>좋은 물리 구조는<br>학습의 역할을 더 선명하게 만든다.</h2>
+              <p>
+                이 연구의 인상적인 지점은 5.7cm라는 수치와 함께,
+                <strong>예측과 제어가 같은 모델을 공유하도록 설계했다는 것</strong>이다.
+                알려진 물리는 계산의 뼈대가 되고, 데이터는 복잡한 비선형성을 채운다.
+                다음 과제는 이 구조를 더 다양한 하중과 실제 작업으로 확장하며,
+                어떤 조건에서 성능이 유지되는지 확인하는 일이다.
+              </p>
+            </div>
+
+            <aside class="share" aria-labelledby="share-title">
+              <h3 id="share-title">공유용 한 문단</h3>
+              <blockquote>
+                39톤 굴착기에서 경로 RMSE 5.7cm. RevNM은 유압계의 3차 물리 구조에 가역 학습을 결합해
+                하나의 모델로 예측과 역제어를 수행한다. 데드존 보상 PD 대비 경로 오차는 약 46%,
+                궤적 오차는 약 52% 감소했다. 핵심은 실차 원 궤적 시험의 성과와 검증 범위를 함께 읽는 것이다.
+              </blockquote>
+              <p class="share-foot">복사해 사용할 수 있는 요약 · #유압제어 #굴착기 #시스템식별 #RevNM</p>
+            </aside>
+          </section>
+
+          <section class="sources" id="sources" aria-labelledby="sources-title">
+            <h2 id="sources-title">출처와 읽기 안내</h2>
+            <ol>
+              <li>
+                <span class="paper-title">Dexian Ma, Yirong Liu, Wenbo Liu, Bo Zhou.
+                “A Data-Driven Modeling and Motion Control of Heavy-Load Hydraulic Manipulators via Reversible Transformation.”</span><br>
+                Southeast University, Nanjing · Key Laboratory of Measurement and Control of Complex Systems of Engineering.
+                읽은 판: <a>arXiv:2411.13856v1</a>, 2024-11-21.
+              </li>
+              <li>
+                <strong>저널 서지.</strong>
+                원 노트는 <cite>IEEE Transactions on Industrial Electronics</cite>, 2026,
+                <a>DOI: 10.1109/TIE.2025.3645454</a>로 기록한다.
+                이 글은 제공된 노트를 편집한 것으로, 저널 최종판과 arXiv v1 사이의 변경 사항은 대조하지 않았다.
+              </li>
+              <li>
+                <strong>그림과 수치.</strong>
+                그림 1·2·3·4·7·9·10·11은 제공된 논문 그림을 사용했다. 그림 번호와 수식 번호는 원 노트의 표기를 따른다.
+                RMSE는 노트의 표 II에서 옮겼으며, 오차 감소율은 해당 수치로 계산해 소수 첫째 자리까지 반올림했다.
+                인용 그림의 권리는 원 저작권자에게 있다.
+              </li>
+              <li>
+                <strong>편집과 해석.</strong>
+                제목·소제목·도식·강조 문장은 이해를 돕기 위해 재구성했다.
+                HR35 적용 제안은 노트 작성자의 해석이며 논문의 실험 결과와 구분된다.
+                비교 데이터가 제시되지 않은 “블랙박스보다 적은 데이터”라는 주장은 이 글의 확정적 결론으로 삼지 않았다.
+              </li>
+            </ol>
+          </section>
+        </main>
+      </div>
+
+      <footer class="footer">
+        <p>FIELDNOTES / ROBOTICS · 논문을 읽고, 적용의 조건을 묻다.</p>
+        <a href="#top">글 처음으로 ↑</a>
+      </footer>
+    </article>
+  </div>
+</body>
+</html>

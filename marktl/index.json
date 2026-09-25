@@ -1,7 +1,27 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T11:42:08.972Z",
+  "updatedAt": "2026-09-25T11:47:57.146Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/tie2026-reversible-datadriven/",
+      "excerpt": "A Data Driven Modeling and Motion Control of Heavy Load Hydraulic Manipulators via Reversible Transformation 요약 한줄 요약 39 t 상용 굴착기(경사계 + 실린더 압력센서, 20 Hz 원격)에 대해, 유압 매니퓰레이터가 \"각도 → 각속도 → 각가속도 → 입력\" 3차 적분기 사슬 이라는 물리 구조를 먼저 유도해 두고 그 위에 MLP 비선형 항",
+      "shortId": "1ng2w8a",
+      "slug": "tie2026-reversible-datadriven",
+      "sourcePath": "02_research/필드로봇/시스템식별/tie2026-reversible-datadriven.md",
+      "tags": [
+        "논문요약",
+        "시스템식별",
+        "굴착기",
+        "가역신경망",
+        "역모델제어",
+        "데드존",
+        "히스테리시스"
+      ],
+      "title": "A Data-Driven Modeling and Motion Control of Heavy-Load Hydraulic Manipulators via Reversible Transformation - 요약",
+      "updatedAt": "2026-09-25T11:47:57.146Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/1ng2w8a/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/nan2024-adaptive/",
