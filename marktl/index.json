@@ -1,7 +1,27 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T11:31:56.201Z",
+  "updatedAt": "2026-09-25T11:36:40.671Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/lra2022-nonlinear-model-learning/",
+      "excerpt": "Nonlinear Model Learning for Compensation and Feedforward Control of Real World Hydraulic Actuators Using Gaussian Processes 요약 한줄 요약 로더 크레인의 유압 액추에이터 4개(회전 관절 3개는 각도 분해능 0.1°, 직동 1개는 1 mm)에 대해, 필터를 거치지 않은 잡음 섞인 위치 측정만으로 \"명령 전류 → 속도\" 특성곡선(데",
+      "shortId": "d1zb44",
+      "slug": "lra2022-nonlinear-model-learning",
+      "sourcePath": "02_research/필드로봇/시스템식별/lra2022-nonlinear-model-learning.md",
+      "tags": [
+        "논문요약",
+        "시스템식별",
+        "유압액추에이터",
+        "가우시안프로세스",
+        "밸브특성곡선",
+        "데드밴드",
+        "역모델"
+      ],
+      "title": "Nonlinear Model Learning for Compensation and Feedforward Control of Real-World Hydraulic Actuators Using Gaussian Processes - 요약",
+      "updatedAt": "2026-09-25T11:36:40.671Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/d1zb44/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/egli2021-general/",

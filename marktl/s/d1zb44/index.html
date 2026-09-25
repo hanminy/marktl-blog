@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>잡음 속에서 배우는 유압 제어: 20분 데이터와 두 개의 GP</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      --paper: #f6f3eb;
+      --surface: #fffdf8;
+      --ink: #192e32;
+      --body: #344346;
+      --muted: #63716f;
+      --line: #d8ddd4;
+      --green: #215e55;
+      --green-soft: #e8eee6;
+      --accent: #a8492e;
+      --accent-soft: #f2e6db;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "Batang", Georgia, serif;
+      --sans: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 2rem; }
+    body { margin: 0; color: var(--body); background: var(--paper); font-family: var(--sans); font-size: 17px; line-height: 1.9; word-break: keep-all; overflow-wrap: break-word; }
+    a { color: var(--green); text-underline-offset: .22em; }
+    a:hover { color: var(--accent); }
+    a:focus-visible { outline: 3px solid var(--accent); outline-offset: 5px; }
+    ::selection { color: var(--ink); background: #d5e3d2; }
+    .skip { position: absolute; top: -100px; left: 1rem; padding: .5rem 1rem; background: var(--surface); z-index: 10; }
+    .skip:focus { top: 1rem; }
+    .shell { max-width: 1220px; margin: auto; padding: 0 48px; }
+    .masthead { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 27px 0; border-bottom: 1px solid var(--ink); font-size: .73rem; letter-spacing: .15em; text-transform: uppercase; color: var(--ink); }
+    .brand { font-weight: 800; }
+    .issue { color: var(--muted); letter-spacing: .06em; }
+    .hero { padding: 76px 0 48px; }
+    .eyebrow { margin: 0 0 24px; font-size: .74rem; color: var(--accent); font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+    h1, h2, h3, h4 { color: var(--ink); }
+    h1 { margin: 0; font-family: var(--serif); font-size: clamp(2.7rem, 5.7vw, 4.8rem); font-weight: 700; line-height: 1.25; letter-spacing: -.065em; }
+    .subtitle { display: block; margin-top: 17px; font-family: var(--sans); font-size: clamp(1.25rem, 2.4vw, 1.85rem); font-weight: 450; letter-spacing: -.045em; line-height: 1.5; }
+    .dek { max-width: 790px; margin: 30px 0 28px; font-size: 1.14rem; line-height: 1.9; }
+    .byline { display: flex; flex-wrap: wrap; gap: 7px 22px; color: var(--muted); font-size: .78rem; }
+    .hero-bottom { display: grid; grid-template-columns: 1fr 1fr 1fr; margin-top: 42px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .stat { padding: 25px 24px; border-right: 1px solid var(--line); }
+    .stat:first-child { padding-left: 0; }
+    .stat:last-child { border-right: 0; }
+    .stat strong { display: block; color: var(--green); font-size: 2.4rem; font-weight: 650; letter-spacing: -.05em; line-height: 1.3; }
+    .stat strong small { font-size: 1rem; margin-left: 5px; font-weight: 500; }
+    .stat span { display: block; margin-top: 7px; font-size: .84rem; }
+    .stat .qualifier { color: var(--muted); font-size: .72rem; margin-top: 2px; }
+    .layout { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 64px; padding-bottom: 60px; }
+    .sidebar { padding-top: 28px; }
+    .toc { position: sticky; top: 28px; font-size: .8rem; }
+    .toc-label { font-size: .68rem; letter-spacing: .14em; font-weight: 800; color: var(--muted); }
+    .toc ol { list-style: none; padding: 0; margin: 16px 0 28px; border-top: 1px solid var(--line); }
+    .toc li { border-bottom: 1px solid var(--line); }
+    .toc a { display: block; padding: 10px 0; text-decoration: none; }
+    .toc a span { display: inline-block; width: 27px; color: var(--muted); font-size: .68rem; }
+    .sidebar-note { font-size: .74rem; color: var(--muted); line-height: 1.8; }
+    .article { min-width: 0; }
+    .abstract { padding: 30px 34px; margin: 12px 0 34px; background: var(--green-soft); border-top: 3px solid var(--green); }
+    .mini-label { margin: 0 0 10px; font-size: .7rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--green); }
+    .abstract p:last-child { margin-bottom: 0; }
+    p { margin: 0 0 1.25em; }
+    .section { padding: 46px 0 10px; border-top: 1px solid var(--line); margin-top: 42px; }
+    .section-head { margin-bottom: 27px; }
+    .section-number { display: block; margin-bottom: 10px; color: var(--accent); font-size: .7rem; letter-spacing: .15em; font-weight: 800; }
+    h2 { margin: 0; font-family: var(--serif); font-size: clamp(1.65rem, 2.7vw, 2.2rem); line-height: 1.45; letter-spacing: -.045em; }
+    h3 { margin: 32px 0 13px; font-size: 1.16rem; letter-spacing: -.025em; line-height: 1.5; }
+    h4 { margin: 0 0 10px; font-size: 1rem; }
+    strong { color: var(--ink); font-weight: 700; }
+    .findings { padding: 0; margin: 20px 0 0; list-style: none; counter-reset: finding; }
+    .findings li { counter-increment: finding; position: relative; padding: 20px 0 20px 47px; border-bottom: 1px solid var(--line); }
+    .findings li::before { content: "0" counter(finding); position: absolute; left: 0; top: 20px; font-size: .78rem; color: var(--accent); font-weight: 700; }
+    .findings strong { display: block; margin-bottom: 4px; }
+    .findings p { margin: 0; font-size: .94rem; }
+    .pullquote { margin: 36px 0; padding: 8px 0 8px 27px; border-left: 3px solid var(--accent); }
+    .pullquote p { margin: 0; font-family: var(--serif); color: var(--green); font-size: clamp(1.25rem, 2.2vw, 1.6rem); line-height: 1.7; letter-spacing: -.035em; }
+    .pullquote footer { margin-top: 10px; font-family: var(--sans); font-size: .73rem; color: var(--muted); }
+    figure { margin: 30px 0; }
+    .image-frame { background: #fff; border: 1px solid var(--line); padding: 20px; }
+    figure img { display: block; max-width: 100%; height: auto; margin: auto; }
+    .compact img { max-height: 480px; width: auto; }
+    figcaption { padding: 12px 0 0; font-size: .79rem; line-height: 1.8; color: var(--muted); }
+    .fig-num { color: var(--accent); font-weight: 750; margin-right: 7px; }
+    .table-wrap { margin: 24px 0; overflow-x: auto; border: 1px solid var(--line); background: var(--surface); }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: .86rem; }
+    caption { padding: 14px 18px; text-align: left; font-weight: 700; color: var(--ink); background: var(--green-soft); }
+    th, td { padding: 14px 18px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--ink); font-weight: 650; }
+    thead th { font-size: .77rem; background: #eeefe8; }
+    tbody tr:last-child > * { border-bottom: 0; }
+    .spec th { width: 24%; }
+    .numeric { white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .best { background: var(--green-soft); }
+    .note { padding: 20px 23px; margin: 24px 0; background: var(--accent-soft); font-size: .88rem; line-height: 1.85; }
+    .note p:last-child { margin: 0; }
+    .flow { display: grid; grid-template-columns: 1fr 28px 1fr; gap: 10px; align-items: stretch; margin: 26px 0 14px; }
+    .flow-card { padding: 23px; background: var(--green-soft); border: 1px solid #cbd8cd; }
+    .flow-card b { display: block; color: var(--green); font-size: .72rem; letter-spacing: .08em; margin-bottom: 8px; }
+    .flow-card strong { display: block; font-size: 1.05rem; }
+    .flow-card p { margin: 10px 0 0; font-size: .82rem; }
+    .arrow { display: grid; place-items: center; color: var(--accent); font-size: 1.4rem; }
+    .equation-group { margin: 24px 0; background: var(--surface); border: 1px solid var(--line); }
+    .equation { padding: 18px 22px; overflow-x: auto; border-bottom: 1px solid var(--line); }
+    .equation:last-child { border-bottom: 0; }
+    .equation .label { display: block; font-family: var(--sans); font-size: .7rem; color: var(--muted); margin-bottom: 8px; }
+    .math { font-family: "Cambria Math", "STIX Two Math", Georgia, serif; font-size: 1.03rem; line-height: 2; white-space: nowrap; color: var(--ink); }
+    .math sub, .math sup { font-size: .7em; }
+    .formula-note { font-size: .77rem; color: var(--muted); }
+    .legend-list { margin: 22px 0; padding: 0; }
+    .legend-list div { display: grid; grid-template-columns: 105px 1fr; gap: 17px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+    .legend-list dt { color: var(--green); font-family: Georgia, serif; }
+    .legend-list dd { margin: 0; font-size: .86rem; }
+    .limits { padding: 0; list-style: none; }
+    .limits li { padding: 19px 0; border-bottom: 1px solid var(--line); }
+    .limits strong { display: block; margin-bottom: 5px; }
+    .limits p { margin: 0; font-size: .93rem; }
+    .application { padding: 30px; margin: 26px 0; background: var(--surface); border: 1px solid var(--line); }
+    .application h3 { margin-top: 0; }
+    .application p:last-child { margin: 0; }
+    .checklist { padding: 0; margin: 20px 0 0; list-style: none; }
+    .checklist li { position: relative; padding: 9px 0 9px 26px; font-size: .9rem; }
+    .checklist li::before { content: "□"; position: absolute; left: 0; color: var(--green); }
+    .ending { padding: 37px; margin: 44px 0 0; background: var(--ink); color: #e3e8df; }
+    .ending h2 { color: #fffdf5; font-size: 1.7rem; margin-bottom: 20px; }
+    .ending strong { color: #fffdf5; }
+    .ending .mini-label { color: #b9cdbb; }
+    .ending p:last-child { margin-bottom: 0; }
+    .share { border-top: 1px solid #58706e; margin-top: 28px; padding-top: 22px; }
+    .share blockquote { margin: 10px 0 0; font-size: .94rem; }
+    .source-card { padding: 25px; margin: 24px 0; border: 1px solid var(--line); background: var(--surface); }
+    .paper-title { display: block; color: var(--ink); font-weight: 650; line-height: 1.6; margin-bottom: 14px; }
+    .source-card p { font-size: .82rem; margin-bottom: 10px; }
+    .source-card p:last-child { margin-bottom: 0; }
+    .source-notes { padding-left: 21px; font-size: .82rem; color: var(--muted); }
+    .source-notes li { margin: 13px 0; padding-left: 5px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
+    .tag { font-size: .72rem; padding: 4px 10px; border: 1px solid var(--line); border-radius: 3px; color: var(--green); }
+    .page-footer { padding: 22px 0 35px; border-top: 1px solid var(--ink); display: flex; justify-content: space-between; gap: 20px; color: var(--muted); font-size: .73rem; }
+    @media (max-width: 1000px) {
+      .shell { padding: 0 32px; }
+      .layout { grid-template-columns: 145px minmax(0, 1fr); gap: 35px; }
+      .stat { padding: 22px 17px; }
+    }
+    @media (max-width: 760px) {
+      body { font-size: 16px; }
+      .shell { padding: 0 22px; }
+      .hero { padding-top: 45px; }
+      .masthead { align-items: flex-start; font-size: .65rem; }
+      .issue { text-align: right; max-width: 130px; }
+      .layout { display: block; }
+      .sidebar { padding-top: 0; }
+      .toc { position: static; margin-bottom: 30px; }
+      .toc ol { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+      .sidebar-note { display: none; }
+      .hero-bottom { margin-top: 30px; }
+      .stat { padding: 18px 12px; }
+      .stat strong { font-size: 1.8rem; }
+      .stat strong small { font-size: .8rem; }
+      .stat span { font-size: .72rem; }
+      .stat .qualifier { font-size: .64rem; }
+      .abstract, .application { padding: 25px; }
+      .section { margin-top: 32px; padding-top: 32px; }
+      .image-frame { padding: 12px; }
+      .ending { padding: 28px; }
+    }
+    @media (max-width: 430px) {
+      .shell { padding: 0 18px; }
+      h1 { font-size: 2.55rem; }
+      .stat strong { font-size: 1.5rem; }
+      .stat { padding-right: 9px; padding-left: 9px; }
+      .flow { grid-template-columns: 1fr; }
+      .arrow { transform: rotate(90deg); height: 24px; }
+      .legend-list div { grid-template-columns: 80px 1fr; gap: 12px; }
+      th, td { padding: 12px; }
+      .page-footer { flex-direction: column; gap: 5px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+    @media print {
+      body { background: white; color: #222; font-size: 10.5pt; }
+      .shell { max-width: none; padding: 0; }
+      .hero { padding-top: 25px; }
+      h1 { font-size: 32pt; }
+      .layout { display: block; }
+      .sidebar, .skip, .back-top { display: none; }
+      figure, .note, .flow, .source-card { break-inside: avoid; }
+      .section { margin-top: 24px; padding-top: 24px; }
+      .ending { background: #eee; color: #222; }
+      .ending h2, .ending strong, .ending .mini-label { color: #222; }
+      a { color: inherit; }
+      .table-wrap, .equation { overflow: visible; }
+      .math { white-space: normal; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nonlinear Model Learning for Compensation and Feedforward Control of Real-World Hydraulic Actuators Using Gaussian Processes - 요약">
+<meta property="og:description" content="Nonlinear Model Learning for Compensation and Feedforward Control of Real World Hydraulic Actuators Using Gaussian Processes 요약 한줄 요약 로더 크레인의 유압 액추에이터 4개(회전 관절 3개는 각도 분해능 0.1°, 직동 1개는 1 mm)에 대해, 필터를 거치지 않은 잡음 섞인 위치 측정만으로 &quot;명령 전류 → 속도&quot; 특성곡선(데">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/d1zb44/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/d1zb44/assets/figure1.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Nonlinear Model Learning for Compensation and Feedforward Control of Real-World Hydraulic Actuators Using Gaussian Processes - 요약">
+<meta name="twitter:description" content="Nonlinear Model Learning for Compensation and Feedforward Control of Real World Hydraulic Actuators Using Gaussian Processes 요약 한줄 요약 로더 크레인의 유압 액추에이터 4개(회전 관절 3개는 각도 분해능 0.1°, 직동 1개는 1 mm)에 대해, 필터를 거치지 않은 잡음 섞인 위치 측정만으로 &quot;명령 전류 → 속도&quot; 특성곡선(데">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/d1zb44/assets/figure1.png">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/lra2022-nonlinear-model-learning/">
+</head>
+<body>
+  <a class="skip" href="#article">본문으로 건너뛰기</a>
+  <div class="shell" id="top">
+    <header class="masthead">
+      <div class="brand">Fieldnotes / Robotics &amp; Control</div>
+      <div class="issue">Research review · 2022 paper</div>
+    </header>
+
+    <main>
+      <header class="hero">
+        <p class="eyebrow">Hydraulics · System Identification · Gaussian Processes</p>
+        <h1>잡음 속에서 배우는<br>유압 제어
+          <span class="subtitle">20분 데이터와 두 개의 GP로 읽는 액추에이터의 비선형</span>
+        </h1>
+        <p class="dek">거친 위치 측정에도 밸브의 특성은 남아 있다. 저해상도 센서로 수집한 데이터를 미리 필터링하지 않고, 데드밴드·비대칭·포화를 학습할 수 있을까? 실제 로더 크레인에서 검증한 이중 가우시안 프로세스 연구를 살펴본다.</p>
+        <div class="byline">
+          <span>논문 해설 · IEEE RA-L, 2022</span>
+          <span>정리일 <time datetime="2026-09-25">2026.09.25</time></span>
+          <span><a href="#sources">원문 및 출처</a></span>
+        </div>
+        <div class="hero-bottom" aria-label="연구의 주요 수치">
+          <div class="stat">
+            <strong>약 20<small>분</small></strong>
+            <span>액추에이터당 데이터 수집</span>
+            <span class="qualifier">학습·검증에 절반씩 사용</span>
+          </div>
+          <div class="stat">
+            <strong>약 1/7</strong>
+            <span>신경망 대비 GP 검증 MSE</span>
+            <span class="qualifier">제시된 비교 실험 기준</span>
+          </div>
+          <div class="stat">
+            <strong>6.85<small>cm</small></strong>
+            <span>개루프 원 궤적 말단 RMSE</span>
+            <span class="qualifier">두 액추에이터를 함께 구동</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="layout">
+        <aside class="sidebar">
+          <nav class="toc" aria-label="글 목차">
+            <div class="toc-label">IN THIS REPORT</div>
+            <ol>
+              <li><a href="#findings"><span>01</span>핵심 발견</a></li>
+              <li><a href="#system"><span>02</span>문제와 실험계</a></li>
+              <li><a href="#model"><span>03</span>두 개의 GP</a></li>
+              <li><a href="#inverse"><span>04</span>역모델과 보상</a></li>
+              <li><a href="#evidence"><span>05</span>실험의 증거</a></li>
+              <li><a href="#limits"><span>06</span>검증의 경계</a></li>
+              <li><a href="#implications"><span>07</span>HR35에 주는 시사점</a></li>
+              <li><a href="#sources"><span>08</span>출처와 읽기 안내</a></li>
+            </ol>
+            <p class="sidebar-note">원 논문의 실험 결과와 HR35 적용에 관한 노트 작성자의 해석을 구분해 읽을 수 있도록 구성했다.</p>
+          </nav>
+        </aside>
+
+        <article class="article" id="article">
+          <section class="abstract" aria-labelledby="abstract-title">
+            <h2 class="mini-label" id="abstract-title">Abstract / 초록</h2>
+            <p>이 연구는 실제 로더 크레인의 유압 액추에이터 네 개를 대상으로, <strong>필터링하지 않은 위치 측정에서 명령 전류와 속도의 관계를 학습</strong>한다. 전류에서 스풀 변위로, 스풀 변위에서 상태 변화율로 이어지는 두 개의 가우시안 프로세스(GP)를 직렬로 연결하고, 과거 명령 입력을 사용해 지연을 다룬다.</p>
+            <p>제시된 검증에서 GP의 평균제곱오차(MSE)는 신경망의 약 1/7, 구간선형 모델의 약 1/10이었다. 학습한 모델은 단조성 손실을 적용한 신경망 역모델과 보상기로 이어졌으며, 두 액추에이터의 개루프 원 궤적 추종에서 말단 RMSE 6.85 cm를 기록했다. 다만 제한된 입력 범위와 압력·부하 입력의 부재는 적용 범위를 판단할 때 함께 고려해야 한다.</p>
+          </section>
+
+          <section id="findings" aria-labelledby="findings-title">
+            <div class="section-head">
+              <span class="section-number">01 / KEY FINDINGS</span>
+              <h2 id="findings-title">먼저 읽는 세 가지 발견</h2>
+            </div>
+            <ol class="findings">
+              <li>
+                <strong>위치를 미분한 거친 관측값도 학습에 쓸 수 있다.</strong>
+                <p>저해상도 위치 측정에서 계산한 변화율을 잡음이 있는 관측으로 취급한다. 학습용 사전 필터링 없이도 밸브의 비선형 특성을 추정했다.</p>
+              </li>
+              <li>
+                <strong>특성곡선 학습은 제어 명령 생성으로 이어진다.</strong>
+                <p>GP에 질의해 만든 자료로 역모델을 학습한다. 단조성 손실은 데드밴드 주변에서 역모델의 기울기가 비물리적으로 변하는 현상을 억제한다.</p>
+              </li>
+              <li>
+                <strong>실차 검증은 유망하지만, 일반화 범위는 한정돼 있다.</strong>
+                <p>개루프 추종은 피드포워드 모델의 가능성을 보여준다. 부하가 달라지는 작업이나 정밀 제어의 성능까지 입증한 결과로 확대해 읽어서는 안 된다.</p>
+              </li>
+            </ol>
+          </section>
+
+          <section class="section" id="system" aria-labelledby="system-title">
+            <div class="section-head">
+              <span class="section-number">02 / THE REAL-WORLD PROBLEM</span>
+              <h2 id="system-title">깨끗한 속도 신호가 없는 현장</h2>
+            </div>
+            <p>유압 밸브는 명령에 비례해 매끄럽게 움직이지 않는다. 작은 명령에는 반응하지 않는 <strong>데드밴드</strong>가 있고, 양방향 응답은 비대칭이며, 큰 명령에서는 포화가 나타난다. 실제 장비에서는 여기에 센서의 낮은 분해능, 측정 잡음, 지연과 진동이 겹친다.</p>
+            <p>연구가 비교 대상으로 삼은 간결한 물리·구간선형 모델은 이런 특성을 충분히 표현하기 어렵다. 신경망은 표현력이 높지만 데이터가 부족한 구간에서 성능이 떨어질 수 있다. 측정 불확실성을 명시적으로 다루지 않는 적합 방식에서는 사전 필터링과 완만한 램프 입력에 의존하기 쉽다.</p>
+            <p>핵심 질문은 실용적이다. <strong>장비마다 긴 식별 실험을 반복하지 않고, 짧은 현장 데이터에서 제어에 쓸 만한 모델을 얻을 수 있는가?</strong></p>
+
+            <figure class="compact">
+              <div class="image-frame">
+                <img src="assets/figure1.png" alt="시험용 로더 크레인과 네 개 액추에이터의 위치. ①부터 ③은 회전 관절, ④는 직동 링크." decoding="async">
+              </div>
+              <figcaption><span class="fig-num">FIG. 1</span>시험 기체와 액추에이터 구성. 회전 관절 세 개와 직동 링크 한 개를 대상으로 모델을 학습했다.</figcaption>
+            </figure>
+
+            <div class="table-wrap">
+              <table class="spec">
+                <caption>실험 시스템과 데이터 조건</caption>
+                <tbody>
+                  <tr><th scope="row">밸브·입력</th><td>직접 구동 비례 스풀 밸브 · 솔레노이드 전류</td></tr>
+                  <tr><th scope="row">위치 측정</th><td>회전 관절 ①–③: 각도 분해능 0.1°<br>직동 링크 ④: 변위 분해능 1 mm</td></tr>
+                  <tr><th scope="row">샘플링</th><td>CAN으로 50 Hz 이상 수집 후 10 Hz로 낮춤</td></tr>
+                  <tr><th scope="row">데이터량</th><td>액추에이터당 약 20분 · 학습과 검증에 절반씩 배분</td></tr>
+                  <tr><th scope="row">검증 기준값</th><td>램프 입력 자료에 비균일 Savitzky–Golay 필터 적용 · 창 51, 11차</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <aside class="note">
+              <p><strong>‘무필터 학습’과 ‘필터 없는 검증’은 다르다.</strong> 모델은 원시 위치 측정에서 계산한 변화율로 학습한다. 성능을 비교할 속도 기준값을 만들 때는 사후 필터를 사용한다.</p>
+            </aside>
+          </section>
+
+          <section class="section" id="model" aria-labelledby="model-title">
+            <div class="section-head">
+              <span class="section-number">03 / MODEL DESIGN</span>
+              <h2 id="model-title">하나의 복잡한 관계를<br>두 개의 GP로 나누다</h2>
+            </div>
+            <p>관측값은 인접한 위치 측정의 차이를 실제 시간 간격으로 나눈 이산 변화율이다. 이를 실제 함수값에 잡음이 더해진 값으로 보고 GP를 학습한다. 시간 간격을 직접 사용하므로 비균일하게 들어오는 측정도 다룰 수 있다.</p>
+
+            <div class="equation-group" aria-label="관측과 가우시안 프로세스의 기본 식">
+              <div class="equation">
+                <span class="label">관측 변화율과 잡음 모형</span>
+                <div class="math">y<sub>k</sub> = (x<sub>k+1</sub> − x<sub>k</sub>) / (t<sub>k+1</sub> − t<sub>k</sub>)</div>
+                <div class="math">f̂(u) = f(u) + ε</div>
+              </div>
+              <div class="equation">
+                <span class="label">제곱지수 커널 · 원문 식 (1)</span>
+                <div class="math">k(u<sub>i</sub>, u<sub>j</sub>) = σ<sub>k</sub><sup>2</sup> exp[−½ (u<sub>i</sub> − u<sub>j</sub>)<sup>T</sup> Λ (u<sub>i</sub> − u<sub>j</sub>)]</div>
+              </div>
+            </div>
+
+            <p>모델의 구조에는 유압 시스템의 단계가 반영된다. 첫 번째 GP는 명령 전류에서 스풀 변위로 이어지는 관계를, 두 번째 GP는 스풀 변위에서 액추에이터의 상태 변화율로 이어지는 관계를 학습한다.</p>
+
+            <div class="flow" role="group" aria-label="명령 전류에서 스풀 변위, 상태 변화율로 이어지는 직렬 GP 구조">
+              <div class="flow-card">
+                <b>GP I · ACTUATION</b>
+                <strong>전류 → 스풀 변위</strong>
+                <p>솔레노이드·스풀 동역학과 명령 지연을 표현하는 단계</p>
+              </div>
+              <div class="arrow" aria-hidden="true">→</div>
+              <div class="flow-card">
+                <b>GP II · MOTION</b>
+                <strong>스풀 변위 → 상태 변화율</strong>
+                <p>유량·기구의 관계와 비선형 특성곡선을 표현하는 단계</p>
+              </div>
+            </div>
+            <p>이렇게 관계를 나누면 차원을 줄이고 각 단계의 특성을 해석하기 쉬워진다. 지연뿐 아니라 포화, 중심 이탈, 양방향 비대칭도 모델을 통해 살펴볼 수 있다.</p>
+
+            <h3>지연은 과거 명령을 함께 넣어 다룬다</h3>
+            <p>입력에는 현재 명령만이 아니라 최근 명령의 이력이 들어간다. 최대 5샘플의 지연을 고려하고, 입력별 커널 길이척도를 최적화하는 <strong>자동 관련성 판정(ARD)</strong>으로 어떤 시점의 명령이 출력과 관련되는지 파악한다.</p>
+
+            <dl class="legend-list">
+              <div><dt>u<sub>k</sub></dt><dd>최근 d개 명령으로 구성한 입력 벡터: {u<sub>k−d+1</sub>, …, u<sub>k</sub>}</dd></div>
+              <div><dt>Λ</dt><dd>입력별 길이척도에 대응하는 커널 계수. 과거 명령의 관련성을 반영한다.</dd></div>
+              <div><dt>K̂<sub>UU</sub></dt><dd>K<sub>UU</sub> + σ<sub>ε</sub><sup>2</sup>I. 관측 잡음을 포함한 공분산 행렬.</dd></div>
+              <div><dt>φ</dt><dd>Λ, 커널 크기 σ<sub>k</sub>, 잡음 크기 σ<sub>ε</sub>로 이루어진 하이퍼파라미터 집합.</dd></div>
+            </dl>
+
+            <h3>예측값과 불확실성을 함께 계산한다</h3>
+            <div class="equation-group">
+              <div class="equation">
+                <span class="label">GP 예측 평균 · 원문 식 (2)에 대응하는 일반형</span>
+                <div class="math">m(u<sub>*</sub>) = μ(u<sub>*</sub>) + k<sub>U*</sub><sup>T</sup>K̂<sub>UU</sub><sup>−1</sup>[y − μ(U)]</div>
+              </div>
+              <div class="equation">
+                <span class="label">잠재 함수의 예측 분산 · 원문 식 (3)에 대응</span>
+                <div class="math">s<sup>2</sup>(u<sub>*</sub>) = k(u<sub>*</sub>, u<sub>*</sub>) − k<sub>U*</sub><sup>T</sup>K̂<sub>UU</sub><sup>−1</sup>k<sub>U*</sub></div>
+              </div>
+              <div class="equation">
+                <span class="label">최대화하는 로그 주변우도 · 원문 식 (4)에 대응</span>
+                <div class="math">ℒ<sub>G</sub> = −½ r<sup>T</sup>K̂<sub>UU</sub><sup>−1</sup>r − ½ log|K̂<sub>UU</sub>| + const.</div>
+              </div>
+            </div>
+            <p class="formula-note">표기 안내: r = y − μ(U). 평균 함수를 0으로 두면 r = y가 된다. 위 분산은 잠재 함수에 대한 값이며, 새로운 잡음 관측의 분산에는 관측 잡음 항이 추가된다. 수식은 읽기 쉽도록 표기를 정리했다.</p>
+
+            <blockquote class="pullquote">
+              <p>잡음을 먼저 지워야 할 대상으로만 보지 않고,<br>학습할 확률 모형 안에 포함한다.</p>
+              <footer>방법의 핵심을 풀어 쓴 해설 · 원문 직접 인용 아님</footer>
+            </blockquote>
+            <p>GP는 커널과 잡음 가정 아래에서 신호의 관계와 불확실성을 함께 추정한다. 이 연구의 결과는 그러한 접근이 거친 위치 측정에서도 유효할 수 있음을 보여준다. 모든 종류의 잡음이나 모든 운전 조건에서 필터가 불필요하다는 뜻은 아니다.</p>
+
+            <figure>
+              <div class="image-frame">
+                <img src="assets/figure2.png" alt="GP 기반 대리 동역학, 신경망 명령 예측, 단조성 손실의 역전파를 연결한 학습 흐름도." loading="lazy" decoding="async">
+              </div>
+              <figcaption><span class="fig-num">FIG. 2</span>모델과 제어기 학습의 데이터 흐름. 파랑은 GP 배치 질의, 초록은 신경망의 명령 예측, 주황은 단조성 손실을 적용하는 역전파 경로를 나타낸다.</figcaption>
+            </figure>
+          </section>
+
+          <section class="section" id="inverse" aria-labelledby="inverse-title">
+            <div class="section-head">
+              <span class="section-number">04 / FROM MODEL TO CONTROL</span>
+              <h2 id="inverse-title">특성곡선을 뒤집는 일에는<br>물리적 조건이 필요하다</h2>
+            </div>
+            <p>전류에서 속도로 가는 모델을 얻었다면, 제어에서는 반대로 원하는 속도에 필요한 전류를 구해야 한다. 그러나 GP가 주는 것은 예측 분포이며, 평균 곡선도 데드밴드에서는 일대일 대응이 아니다. 단순히 축을 바꾸는 것만으로 안정적인 역모델이 완성되지는 않는다.</p>
+            <p>연구진은 GP 질의로 만든 자료를 이용해 신경망 역모델을 학습하고, 명령 오차에 더해 <strong>단조성 손실</strong>을 적용한다. 원하는 속도가 증가할 때 예측 명령이 감소하는 구간에 벌점을 주는 방식이다.</p>
+
+            <div class="equation-group">
+              <div class="equation">
+                <span class="label">명령 예측 오차 · 원문 식 (6)</span>
+                <div class="math">ℒ<sub>MSE</sub> = (1/N<sub>b</sub>) Σ<sub>i</sub> (u<sub>bᵢ</sub> − û<sub>i</sub>)<sup>2</sup></div>
+              </div>
+              <div class="equation">
+                <span class="label">음의 기울기에 대한 벌점 · 원문 식 (7)</span>
+                <div class="math">ℒ<sub>mono</sub> = (1/N<sub>b</sub>) Σ<sub>i</sub> |min(∂û<sub>i</sub>/∂v̂, 0)|</div>
+              </div>
+            </div>
+            <p class="formula-note">N<sub>b</sub>는 배치 크기, û는 역모델이 예측한 명령, v̂는 역모델에 입력하는 속도(원 노트의 ẋ̂)다. 기울기는 자동 미분으로 계산한다.</p>
+
+            <p>이 손실은 “명령이 커질수록 유량이 같거나 증가한다”는 관계를 역모델 학습에 반영한다. 다만 학습 지점에서의 벌점은 전체 입력 영역에 대한 엄밀한 단조성 보증과는 구분해야 한다.</p>
+            <p>계산 구조도 실용성을 고려했다. 역전파가 GP를 통과하지 않도록 하고 GPU에서 질의를 배치 처리해 시간과 메모리를 줄였다. 제공된 요약에 따르면 역모델 학습은 액추에이터당 1분 미만이며, 역모델·보상기 학습은 분 단위로 수행된다.</p>
+
+            <figure>
+              <div class="image-frame">
+                <img src="assets/figure6.png" alt="선회 액추에이터 ①의 역모델 비교. 단조성 손실을 사용하지 않은 모델에서 데드밴드 부근의 기울기 이상이 나타난다." loading="lazy" decoding="async">
+              </div>
+              <figcaption><span class="fig-num">FIG. 6</span>선회 ①의 역모델. 단조성 손실이 없는 경우 데드밴드 주변에서 기울기가 불안정해지는 모습을 비교한다.</figcaption>
+            </figure>
+
+            <figure>
+              <div class="image-frame">
+                <img src="assets/figure7.png" alt="직동 액추에이터 ④에서 학습한 보상기를 적용하고 목표 특성곡선과 실차 램프 응답을 비교한 그래프." loading="lazy" decoding="async">
+              </div>
+              <figcaption><span class="fig-num">FIG. 7</span>직동 ④의 보상 결과. 대칭이며 데드밴드가 없는 목표 곡선을 10차 다항식으로 정의하고, 그 관계를 따르도록 보상기를 학습한 뒤 실차 램프 입력으로 검증했다.</figcaption>
+            </figure>
+          </section>
+
+          <section class="section" id="evidence" aria-labelledby="evidence-title">
+            <div class="section-head">
+              <span class="section-number">05 / EXPERIMENTAL EVIDENCE</span>
+              <h2 id="evidence-title">실험은 무엇을 보여줬나</h2>
+            </div>
+
+            <h3>증거 1 — 저해상도 위치에서도 속도 관계를 추정했다</h3>
+            <p>선회 관절의 램프 실험에서는 원시 측정으로 학습한 GP 예측이 사후 필터의 속도 추정과 유사한 경향을 보인다. 제공된 요약은 0.1° 분해능 조건에서 온라인 필터만으로는 속도를 충분히 포착하기 어렵다고 설명한다.</p>
+            <figure>
+              <div class="image-frame">
+                <img src="assets/figure3.png" alt="선회 관절 ①의 램프 입력 실험에서 원시 측정, 필터 추정, GP 속도 예측을 비교한 그래프." loading="lazy" decoding="async">
+              </div>
+              <figcaption><span class="fig-num">FIG. 3</span>선회 ①의 램프 입력. GP 예측을 온라인 필터 및 미래 측정까지 사용하는 사후(acausal) 필터 추정과 비교한다.</figcaption>
+            </figure>
+            <p>직동 액추에이터의 잦은 스텝 입력에서는 데드밴드와 포화가 함께 드러난다. 필터 추정이 흔들리는 구간에서도 GP는 원시 관측으로부터 입력과 출력의 관계를 추정한다.</p>
+            <figure>
+              <div class="image-frame">
+                <img src="assets/figure4.png" alt="직동 액추에이터 ④의 스텝 입력 응답. 데드밴드와 포화 구간에서 GP 예측과 필터 추정을 비교한다." loading="lazy" decoding="async">
+              </div>
+              <figcaption><span class="fig-num">FIG. 4</span>직동 ④의 스텝 입력. 3초 이전과 19초 이후의 데드밴드 구간, 그리고 포화 영역을 관찰할 수 있다.</figcaption>
+            </figure>
+
+            <h3>증거 2 — 비교 모델보다 검증 MSE가 낮았다</h3>
+            <p>직동 ④의 특성곡선 비교에서는 GP가 비선형, 양방향 비대칭, 중심 이탈, 데드밴드와 포화를 함께 표현한다. 구간선형 모델은 데드밴드를 과대 추정하고 포화를 과소 추정했으며, 신경망은 데이터가 많은 데드밴드는 포착하지만 포화 표현에서 한계를 보였다.</p>
+            <figure>
+              <div class="image-frame">
+                <img src="assets/figure5.png" alt="직동 액추에이터 ④의 GP, 신경망, 구간선형 모델 특성곡선과 출력 분포 비교." loading="lazy" decoding="async">
+              </div>
+              <figcaption><span class="fig-num">FIG. 5</span>세 모델의 특성곡선 비교. 오른쪽에는 출력 분포가 함께 제시된다.</figcaption>
+            </figure>
+
+            <div class="table-wrap">
+              <table>
+                <caption>모델별 MSE와 파라미터 구성 · 제공된 노트의 수치</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">모델</th>
+                    <th scope="col">학습 MSE</th>
+                    <th scope="col">검증 MSE</th>
+                    <th scope="col">파라미터</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="best">
+                    <th scope="row">가우시안 프로세스</th>
+                    <td class="numeric">2.59 × 10<sup>−2</sup></td>
+                    <td class="numeric"><strong>1.08 × 10<sup>−3</sup></strong></td>
+                    <td>비모수</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">신경망<br><small>16 × 16 ReLU</small></th>
+                    <td class="numeric">7.06 × 10<sup>−2</sup></td>
+                    <td class="numeric">7.73 × 10<sup>−3</sup></td>
+                    <td>385</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">구간선형</th>
+                    <td class="numeric">7.27 × 10<sup>−2</sup></td>
+                    <td class="numeric">10.24 × 10<sup>−3</sup></td>
+                    <td>6</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>이 표에서 GP의 검증 MSE는 신경망의 <strong>약 1/7.2</strong>, 구간선형 모델의 <strong>약 1/9.5</strong>다. “약 1/7, 약 1/10”이라는 요약은 이 비율을 반올림한 표현이다. 이는 MSE의 비율이며, RMSE나 실제 위치 오차의 비율을 뜻하지 않는다.</p>
+
+            <figure class="compact">
+              <div class="image-frame">
+                <img src="assets/table1.png" alt="논문 원본 표 1. GP, 신경망, 구간선형 모델의 학습 및 검증 오차 비교." loading="lazy" decoding="async">
+              </div>
+              <figcaption><span class="fig-num">TABLE 1 · 원본</span>수치를 대조할 수 있도록 원본 표 이미지도 보존했다. 위 HTML 표는 제공된 노트의 수치를 옮긴 것이다.</figcaption>
+            </figure>
+
+            <aside class="note">
+              <p><strong>수치 해석의 주의점.</strong> 학습에는 잡음이 있는 변화율을, 검증에는 필터로 만든 기준값을 사용한다. 학습 MSE와 검증 MSE의 크기를 같은 조건의 오차처럼 직접 비교하기는 어렵다. 제공된 노트에는 MSE의 단위·정규화 세부가 없어, 여기서는 모델 간 상대 비교에 초점을 맞췄다.</p>
+            </aside>
+
+            <h3>증거 3 — 피드백 없이 두 관절을 함께 움직였다</h3>
+            <p>마지막 검증은 모델 적합을 넘어 실제 궤적 생성으로 이어진다. 액추에이터 ②와 ④를 함께 구동하고, 역모델이 계산한 명령만으로 말단이 원 궤적을 따르도록 했다. 피드백이 없는 조건에서 보고된 말단 RMSE는 <strong>6.85 cm</strong>다.</p>
+            <figure>
+              <div class="image-frame">
+                <img src="assets/figure8.png" alt="액추에이터 ②와 ④를 이용한 개루프 원 궤적 추종 결과. 말단 RMSE는 6.85 cm로 보고됐다." loading="lazy" decoding="async">
+              </div>
+              <figcaption><span class="fig-num">FIG. 8</span>역모델 기반 개루프 다관절 추종. 피드백 보정 없이 얻은 결과로, 실차 피드포워드 제어의 가능성을 보여준다.</figcaption>
+            </figure>
+          </section>
+
+          <section class="section" id="limits" aria-labelledby="limits-title">
+            <div class="section-head">
+              <span class="section-number">06 / BOUNDARIES OF THE CLAIM</span>
+              <h2 id="limits-title">좋은 결과의 경계까지 읽기</h2>
+            </div>
+            <ul class="limits">
+              <li>
+                <strong>검증한 입력 범위는 전체의 약 40% 남짓이다.</strong>
+                <p>물리적 제약으로 램프 검증이 입력 전 범위를 덮지 못했다. 나머지 영역의 정확도는 이 실험으로 확인되지 않았다.</p>
+              </li>
+              <li>
+                <strong>압력과 부하는 모델 입력에 없다.</strong>
+                <p>특성곡선은 무부하에 가까운 조건의 결과다. 부하가 큰 굴착이나 압력 조건이 바뀌는 운전에서 같은 곡선을 그대로 사용할 수 있는지는 별도 검증이 필요하다.</p>
+              </li>
+              <li>
+                <strong>개루프 성능이 정밀 작업의 완성을 뜻하지는 않는다.</strong>
+                <p>6.85 cm는 피드백 없는 원 궤적 실험의 RMSE다. 정밀 작업에는 피드백을 결합하고, 작업별 허용 오차와 외란 조건에서 성능을 평가해야 한다.</p>
+              </li>
+            </ul>
+          </section>
+
+          <section class="section" id="implications" aria-labelledby="implications-title">
+            <div class="section-head">
+              <span class="section-number">07 / APPLICATION NOTES</span>
+              <h2 id="implications-title">HR35에는 어떻게 연결할까</h2>
+            </div>
+            <p class="formula-note">이 절은 노트 작성자의 HR35 관점 해석과 후속 실험 제안이다. 원 논문이 HR35에서 입증한 결과는 아니다.</p>
+            <p>가장 직접적인 적용 후보는 <strong>조이스틱 명령 → 관절 속도</strong>의 특성곡선 식별이다. 짧은 현장 데이터로 데드밴드, 비대칭, 포화를 추정할 수 있다면 트윈 장부의 데드밴드 측정값과 유량 이득을 대조하는 출발점이 된다. 다만 조이스틱 명령과 실제 밸브 전류 사이의 관계도 함께 확인해야 한다.</p>
+
+            <div class="application">
+              <p class="mini-label">Hypothesis / 검증할 가설</p>
+              <h3>더 높은 분해능은 유리한 조건일 수 있다</h3>
+              <p>노트에 기재된 HR35 경사계 사양은 <strong>0.01°·20 Hz</strong>다. 각도 분해능은 논문의 회전 관절 센서 0.1°보다 세밀하지만, 이것만으로 더 좋은 식별 성능을 보장하지는 않는다. 실제 잡음, 시간 동기화, 센서 지연, 입력 범위와 부하 조건까지 비교해야 한다.</p>
+            </div>
+
+            <h3>같은 데이터로 비교하고, 확장은 분리해 검증한다</h3>
+            <p>노트는 기존의 여과 회귀 접근과 무필터 GP를 각속도 잡음 문제에 대한 두 후보로 제안한다. HR35의 축 G에서는 동일한 데이터와 검증 구간으로 비교하는 것이 판단에 도움이 된다. 어느 방법이 유리한지는 센서 조건과 실제 운전 데이터로 확인해야 한다.</p>
+            <p>단조성 검사는 트윈 밸브 맵의 검토 항목으로 활용할 수 있다. 다른 조건이 일정할 때 명령이 커지는데 유량이 감소하는 구간은 모델이나 자료를 점검할 신호다. 압력·부하가 바뀌는 자료에서는 그 영향을 분리해 해석해야 한다.</p>
+            <p>부하 의존성을 다루려면 압력 정보를 GP 입력에 추가하는 확장이 후보가 된다. 이는 노트가 축 B의 후속 과제로 제시한 방향이며, 이 논문의 검증 범위를 넘어서는 별도 설계·실험 과제다.</p>
+
+            <div class="application">
+              <p class="mini-label">Evaluation checklist / 후속 실험 점검표</p>
+              <ul class="checklist">
+                <li>명령·위치·시간 기록을 맞추고 실제 지연과 누락을 확인한다.</li>
+                <li>양방향 데드밴드와 포화를 포함한 입력 범위를 확보한다.</li>
+                <li>동일한 검증 자료로 여과 회귀와 무필터 GP를 비교한다.</li>
+                <li>밸브 맵의 단조성과 기존 데드밴드·유량 이득 값을 대조한다.</li>
+                <li>부하 조건을 나누어 평가한 뒤 압력 입력의 효과를 검증한다.</li>
+              </ul>
+            </div>
+          </section>
+
+          <section class="ending" aria-labelledby="ending-title">
+            <p class="mini-label">Takeaway / 독자가 가져갈 한 가지</p>
+            <h2 id="ending-title">현장 데이터의 거칠음도<br>모델 설계의 일부가 될 수 있다</h2>
+            <p>이 연구의 핵심은 <strong>잡음 모형, 입력 이력, 물리적 단조성</strong>을 함께 사용해 짧은 실차 데이터에서 제어에 쓸 수 있는 관계를 끌어냈다는 데 있다. 두 개의 GP가 특성곡선을 배우고, 신경망 역모델이 그 관계를 명령으로 바꾼다.</p>
+            <p>다음 장비에 적용할 때의 출발점도 분명하다. 같은 데이터에서 기존 방법과 비교하고, 검증된 입력·부하 범위를 명시하는 것. 그 과정을 거치면 이 접근은 현장 식별과 피드포워드 제어를 연결하는 실용적인 후보가 된다.</p>
+            <div class="share">
+              <p class="mini-label">공유용 한 문장 · 복사해 사용</p>
+              <blockquote>약 20분의 거친 위치 데이터로 유압 액추에이터의 비선형을 배운다. 두 개의 GP와 단조성 손실이 특성곡선 학습을 실차 피드포워드 제어로 연결한 연구.</blockquote>
+            </div>
+          </section>
+
+          <section class="section" id="sources" aria-labelledby="sources-title">
+            <div class="section-head">
+              <span class="section-number">08 / SOURCE NOTES</span>
+              <h2 id="sources-title">원문과 출처 안내</h2>
+            </div>
+            <div class="source-card">
+              <cite class="paper-title" lang="en">Nonlinear Model Learning for Compensation and Feedforward Control of Real-World Hydraulic Actuators Using Gaussian Processes</cite>
+              <p lang="en">Abdolreza Taheri, Pelle Gustafsson, Marcus Rösth, Reza Ghabcheloo, Joni Pajarinen</p>
+              <p>HIAB Control Systems R&amp;D · Tampere University · Aalto University</p>
+              <p><em>IEEE Robotics and Automation Letters</em>, 7(4), 9525–9532, 2022.</p>
+              <p><a>원문 보기 · DOI 10.1109/LRA.2022.3190808</a></p>
+            </div>
+            <ol class="source-notes">
+              <li>이 글은 제공된 Obsidian 논문 요약 노트를 바탕으로 구성한 한국어 해설이다. 수치와 실험 조건은 해당 노트에서 옮겼으며, 원문을 별도로 재검증한 보고서는 아니다.</li>
+              <li>그림 1–8과 표 1은 제공된 논문 이미지 자산이다. 그림 번호는 원문 기준을 유지하고, 설명은 한국어로 재구성했다. 원 논문의 라이선스는 제공된 서지정보 기준 <a>CC BY 4.0</a>이다.</li>
+              <li>검증 MSE 비율 약 1/7.2와 약 1/9.5는 제시된 표의 수치로 계산했다. 수식은 표기를 정리했으며, GP 예측 평균에는 평균 함수의 처리를 명시했다.</li>
+              <li>HR35 사양과 적용 제안은 노트 작성자의 맥락이다. 노트가 언급한 “ISARC 2002”와 “ETH 2026”은 구체적인 서지정보가 제공되지 않아, 이 글에서는 검증된 비교 근거로 사용하지 않았다.</li>
+              <li>본문의 강조 인용문과 공유용 문장은 이해를 돕기 위한 편집 문구이며, 논문 저자의 직접 인용이 아니다.</li>
+            </ol>
+            <div class="tags" aria-label="핵심 키워드">
+              <span class="tag">가우시안 프로세스</span>
+              <span class="tag">이중 GP</span>
+              <span class="tag">시스템 식별</span>
+              <span class="tag">자동 관련성 판정</span>
+              <span class="tag">데드밴드·비대칭·포화</span>
+              <span class="tag">단조성 손실</span>
+              <span class="tag">무필터 학습</span>
+              <span class="tag">개루프 피드포워드</span>
+            </div>
+          </section>
+        </article>
+      </div>
+    </main>
+
+    <footer class="page-footer">
+      <span>FIELDNOTES / 연구를 읽고, 적용의 조건을 기록합니다.</span>
+      <a class="back-top" href="#top">처음으로 ↑</a>
+    </footer>
+  </div>
+</body>
+</html>
