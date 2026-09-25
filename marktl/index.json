@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T11:56:50.796Z",
+  "updatedAt": "2026-09-25T12:01:17.431Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/zhao2020-soil-id/",
+      "excerpt": "A Novel Method of Soil Parameter Identification and Force Prediction for Automatic Excavation 요약 한줄 요약 1.7 t Sunward SWE17 굴착기에서 굴착을 관입 → 절삭 → 상차 3단계로 나누고, 관입 3초 동안의 저항력 최대값·평균값 을 퍼지 규칙표에 넣어 토양 경도 $k d$ 를 얻은 뒤 다항식으로 밀도·점착력·마찰각 4개를 뽑고, 절삭 단계",
+      "shortId": "2euf51",
+      "slug": "zhao2020-soil-id",
+      "sourcePath": "02_research/필드로봇/시스템식별/zhao2020-soil-id.md",
+      "tags": [
+        "논문요약",
+        "토양식별",
+        "굴착기",
+        "퍼지추정",
+        "FEE모델",
+        "접촉력예측"
+      ],
+      "title": "A Novel Method of Soil Parameter Identification and Force Prediction for Automatic Excavation - 요약",
+      "updatedAt": "2026-09-25T12:01:17.431Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/2euf51/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/anzcc2020-delay-review/",
