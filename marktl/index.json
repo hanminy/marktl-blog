@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T12:29:27.976Z",
+  "updatedAt": "2026-09-25T12:33:41.371Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/villaverde2016-strikegoldd/",
+      "excerpt": "Structural Identifiability of Dynamic Systems Biology Models 요약 한줄 요약 파라미터를 \"미분이 0 인 상태\" 로 붙여 구조적 식별가능성을 비선형 관측가능성의 확장 으로 푸는 방법과 MATLAB 도구 STRIKE GOLDD. 리 미분으로 확장 관측 행렬을 쌓아 계수를 검사하고, 계수가 모자라면 열을 하나씩 지워 어느 파라미터가 비식별인지, 영공간 으로 식별 가능한 조합이 무엇인지",
+      "shortId": "1p3vdj",
+      "slug": "villaverde2016-strikegoldd",
+      "sourcePath": "02_research/필드로봇/시스템식별/villaverde2016-strikegoldd.md",
+      "tags": [
+        "논문요약",
+        "구조적식별가능성",
+        "관측가능성",
+        "리미분",
+        "모델분해",
+        "STRIKE-GOLDD"
+      ],
+      "title": "Structural Identifiability of Dynamic Systems Biology Models - 요약",
+      "updatedAt": "2026-09-25T12:33:41.371Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/1p3vdj/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/villaverde2018-input-dependent/",
