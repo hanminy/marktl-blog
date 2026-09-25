@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-23T12:37:42.334Z",
+  "updatedAt": "2026-09-25T05:18:43.574Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/werner2025-calibrated/",
+      "excerpt": "Calibrated Dynamic Modeling for Force and Payload Estimation in Hydraulic Machinery 요약 양식: 옵시디언 paper summary 스킬(공개 게시 단계 제외) + B 과제 필수 추출표(§S). 그림은 스킬 Step 3 절차로 추출한 attachments/werner2025 calibrated/ . 수식은 arXiv v1 의 4 12쪽을 직접 렌더링해 확인했다(텍",
+      "shortId": "lm0m9n",
+      "slug": "werner2025-calibrated",
+      "sourcePath": "02_research/필드로봇/시스템식별/werner2025-calibrated.md",
+      "tags": [
+        "논문요약",
+        "시스템식별",
+        "굴착기",
+        "페이로드추정",
+        "묶음파라미터",
+        "ETH"
+      ],
+      "title": "Calibrated Dynamic Modeling for Force and Payload Estimation in Hydraulic Machinery - 요약",
+      "updatedAt": "2026-09-25T05:18:43.574Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/lm0m9n/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-anthropic-openai%EA%B0%80-%EB%A7%90%ED%95%98%EB%8A%94-ai-%EA%B0%9C%EB%B0%9C-%EC%86%8D%EB%8F%84%EB%A5%BC-%EB%8A%A6%EC%B6%B0%EC%95%BC-%ED%95%98%EB%8A%94-%EC%9D%B4%EC%9C%A0-%EC%9A%94%EC%95%BD/",

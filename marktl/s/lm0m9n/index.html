@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>굴착기는 압력만으로 무게를 얼마나 정확히 알 수 있을까? — 동역학 보정 연구 읽기</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      --paper: #f7f5ef;
+      --white: #fffefb;
+      --ink: #202d2c;
+      --muted: #61706b;
+      --line: #d9ddd3;
+      --green: #234e43;
+      --green-light: #e9efe8;
+      --orange: #a74727;
+      --orange-light: #f5e9dd;
+      --mono: ui-monospace, "SFMono-Regular", Consolas, monospace;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "Batang", Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-padding-top: 24px; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.85;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--green); text-underline-offset: 4px; text-decoration-thickness: 1px; }
+    a:hover { color: var(--orange); }
+    a:focus-visible { outline: 3px solid var(--orange); outline-offset: 5px; }
+    ::selection { color: var(--ink); background: #ead4ad; }
+    .skip { position: absolute; left: 16px; top: -100px; padding: 10px 16px; background: var(--white); z-index: 10; }
+    .skip:focus { top: 12px; }
+    .shell { width: min(1200px, calc(100% - 80px)); margin-inline: auto; }
+    .masthead {
+      display: flex; justify-content: space-between; align-items: center; gap: 20px;
+      padding-block: 24px; border-bottom: 1px solid var(--ink);
+      font-size: 12px; letter-spacing: .14em;
+    }
+    .brand { color: var(--ink); font-weight: 800; text-decoration: none; }
+    .edition { color: var(--muted); text-align: right; letter-spacing: .04em; }
+    .hero { padding-top: 66px; }
+    .eyebrow, .label {
+      display: block; color: var(--orange); font-size: 12px;
+      font-weight: 800; letter-spacing: .13em; line-height: 1.6;
+    }
+    h1, h2, h3, h4 { line-height: 1.35; overflow-wrap: break-word; }
+    h1 {
+      max-width: 1020px; margin: 22px 0 24px;
+      font-family: var(--serif); font-size: clamp(36px, 4.9vw, 66px);
+      font-weight: 700; letter-spacing: -.055em; line-height: 1.25;
+    }
+    .dek { max-width: 810px; font-size: clamp(18px, 2vw, 23px); line-height: 1.7; color: #52605b; margin: 0; letter-spacing: -.025em; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 28px; color: var(--muted); font-size: 13px; }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(250px, 1fr); gap: 28px; margin-block: 38px 50px; align-items: stretch; }
+    figure { margin: 30px 0; }
+    .image-frame { padding: 20px; background: white; border: 1px solid var(--line); border-radius: 3px; }
+    img { display: block; width: 100%; height: auto; object-fit: contain; }
+    figcaption { margin-top: 12px; color: var(--muted); font-size: 13px; line-height: 1.75; }
+    .fig-no { color: var(--orange); font-family: var(--mono); font-size: 11px; font-weight: bold; letter-spacing: .04em; }
+    .hero-figure { margin: 0; display: flex; flex-direction: column; }
+    .hero-figure .image-frame { flex: 1; display: grid; place-items: center; padding: 25px; }
+    .thesis-card { background: var(--green); color: #f6f5eb; padding: 32px; display: flex; flex-direction: column; justify-content: space-between; border-radius: 3px; }
+    .thesis-card .label { color: #dfc692; }
+    .thesis-card p { font-size: 22px; line-height: 1.7; letter-spacing: -.035em; }
+    .thesis-card small { color: #cfdbd1; font-size: 12px; line-height: 1.8; }
+    .article-grid { display: grid; grid-template-columns: 190px minmax(0, 850px); justify-content: space-between; gap: 50px; align-items: start; }
+    .rail { position: sticky; top: 25px; padding-top: 9px; }
+    .rail-title { margin: 0 0 14px; font-size: 11px; letter-spacing: .15em; color: var(--muted); }
+    .rail ol { list-style: none; padding: 0; margin: 0; }
+    .rail li { border-top: 1px solid var(--line); }
+    .rail a { display: block; padding: 10px 0; color: var(--muted); font-size: 13px; text-decoration: none; }
+    .rail a:hover { color: var(--orange); }
+    .rail .n { font-family: var(--mono); color: var(--orange); margin-right: 9px; font-size: 11px; }
+    .rail-note { margin-top: 22px; color: var(--muted); font-size: 12px; line-height: 1.8; }
+    .content { min-width: 0; }
+    .section { padding-block: 48px 16px; border-top: 1px solid var(--line); margin-top: 34px; }
+    .section:first-child { border-top: none; margin-top: 0; padding-top: 0; }
+    .section-number { display: inline-block; font-family: var(--mono); font-size: 12px; color: var(--orange); letter-spacing: .12em; margin-bottom: 10px; }
+    h2 { font-size: clamp(27px, 3vw, 36px); letter-spacing: -.045em; margin: 0 0 25px; font-weight: 750; }
+    h3 { margin: 35px 0 13px; font-size: 22px; letter-spacing: -.035em; }
+    h4 { margin: 24px 0 10px; font-size: 17px; }
+    p { margin: 0 0 19px; }
+    strong { font-weight: 750; }
+    .abstract { font-size: 18px; line-height: 1.95; }
+    .abstract .label { margin-bottom: 13px; }
+    .findings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 30px 0; }
+    .finding { padding: 22px 20px; background: var(--white); border-top: 3px solid var(--green); }
+    .finding .stat { font-family: Georgia, var(--serif); font-size: 43px; letter-spacing: -.035em; line-height: 1.2; margin: 7px 0 14px; color: var(--green); }
+    .finding .stat small { font: 15px var(--sans); }
+    .finding h3 { margin: 0 0 8px; font-size: 15px; }
+    .finding p { color: var(--muted); font-size: 13px; line-height: 1.75; margin: 0; }
+    .note { padding: 22px 25px; margin: 26px 0; background: var(--green-light); border-left: 3px solid var(--green); font-size: 15px; }
+    .note.warning { background: var(--orange-light); border-left-color: var(--orange); }
+    .note p:last-child { margin-bottom: 0; }
+    .note-title { display: block; margin-bottom: 8px; font-weight: 800; font-size: 14px; }
+    .pullquote { margin: 38px 0; padding: 26px 0 26px 26px; border-left: 3px solid var(--orange); font-family: var(--serif); font-size: clamp(23px, 2.5vw, 29px); line-height: 1.65; letter-spacing: -.035em; }
+    .pullquote p { margin: 0; }
+    .pullquote footer { font-family: var(--sans); font-size: 12px; color: var(--muted); margin-top: 14px; letter-spacing: 0; }
+    .table-wrap { overflow-x: auto; margin: 24px 0; border: 1px solid var(--line); background: var(--white); border-radius: 3px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.75; }
+    caption { text-align: left; padding: 15px 18px; font-size: 13px; font-weight: 750; color: var(--green); background: #eef1e9; border-bottom: 1px solid var(--line); }
+    th, td { padding: 14px 17px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+    thead th { color: var(--green); font-size: 12px; background: #f0f2ec; white-space: nowrap; }
+    tbody th { font-weight: 700; width: 23%; }
+    tbody tr:last-child > * { border-bottom: none; }
+    .wide-table { min-width: 660px; }
+    .source { font-size: 12px; color: var(--muted); line-height: 1.8; }
+    .equation {
+      padding: 17px 20px; margin: 20px 0; border: 1px solid var(--line);
+      background: var(--white); overflow-x: auto; border-radius: 3px;
+    }
+    .eq-line { display: flex; justify-content: space-between; align-items: baseline; gap: 25px; min-width: max-content; }
+    .math { font-family: "Cambria Math", "STIX Two Math", Georgia, var(--serif); font-size: 18px; line-height: 2; }
+    .math sub, .math sup { font-size: .72em; }
+    .eq-no { font-family: var(--mono); font-size: 11px; color: var(--muted); white-space: nowrap; }
+    .equation .source { margin: 8px 0 0; }
+    .equation-stack .eq-line + .eq-line { margin-top: 10px; padding-top: 10px; border-top: 1px solid #ebede6; }
+    .flow { margin: 28px 0; padding: 24px; background: #eaf0e9; border: 1px solid #d3ded1; border-radius: 3px; }
+    .flow-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .flow-box { background: var(--white); border: 1px solid #d2dbcd; padding: 17px; font-size: 14px; line-height: 1.7; }
+    .flow-box strong { display: block; margin-bottom: 5px; color: var(--green); }
+    .flow-box small { color: var(--muted); font-size: 12px; }
+    .flow-arrow { text-align: center; padding-block: 7px; color: var(--green); font-size: 23px; }
+    .flow-core { background: var(--green); color: white; text-align: center; padding: 18px; font-size: 16px; }
+    .flow-core small { display: block; margin-top: 4px; color: #d4ded3; font-size: 12px; }
+    .flow figcaption { margin-bottom: 0; }
+    .steps { list-style: none; padding: 0; margin: 30px 0; counter-reset: step; }
+    .steps li { position: relative; padding: 0 0 29px 53px; border-left: 1px solid var(--line); margin-left: 17px; counter-increment: step; }
+    .steps li:last-child { padding-bottom: 0; border-left-color: transparent; }
+    .steps li::before {
+      content: counter(step, decimal-leading-zero); position: absolute; top: 0; left: -18px;
+      width: 35px; height: 35px; display: grid; place-items: center;
+      border-radius: 50%; background: var(--green); color: white;
+      font-family: var(--mono); font-size: 12px;
+    }
+    .steps h3 { margin: 0 0 9px; font-size: 20px; }
+    .steps p { margin: 0; font-size: 15px; }
+    .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin: 28px 0; }
+    .pair figure { margin: 0; }
+    .pair .image-frame { padding: 12px; }
+    ul, ol { padding-left: 1.4em; }
+    li { margin-block: 8px; }
+    .compact { font-size: 15px; }
+    .implication { display: grid; grid-template-columns: 40px 1fr; gap: 16px; border-top: 1px solid var(--line); padding: 23px 0; }
+    .implication .index { color: var(--orange); font-family: var(--mono); font-size: 13px; padding-top: 3px; }
+    .implication h3 { margin: 0 0 10px; font-size: 20px; }
+    .implication p { margin: 0; font-size: 15px; }
+    .checklist { list-style: none; padding: 0; }
+    .checklist li { position: relative; padding-left: 26px; font-size: 15px; }
+    .checklist li::before { content: "□"; position: absolute; left: 0; color: var(--green); }
+    .ending { background: var(--green); color: #fbfaf1; margin-top: 42px; padding: 34px; border-radius: 3px; }
+    .ending .label { color: #dfc692; }
+    .ending h2 { margin-top: 14px; font-size: 30px; }
+    .ending p { font-size: 17px; color: #e4e9df; }
+    .ending p:last-child { margin: 0; }
+    .share { margin-top: 28px; padding: 22px 25px; border: 1px dashed #a9b3a6; }
+    .share p { margin: 8px 0 0; font-size: 16px; }
+    .appendix { font-size: 15px; }
+    .appendix h2 { font-size: 30px; }
+    .appendix .math { font-size: 16px; }
+    .bibliography { list-style: none; padding: 0; }
+    .bibliography li { padding: 20px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+    .bibliography .entry { font-weight: 750; display: block; margin-bottom: 5px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0; }
+    .tag { border: 1px solid var(--line); padding: 4px 10px; color: var(--muted); font-size: 11px; letter-spacing: .01em; border-radius: 2px; }
+    .footer { margin-top: 60px; padding-block: 25px 40px; border-top: 1px solid var(--ink); display: flex; justify-content: space-between; gap: 20px; font-size: 12px; color: var(--muted); }
+    @media (max-width: 1000px) {
+      .shell { width: min(880px, calc(100% - 48px)); }
+      .article-grid { grid-template-columns: 1fr; gap: 30px; }
+      .rail { position: static; border-bottom: 1px solid var(--line); padding-bottom: 20px; }
+      .rail ol { display: flex; flex-wrap: wrap; gap: 0 20px; }
+      .rail li { border: 0; }
+      .rail a { padding-block: 5px; }
+      .rail-note { display: none; }
+      .hero-grid { grid-template-columns: 1.4fr 1fr; }
+      .thesis-card { padding: 24px; }
+      .thesis-card p { font-size: 19px; }
+    }
+    @media (max-width: 620px) {
+      body { font-size: 16px; }
+      .shell { width: calc(100% - 36px); }
+      .masthead { padding-block: 18px; font-size: 10px; letter-spacing: .08em; }
+      .edition { max-width: 130px; font-size: 10px; }
+      .hero { padding-top: 38px; }
+      h1 { font-size: 37px; }
+      .hero-grid, .pair { grid-template-columns: 1fr; }
+      .hero-grid { margin-bottom: 34px; gap: 22px; }
+      .hero-figure .image-frame { padding: 12px; }
+      .thesis-card p { font-size: 22px; margin-top: 14px; }
+      .findings { grid-template-columns: 1fr; gap: 10px; }
+      .finding { display: grid; grid-template-columns: 95px 1fr; column-gap: 18px; padding: 19px; }
+      .finding .stat { grid-row: span 2; margin: 0; font-size: 35px; }
+      .finding h3 { align-self: end; }
+      .flow { padding: 16px; }
+      .flow-grid { grid-template-columns: 1fr; }
+      .flow-box { padding: 14px; }
+      .section { padding-top: 34px; margin-top: 26px; }
+      h2 { font-size: 28px; }
+      .abstract { font-size: 17px; }
+      .note { padding: 19px; }
+      .image-frame { padding: 12px; }
+      .ending { padding: 25px; }
+      .ending h2 { font-size: 27px; }
+      .steps li { padding-left: 36px; }
+      th, td { padding: 12px; }
+      .footer { flex-direction: column; gap: 8px; }
+    }
+    @media print {
+      body { background: white; color: black; font-size: 10.5pt; }
+      .shell { width: 100%; }
+      .rail, .skip { display: none; }
+      .article-grid { display: block; }
+      .hero { padding-top: 20px; }
+      h1 { font-size: 30pt; }
+      h2 { font-size: 20pt; }
+      .section { padding-top: 24px; }
+      .table-wrap, .equation { overflow: visible; }
+      .eq-line { min-width: 0; flex-wrap: wrap; }
+      .wide-table { min-width: 0; }
+      figure, .finding, .note, .implication { break-inside: avoid; }
+      a { color: inherit; }
+      .thesis-card, .ending, .flow-core { background: #edf0e9; color: black; }
+      .thesis-card small, .ending p, .flow-core small { color: #333; }
+      .footer { margin-top: 25px; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Calibrated Dynamic Modeling for Force and Payload Estimation in Hydraulic Machinery - 요약">
+<meta property="og:description" content="Calibrated Dynamic Modeling for Force and Payload Estimation in Hydraulic Machinery 요약 양식: 옵시디언 paper summary 스킬(공개 게시 단계 제외) + B 과제 필수 추출표(§S). 그림은 스킬 Step 3 절차로 추출한 attachments/werner2025 calibrated/ . 수식은 arXiv v1 의 4 12쪽을 직접 렌더링해 확인했다(텍">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/lm0m9n/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/lm0m9n/assets/figure1.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Calibrated Dynamic Modeling for Force and Payload Estimation in Hydraulic Machinery - 요약">
+<meta name="twitter:description" content="Calibrated Dynamic Modeling for Force and Payload Estimation in Hydraulic Machinery 요약 양식: 옵시디언 paper summary 스킬(공개 게시 단계 제외) + B 과제 필수 추출표(§S). 그림은 스킬 Step 3 절차로 추출한 attachments/werner2025 calibrated/ . 수식은 arXiv v1 의 4 12쪽을 직접 렌더링해 확인했다(텍">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/lm0m9n/assets/figure1.png">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/werner2025-calibrated/">
+</head>
+<body>
+  <a class="skip" href="#article">본문으로 건너뛰기</a>
+
+  <header class="masthead shell">
+    <a class="brand" href="#top">FIELD NOTES / ROBOTICS</a>
+    <span class="edition">RESEARCH REPORT · 유압 기계의 시스템 식별</span>
+  </header>
+
+  <main id="top" class="shell">
+    <article id="article" aria-labelledby="article-title">
+      <header class="hero">
+        <span class="eyebrow">DYNAMICS &amp; ESTIMATION · 논문 해설</span>
+        <h1 id="article-title">굴착기는 압력만으로<br>무게를 얼마나 정확히 알 수 있을까?</h1>
+        <p class="dek">답은 압력에 자세와 움직임을 더하는 데 있다. 링크의 질량과 관성을 따로 몰라도, 단계별 보정으로 페이로드와 말단힘을 읽어내는 연구를 살펴본다.</p>
+        <div class="meta">
+          <span>대상 연구 · Werner 외, 2025</span>
+          <span>ETH Zürich Robotic Systems Lab · Hexagon AB</span>
+          <span>주제 · 굴착기 동역학 · 묶음 파라미터</span>
+        </div>
+
+        <div class="hero-grid">
+          <figure class="hero-figure">
+            <div class="image-frame">
+              <img src="assets/figure1.png" alt="25톤급 CASE250 굴착기와 붐·스틱·버킷 관절각, 토크 및 외력의 명명 규약">
+            </div>
+            <figcaption><span class="fig-no">FIG. 1</span> 평가에 사용한 CASE250. 압력에서 얻는 관절 토크와 팔의 자세를 연결하는 것이 출발점이다.</figcaption>
+          </figure>
+          <aside class="thesis-card" aria-label="연구의 핵심 관점">
+            <span class="label">THE CENTRAL IDEA</span>
+            <p>빈 버킷을 움직이는 데 필요한 토크를 알면,<br><strong>남는 토크에서 하중을 읽을 수 있다.</strong></p>
+            <small>단, 잔차에는 외력뿐 아니라 모델 오차도 남는다. 보정의 품질과 적용 조건이 추정의 정확도를 결정한다.</small>
+          </aside>
+        </div>
+      </header>
+
+      <div class="article-grid">
+        <nav class="rail" aria-label="목차">
+          <p class="rail-title">IN THIS REPORT</p>
+          <ol>
+            <li><a href="#abstract"><span class="n">00</span>초록과 핵심 발견</a></li>
+            <li><a href="#problem"><span class="n">01</span>무엇을 풀었나</a></li>
+            <li><a href="#model"><span class="n">02</span>압력에서 동역학으로</a></li>
+            <li><a href="#calibration"><span class="n">03</span>30분 보정의 순서</a></li>
+            <li><a href="#estimation"><span class="n">04</span>힘과 무게를 읽는 법</a></li>
+            <li><a href="#evidence"><span class="n">05</span>실험이 보여준 것</a></li>
+            <li><a href="#limits"><span class="n">06</span>결과의 경계</a></li>
+            <li><a href="#implications"><span class="n">07</span>HR35 적용 시사점</a></li>
+            <li><a href="#appendix"><span class="n">A</span>수식·식별 기록</a></li>
+            <li><a href="#sources"><span class="n">B</span>출처와 검산 노트</a></li>
+          </ol>
+          <p class="rail-note">논문 보고값, 요약 노트의 검산, 적용을 위한 해석을 구분해 읽는다. 쪽·식·그림 번호는 제공 노트가 지정한 arXiv v1 기준이다.</p>
+        </nav>
+
+        <div class="content">
+          <section id="abstract" class="section">
+            <div class="abstract">
+              <span class="label">ABSTRACT</span>
+              <p>굴착기에 힘 센서를 추가하지 않고도 버킷의 하중을 추정할 수 있을까? 이 연구는 <strong>링크 IMU의 관절각·각속도와 붐·스틱 실린더 압력</strong>으로 무부하 동역학 모델을 보정한다. 링크별 질량·무게중심·관성을 따로 복원하는 대신, 토크 예측에 필요한 조합인 <strong>묶음 파라미터</strong>를 식별한다.</p>
+              <p>핵심은 보정 순서다. 실린더 면적을 구한 뒤 관성, 마찰, 중력을 차례로 분리한다. 이렇게 예측한 무부하 토크와 측정 토크의 차이를 이용해 평면 내 말단힘과 버킷 페이로드를 추정한다. 두 실제 굴착기의 평가에서 페이로드 산포는 <strong>3σ 기준 정격 하중의 약 1%</strong>로 보고됐다. 다만 정지 마찰, 가속도 잡음, 일부 단순화와 검증 정보의 공백은 남아 있다.</p>
+            </div>
+
+            <div class="findings" aria-label="핵심 발견 세 가지">
+              <div class="finding">
+                <div class="stat">30<small> min</small></div>
+                <h3>분해 없는 보정</h3>
+                <p>관절당 3세트, 전체 기계 보정 시간 30분 이내로 보고.</p>
+              </div>
+              <div class="finding">
+                <div class="stat">≈1<small>%</small></div>
+                <h3>정격 대비 페이로드 3σ</h3>
+                <p>측정값 대비 오차율이나 모든 측정의 최대 오차를 뜻하지 않는다.</p>
+              </div>
+              <div class="finding">
+                <div class="stat">13<small>°</small></div>
+                <h3>말단힘 방향 오차</h3>
+                <p>매단 추를 이용한 평가의 보고값. 크기 지표에는 확인할 불일치가 있다.</p>
+              </div>
+            </div>
+
+            <aside class="note warning">
+              <span class="note-title">이 글의 근거와 판본</span>
+              <p>제공된 논문 요약·검산 노트를 바탕으로 재구성했다. 저널 확정판과 원자료는 이 글에서 대조하지 않았다. 노트의 작성·확인일과 arXiv 제출일 표기에 선후관계 충돌이 있어 <a href="#version-note">출처 노트</a>에 따로 기록했다.</p>
+            </aside>
+          </section>
+
+          <section id="problem" class="section">
+            <span class="section-number">01 / THE PROBLEM</span>
+            <h2>힘 센서는 없고,<br>링크 물성도 모른다면</h2>
+            <p>굴착과 정지(整地, grading) 작업에서 버킷과 토양 사이의 힘을 알면 힘 제어와 지하 장애물 대응에 도움이 된다. 그러나 중장비에는 이를 직접 측정할 힘 센서가 없는 경우가 많다. 동역학으로 힘을 계산하려 해도 링크의 질량과 관성을 알아야 한다. 실차를 분해해 측정하기는 어렵고, 제조사 자료도 충분하지 않다.</p>
+            <p>Werner 등의 연구는 이 문제를 <strong>기존 기계에 센서를 덧붙여 보정하는 절차</strong>로 접근한다. 압력을 관절 토크로 바꾸고, 기계 자체를 움직이는 토크를 모델링한다. 목표는 물성의 완전한 복원이 아니라 힘·하중 추정에 쓸 수 있는 토크 예측이다.</p>
+
+            <div class="table-wrap">
+              <table>
+                <caption>기존 접근과 이 연구의 출발점 · 논문 p.3–4의 비교를 요약</caption>
+                <thead><tr><th scope="col">접근</th><th scope="col">노트에 정리된 제약</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">정적 토크 경험식</th><td>관성과 동적 토크를 무시해 사용할 수 있는 동작이 제한된다. Silvy-Leligois &amp; Giroud, Bennett 계열.</td></tr>
+                  <tr><th scope="row">선형회귀 페이로드 추정</th><td>링크 질량·관성에 대한 사전지식이 필요하다. Renner 외, 2020.</td></tr>
+                  <tr><th scope="row">유압 포함 EKF</th><td>1축 적용에 한정되거나 유압 구성에 대한 사전지식이 필요하다. Pyrhönen, Khadim 계열.</td></tr>
+                  <tr><th scope="row">기존 묶음 파라미터 접근</th><td>두 관절의 토크 차를 사용하지만 힘 벡터 추정은 지원하지 않는다. Ferlibas &amp; Ghabcheloo, 2021.</td></tr>
+                  <tr><th scope="row">데이터 기반 힘 추정</th><td>학습용 실측 힘이 필요하며, 새로운 조건에 대한 일반화가 중요하다.</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>저자들이 제안하는 기여는 세 가지다. 동적 동작과 선회를 포함하는 무부하 토크 모델, 분해 없는 보정 절차, 그리고 이를 이용한 가벼운 힘·페이로드 추정기다. 다만 폭넓은 운전 조건을 목표로 한다는 주장과 실제로 검증된 범위는 구분해야 한다.</p>
+
+            <blockquote class="pullquote">
+              <p>개별 질량을 알아내는 대신,<br>토크를 설명하는 조합을 알아낸다.</p>
+              <footer>묶음 파라미터 식별의 의미를 풀어쓴 해설</footer>
+            </blockquote>
+          </section>
+
+          <section id="model" class="section">
+            <span class="section-number">02 / THE MODEL</span>
+            <h2>압력에서 토크로,<br>토크에서 기계의 움직임으로</h2>
+            <p>입력은 두 갈래다. 챔버 압력은 실린더 힘과 관절 토크로 변환한다. 링크 IMU의 관절각·각속도는 기구학과 동역학 모델에 넣는다. 밸브·유량·펌프를 따로 모델링하지 않는 이유는 실린더 챔버 압력을 직접 측정하기 때문이다.</p>
+
+            <figure class="flow" aria-labelledby="flow-caption">
+              <div class="flow-grid">
+                <div class="flow-box">
+                  <strong>측정 경로</strong>
+                  챔버 압력 p₁, p₂ → 실린더 힘 F<br>
+                  관절 기하 → 지렛대 η(Θ)<br>
+                  <small>두 값을 결합해 측정 토크 τ<sub>m</sub> 계산</small>
+                </div>
+                <div class="flow-box">
+                  <strong>예측 경로</strong>
+                  IMU 관절각·각속도 → 가속도 추정<br>
+                  관성 + 마찰 + 중력 + 선회 원심항<br>
+                  <small>보정된 무부하 토크 모델</small>
+                </div>
+              </div>
+              <div class="flow-arrow" aria-hidden="true">↓</div>
+              <div class="flow-core">
+                두 토크의 차이 Δτ
+                <small>외력의 효과와 잔여 모델 오차가 함께 들어 있다.</small>
+              </div>
+              <div class="flow-arrow" aria-hidden="true">↓</div>
+              <div class="flow-grid">
+                <div class="flow-box"><strong>2차원 말단힘</strong>붐·스틱 잔차 + 자코비안<br><small>매 스텝 대수 계산 · 빈 버킷 가정</small></div>
+                <div class="flow-box"><strong>페이로드 질량</strong>붐 잔차 + 동작 전체의 하중 모델<br><small>질량 1개를 최적화 · 상승/하강 궤적 사용</small></div>
+              </div>
+              <figcaption id="flow-caption">제공 노트의 아키텍처를 재구성한 개념도. 원문의 힘 부호 규약은 식 (23)을 따른다.</figcaption>
+            </figure>
+
+            <h3>압력 → 실린더 힘 → 관절 토크</h3>
+            <div class="equation equation-stack" aria-label="압력과 기하를 이용한 토크 계산식">
+              <div class="eq-line"><span class="math">F = A<sub>p</sub>p₁ − (A<sub>p</sub> − A<sub>r</sub>)p₂</span><span class="eq-no">(1)</span></div>
+              <div class="eq-line"><span class="math">b = √[a² + c² − 2ac cos(Θ<sub>boom</sub> + φ₁ + φ₂)]</span><span class="eq-no">(2)</span></div>
+              <div class="eq-line"><span class="math">η = ∂b/∂Θ<sub>boom</sub> = ac sin(β + φ₁ + φ₂) / √[a² − 2ac cos(β + φ₁ + φ₂) + c²]</span><span class="eq-no">(3)</span></div>
+              <div class="eq-line"><span class="math">τ = ηF</span><span class="eq-no">(4)</span></div>
+            </div>
+            <p class="compact">A<sub>p</sub>는 플런저 면적, A<sub>r</sub>은 로드 단면적이다. a와 c는 관절축에서 실린더 양 핀까지의 거리, b는 핀 간 길이, φ₁·φ₂는 고정 기하각이다. 압력은 Pa, 면적은 m², 길이와 지렛대 η는 m 단위다.</p>
+
+            <figure>
+              <div class="image-frame"><img src="assets/figure2.png" loading="lazy" alt="붐 관절축과 실린더 양 핀의 거리 및 각도로 정의한 실린더-링크 기하"></div>
+              <figcaption><span class="fig-no">FIG. 2</span> 힘을 토크로 바꾸는 지렛대는 고정 상수가 아니라 자세에 따라 변한다. 가상일 관계 τ dΘ = F db에서 η = ∂b/∂Θ를 얻는다.</figcaption>
+            </figure>
+            <p class="source">표기 주의: 노트에 전사된 식 (2)는 Θ<sub>boom</sub>, 식 (3)은 β를 사용한다. 미분 형태는 맞지만 두 각의 대응은 저널판에서 확인할 항목으로 남겨둔다.</p>
+
+            <h3>무부하 모델의 네 성분</h3>
+            <div class="equation">
+              <div class="eq-line"><span class="math">τ<sub>m</sub> = I(Θ)Θ̈ + τ<sub>fric</sub> + τ<sub>g</sub>(Θ) + h(Θ, Θ̇) + J(Θ)<sup>T</sup>f<sub>ext</sub></span><span class="eq-no">(5)</span></div>
+              <p class="source">관성 + 마찰 + 중력 + 원심 + 외력. 마찰은 아래 식 (20)처럼 측정 토크와 운동 방향에 의존하는 형태로 보정한다.</p>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <caption>모델을 구성하는 묶음 파라미터</caption>
+                <thead><tr><th scope="col">성분</th><th scope="col">모델과 해석</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">중력 · 6 + 4개</th><td>붐은 6개, 스틱은 4개의 sin/cos 계수로 표현한다. 질량과 무게중심을 각각 구하는 대신 이들의 곱과 링크 간 조합을 식별한다.</td></tr>
+                  <tr><th scope="row">관성 · 5 + 3개</th><td>붐 5개, 스틱 3개의 계수. 자체 관성과 평행축 정리의 효과를 상수항·자세 의존항으로 묶는다.</td></tr>
+                  <tr><th scope="row">마찰 · 8개</th><td>관절별 상승·하강에 각각 기울기와 절편을 둔다. 속도 크기보다 측정 토크와의 선형 관계를 사용한다.</td></tr>
+                  <tr><th scope="row">선회 · 스케일 1개</th><td>중력 계수의 sin/cos 배치를 바꾸고 캐빈 선회 각속도의 제곱과 π<sub>c</sub>를 곱하는 근사다.</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="equation">
+              <div class="eq-line"><span class="math">τ<sub>f,i</sub> = π<sub>f,i,1</sub>τ<sub>m,i</sub> + π<sub>f,i,2</sub></span><span class="eq-no">(20)</span></div>
+              <p class="source">상승·하강에 서로 다른 계수를 적용한다. 압력이 커질수록 패킹 압착과 유압 마찰이 커진다는 관찰에 기초한다.</p>
+            </div>
+            <p>“묶음”은 단순한 계산 편의가 아니다. 준정적 데이터에서는 질량과 무게중심을 분리할 수 없다. 예를 들어 붐의 중력 계수에는 붐 자체의 질량·무게중심뿐 아니라 뒤에 연결된 스틱과 버킷의 질량도 섞인다. <strong>좋은 토크 예측이 곧 개별 물성의 식별을 뜻하지는 않는다.</strong></p>
+
+            <aside class="note">
+              <span class="note-title">모델이 사용하는 범위</span>
+              <p>붐 회전축을 원점으로 하고 중력에 정렬한 평면 좌표계를 사용한다. 버킷 각도는 모델에 들어가지만 <strong>버킷 관절 토크는 사용하지 않는다.</strong> 붐·스틱·버킷 운동에 따른 코리올리 항은 무시하고 캐빈 선회 원심항만 근사한다. 코리올리 생략의 근거는 0.7 m/s 굴착 시뮬레이션에서 중력보다 두 자릿수 이상 작았다는 관찰이다.</p>
+            </aside>
+          </section>
+
+          <section id="calibration" class="section">
+            <span class="section-number">03 / CALIBRATION</span>
+            <h2>한꺼번에 맞추지 않고,<br>분리할 수 있는 순서로 보정한다</h2>
+            <p>이 연구의 실용적인 기여는 보정의 순서에 있다. 서로 섞인 토크 성분을 한 번에 풀기보다, 특정 성분이 잘 드러나는 움직임을 만든다. 시작 전에 링크 길이, 실린더 연결 기하와 로드 지름을 실측해야 한다.</p>
+
+            <figure>
+              <div class="image-frame"><img src="assets/figure6.png" loading="lazy" alt="기구학, 관성, 마찰, 중력을 순서대로 보정한 뒤 측정에 사용하는 절차"></div>
+              <figcaption><span class="fig-no">FIG. 6</span> 보정의 흐름. 관성은 흔들림·가속에서, 마찰은 같은 자세의 상승·하강 차이에서, 중력은 넓은 자세 범위에서 식별한다.</figcaption>
+            </figure>
+
+            <ol class="steps">
+              <li>
+                <h3>실린더 면적 — 알려진 추로 압력의 스케일을 정한다</h3>
+                <p>다른 관절을 고정한 채 추를 달았을 때와 달지 않았을 때의 준정적 왕복을 기록한다. 겹치는 자세 구간에서 팔 자체의 토크를 상쇄하면 플런저 면적을 역산할 수 있다. 평균 면적을 규격표와 비교해 실린더 형식을 고른다.</p>
+              </li>
+              <li>
+                <h3>관성 — 흔들림을 방해가 아닌 자극으로 쓴다</h3>
+                <p>자세를 바꾸며 약 10회 왕복하고 급가속·차체 흔들림을 유도한다. 관성 토크를 뺀 잔차의 0.5–3 Hz 대역 성분을 줄이도록 계수를 맞춘다. 가속 신호와 차체 고유진동수가 겹쳐 단순 저역통과로는 분리하기 어렵다는 점을 활용한다.</p>
+              </li>
+              <li>
+                <h3>마찰 — 같은 자세에서 올라갈 때와 내려갈 때를 비교한다</h3>
+                <p>완전히 접은 상태부터 펼친 상태까지 네 자세를 사용한다. 상승·하강 토크 궤적에 2차 곡선을 맞춘 뒤, 두 곡선의 차이에서 마찰을 추출하고 측정 토크에 대해 선형 적합한다.</p>
+              </li>
+              <li>
+                <h3>중력 — 남은 자세 의존 토크를 맞춘다</h3>
+                <p>작업영역 전반에서 흔들림이 작은 왕복 데이터를 수집한다. 앞에서 식별한 관성과 마찰을 반영한 뒤, 중력 묶음 파라미터를 최소제곱으로 구한다.</p>
+              </li>
+            </ol>
+
+            <figure>
+              <div class="image-frame"><img src="assets/figure7.png" loading="lazy" alt="추 유무에 따른 M545 붐 플런저측 압력과 관절각의 관계"></div>
+              <figcaption><span class="fig-no">FIG. 7</span> M545 붐의 추 유무 비교. 겹치는 −0.75~−0.57 rad 구간의 평균 압력 차 5.48 MPa를 면적 식별에 활용한다. 이 수치만으로 면적을 재계산하려면 추의 질량·거리와 로드 면적이 추가로 필요하다.</figcaption>
+            </figure>
+
+            <figure>
+              <div class="image-frame"><img src="assets/figure8.png" loading="lazy" alt="관성 보정 전후 토크의 주파수 특성을 비교하여 0.5~3 Hz 대역의 진동 봉우리 감소를 보여주는 그림"></div>
+              <figcaption><span class="fig-no">FIG. 8</span> 관성 보정 후 관심 대역의 흔들림 성분이 줄어든다. 제공된 추출 이미지에는 주변 본문이 포함될 수 있으며, 원본 범위를 유지했다.</figcaption>
+            </figure>
+
+            <div class="pair">
+              <figure>
+                <div class="image-frame"><img src="assets/figure9.png" loading="lazy" alt="세 자세에서 상승과 하강 토크 궤적 및 각 궤적에 대한 2차 곡선 적합"></div>
+                <figcaption><span class="fig-no">FIG. 9</span> 같은 자세의 상승·하강 토크 차이를 이용한다. 평가된 속도 범위에서는 속도가 달라도 궤적 차이가 작게 관찰됐다.</figcaption>
+              </figure>
+              <figure>
+                <div class="image-frame"><img src="assets/figure10.png" loading="lazy" alt="측정 토크에 따른 마찰 토크와 상승·하강별 선형 적합"></div>
+                <figcaption><span class="fig-no">FIG. 10</span> 측정 토크가 커질수록 마찰도 커지는 관계. 상승과 하강의 계수는 각각 식별한다.</figcaption>
+              </figure>
+            </div>
+
+            <p>전체 기계 보정 시간은 30분 이내로 보고된다. 이 숫자와 함께 볼 것은 <strong>자극의 구성</strong>이다. 알려진 추, 자세를 바꾸는 움직임, 충분한 관성 자극, 반복 가능한 상승·하강 궤적이 있어야 각 성분을 분리할 수 있다.</p>
+          </section>
+
+          <section id="estimation" class="section">
+            <span class="section-number">04 / ESTIMATION</span>
+            <h2>같은 잔차에서,<br>힘과 무게를 다르게 읽는다</h2>
+
+            <h3>말단힘은 순간별로 계산한다</h3>
+            <p>빈 버킷을 가정하면 붐·스틱의 토크 잔차 두 개로 평면 내 힘 벡터를 계산한다. 날 끝 위치를 붐·스틱 관절각으로 미분한 2×2 자코비안 J를 사용한다.</p>
+            <div class="equation">
+              <div class="eq-line"><span class="math">f<sub>ext</sub> = −J(Θ)<sup>−T</sup>[Δτ<sub>boom</sub>, Δτ<sub>stick</sub>]<sup>T</sup></span><span class="eq-no">(23)</span></div>
+            </div>
+            <p>매 스텝 대수 계산이므로 반복 최적화는 필요 없다. 다만 역행렬을 쓰는 구조상 J가 가역이어야 한다. <span class="source">이는 수식에서 따라오는 구현 조건이며, 특이 자세의 처리 방식은 제공 노트에서 확인되지 않는다.</span></p>
+
+            <h3>페이로드는 동작 전체에서 맞춘다</h3>
+            <p>페이로드는 붐 토크만 사용한다. 한 번의 상승·하강 동작에서 얻은 수백 샘플을 모아, 질량 m<sub>pl</sub> 하나를 Nelder–Mead로 최적화한다. 하중 모델에는 중력, 선회 원심력, 붐 가속에 의한 관성을 넣는다.</p>
+            <div class="equation">
+              <div class="eq-line"><span class="math">min<sub>m_pl</sub> ‖Δτ<sub>boom</sub> − τ<sub>pl,boom</sub>(Θ, Θ̇, Θ̈, m<sub>pl</sub>)‖</span><span class="eq-no">(24)</span></div>
+            </div>
+            <p>임베디드 환경에서 보고된 최적화 시간은 평균 0.4초, 최대 1.4초다. 약 30초의 굴착 사이클에 비하면 짧지만, 매 샘플 산출하는 힘 추정과는 시간 단위가 다르다. 또한 <strong>정지 상태는 스틱션 때문에 사용하지 않는다.</strong> 붐이 움직여야 이 마찰 모델을 적용할 수 있다.</p>
+
+            <figure>
+              <div class="image-frame"><img src="assets/figure5.png" loading="lazy" alt="M545 작업영역에서 1 kN의 말단 중력 하중이 만드는 붐 챔버 압력 변화 분포"></div>
+              <figcaption><span class="fig-no">FIG. 5</span> 같은 1 kN 하중도 자세에 따라 약 50~860 kPa의 압력 변화를 만든다. 압력만으로 하중을 읽을 수 없는 이유다. 노트가 인용한 “정상 작업영역에서 감도 3배”는 영역 정의가 없어 이 그림만으로 재계산하지 못했다.</figcaption>
+            </figure>
+          </section>
+
+          <section id="evidence" class="section">
+            <span class="section-number">05 / EVIDENCE</span>
+            <h2>“1% 정확도”를 읽는 정확한 방법</h2>
+            <p>실험은 Menzi Muck M545와 CASE250에서 수행됐다. 노트에는 M545가 “12 t급”으로도 소개되지만, 실험 제원 표에는 13.5 t로 기재돼 있다. 아래는 제원 표를 기준으로 정리한 값이다.</p>
+
+            <div class="table-wrap">
+              <table>
+                <caption>실험 장비와 계측 · p.12, Table 1</caption>
+                <thead><tr><th scope="col">항목</th><th scope="col">구성</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">Menzi Muck M545</th><td>13.5 t · 붐 2.8 m · 스틱 2.1 m · 프리즘 관절 잠금</td></tr>
+                  <tr><th scope="row">CASE250</th><td>25 t · 붐 5.8 m · 스틱 3.0 m</td></tr>
+                  <tr><th scope="row">관절 센서</th><td>Leica iCON, 링크별 MSS40x IMU · 관절 위치·속도 50 Hz</td></tr>
+                  <tr><th scope="row">가속도 처리</th><td>최근 5점의 1차 적합으로 미분 · 위상 정렬을 위해 다른 신호도 5점 평균</td></tr>
+                  <tr><th scope="row">압력 센서</th><td>Wika P30 · 붐·스틱 실린더 챔버에 직접 연결 · 중간 유압 요소 없음</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <figure>
+              <div class="image-frame"><img src="assets/table1.png" loading="lazy" alt="논문 Table 1: M545와 CASE250 시험 기체의 제원 비교"></div>
+              <figcaption><span class="fig-no">TABLE 1 · 원문 이미지</span> 두 시험 기체의 제원. 센서 정확도 수치와 별도 시간 동기 절차는 제공 노트에 기록돼 있지 않다.</figcaption>
+            </figure>
+
+            <h3>페이로드: 평균 오차보다 산포의 기준을 보자</h3>
+            <div class="table-wrap">
+              <table>
+                <caption>페이로드 비교 · Table 2의 노트 전사값, 단위 kg</caption>
+                <thead><tr><th scope="col">지표</th><th scope="col">CASE250</th><th scope="col">M545</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">제안 방법의 보고 오차</th><td>5.7</td><td>4.5</td></tr>
+                  <tr><th scope="row">제안 방법의 표준편차 σ</th><td>30.4</td><td>20.0</td></tr>
+                  <tr><th scope="row">준정적 기준의 보고 오차</th><td>264.7</td><td>2263</td></tr>
+                  <tr><th scope="row">상용 시스템의 보고 오차</th><td>101.7</td><td>51.3</td></tr>
+                  <tr><th scope="row">3σ / 정격 하중</th><td>91.2 / 9210 ≈ <strong>0.99%</strong></td><td>60 / 6000 = <strong>1.00%</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="source">“보고 오차”와 표준편차를 구분했다. 원자료가 없어 통계량을 재현하지 않았으며, 비교값을 임의로 RMSE나 절대오차로 재정의하지 않았다. 정격 하중의 제조사별 자세·리치 조건은 별도 확인이 필요하다.</p>
+
+            <aside class="note">
+              <span class="note-title">정격 대비 1%는 무엇을 뜻하나</span>
+              <p>CASE250은 3 × 30.4 = 91.2 kg이고, 이를 정격 9210 kg으로 나누면 0.99%다. M545는 3 × 20.0 / 6000 = 1.00%다. 즉 이 표현은 <strong>표준편차의 세 배를 정격 하중으로 나눈 값</strong>이다. 580 kg 추의 모든 측정이 ±5.8 kg 안에 들어왔다는 뜻도, 최대 오차의 보장도 아니다.</p>
+            </aside>
+
+            <figure>
+              <div class="image-frame"><img src="assets/table2.png" loading="lazy" alt="논문 Table 2: 제안 방법, 준정적 방법, 상용 시스템의 페이로드 오차와 표준편차 비교"></div>
+              <figcaption><span class="fig-no">TABLE 2 · 원문 이미지</span> 제안 방법과 두 비교 기준. 상용 시스템의 내부 기법은 공개되지 않은 것으로 노트에 정리돼 있다.</figcaption>
+            </figure>
+            <figure>
+              <div class="image-frame"><img src="assets/figure14.png" loading="lazy" alt="CASE250에서 580 kg의 추를 52회 측정한 페이로드 추정값의 히스토그램"></div>
+              <figcaption><span class="fig-no">FIG. 14</span> CASE250에서 참값 580 kg을 52회 측정했다. 평가에는 급가속, 다관절 운동, 선회, 0.5초의 짧은 동작이 포함됐다.</figcaption>
+            </figure>
+
+            <h3>토크와 말단힘: 정량 결과의 조건</h3>
+            <div class="table-wrap">
+              <table class="wide-table">
+                <caption>주요 평가 결과와 해석의 범위</caption>
+                <thead><tr><th scope="col">평가</th><th scope="col">보고 결과</th><th scope="col">함께 볼 조건</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">무부하 토크 추종</th><td>5초 상승 동작에서 운동 중 추종, 정지 구간에서 오차</td><td>정지 마찰은 모델에 포함되지 않는다. Fig. 12.</td></tr>
+                  <tr><th scope="row">중력 토크 작업영역 오차</th><td>평균 644 N·m<br>98백분위 2186 N·m</td><td>CASE250, 15개 궤적. 정지·급가속 구간을 제외한 영역의 평가다. Fig. 13.</td></tr>
+                  <tr><th scope="row">말단힘 크기</th><td>참값 5689.8 N<br>추정 평균 6183 N<br>표준편차 452 N</td><td>580 kg 매단 추, 5회의 정지(整地) 동작, 50 Hz 전체 샘플. 추의 흔들림이 영향을 준다.</td></tr>
+                  <tr><th scope="row">말단힘 방향</th><td>오차 13°<br>표준편차 9.2°</td><td>매단 추를 사용한 해당 평가의 결과다.</td></tr>
+                  <tr><th scope="row">실행 시간</th><td>페이로드 평균 0.4초, 최대 1.4초<br>힘 벡터는 매 스텝 고정 크기 대수 연산</td><td>페이로드는 동작 묶음 단위, 힘은 순간 단위로 추정한다.</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <aside class="note warning">
+              <span class="note-title">힘 크기의 “383 N”은 확인이 필요하다</span>
+              <p>노트가 인용한 초록의 크기 정확도는 383 N이다. 그러나 본문 보고값으로 계산하면 평균 편차는 6183 − 5689.8 = <strong>493.2 N</strong>이고 표준편차는 452 N이다. 서로 다른 통계량이나 데이터셋인지 확인되지 않아, 이 글은 383 N을 대표 성능으로 채택하지 않는다.</p>
+            </aside>
+          </section>
+
+          <section id="limits" class="section">
+            <span class="section-number">06 / BOUNDARIES</span>
+            <h2>좋은 잔차 모델에도 경계는 있다</h2>
+            <p>측정 토크에서 모델 토크를 빼는 방식은 단순하고 빠르다. 동시에 남아 있는 모델 오차가 외력으로 해석될 수 있다. 이 연구를 다른 장비나 작업으로 가져갈 때는 다음 조건을 다시 확인해야 한다.</p>
+
+            <div class="table-wrap">
+              <table>
+                <caption>한계와 후속 검증 방향 · 논문 p.14–15 및 노트의 해석</caption>
+                <thead><tr><th scope="col">현재 경계</th><th scope="col">추정에 주는 영향과 다음 단계</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">정지 마찰 미모델</th><td>정지 구간의 토크 잔차를 곧바로 하중으로 볼 수 없다. 정지 마찰을 포함한 모델이 후속 과제다.</td></tr>
+                  <tr><th scope="row">단순한 마찰식</th><td>토크 선형·방향 비대칭 모델과 파라미터 오차가 오프셋을 만든다. 온도나 접촉 작업으로의 적용 범위는 별도 검증해야 한다.</td></tr>
+                  <tr><th scope="row">가속도 잡음</th><td>자이로 신호를 미분하므로 고동적 구간의 관성 토크가 불확실해진다.</td></tr>
+                  <tr><th scope="row">기름 이동·기체 기울기</th><td>실린더 내외의 기름 이동에 따른 무게중심 변화는 미모델이다. 평지 가정과 피치·롤 보정의 잔여 오차도 고려해야 한다.</td></tr>
+                  <tr><th scope="row">동역학 단순화</th><td>버킷 토크 미사용, 코리올리 생략, 선회 원심항의 단일 스케일 근사. 고속 다관절 운동에서는 재검토가 필요하다.</td></tr>
+                  <tr><th scope="row">검증 설계의 공백</th><td>보정과 평가에 다른 동작을 썼다는 설명은 있으나 명시적 홀드아웃 분할은 없다. 두 기체의 결과가 보정값의 무변경 전이를 입증하는 것은 아니다.</td></tr>
+                  <tr><th scope="row">굴착 접촉 평가</th><td>실제 굴착 중 평가는 정성적으로 정리돼 있다. 매단 추의 결과만으로 토양 접촉력의 동일한 정확도를 보장할 수 없다.</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p>저자들이 제시한 다음 단계는 더 정교한 마찰 모델, 코리올리 항의 포함, 식별 모델을 넣은 관측기, 보정 궤적 자동 생성, 미모델 동역학의 학습이다. 이 중 관측기와 보정 자동화는 현재 방법을 말단 임피던스 제어와 지하 충돌 인지로 연결하는 방향이다.</p>
+          </section>
+
+          <section id="implications" class="section">
+            <span class="section-number">07 / IMPLICATIONS</span>
+            <h2>HR35에 가져올 것은<br>숫자보다 식별의 순서다</h2>
+            <p>제공 노트는 HR35의 경사계·실린더 압력 구성과 이 연구의 유사성에 주목한다. 아래는 <strong>논문의 실험 결과가 아니라 HR35 적용을 위한 노트 작성자의 해석</strong>이다. HR35 관련 수치와 현장 조건은 이 논문이 검증한 사항이 아니다.</p>
+
+            <div class="implication">
+              <span class="index">01</span>
+              <div>
+                <h3>먼저 압력의 단위와 측정 위치를 확정한다</h3>
+                <p>압력 카운트를 Pa 또는 bar로 변환할 수 있어야 한다. 센서가 실린더 챔버에 직접 연결돼 있는지도 확인해야 한다. MCV 쪽 측정이라면 논문의 계측 조건과 차이가 생긴다. 이 두 조건이 동역학 식별보다 먼저다.</p>
+              </div>
+            </div>
+            <div class="implication">
+              <span class="index">02</span>
+              <div>
+                <h3>준정적 면적 식별부터 시작할 수 있다</h3>
+                <p>알려진 추의 질량·매단 위치·방향, 로드 지름, 다른 관절을 고정한 추 유무 왕복 2세트가 필요하다. 노트는 20 Hz 경사계로도 준정적 실험이 가능하다고 판단한다. 버킷 보어 Ø70/Ø80 후보를 구분하는 데 적용하려면 해당 관절의 기하와 토크 감도를 따로 확인해야 한다.</p>
+              </div>
+            </div>
+            <div class="implication">
+              <span class="index">03</span>
+              <div>
+                <h3>중력 계수는 디지털 트윈의 제약으로 쓴다</h3>
+                <p>식별되는 10개의 중력 계수는 개별 링크 질량이 아니다. 노트의 기존 개별 질량 후보 182/122/92 kg과 총중량 3507 kg은 별도 정보다. 묶음 계수는 트윈의 질량·무게중심 배치가 만족해야 할 제약으로 사용하는 편이 타당하다.</p>
+              </div>
+            </div>
+            <div class="implication">
+              <span class="index">04</span>
+              <div>
+                <h3>관성 식별에는 센서와 주파수 대역을 다시 설계한다</h3>
+                <p>노트가 제시한 HR35 붐 계통 모드는 3.0–3.3 Hz로 논문의 0.5–3 Hz 대역 끝에 걸린다. 20 Hz 경사계 차분의 잡음도 우려된다. 링크 IMU 100 Hz 이상은 노트의 실용적 제안이며, 논문이 입증한 필수 하한은 아니다.</p>
+              </div>
+            </div>
+            <div class="implication">
+              <span class="index">05</span>
+              <div>
+                <h3>마찰 모델은 현장 데이터로 비교한다</h3>
+                <p>논문의 토크 비례·방향 비대칭 모델과 기존 트윈의 쿨롱+점성 모델을 상하 왕복 데이터에서 비교할 수 있다. 노트의 S1–S6 시험처럼 상승·하강 토크 차를 부하와 속도에 대해 살펴보는 방식이다. 공중에서 식별한 관계를 접촉 굴착에 적용하려면 더 큰 하중 범위에서도 성립하는지 확인해야 한다.</p>
+              </div>
+            </div>
+            <div class="implication">
+              <span class="index">06</span>
+              <div>
+                <h3>선회 근사는 결합 효과를 살피는 출발점으로 쓴다</h3>
+                <p>π<sub>c</sub> 하나를 쓰는 원심항은 선회와 팔 운동의 결합을 대략 비교하는 데 활용할 수 있다. 다만 노트의 덤프 자세 흔들림과 “선회 가속 2.54배” 관찰을 설명하려면, 각속도 제곱 기반의 원심항만으로 충분한지 별도 검증해야 한다.</p>
+              </div>
+            </div>
+
+            <aside class="note">
+              <span class="note-title">현장 적용 전 확인할 항목</span>
+              <ul class="checklist">
+                <li>압력 센서 6채널의 위치: 실린더 챔버 직결인지, MCV 측인지</li>
+                <li>카운트→물리 압력 변환식과 센서 정확도</li>
+                <li>로드 지름, 실린더 핀 기하, 추의 질량·매단 거리·방향</li>
+                <li>정격 범위 내에서 알려진 추를 사용한 왕복 실험 가능 여부</li>
+                <li>관성 식별에 필요한 링크 IMU와 적절한 자극 주파수 대역</li>
+              </ul>
+            </aside>
+
+            <div class="ending">
+              <span class="label">TAKEAWAY</span>
+              <h2>더 잘 재려면,<br>먼저 무엇을 구분할 수 있는지 알아야 한다.</h2>
+              <p>이 연구의 강점은 제조사 물성표 없이도 현장 데이터로 쓸 만한 토크 모델을 만드는 데 있다. 압력의 스케일을 정하고, 관성과 마찰을 분리하고, 마지막에 중력을 맞춘다.</p>
+              <p>가져갈 결론은 두 가지다. 묶음 파라미터만으로도 하중 추정은 가능하다. 그러나 정격 대비 1%라는 숫자는 보정 절차, 움직임의 조건, 평가 지표와 함께 읽어야 한다.</p>
+            </div>
+
+            <aside class="share" aria-label="공유용 핵심 문장">
+              <span class="label">공유용 한 문장</span>
+              <p>굴착기의 링크 물성을 따로 몰라도 압력과 IMU로 하중을 추정할 수 있다. 핵심은 면적→관성→마찰→중력의 보정 순서이며, “1%”는 측정 하중이 아닌 정격 대비 3σ 기준이다.</p>
+            </aside>
+          </section>
+
+          <section id="appendix" class="section appendix">
+            <span class="section-number">APPENDIX A / TECHNICAL RECORD</span>
+            <h2>수식과 시스템 식별 기록</h2>
+            <p>본문의 흐름을 유지하기 위해 긴 수식과 재사용에 필요한 조건을 모았다. 아래 식 번호는 제공 노트의 arXiv v1 표기를 따른다. Θ<sub>b</sub>, Θ<sub>s</sub>, Θ<sub>bu</sub>는 각각 붐·스틱·버킷 관절각이다.</p>
+
+            <h3>중력: 각도 기저에 대한 선형 계수</h3>
+            <div class="equation equation-stack">
+              <div class="eq-line"><span class="math">τ<sub>grav,boom</sub> = π<sub>bg,1</sub> cos Θ<sub>b</sub> + π<sub>bg,2</sub> sin Θ<sub>b</sub> + π<sub>bg,3</sub> cos(Θ<sub>b</sub> + Θ<sub>s</sub>) + π<sub>bg,4</sub> sin(Θ<sub>b</sub> + Θ<sub>s</sub>)<br>+ π<sub>bg,5</sub> cos(Θ<sub>b</sub> + Θ<sub>s</sub> + Θ<sub>bu</sub>) + π<sub>bg,6</sub> sin(Θ<sub>b</sub> + Θ<sub>s</sub> + Θ<sub>bu</sub>)</span><span class="eq-no">(13)</span></div>
+              <div class="eq-line"><span class="math">τ<sub>grav,stick</sub> = π<sub>sg,7</sub> cos(Θ<sub>b</sub> + Θ<sub>s</sub>) + π<sub>sg,8</sub> sin(Θ<sub>b</sub> + Θ<sub>s</sub>)<br>+ π<sub>sg,9</sub> cos(Θ<sub>b</sub> + Θ<sub>s</sub> + Θ<sub>bu</sub>) + π<sub>sg,10</sub> sin(Θ<sub>b</sub> + Θ<sub>s</sub> + Θ<sub>bu</sub>)</span><span class="eq-no">(14)</span></div>
+            </div>
+            <p>ノ트의 독립 전개에서는 식 (6)~(9)의 cos/sin 항을 모아 다음과 같은 계수를 얻었다. 뒤쪽 링크 질량이 앞 링크의 계수에 들어가므로, 계수만으로 개별 질량을 역산할 수 없음을 보여준다.</p>
+            <div class="equation">
+              <div class="math">π<sub>bg,1</sub> = −g(m<sub>boom</sub>cog<sub>boom,x</sub> + m<sub>stick</sub>l<sub>boom</sub> + m<sub>bucket</sub>l<sub>boom</sub>)<br>π<sub>bg,2</sub> = −g m<sub>boom</sub>cog<sub>boom,z</sub></div>
+              <p class="source">논문의 별도 주장으로 인용한 식이 아니라 제공 노트의 항별 전개다.</p>
+            </div>
+
+            <h3>관성: 평행축 정리와 자세 의존성</h3>
+            <div class="equation equation-stack">
+              <div class="eq-line"><span class="math">I<sub>b</sub> = m<sub>boom</sub>d<sub>bo</sub>² + m<sub>stick</sub>d<sub>st</sub>² + m<sub>bucket</sub>d<sub>bu</sub>² + I<sub>zz,boom</sub> + I<sub>zz,stick</sub> + I<sub>zz,bucket</sub></span><span class="eq-no">(15)</span></div>
+              <div class="eq-line"><span class="math">I<sub>b</sub> = π<sub>bI,1</sub> + π<sub>bI,2</sub> cos Θ<sub>s</sub> + π<sub>bI,3</sub> sin Θ<sub>s</sub><br>+ π<sub>bI,4</sub>[2l<sub>boom</sub> cos(Θ<sub>s</sub> + Θ<sub>bu</sub>) + 2l<sub>stick</sub> cos Θ<sub>bu</sub>]<br>+ π<sub>bI,5</sub>[2l<sub>boom</sub> sin(Θ<sub>s</sub> + Θ<sub>bu</sub>) + 2l<sub>stick</sub> sin Θ<sub>bu</sub>]</span><span class="eq-no">(18)</span></div>
+              <div class="eq-line"><span class="math">I<sub>s</sub> = π<sub>sI,1</sub> + π<sub>sI,2</sub> cos Θ<sub>bu</sub> + π<sub>sI,3</sub> sin Θ<sub>bu</sub></span><span class="eq-no">(19)</span></div>
+            </div>
+            <p class="source">dは回転軸から各リンク重心までの距離。d<sub>st</sub>²とd<sub>bu</sub>²の姿勢依存性は原論文の式 (16)(17)に対応する。</p>
+
+            <h3>선회 원심항의 근사</h3>
+            <div class="equation">
+              <div class="eq-line"><span class="math">τ<sub>c,boom</sub> = Θ̇<sub>cab</sub>² π<sub>c</sub>[π<sub>bg,2</sub> cos Θ<sub>b</sub> + π<sub>bg,1</sub> sin Θ<sub>b</sub><br>+ π<sub>bg,4</sub> cos(Θ<sub>b</sub> + Θ<sub>s</sub>) + π<sub>bg,3</sub> sin(Θ<sub>b</sub> + Θ<sub>s</sub>)<br>+ π<sub>bg,6</sub> cos(Θ<sub>b</sub> + Θ<sub>s</sub> + Θ<sub>bu</sub>) + π<sub>bg,5</sub> sin(Θ<sub>b</sub> + Θ<sub>s</sub> + Θ<sub>bu</sub>)]</span><span class="eq-no">(21)</span></div>
+            </div>
+            <p>중력 계수의 sin/cos 배치를 바꿔 수평 가속에 의한 토크를 근사한다. 뒤 링크까지의 거리 효과에서 생기는 근사 오차를 π<sub>c</sub> 하나로 흡수하며, 선회가 포함된 데이터 한 세트로 식별한다고 정리돼 있다.</p>
+
+            <h3>말단 기구학과 페이로드 토크</h3>
+            <div class="equation equation-stack">
+              <div class="eq-line"><span class="math">T<sub>boom</sub><sup>blade</sup>(Θ) = [ C(Θ), r(Θ); 0, 1 ]</span><span class="eq-no">(22)</span></div>
+              <div class="eq-line"><span class="math">τ<sub>pl,c</sub> = J<sup>T</sup>(r<sub>x</sub>(Θ) m<sub>pl</sub> Θ̇<sub>cab</sub>² [1, 0]<sup>T</sup>)</span><span class="eq-no">(25)</span></div>
+              <div class="eq-line"><span class="math">τ<sub>pl,g</sub> = −J<sup>T</sup>(m<sub>pl</sub>[0, −g]<sup>T</sup>)</span><span class="eq-no">(26)</span></div>
+              <div class="eq-line"><span class="math">τ<sub>pl,boom,i</sub> = Θ̈<sub>boom</sub> |r(Θ)|² m<sub>pl</sub></span><span class="eq-no">(27)</span></div>
+              <div class="eq-line"><span class="math">τ<sub>pl,boom</sub> = τ<sub>pl,c</sub> + τ<sub>pl,g</sub> + τ<sub>pl,boom,i</sub></span><span class="eq-no">(28)</span></div>
+            </div>
+            <p class="source">C와 r은 회전·위치 성분이다. 식 (28)은 노트의 축약 표기를 유지했으며, 붐 토크를 구성할 때 식 (25)(26)의 관절 토크 벡터에서 붐 성분을 사용한다. 식 (27)은 점질량 관성 근사로 읽을 수 있다.</p>
+
+            <h3>보정 비용함수와 면적 식별식</h3>
+            <div class="equation">
+              <div class="eq-line"><span class="math">A<sub>p</sub> = {A<sub>r</sub>η(Θ<sub>i</sub>)(p₂<sup>wo</sup> − p₂<sup>w</sup>) + g|r|m<sub>pl</sub> cos(Θ<sub>i</sub> − Θ<sub>m</sub>)}<br>/ {η(Θ<sub>i</sub>)[(p₁<sup>w</sup> − p₂<sup>w</sup>) − (p₁<sup>wo</sup> − p₂<sup>wo</sup>)]}</span><span class="eq-no">(29)</span></div>
+              <p class="source">wo: 추 없음 · w: 추 있음 · |r|: 관절–추 거리 · Θ<sub>m</sub>: 추 방향 오프셋. 분모가 작은 자세는 면적 추정의 조건을 나쁘게 만든다는 것이 노트의 해석이다.</p>
+            </div>
+            <div class="equation">
+              <div class="eq-line"><span class="math">min<sub>π_I</sub> ∫<sub>0.5 Hz</sub><sup>3 Hz</sup> S<sub>t</sub>(f) df,<br>S<sub>t</sub>(f) := ℱ(τ<sub>m</sub>(t) − I<sub>b</sub>(π<sub>I</sub>, t)Θ̈<sub>i</sub>)</span><span class="eq-no">(30)</span></div>
+              <p class="source">노트가 전사한 표기다. 절차는 잔차 토크의 PSD 대역 최소화로 설명되지만, ℱ만으로 적힌 식의 PSD 정의·정규화는 제공 정보만으로 확정하지 않는다.</p>
+            </div>
+            <div class="equation">
+              <div class="eq-line"><span class="math">min<sub>π_g</sub> ‖τ<sub>m</sub> − [I<sub>i</sub>(Θ)Θ̈<sub>i</sub> + τ<sub>fric,i</sub> + τ<sub>g,i</sub>(Θ, π<sub>g</sub>)]‖</span><span class="eq-no">(31)</span></div>
+            </div>
+
+            <h3>재사용을 위한 식별 추출표</h3>
+            <div class="table-wrap">
+              <table>
+                <caption>무엇을 측정하고, 무엇을 추정하며, 무엇이 남는가</caption>
+                <tbody>
+                  <tr><th scope="row">입력·상태·출력</th><td>운전자 조작 아래 Θ, Θ̇, 미분한 Θ̈, p₁·p₂를 기록한다. 출력은 측정 토크, 토크 잔차, 말단힘, 페이로드다. 밸브·유량·펌프 상태는 모델에 없다.</td></tr>
+                  <tr><th scope="row">추정 대상</th><td>대상 실린더의 A<sub>p</sub>, 중력 π<sub>g</sub>(6+4), 관성 π<sub>I</sub>(5+3), 마찰 π<sub>f</sub>(2×2×2), 선회 π<sub>c</sub>(1). 이후 m<sub>pl</sub>과 f<sub>ext</sub>를 추정한다.</td></tr>
+                  <tr><th scope="row">고정 정보·가정</th><td>링크 길이·핀 기하·로드 면적은 실측. 평지 기준, 코리올리 생략, 버킷 토크 미사용. 캐빈 피치는 붐 각 오프셋, 롤은 힘 스케일로 보정한다고 정리돼 있다.</td></tr>
+                  <tr><th scope="row">좌표·부호</th><td>붐축 원점·중력 정렬. 국소 무게중심 좌표는 관절축 원점이며 x축은 다음 관절 방향. 힘 부호는 식 (23)의 −J<sup>−T</sup>를 따른다.</td></tr>
+                  <tr><th scope="row">식별 가능성</th><td>개별 m, cog, I<sub>zz</sub>는 묶음 계수로부터 유일하게 분리되지 않는다. 단계별 자극은 묶음의 실용적 식별을 돕지만, 수치 조건성의 정량 검증은 노트에서 확인되지 않는다.</td></tr>
+                  <tr><th scope="row">데이터 제외 규칙</th><td>면적은 추 유무의 겹치는 준정적 구간. 하중 추정은 정지 구간 제외. 중력 오차 평가에서는 정지·급가속 구간 제외.</td></tr>
+                  <tr><th scope="row">최적화·제약</th><td>면적 대수 해, 관성 대역 최소화, 마찰 곡선·선형 적합, 중력 최소제곱, 페이로드 1변수 Nelder–Mead. 물리 일관성 제약은 사용하지 않은 것으로 정리돼 있다.</td></tr>
+                  <tr><th scope="row">잡음·폐루프</th><td>반복·평균·주파수 분리로 잡음에 대응한다. 운전자 폐루프 아래 기록하지만 제어기 편향에 대한 별도 논의는 없다.</td></tr>
+                  <tr><th scope="row">일반화·불확실성</th><td>두 기체와 다양한 평가 동작을 사용한다. 명시적 홀드아웃 분할은 없고 불확실성은 주로 표준편차로 제시된다.</td></tr>
+                  <tr><th scope="row">코드·데이터</th><td>제공 노트가 읽은 본문에서는 저장소·데이터 링크가 확인되지 않았다. 현재 공개 여부를 별도로 검증한 것은 아니다.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section id="sources" class="section appendix">
+            <span class="section-number">APPENDIX B / SOURCE NOTES</span>
+            <h2>주장, 검산, 미확인을 분리하기</h2>
+            <p>아래 계산은 보고 숫자 사이의 정합성을 확인하는 산술 검산이다. 원자료 기반의 오차 통계 재현이나 새로운 실험 검증과는 구분한다.</p>
+
+            <div class="table-wrap">
+              <table class="wide-table">
+                <caption>제공 노트의 독립 검산과 남은 확인 사항</caption>
+                <thead><tr><th scope="col">논문에서 인용한 주장</th><th scope="col">검산·해석</th><th scope="col">판정 또는 미확인</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">페이로드 3σ ≈ 정격 1%</th><td>CASE: 3×30.4/9210 = 0.99%<br>M545: 3×20.0/6000 = 1.00%</td><td>산술 일치. 정격 하중의 자세·리치 조건은 확인 필요.</td></tr>
+                  <tr><th scope="row">580 kg 추 = 5689.8 N</th><td>580×9.81 = 5689.8</td><td>g = 9.81 m/s²에서 일치.</td></tr>
+                  <tr><th scope="row">6 m에서 약 36 kg 환산</th><td>2186/(9.81×6) = 37.1 kg<br>644/(9.81×6) = 10.9 kg</td><td>약 3% 차이. 정확한 리치 확인 필요. 2186 N·m은 표에서 98백분위이며 관측 최대값으로 바꾸어 읽지 않는다.</td></tr>
+                  <tr><th scope="row">초록의 크기 정확도 383 N</th><td>본문 평균값의 편차는 493.2 N, 표준편차는 452 N</td><td>통계 정의·평가 세트의 대응 미확인. 저널판 대조 필요.</td></tr>
+                  <tr><th scope="row">식 (3) 지렛대</th><td>d√(a²+c²−2ac cos θ)/dθ = ac sin θ/b</td><td>미분 형태 일치. Θ<sub>boom</sub>와 β의 표기 대응은 미확인.</td></tr>
+                  <tr><th scope="row">식 (29) 면적</th><td>F = A<sub>p</sub>(p₁−p₂)+A<sub>r</sub>p₂와 추 유무 토크 차를 결합하면 같은 형태를 얻는다.</td><td>대수 형태 일치. 실제 면적 재계산에 필요한 일부 실험값은 미기재.</td></tr>
+                  <tr><th scope="row">식 (27) 관성 토크</th><td>rad/s² × m² × kg → N·m</td><td>차원 일치. 점질량 근사로 해석.</td></tr>
+                  <tr><th scope="row">코리올리 두 자릿수 작음</th><td>노트의 Fig. 3 판독: 중력 약 10⁵ N·m, 코리올리 약 10³ N·m</td><td>시뮬레이션 조건에서의 비교. 모델 출처와 고속·소형 기체 적용은 추가 확인.</td></tr>
+                  <tr><th scope="row">정상 작업영역 감도 3배</th><td>Fig. 5 전체 눈금 50~860 kPa/kN은 약 17배</td><td>“정상 작업영역” 정의가 없어 3배를 독립 재계산하지 못함.</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>서지와 판본</h3>
+            <ul class="bibliography">
+              <li>
+                <span class="entry">Calibrated Dynamic Modeling for Force and Payload Estimation in Hydraulic Machinery</span>
+                Lennart Werner, Pol Eyschen, Sean Costello, Pierluigi Micarelli, Marco Hutter.<br>
+                ETH Zürich Robotic Systems Lab; Hexagon AB.<br>
+                <em>Construction Robotics</em>, 2025.<br>
+                <a>저널 DOI · 10.1007/s41693-025-00169-7</a>
+              </li>
+              <li>
+                <span class="entry">제공 노트가 지정한 열람 판본</span>
+                <a>arXiv:2510.11574v1</a> · 18쪽 · 노트상 제출일 2025-10-13.<br>
+                쪽·식·그림 번호는 이 판본 기준이다. 노트는 저널 확정판을 확보하지 못했다고 명시한다.
+              </li>
+              <li>
+                <span class="entry">그림과 표</span>
+                본문 그림 1·2·5·6·7·8·9·10·14 및 표 1·2는 제공된 로컬 추출 이미지를 사용했다. 개념도는 요약 노트의 아키텍처를 HTML/CSS로 재구성했다. 외부 이미지·스크립트·스타일시트는 사용하지 않는다.
+              </li>
+              <li>
+                <span class="entry">검토 범위</span>
+                노트는 수식을 PDF 4~12쪽의 렌더링과 대조했다고 기록하며, 특히 텍스트 추출이 깨진 식 (3)·(29)를 확인했다고 설명한다. 이 문서의 편집 과정에서 PDF나 원자료를 새로 검증한 것은 아니다.
+              </li>
+            </ul>
+
+            <aside id="version-note" class="note warning">
+              <span class="note-title">메타데이터의 날짜 충돌</span>
+              <p>제공 노트의 작성일과 Crossref 확인일은 2026-09-25인데, 열람 판본의 제출일은 2025-10-13으로 적혀 있다. 이 날짜들 자체는 시간 순서상 모순되지 않는다. 다만 본문에 인용된 판본 정보와 DOI 확인 이력은 제공 노트의 기록이며, 이 HTML에서 독립적으로 재확인하지 않았다.</p>
+            </aside>
+
+            <div class="tags" aria-label="핵심 키워드">
+              <span class="tag">LUMPED PARAMETERS</span>
+              <span class="tag">PAYLOAD ESTIMATION</span>
+              <span class="tag">PRESSURE-BASED TORQUE</span>
+              <span class="tag">PSD INERTIA IDENTIFICATION</span>
+              <span class="tag">TORQUE-DEPENDENT FRICTION</span>
+              <span class="tag">RETROFIT CALIBRATION</span>
+            </div>
+            <p class="source">이 글은 논문 내용을 설명하는 연구 해설이다. 논문의 보고값, 제공 노트의 검산, HR35 적용에 대한 의견은 각각의 근거 범위 안에서 제시했다.</p>
+          </section>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer shell">
+    <span>FIELD NOTES / ROBOTICS · 동역학을 현장의 측정으로 연결하기</span>
+    <a href="#top">맨 위로 ↑</a>
+  </footer>
+</body>
+</html>
