@@ -1,7 +1,27 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T12:58:44.021Z",
+  "updatedAt": "2026-09-25T13:03:46.509Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/schoukens2019-roadmap/",
+      "excerpt": "Nonlinear System Identification: A User Oriented Road Map 요약 한줄 요약 비선형 시스템 식별을 처음 하는 실무자를 위한 72쪽짜리 안내서다. 순서는 네 가지다. (1) 주기 가진(멀티사인) 으로 모델 없이 비선형 왜곡의 크기와 잡음 바닥을 먼저 재서 선형으로 충분한지 결정한다. (2) 물리 지식의 양에 따라 흰색→검은색 모델 팔레트 에서 고른다. (3) 비선형에서는 구조 모델 오차",
+      "shortId": "rkuaoz",
+      "slug": "schoukens2019-roadmap",
+      "sourcePath": "02_research/필드로봇/시스템식별/schoukens2019-roadmap.md",
+      "tags": [
+        "논문요약",
+        "비선형시스템식별",
+        "실험설계",
+        "멀티사인",
+        "구조모델오차",
+        "모델검증",
+        "유압크레인"
+      ],
+      "title": "Nonlinear System Identification: A User-Oriented Road Map - 요약",
+      "updatedAt": "2026-09-25T13:03:46.509Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/rkuaoz/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/dadhich2016-keychallenges/",

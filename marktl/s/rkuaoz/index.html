@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>비선형 모델을 만들기 전에, 비선형부터 측정하라 — 시스템 식별의 실무 로드맵</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      --paper: #f5f3ed;
+      --surface: #fffefb;
+      --ink: #192d34;
+      --muted: #5f6d70;
+      --accent: #b7472e;
+      --teal: #276c70;
+      --line: #d8ddd7;
+      --tint: #eaf0ec;
+      --warm: #f3e7dc;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "Batang", "AppleMyungjo", Georgia, serif;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.9;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--teal); text-underline-offset: 4px; text-decoration-thickness: 1px; }
+    a:hover { color: var(--accent); }
+    a:focus-visible { outline: 3px solid var(--accent); outline-offset: 5px; }
+    ::selection { background: #e8c4ae; color: var(--ink); }
+    .skip-link {
+      position: absolute;
+      top: -90px;
+      left: 20px;
+      z-index: 10;
+      padding: 10px 18px;
+      background: var(--surface);
+    }
+    .skip-link:focus { top: 12px; }
+    .shell { width: min(1160px, calc(100% - 80px)); margin-inline: auto; }
+    .masthead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--ink);
+      font-size: 12px;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    .masthead strong { font-size: 14px; letter-spacing: .16em; }
+    .masthead span { color: var(--muted); }
+    .hero { padding: 76px 0 54px; }
+    .eyebrow {
+      margin: 0 0 23px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    h1, h2, h3, p, figure, blockquote { margin-top: 0; }
+    h1 {
+      max-width: 1030px;
+      margin-bottom: 28px;
+      font-family: var(--serif);
+      font-size: clamp(38px, 5.2vw, 66px);
+      line-height: 1.32;
+      letter-spacing: -.065em;
+      font-weight: 700;
+      text-wrap: balance;
+    }
+    h1 em { color: var(--accent); font-style: normal; }
+    .dek {
+      max-width: 790px;
+      margin-bottom: 28px;
+      color: #41585e;
+      font-size: clamp(18px, 2vw, 22px);
+      line-height: 1.85;
+      letter-spacing: -.025em;
+    }
+    .byline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .route {
+      background: var(--ink);
+      color: #fffefb;
+      padding: 32px;
+      margin-bottom: 54px;
+    }
+    .route-label { color: #b6c9c5; font-size: 11px; letter-spacing: .17em; margin-bottom: 22px; }
+    .route ol {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 28px;
+      padding: 0;
+      margin: 0;
+    }
+    .route li { border-top: 1px solid #5b7278; padding-top: 16px; }
+    .route .step { display: block; font-size: 12px; color: #e6ae90; margin-bottom: 7px; }
+    .route strong { display: block; font-size: 21px; margin-bottom: 8px; }
+    .route p { margin: 0; font-size: 13px; line-height: 1.8; color: #c9d5d3; }
+    .route a { color: inherit; text-decoration: none; }
+    .reading-layout { display: grid; grid-template-columns: 198px minmax(0, 1fr); gap: 58px; align-items: start; }
+    .sidebar { position: sticky; top: 28px; padding-bottom: 32px; }
+    .sidebar-label { font-size: 10px; letter-spacing: .2em; color: var(--muted); margin-bottom: 14px; }
+    .toc { border-top: 2px solid var(--ink); }
+    .toc a {
+      display: flex;
+      gap: 11px;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 12px;
+      text-decoration: none;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .toc a:hover { color: var(--accent); }
+    .toc span { color: var(--accent); font-size: 10px; padding-top: 2px; }
+    .sidebar-note { margin-top: 25px; font-size: 11px; color: var(--muted); line-height: 1.9; }
+    .sidebar-note strong { display: block; color: var(--ink); margin-bottom: 4px; }
+    .article-body { min-width: 0; }
+    .abstract {
+      padding: 30px 32px;
+      background: var(--surface);
+      border-top: 3px solid var(--teal);
+      margin-bottom: 36px;
+    }
+    .small-label { font-size: 11px; font-weight: 800; letter-spacing: .12em; color: var(--teal); text-transform: uppercase; }
+    .abstract h2 { font-family: var(--sans); font-size: 20px; letter-spacing: -.03em; margin: 10px 0 16px; }
+    .abstract p { margin-bottom: 0; font-size: 16px; }
+    .findings { margin-bottom: 64px; }
+    .findings h2 { font-size: 14px; font-family: var(--sans); letter-spacing: .02em; margin-bottom: 16px; }
+    .finding-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .finding { padding: 22px; border: 1px solid var(--line); }
+    .finding .index { font-size: 11px; color: var(--accent); font-weight: 800; letter-spacing: .12em; }
+    .finding h3 { margin: 8px 0; font-size: 17px; line-height: 1.55; }
+    .finding p { font-size: 13px; color: var(--muted); margin: 0; line-height: 1.85; }
+    .chapter { margin-bottom: 68px; }
+    .section-head { padding-top: 24px; border-top: 1px solid var(--ink); margin-bottom: 26px; }
+    .section-kicker { display: block; font-size: 11px; color: var(--accent); letter-spacing: .12em; margin-bottom: 10px; font-weight: 800; }
+    h2 { font-family: var(--serif); font-size: clamp(26px, 3vw, 34px); line-height: 1.45; letter-spacing: -.045em; margin-bottom: 0; text-wrap: balance; }
+    h3 { font-size: 20px; line-height: 1.55; letter-spacing: -.025em; margin: 30px 0 13px; }
+    p { margin-bottom: 22px; }
+    strong { font-weight: 750; }
+    .lead { font-size: 19px; line-height: 1.85; letter-spacing: -.02em; }
+    .figure { margin: 30px 0; }
+    .image-mat {
+      background: #fff;
+      padding: 22px;
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .image-mat img { display: block; width: 100%; height: auto; max-width: 680px; object-fit: contain; }
+    .image-mat.compact img { max-width: 490px; }
+    .image-mat.crane img { max-width: 310px; }
+    figcaption { margin-top: 11px; font-size: 12px; line-height: 1.85; color: var(--muted); }
+    .fig-label { color: var(--accent); font-weight: 800; margin-right: 7px; }
+    .callout { padding: 24px 26px; background: var(--tint); margin: 28px 0; border-left: 3px solid var(--teal); }
+    .callout.warm { background: var(--warm); border-color: var(--accent); }
+    .callout h3 { font-size: 16px; margin: 0 0 9px; }
+    .callout p { font-size: 15px; margin: 0; }
+    .pullquote { margin: 36px 0; padding: 8px 0 8px 25px; border-left: 3px solid var(--accent); }
+    .pullquote p { font-family: var(--serif); font-size: clamp(23px, 3vw, 29px); line-height: 1.7; letter-spacing: -.035em; margin: 0; }
+    .pullquote footer { color: var(--muted); font-size: 11px; margin-top: 12px; }
+    .equation {
+      margin: 26px 0;
+      padding: 23px 25px;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .formula {
+      display: block;
+      font-family: Georgia, "Times New Roman", var(--serif);
+      font-size: 20px;
+      line-height: 1.9;
+      overflow-wrap: normal;
+    }
+    .formula sub, .formula sup { font-size: .65em; }
+    .equation-label { font-family: var(--sans); font-size: 11px; color: var(--muted); display: block; margin-top: 10px; }
+    .formula-small { font-size: 17px; margin-top: 6px; }
+    .table-wrap { width: 100%; overflow-x: auto; margin: 26px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; line-height: 1.75; }
+    caption { text-align: left; font-weight: 750; font-size: 12px; color: var(--muted); margin-bottom: 11px; }
+    th { text-align: left; background: var(--tint); font-size: 12px; color: var(--ink); }
+    th, td { padding: 14px 15px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    thead th { border-top: 1px solid var(--ink); }
+    tbody th { font-weight: 650; background: transparent; }
+    .model-table { min-width: 600px; }
+    .model-table td:first-child { white-space: nowrap; }
+    .swatch { display: inline-block; width: 9px; height: 9px; margin-right: 7px; border: 1px solid #81908f; border-radius: 50%; }
+    .s1 { background: #fff; }
+    .s2 { background: #e9e7de; }
+    .s3 { background: #bbc5c1; }
+    .s4 { background: #829493; }
+    .s5 { background: #447279; }
+    .s6 { background: #192d34; }
+    .clean-list { padding-left: 21px; margin: 20px 0; }
+    .clean-list li { padding-left: 4px; margin-bottom: 12px; }
+    .clean-list li::marker { color: var(--accent); }
+    .case-study { background: var(--surface); border: 1px solid var(--line); padding: 30px; margin: 30px 0; }
+    .case-study h3 { margin-top: 10px; }
+    .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 26px 0; }
+    .metric { padding-top: 18px; border-top: 1px solid var(--line); }
+    .metric .value { display: block; font-family: Georgia, serif; font-size: 54px; letter-spacing: -.05em; line-height: 1.15; }
+    .metric .value small { font-size: 24px; }
+    .metric.highlight .value { color: var(--accent); }
+    .metric .name { font-size: 12px; color: var(--muted); display: block; margin-top: 9px; }
+    .case-study .figure { margin-bottom: 0; }
+    .decomposition { display: grid; gap: 10px; margin: 16px 0 0; }
+    .error-term { display: grid; grid-template-columns: 118px 1fr; gap: 15px; font-size: 13px; padding-top: 11px; border-top: 1px solid var(--line); }
+    .error-term strong { color: var(--teal); }
+    .error-term span { color: var(--muted); }
+    .checklist { padding: 0; margin: 22px 0; list-style: none; }
+    .checklist li { position: relative; padding: 15px 0 15px 30px; border-bottom: 1px solid var(--line); font-size: 15px; }
+    .checklist li::before { content: "□"; position: absolute; left: 1px; top: 15px; color: var(--teal); font-size: 20px; line-height: 1.4; }
+    .application { padding: 34px; border: 1px solid #b9c9bf; background: #edf1eb; margin-bottom: 60px; }
+    .application .section-head { border-color: var(--teal); }
+    .application .section-kicker { color: var(--teal); }
+    .application-intro { font-size: 14px; color: var(--muted); }
+    .proposal { padding: 25px 0; border-bottom: 1px solid #ccd5cb; }
+    .proposal:last-child { padding-bottom: 0; border-bottom: 0; }
+    .proposal h3 { margin: 0 0 12px; font-size: 19px; }
+    .proposal p { font-size: 15px; margin: 0; }
+    .proposal .detail { margin-top: 12px; font-size: 13px; color: var(--muted); }
+    .pill { display: inline-block; font-size: 10px; color: var(--teal); border: 1px solid #a6bdb2; padding: 2px 7px; vertical-align: middle; margin: 0 0 11px; letter-spacing: .06em; }
+    .limitations { background: var(--surface); padding: 26px; border: 1px solid var(--line); margin-bottom: 35px; }
+    .limitations h3 { margin-top: 0; font-size: 18px; }
+    .limitations li { font-size: 14px; }
+    .closing { border-top: 3px solid var(--accent); padding-top: 30px; margin-bottom: 52px; }
+    .closing h2 { margin-bottom: 22px; }
+    .closing .last-line { color: var(--teal); font-weight: 750; }
+    .share-note { margin-top: 28px; padding: 24px; background: var(--warm); }
+    .share-note h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .13em; color: var(--accent); margin: 0 0 12px; }
+    .share-note p { margin: 0; font-size: 17px; font-family: var(--serif); line-height: 1.85; }
+    .source-notes { padding-top: 26px; border-top: 1px solid var(--ink); margin-bottom: 48px; }
+    .source-notes h2 { font-family: var(--sans); font-size: 19px; letter-spacing: -.02em; margin-bottom: 22px; }
+    .source-notes p, .source-notes li { font-size: 12px; color: var(--muted); line-height: 1.9; }
+    .source-notes ol { padding-left: 19px; }
+    .source-notes li { margin-bottom: 13px; padding-left: 4px; }
+    .citation { border-left: 2px solid var(--line); padding-left: 18px; }
+    .citation cite { font-style: normal; color: var(--ink); }
+    .tags { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 22px; }
+    .tags span { padding: 3px 9px; border: 1px solid var(--line); font-size: 10px; color: var(--muted); }
+    .page-footer { display: flex; justify-content: space-between; gap: 20px; padding: 22px 0 35px; border-top: 1px solid var(--ink); font-size: 11px; color: var(--muted); }
+    .page-footer a { color: var(--ink); }
+    @media (max-width: 1000px) {
+      .shell { width: min(900px, calc(100% - 48px)); }
+      .reading-layout { grid-template-columns: 150px minmax(0, 1fr); gap: 32px; }
+      .route { padding: 25px; }
+      .route ol { gap: 20px; }
+      .route strong { font-size: 18px; }
+      .application { padding: 25px; }
+    }
+    @media (max-width: 760px) {
+      body { font-size: 16px; line-height: 1.85; }
+      .shell { width: calc(100% - 36px); }
+      .masthead { padding: 18px 0; font-size: 10px; }
+      .masthead strong { font-size: 11px; }
+      .masthead .edition { display: none; }
+      .hero { padding: 45px 0 35px; }
+      .hero h1 { font-size: clamp(35px, 7vw, 49px); }
+      .eyebrow { font-size: 10px; margin-bottom: 17px; }
+      .dek { font-size: 18px; }
+      .byline { font-size: 11px; gap: 5px 16px; }
+      .route { margin-bottom: 32px; padding: 24px; }
+      .route ol { grid-template-columns: 1fr 1fr; gap: 24px; }
+      .reading-layout { display: block; }
+      .sidebar { position: static; padding-bottom: 28px; }
+      .sidebar-label, .sidebar-note { display: none; }
+      .toc { display: grid; grid-template-columns: 1fr 1fr; column-gap: 22px; }
+      .toc a { font-size: 11px; padding: 9px 0; }
+      .abstract { padding: 24px; }
+      .chapter { margin-bottom: 48px; }
+      .finding { padding: 19px; }
+      .findings { margin-bottom: 45px; }
+      .image-mat { padding: 12px; }
+      .callout { padding: 21px; }
+      .case-study { padding: 23px; }
+      .application { padding: 23px; margin-bottom: 45px; }
+      .formula { font-size: 17px; }
+      .formula-small { font-size: 15px; }
+      .equation { padding: 20px 16px; }
+    }
+    @media (max-width: 440px) {
+      .finding-grid { grid-template-columns: 1fr; }
+      .route { padding: 20px; }
+      .route ol { gap: 20px 17px; }
+      .route strong { font-size: 17px; }
+      .route p { font-size: 12px; }
+      .error-term { grid-template-columns: 1fr; gap: 3px; }
+      .metric .value { font-size: 46px; }
+      .application { padding: 20px; }
+      th, td { padding: 11px; }
+      .page-footer { flex-direction: column; gap: 8px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+    @media print {
+      body { background: white; font-size: 10.5pt; color: #111; }
+      .shell { width: 100%; }
+      .sidebar, .skip-link, .page-footer a { display: none; }
+      .reading-layout { display: block; }
+      .hero { padding: 28px 0; }
+      h1 { font-size: 32pt; }
+      h2 { font-size: 21pt; }
+      .route { color: #111; background: #f1f1f1; border: 1px solid #999; }
+      .route p, .route-label, .route .step { color: #444; }
+      .figure, .callout, .finding, .equation, .proposal { break-inside: avoid; }
+      .chapter { margin-bottom: 30px; }
+      .section-head { break-after: avoid; }
+      .table-wrap { overflow: visible; }
+      .model-table { min-width: 0; }
+      .application { background: #f5f5f5; }
+      a { color: inherit; }
+      img { max-height: 650px; object-fit: contain; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nonlinear System Identification: A User-Oriented Road Map - 요약">
+<meta property="og:description" content="Nonlinear System Identification: A User Oriented Road Map 요약 한줄 요약 비선형 시스템 식별을 처음 하는 실무자를 위한 72쪽짜리 안내서다. 순서는 네 가지다. (1) 주기 가진(멀티사인) 으로 모델 없이 비선형 왜곡의 크기와 잡음 바닥을 먼저 재서 선형으로 충분한지 결정한다. (2) 물리 지식의 양에 따라 흰색→검은색 모델 팔레트 에서 고른다. (3) 비선형에서는 구조 모델 오차">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/rkuaoz/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/rkuaoz/assets/figure3.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Nonlinear System Identification: A User-Oriented Road Map - 요약">
+<meta name="twitter:description" content="Nonlinear System Identification: A User Oriented Road Map 요약 한줄 요약 비선형 시스템 식별을 처음 하는 실무자를 위한 72쪽짜리 안내서다. 순서는 네 가지다. (1) 주기 가진(멀티사인) 으로 모델 없이 비선형 왜곡의 크기와 잡음 바닥을 먼저 재서 선형으로 충분한지 결정한다. (2) 물리 지식의 양에 따라 흰색→검은색 모델 팔레트 에서 고른다. (3) 비선형에서는 구조 모델 오차">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/rkuaoz/assets/figure3.png">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/schoukens2019-roadmap/">
+</head>
+<body>
+  <a class="skip-link" href="#article-content">본문 바로가기</a>
+
+  <div class="shell" id="top">
+    <header class="masthead">
+      <strong>Engineering / Research Notes</strong>
+      <span class="edition">시스템 식별 · 실험과 모델 사이</span>
+      <span>2019 Paper / 2026 Review</span>
+    </header>
+
+    <main>
+      <article aria-labelledby="article-title">
+        <header class="hero">
+          <p class="eyebrow">Research Report · Nonlinear System Identification</p>
+          <h1 id="article-title">비선형 모델을 만들기 전에,<br><em>비선형부터 측정하라</em></h1>
+          <p class="dek">복잡한 모델이 언제 필요한지부터 묻는다. 멀티사인 실험, 물리 지식에 따른 모델 선택, 구조 오차와 검증까지—Schoukens와 Ljung의 72쪽 로드맵을 실무의 순서로 읽는다.</p>
+          <div class="byline">
+            <span>원 논문 · Johan Schoukens &amp; Lennart Ljung</span>
+            <span>IEEE Control Systems Magazine · 2019</span>
+            <span>요약 노트 · <time datetime="2026-09-25">2026.09.25</time></span>
+          </div>
+        </header>
+
+        <nav class="route" aria-label="비선형 시스템 식별의 네 단계">
+          <p class="route-label">THE ROAD MAP — 모델보다 먼저 정할 네 가지</p>
+          <ol>
+            <li>
+              <span class="step">01 / MEASURE</span>
+              <strong><a href="#measure">왜곡부터 측정</a></strong>
+              <p>잡음과 비선형 왜곡을 나누고, 선형 모델로 충분한지 판단한다.</p>
+            </li>
+            <li>
+              <span class="step">02 / CHOOSE</span>
+              <strong><a href="#palette">물리 지식으로 선택</a></strong>
+              <p>알고 있는 물리와 비선형의 위치에 맞춰 모델 구조를 고른다.</p>
+            </li>
+            <li>
+              <span class="step">03 / WEIGH</span>
+              <strong><a href="#structural-error">목적에 맞게 평가</a></strong>
+              <p>구조 오차가 크다면 실제 사용 목적에 맞게 비용 함수를 정한다.</p>
+            </li>
+            <li>
+              <span class="step">04 / VALIDATE</span>
+              <strong><a href="#validation">새로운 입력으로 검증</a></strong>
+              <p>독립 데이터와 다른 입력으로 시험하고 상태 영역을 확인한다.</p>
+            </li>
+          </ol>
+        </nav>
+
+        <div class="reading-layout">
+          <aside class="sidebar" aria-label="글 탐색">
+            <p class="sidebar-label">IN THIS REPORT</p>
+            <nav class="toc" aria-label="목차">
+              <a href="#abstract"><span>00</span>초록과 핵심 발견</a>
+              <a href="#difficulty"><span>01</span>비선형이 어려운 이유</a>
+              <a href="#measure"><span>02</span>모델 없이 먼저 재기</a>
+              <a href="#palette"><span>03</span>모델 팔레트</a>
+              <a href="#crane"><span>04</span>유압 크레인의 증거</a>
+              <a href="#experiment"><span>05</span>실험과 일반화</a>
+              <a href="#structural-error"><span>06</span>구조 오차의 규칙</a>
+              <a href="#validation"><span>07</span>검증과 한계</a>
+              <a href="#hr35"><span>08</span>HR35 적용 제안</a>
+              <a href="#takeaways"><span>09</span>실무의 다음 질문</a>
+              <a href="#sources"><span>↗</span>출처와 해석 범위</a>
+            </nav>
+            <p class="sidebar-note"><strong>이 글의 읽기 기준</strong>앞부분은 논문의 논지와 사례를 요약한다. HR35 부분은 원 노트 작성자의 적용 의견이며, 별도 검증이 필요한 가설로 구분한다.</p>
+          </aside>
+
+          <div class="article-body" id="article-content">
+            <section class="abstract" id="abstract" aria-labelledby="abstract-title">
+              <span class="small-label">Abstract / 초록</span>
+              <h2 id="abstract-title">좋은 식별은 모델 선택보다 앞에서 시작된다</h2>
+              <p>비선형 시스템 식별의 첫 질문은 “어떤 알고리즘을 쓸까”가 아니라 “비선형이 얼마나 크고, 어디에 있는가”다. 이 논문은 주기 가진을 이용한 비모수 왜곡 분석에서 출발해 물리 지식의 양에 따른 모델 선택, 구조 모델 오차를 고려한 추정, 새로운 입력과 상태 영역을 통한 검증으로 이어지는 실무 지도를 제시한다. 탱크·완충조·연료 공급계·유압 크레인·뇌·배터리의 여섯 사례를 관통하는 메시지는 같다. <strong>모델의 복잡도만큼 중요한 것은 무엇을 측정했고, 어디에서 사용할 것인가다.</strong></p>
+            </section>
+
+            <section class="findings" aria-labelledby="findings-title">
+              <h2 id="findings-title">먼저 읽는 네 가지 발견</h2>
+              <div class="finding-grid">
+                <div class="finding">
+                  <span class="index">FINDING 01</span>
+                  <h3>선형의 한계를 먼저 관측할 수 있다</h3>
+                  <p>멀티사인은 모델을 맞추기 전에 비선형 왜곡과 잡음 바닥을 분리해 보여 준다.</p>
+                </div>
+                <div class="finding">
+                  <span class="index">FINDING 02</span>
+                  <h3>작은 구조 변경이 큰 차이를 만든다</h3>
+                  <p>유압 크레인은 입력단 정적 비선형을 추가하자 적합률이 42%에서 72%로 높아졌다.</p>
+                </div>
+                <div class="finding">
+                  <span class="index">FINDING 03</span>
+                  <h3>최선의 모델도 입력에 따라 달라진다</h3>
+                  <p>구조 오차가 남으면 실험 입력과 비용 함수가 추정 결과의 의미를 결정한다.</p>
+                </div>
+                <div class="finding">
+                  <span class="index">FINDING 04</span>
+                  <h3>진폭과 주파수가 같아도 검증은 실패한다</h3>
+                  <p>서로 다른 입력이 방문하는 상태 영역까지 같다는 보장은 없다.</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="chapter" id="difficulty" aria-labelledby="difficulty-title">
+              <header class="section-head">
+                <span class="section-kicker">01 / THE PROBLEM</span>
+                <h2 id="difficulty-title">비선형 모델은 관측하지 않은 영역을 보장하지 않는다</h2>
+              </header>
+              <p class="lead">선형 모델의 익숙한 직관은 비선형으로 넘어가는 순간 약해진다. 같은 진폭과 주파수 대역을 확보했더라도, 시스템이 실제로 지나가는 상태 영역은 다를 수 있다.</p>
+
+              <figure class="figure">
+                <div class="image-mat compact">
+                  <img src="assets/figure3.png" alt="선형 모델의 평면과 비선형 모델의 곡면을 비교한 개념도. 비선형 곡면에서는 관측하지 않은 영역의 형태를 알기 어렵다." decoding="async">
+                </div>
+                <figcaption><span class="fig-label">원 논문 그림 3</span>선형의 평면과 비선형의 곡면. 이 대비는 비선형 식별에서 표본이 덮는 영역이 왜 중요한지 보여 준다.</figcaption>
+              </figure>
+
+              <p>따라서 <strong>관심 영역 전체를 실험으로 덮는 일</strong>이 출발점이다. 진폭 범위와 주파수 대역의 일치는 필요조건이지만 충분조건은 아니다. 학습 데이터 밖으로 나갈수록 모델의 성능을 별도로 확인해야 한다.</p>
+              <p>또 하나의 차이는 오차의 성격이다. 선택한 모델 구조로 실제 시스템을 완전히 표현하지 못하는 <strong>구조 모델 오차</strong>가 측정 잡음보다 클 수 있다. 이때 잡음만을 중심으로 설계한 최대우도 비용 함수, 이론 공분산, 잔차 백색성 검정만으로 모델의 신뢰도를 설명하기 어렵다.</p>
+
+              <div class="callout">
+                <h3>잡음이 어디에 들어오는지도 중요하다</h3>
+                <p><span class="formula formula-small">y = (u + w)<sup>2</sup> + v</span>프로세스 잡음 <i>w</i>가 제곱 비선형 앞에 들어가면, 전개된 식에는 2<i>uw</i>와 <i>w</i><sup>2</sup>가 생긴다. 잡음 자체가 평균 0이어도 출력 교란은 평균이 0이 아닐 수 있고 입력에도 종속된다. 단순히 출력에 독립 잡음이 더해진다는 가정이 깨지는 이유다.</p>
+              </div>
+            </section>
+
+            <section class="chapter" id="measure" aria-labelledby="measure-title">
+              <header class="section-head">
+                <span class="section-kicker">02 / MEASURE BEFORE MODELING</span>
+                <h2 id="measure-title">선형으로 충분한가? 모델 없이 먼저 재기</h2>
+              </header>
+              <p>랜덤 위상 멀티사인은 여러 주파수의 사인파를 합친 주기 입력이다. 관심 대역의 진폭을 정하고, 각 성분에 서로 독립적인 랜덤 위상을 부여한다. 여기서 일부 주파수를 의도적으로 비워 두면 비선형이 만들어 낸 성분을 관측할 수 있다.</p>
+
+              <div class="equation" aria-label="랜덤 위상 멀티사인 식">
+                <span class="formula">u(t) = ∑<sub>k=1</sub><sup>F</sup> U<sub>k</sub> cos(2πk f<sub>0</sub>t + φ<sub>k</sub>)</span>
+                <span class="formula formula-small">f<sub>0</sub> = f<sub>s</sub>/N, &nbsp; φ<sub>k</sub> ∼ U[0, 2π)</span>
+                <span class="equation-label">원 논문 식 (27) · 가진하지 않는 주파수에서는 U<sub>k</sub> = 0</span>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <caption>멀티사인 실험의 설계 변수</caption>
+                  <thead><tr><th scope="col">기호</th><th scope="col">의미와 역할</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">f<sub>0</sub></th><td>주파수 분해능. 주기는 T = 1/f<sub>0</sub> = N/f<sub>s</sub>다.</td></tr>
+                    <tr><th scope="row">U<sub>k</sub></th><td>각 주파수의 진폭. 홀수 성분만 가진하고 일부 홀수 성분도 비워 두면 짝수·홀수 왜곡을 분리해 관측한다.</td></tr>
+                    <tr><th scope="row">φ<sub>k</sub></th><td>서로 독립인 랜덤 위상. 위상 실현을 바꿔 여러 번 측정한다.</td></tr>
+                    <tr><th scope="row">f<sub>s</sub>, N</th><td>표본 주파수와 한 주기의 표본 수. 반복 주기의 차이를 통해 잡음 수준을 추정한다.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <figure class="figure">
+                <div class="image-mat">
+                  <img src="assets/figure4.png" alt="홀수 랜덤 위상 멀티사인의 왜곡 분석. 입력 진폭이 증가하는 네 조건에서 홀수 왜곡과 짝수 왜곡이 잡음 바닥과 분리되어 나타난다." loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-label">원 논문 그림 4</span>가진하지 않은 홀수 주파수의 홀수 왜곡은 빨강, 짝수 주파수의 짝수 왜곡은 파랑, 잡음 바닥은 초록으로 표시된다. 가진 크기가 (a)에서 (d)로 커지며 왜곡이 증가한다.</figcaption>
+              </figure>
+
+              <blockquote class="pullquote">
+                <p>선형 시스템은 입력 주파수를 옮기지 못한다.<br>비워 둔 주파수가 비선형을 드러내는 관측창이 된다.</p>
+                <footer>논문의 왜곡 분석 원리를 풀어쓴 설명</footer>
+              </blockquote>
+
+              <p>주기 정상상태에서 누설과 잡음을 구분할 수 있도록 실험하면, 비가진 주파수에 나타난 출력 성분으로 비선형 왜곡을 평가할 수 있다. 주기 반복 간 차이는 잡음 바닥을 알려 준다. <strong>왜곡과 잡음 바닥의 간격은 비선형 모델로 줄일 수 있는 오차의 여지를 가늠하는 기준</strong>이다. 실제 개선 폭은 모델 구조와 추정·검증 결과에 달려 있다.</p>
+              <p>사인 스윕은 공진계에서 고조파가 감쇠되면서 비선형을 작게 보이게 할 수 있다. 논문은 주기 가진이 가능하다면 멀티사인 분석을 먼저 수행하라고 권한다. 선형 식별과 비슷한 실험 부담으로, 이후 모델링의 필요성과 방향을 판단할 수 있기 때문이다.</p>
+            </section>
+
+            <section class="chapter" id="palette" aria-labelledby="palette-title">
+              <header class="section-head">
+                <span class="section-kicker">03 / THE MODEL PALETTE</span>
+                <h2 id="palette-title">알고 있는 물리만큼, 모델의 색을 고른다</h2>
+              </header>
+              <p>모델 팔레트는 성능 순위가 아니다. 물리식을 얼마나 알고 있는지, 비선형이 시스템의 어느 위치에 있는지에 따라 선택지를 정리한 지도다.</p>
+
+              <div class="table-wrap" role="region" aria-label="모델 팔레트 비교표" tabindex="0">
+                <table class="model-table">
+                  <caption>흰색에서 검은색까지: 사전 지식의 양에 따른 모델 구조</caption>
+                  <thead>
+                    <tr><th scope="col">색</th><th scope="col">모델 계열</th><th scope="col">무엇을 이용하나</th><th scope="col">논문 사례</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><span class="swatch s1"></span>흰색</td><th scope="row">제1원리</th><td>물리식으로 구성. 팔레트상 식별이 없는 기준점이며 Modelica 계열이 예시다.</td><td>—</td></tr>
+                    <tr><td><span class="swatch s2"></span>회백색</td><th scope="row">Off-white</th><td>알려진 물리식의 일부 상수를 추정한다.</td><td>2단 탱크</td></tr>
+                    <tr><td><span class="swatch s3"></span>연회색</td><th scope="row">반물리 모델</th><td>정성적 물리 지식으로 변수나 시간축을 변환한다.</td><td>펄프 완충조</td></tr>
+                    <tr><td><span class="swatch s4"></span>강회색</td><th scope="row">국소 선형·LPV</th><td>운전점별 선형 모델을 연결한다.</td><td>고압 연료 공급계</td></tr>
+                    <tr><td><span class="swatch s5"></span>청회색</td><th scope="row">블록 지향</th><td>선형 동역학과 정적 비선형을 조합한다.</td><td>유압 크레인</td></tr>
+                    <tr><td><span class="swatch s6"></span>검은색</td><th scope="row">NARX·NLSS·볼테라</th><td>범용 근사기로 비선형 관계를 표현한다.</td><td>뇌·리튬 배터리</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <figure class="figure">
+                <div class="image-mat">
+                  <img src="assets/figure5.png" alt="Hammerstein, Wiener, 병렬 및 피드백 구조를 포함한 블록 지향 비선형 모델의 구성도." loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-label">원 논문 그림 5</span>입력단 비선형을 표현하는 Hammerstein, 출력단 비선형을 표현하는 Wiener, 병렬 및 피드백 구조. 액추에이터·센서·내부 동역학 중 비선형이 어디에 있는지가 선택의 단서다.</figcaption>
+              </figure>
+
+              <p>Hammerstein 구조는 액추에이터처럼 입력단에 있는 비선형을, Wiener 구조는 센서처럼 출력단에 있는 비선형을 표현하기에 자연스럽다. 병렬 구조는 페이딩 메모리 시스템을 근사하는 데 쓰이며, Duffing 진동자처럼 내부 비선형이 중요한 시스템에는 피드백 구조가 필요할 수 있다.</p>
+
+              <figure class="figure">
+                <div class="image-mat compact">
+                  <img src="assets/table2.png" alt="외부 비선형과 내부 비선형을 비교한 원 논문 표. 피드백 고리 내부의 비선형은 공진 이동과 감쇠 변화 등을 일으켜 식별을 어렵게 한다." loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-label">원 논문 표 2</span>비선형이 되먹임 고리 밖에 있는지, 안에 있는지는 식별 난도를 크게 바꾼다. 내부 비선형은 공진 이동·감쇠 변화·카오스 등과 연결된다. 이 위치는 모델러의 취향이 아니라 시스템의 성질이다.</figcaption>
+              </figure>
+
+              <div class="callout warm">
+                <h3>물리식이 있다고 추정 상수가 곧 물리 상수인 것은 아니다</h3>
+                <p>탱크 사례는 손실항 두 개를 추가하자 적합 오차가 5.93%에서 1.78%로 감소했다. 논문은 이 개선을 손실 자체의 효과만으로 보기 어렵다고 해석한다. 누락된 현상이 있으면 추정 상수가 다른 결함까지 보상하며, 물리적 의미가 흐려질 수 있다.</p>
+              </div>
+
+              <h3>한 스텝 예측과 시뮬레이션을 구별하라</h3>
+              <p>표본율이 높으면 최근 측정값을 활용하는 한 스텝 예측은 단순 모델로도 잘 맞을 수 있다. 반면 시뮬레이션은 모델이 스스로 동역학을 재현해야 한다. 탱크의 GP-NARX 사례에서 <strong>예측 오차는 0.057%, 시뮬레이션 오차는 4.62%</strong>였다. 어떤 지표를 보고 있는지에 따라 같은 모델의 인상이 달라진다.</p>
+            </section>
+
+            <section class="chapter" id="crane" aria-labelledby="crane-title">
+              <header class="section-head">
+                <span class="section-kicker">04 / CASE EVIDENCE</span>
+                <h2 id="crane-title">유압 크레인: 비선형 하나를 제자리에 놓는 효과</h2>
+              </header>
+              <p class="lead">기계 구조가 만드는 공진과 유압 압력에서 힘으로 이어지는 비선형을 분리하면, 비교적 단순한 구조 변경으로도 설명력이 높아진다.</p>
+
+              <figure class="figure">
+                <div class="image-mat crane">
+                  <img src="assets/figure21.png" alt="식별 실험에 사용된 임업용 유압 크레인. 입력은 유압 압력이고 출력은 크레인 끝단 위치다." loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-label">원 논문 그림 21</span>임업용 유압 크레인. 유압 압력을 입력으로, 끝단 위치를 출력으로 관측한다.</figcaption>
+              </figure>
+
+              <div class="case-study">
+                <span class="small-label">Linear → Hammerstein</span>
+                <h3>5차 선형 모델 앞에 정적 비선형을 추가하다</h3>
+                <div class="metrics">
+                  <div class="metric">
+                    <span class="value">42<small>%</small></span>
+                    <span class="name">5차 선형 상태공간 모델 · 적합률</span>
+                  </div>
+                  <div class="metric highlight">
+                    <span class="value">72<small>%</small></span>
+                    <span class="name">Hammerstein 모델 · 적합률</span>
+                  </div>
+                </div>
+                <p>입력단에 포화를 표현하는 구간 선형 정적 비선형을 붙이자 적합률이 30%포인트 높아졌다. “입력 비선형 + 선형 동역학”이라는 선택은 성능뿐 아니라 시스템의 물리적 해석과도 연결된다.</p>
+                <figure class="figure">
+                  <div class="image-mat">
+                    <img src="assets/figure24.png" alt="유압 크레인의 측정 출력과 모델 응답 비교. 선형 모델 적합률 42%, Hammerstein 모델 적합률 72%." loading="lazy" decoding="async">
+                  </div>
+                  <figcaption><span class="fig-label">원 논문 그림 24</span>입력단 비선형을 포함한 모델의 응답 비교. 수치는 아래의 정규화된 시뮬레이션 적합률이다.</figcaption>
+                </figure>
+              </div>
+
+              <div class="equation" aria-label="시뮬레이션 적합률 정의">
+                <span class="formula">fit = 100 × (1 − ‖y − ŷ<sub>s</sub>‖ / ‖y − ȳ‖) [%]</span>
+                <span class="equation-label">원 논문 식 (28) · y: 측정 출력 · ŷ<sub>s</sub>: 시뮬레이션 출력 · ȳ: 측정 출력의 평균</span>
+              </div>
+              <p>이 수치는 오차율이나 결정계수와 같은 지표가 아니다. 측정 평균을 기준으로 한 출력 변동에 비해 시뮬레이션 오차가 얼마나 작은지를 나타낸다. 실무적 교훈은 분명하다. <strong>입력단 비선형이 의심된다면, 복잡한 범용 모델에 앞서 Hammerstein 구조를 시험할 근거가 있다.</strong></p>
+            </section>
+
+            <section class="chapter" id="experiment" aria-labelledby="experiment-title">
+              <header class="section-head">
+                <span class="section-kicker">05 / EXPERIMENT DESIGN</span>
+                <h2 id="experiment-title">일반화의 경계는 실험이 그린다</h2>
+              </header>
+              <p>고압 연료 공급계 사례는 입력 3개, 출력 1개인 시스템에 국소 선형 모델망을 적용한다. 램프·처프와 최적화된 계단 입력은 서로 다른 방식으로 시스템을 움직인다. 한쪽에서 잘 맞은 모델이 다른 쪽에서도 잘 맞는 것은 아니다.</p>
+
+              <figure class="figure">
+                <div class="image-mat">
+                  <img src="assets/figure19.png" alt="연료 공급계에서 램프·처프 입력과 OMNIPUS 계단 입력으로 학습한 국소 선형 모델의 검증 결과 비교. 서로 다른 입력 조건에서 오차가 커진다." loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-label">원 논문 그림 19</span>램프·처프로 학습한 모델은 OMNIPUS 계단 입력 구간 (c)에서 크게 어긋나며, 반대 방향의 검증도 구간 (b)에서 문제가 나타난다.</figcaption>
+              </figure>
+
+              <p>OMNIPUS 계단 열은 운전점이 관심 영역에 고루 퍼지도록 설계한다. 계단의 지속 시간은 지배 시정수를 고려하고, 진폭과 기울기 제약도 지킨다. 이는 단순히 입력을 크게 흔드는 것과 다르다. 시스템이 어떤 조합의 상태와 운전점을 실제로 방문하는지가 핵심이다.</p>
+              <p>같은 데이터의 가우시안 프로세스 모델은 입력 설계에 덜 민감했지만, 실험이 덮지 못한 영역의 문제를 없애지는 못했다. 이 사례는 <strong>모델 종류를 바꾸는 일보다 실험 설계가 더 큰 영향을 줄 수 있음</strong>을 보여 준다.</p>
+
+              <div class="callout">
+                <h3>최적 입력도 가정 안에서만 최적이다</h3>
+                <p>Fisher 정보에 기반한 입력 설계는 구조 오차가 없다는 가정에 의존한다. 비선형 시스템에서는 주파수 스펙트럼뿐 아니라 진폭 분포도 중요하다. 모든 시스템에 통하는 하나의 최적 입력은 기대하기 어렵다.</p>
+              </div>
+            </section>
+
+            <section class="chapter" id="structural-error" aria-labelledby="error-title">
+              <header class="section-head">
+                <span class="section-kicker">06 / WHEN MODEL ERROR DOMINATES</span>
+                <h2 id="error-title">구조 오차가 크면, 통계의 사용법도 바뀐다</h2>
+              </header>
+              <p>모델과 측정값의 차이를 전부 잡음으로 취급하면 중요한 원인을 놓친다. 논문은 오차를 예측할 수 없는 성분, 모델 구조의 한계, 유한한 데이터에 따른 추정 변동으로 나누어 본다.</p>
+
+              <div class="equation" aria-label="예측 불가 성분, 구조 모델 오차, 랜덤 오차로 나눈 오차 분해">
+                <span class="formula formula-small">y − h(u, θ̂<sub>N</sub>) = ν</span>
+                <span class="formula formula-small">+ [h<sub>0</sub>(u) − h(u, θ*<sub>u</sub>)]</span>
+                <span class="formula formula-small">+ [h(u, θ*<sub>u</sub>) − h(u, θ̂<sub>N</sub>)]</span>
+                <span class="equation-label">원 논문 식 (S37) · h<sub>0</sub>: 실제 시스템의 관계 · θ*<sub>u</sub>: 해당 입력 조건에서 최선인 모델 파라미터 · θ̂<sub>N</sub>: 데이터로 추정한 파라미터</span>
+                <div class="decomposition">
+                  <div class="error-term"><strong>예측 불가 성분</strong><span>ν — 모델로 예측할 수 없는 부분.</span></div>
+                  <div class="error-term"><strong>구조 모델 오차</strong><span>h<sub>0</sub>(u) − h(u, θ*<sub>u</sub>) — 선택한 모델 계열로 표현하지 못하는 부분.</span></div>
+                  <div class="error-term"><strong>랜덤 오차</strong><span>h(u, θ*<sub>u</sub>) − h(u, θ̂<sub>N</sub>) — 유한 데이터와 잡음으로 인한 추정 변동.</span></div>
+                </div>
+              </div>
+
+              <blockquote class="pullquote">
+                <p>“가장 좋은 모델”은 하나로 고정되지 않는다.<br>어떤 입력으로 물었는지에 따라 답이 바뀐다.</p>
+                <footer>구조 모델 오차가 입력에 종속된다는 논지의 요약</footer>
+              </blockquote>
+
+              <p>구조 오차가 남으면 최선의 파라미터 θ*<sub>u</sub> 자체가 입력 조건에 따라 달라진다. 가우시안 가진과 사인 가진에서 최선인 단순 모델이 서로 다를 수 있다는 뜻이다. 잡음만 가정한 공분산은 이 차이를 포착하지 못해 실제 변동을 과소평가할 수 있다.</p>
+
+              <div class="table-wrap">
+                <table>
+                  <caption>구조 오차가 지배할 때 바꾸어야 할 실무 기준</caption>
+                  <thead><tr><th scope="col">결정</th><th scope="col">실무 기준</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">실험 입력</th><td>나중에 사용할 입력과 같은 종류의 입력을 포함한다.</td></tr>
+                    <tr><th scope="row">비용 함수</th><td>잡음 분산만으로 가중하지 않고, 실제로 오차가 작아야 하는 대역과 용도를 반영한다.</td></tr>
+                    <tr><th scope="row">불확실성</th><td>검증에 실패한 모델의 이론 경계에 의존하지 않는다. 가진 실현을 바꾸어 반복하고 결과의 흩어짐을 관측한다.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>반복 실험도 관측하지 않은 영역까지 보증하지는 않는다. 다만 실제 조건에서 나타나는 변동을 직접 확인함으로써, 이론적인 오차 막대가 놓친 부분을 드러낼 수 있다.</p>
+            </section>
+
+            <section class="chapter" id="validation" aria-labelledby="validation-title">
+              <header class="section-head">
+                <span class="section-kicker">07 / VALIDATION &amp; LIMITS</span>
+                <h2 id="validation-title">새 데이터만으로는 부족하다. 다른 움직임으로 시험하라</h2>
+              </header>
+              <p>검증 데이터가 학습 데이터와 분리되어 있어도, 같은 종류의 입력만 반복하면 모델의 약점을 놓칠 수 있다. Duffing 진동자는 진폭과 스펙트럼이 비슷한 입력조차 서로 다른 상태 영역을 방문할 수 있음을 보여 준다.</p>
+
+              <figure class="figure">
+                <div class="image-mat">
+                  <img src="assets/figure7.png" alt="Duffing 진동자의 학습 및 검증 상태 궤적과 오차. 검증 입력의 진폭과 스펙트럼이 같아도 더 넓은 상태 영역을 방문하는 구간에서 오차가 증가한다." loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-label">원 논문 그림 7</span>파랑 학습 데이터로 식별한 NLSS 모델을 빨강 스윕 데이터로 검증한다. 상태 궤적 (a)가 학습 영역을 벗어나는 곳에서 오차 (b, c)가 커진다.</figcaption>
+              </figure>
+
+              <h3>검증에서 확인할 네 가지</h3>
+              <ul class="checklist">
+                <li><strong>독립 데이터:</strong> 교차 검증으로 시뮬레이션 적합률과 k 스텝 예측 성능을 확인했는가?</li>
+                <li><strong>잔차의 위치:</strong> 주기 가진의 왜곡 그림에 잔차를 겹쳐, 잡음 바닥과 남은 짝수·홀수 왜곡을 비교했는가?</li>
+                <li><strong>입력의 종류:</strong> 학습 때와 다른 종류의 입력에서도 모델을 시험했는가?</li>
+                <li><strong>상태 영역:</strong> 검증 궤적이 학습 궤적이 덮은 영역 안에 있는지 확인했는가?</li>
+              </ul>
+
+              <p>잔차 자기상관과 입력·잔차 교차상관 같은 선형 검증 도구는 2차 모멘트를 본다. 따라서 이 검정만으로 모든 비선형 의존성이 사라졌다고 판단할 수 없다. 고차 모멘트 검정은 더 많은 데이터를 요구해 실무 적용이 쉽지 않다.</p>
+
+              <h3>배터리: 운전점에 따라 선형의 충분성이 달라진다</h3>
+              <figure class="figure">
+                <div class="image-mat">
+                  <img src="assets/figure29.png" alt="리튬 배터리의 충전 상태 90%와 10%에서 비선형 왜곡을 비교한 그래프. 낮은 충전 상태에서 짝수 왜곡이 크게 증가한다." loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-label">원 논문 그림 29</span>충전 상태 90%인 (a)에서는 왜곡이 약 −50 dB로 1% 미만이다. 10%인 (b)에서는 짝수 왜곡이 출력의 약 10% 수준으로 커진다. 이 사례에서는 낮은 충전 상태에서 비선형 모델의 필요성이 뚜렷하다.</figcaption>
+              </figure>
+
+              <p>배터리 사례의 3상태·3차 다항 NLSS 모델은 선형 모델보다 약 10배 개선된 결과를 보였지만, 잔차는 여전히 잡음 바닥 위에 남았다. 다항 기저는 학습 영역 밖에서 발산해 검증 중 불안정해지기도 했다. <strong>개선되었다는 사실과 충분히 검증되었다는 판단은 별개다.</strong></p>
+
+              <div class="limitations">
+                <h3>이 로드맵이 남겨 둔 문제</h3>
+                <ul class="clean-list">
+                  <li>저자들의 경험을 바탕으로 선택한 안내서이며, 시변 시스템과 카오스의 본격적인 식별은 범위 밖이다.</li>
+                  <li>프로세스 잡음이 비선형 앞에 들어오는 경우에는 입자 필터 등 계산 부담이 큰 도구가 필요할 수 있다.</li>
+                  <li>구조 오차가 존재할 때 믿을 만한 불확실성 경계를 만드는 문제는 논문에서 미해결 과제로 남는다.</li>
+                </ul>
+                <p>이 범위와 한계는 2019년 논문에 대한 요약이며, 이후 연구 동향 전체를 평가한 것은 아니다.</p>
+              </div>
+            </section>
+
+            <section class="application" id="hr35" aria-labelledby="hr35-title">
+              <header class="section-head">
+                <span class="section-kicker">08 / IMPLICATIONS FOR HR35</span>
+                <h2 id="hr35-title">HR35에 옮겨 보면:<br>트윈보다 먼저, 축별 실험부터</h2>
+              </header>
+              <p class="application-intro">다음은 원 노트 작성자의 HR35 적용 의견을 실험 과제로 정리한 것이다. 논문이 HR35에서 검증한 결과는 아니다. 제시된 대역·주기·모델 차수는 장비 응답과 데이터로 확인해야 할 초기 후보값이다.</p>
+
+              <div class="proposal">
+                <span class="pill">제안 01 · 비모수 진단</span>
+                <h3>첫 실차 실험은 왜곡과 잡음의 분리</h3>
+                <p>조이스틱 명령을 CAN으로 주입할 수 있다는 전제에서, 축별 홀수 랜덤 위상 멀티사인을 먼저 시도한다. 노트는 파일럿 단 응답이 약 0.5 Hz라는 가정 아래 <strong>0.05–1 Hz 대역, 20–60초 주기, 3개 이상의 위상 실현</strong>을 초기안으로 제시한다. 주기와 가진 주파수는 f<sub>0</sub> = 1/T의 정수배 격자에 맞춰 함께 정해야 한다.</p>
+                <p class="detail">기대 산출물은 축별 왜곡 수준과 잡음 바닥이다. 아주대 PID 레인의 선형 설계와 서울대 MPC 레인의 비선형 예측 모델 필요성을 판단할 근거로 삼되, 실제 제어 요구 성능과 함께 평가한다.</p>
+              </div>
+
+              <div class="proposal">
+                <span class="pill">제안 02 · 단순 구조의 기준 모델</span>
+                <h3>붐·암에 축별 Hammerstein부터 시험</h3>
+                <p>입력단의 데드밴드·포화와 뒤따르는 기계 동역학을 분리할 수 있는지 확인한다. 초기 구조는 <strong>조이스틱→유량 정적 곡선 + 2–5차 선형 동역학</strong>이다. 이를 통해 얻는 비선형 곡선과 고유진동수는 전체 유압 트윈을 맞추기 전에 사용할 비교 기준이 된다.</p>
+                <p class="detail">논문의 크레인은 압력을 입력으로 사용한다. HR35의 조이스틱 입력으로 확장하면 밸브·파일럿 동역학까지 포함되므로, 같은 구조가 충분한지는 별도 검증해야 한다. 원 노트의 “하루 안에 식별”은 작업 목표이지 보장된 소요 시간이 아니다.</p>
+              </div>
+
+              <div class="proposal">
+                <span class="pill">제안 03 · 파라미터의 해석</span>
+                <h3>트윈의 빈틈을 메운 값을 물리 상수로 보고하지 않기</h3>
+                <p>원 노트는 현재 트윈에 펌프·LS·MCV 유량 공유가 빠져 있다고 본다. 이 조건에서 체적탄성계수 β, 보어, 유량계수 C<sub>d</sub>를 맞추면 누락된 현상을 흡수하는 유효 상수가 될 수 있다. β를 “계통 강성의 대용값”으로 해석하는 것과, 재료의 물리 상수로 단정하는 것을 구분해야 한다.</p>
+              </div>
+
+              <div class="proposal">
+                <span class="pill">제안 04 · 용도에 맞는 검증</span>
+                <h3>주요 판정 지표는 회차별 시뮬레이션 적합률</h3>
+                <p>20 Hz 한 스텝 예측만으로 트윈의 신뢰도를 판단하지 않는다. 회차별 홀드아웃 데이터에 식 (28)의 시뮬레이션 적합률을 적용하고, 공중 스텝·멀티사인·굴착 궤적으로 입력 종류를 바꾼다. 그림 7처럼 상태 영역의 포함 여부도 함께 확인한다.</p>
+                <p class="detail">공중에서 맞춘 모델이 흙과 접촉할 때 어긋나면, 학습 영역 밖의 조건과 누락된 접촉 동역학을 먼저 살핀다. 굴착까지 사용 범위로 삼는다면 그 조건의 검증 역시 완료 기준에 포함된다.</p>
+              </div>
+
+              <div class="proposal">
+                <span class="pill">제안 05 · 접촉 조건의 분리</span>
+                <h3>공중 데이터로 유압·기구를, 굴착 데이터로 흙 모델을</h3>
+                <p>흙 반력을 비선형 동역학에 영향을 주는 프로세스 외란으로 취급하면, 단순한 출력 오차 가정으로 충분하지 않을 수 있다. 먼저 공중 데이터로 유압·기구 모델을 식별하고, 이후 굴착 데이터로 흙 모델을 별도 식별하는 두 단계 접근을 검토한다.</p>
+                <p class="detail">외란의 작용 위치와 상태·입력 의존성을 확인해야 한다. 노트에 언급된 Zhao (2020), Egli (2022)는 후속 검토 대상이며, 제공된 정보만으로는 정확한 문헌을 특정하지 않는다.</p>
+              </div>
+
+              <div class="proposal">
+                <span class="pill">제안 06 · 반복 측정</span>
+                <h3>오차 막대는 같은 조건의 여러 회차에서 얻기</h3>
+                <p>트윈·실차 비교에서는 최소제곱 공분산만 제시하지 않고 반복 회차의 흩어짐을 보고한다. Janot의 IDIM-IV 통계 검정과 병행하는 방안도 원 노트의 제안이다. 다만 검정 실패만으로 구조 오차가 유일한 원인이라고 단정하지 않고, 도구의 가정과 다른 오차 원인을 함께 확인한다.</p>
+              </div>
+
+              <div class="proposal">
+                <span class="pill">제안 07 · 반물리 변환</span>
+                <h3>회전수 변화는 ‘유량 시간’으로 분리할 수 있을까</h3>
+                <p>펌프 유량이 엔진 회전수에 비례한다는 가정이 유효하다면, 완충조 사례처럼 누적 유량에 대응하는 시간축으로 재표본하는 방안을 시험할 수 있다. 엔진 회전수 기록이 있다면 변환 전후의 검증 오차를 비교해 볼 만한 반물리 모델링 가설이다.</p>
+              </div>
+            </section>
+
+            <section class="closing" id="takeaways" aria-labelledby="takeaways-title">
+              <span class="section-kicker">09 / THE PRACTICAL TAKEAWAY</span>
+              <h2 id="takeaways-title">다음 모델보다, 다음 실험을 먼저 설계하자</h2>
+              <p>크레인의 42→72% 적합률, 탱크의 5.93→1.78% 오차 감소, 완충조의 21→60% 적합 개선, 배터리의 약 10배 개선은 서로 다른 사례와 지표다. 숫자를 직접 순위화할 수는 없지만, 공통된 방향은 읽을 수 있다. 물리적 구조를 이해하고 그 구조를 드러내는 실험을 설계할 때 모델링의 선택지가 좁혀진다.</p>
+              <p>새 프로젝트에서 가장 먼저 남길 결과물은 복잡한 모델 파일이 아닐 수도 있다. 왜곡과 잡음을 나눈 그림 한 장, 관심 상태 영역을 덮는 입력 계획, 그리고 모델이 통과해야 할 시뮬레이션 검증 기준이 이후 작업의 품질을 결정한다.</p>
+              <p class="last-line">지금의 모델에 항을 더하기 전에 묻자. 우리가 아직 측정하지 않은 것은 무엇인가?</p>
+
+              <aside class="share-note" aria-label="공유용 핵심 문장">
+                <h3>Copy-ready takeaway / 공유할 한 문장</h3>
+                <p>비선형 모델을 만들기 전에 비선형의 크기를 재라. 실제 쓰임과 같은 입력으로 실험하고, 새로운 입력과 상태 영역으로 검증하라.</p>
+              </aside>
+            </section>
+
+            <section class="source-notes" id="sources" aria-labelledby="sources-title">
+              <h2 id="sources-title">출처와 해석 범위</h2>
+              <div class="citation">
+                <p><cite>Johan Schoukens and Lennart Ljung. “Nonlinear System Identification: A User-Oriented Road Map.” <em>IEEE Control Systems Magazine</em>, 39(6), 28–99, 2019.</cite><br>
+                DOI: <a>10.1109/MCS.2019.2938121</a> ·
+                <a>arXiv 공개 원고</a><br>
+                소속: Vrije Universiteit Brussel / TU Eindhoven; Linköping University.</p>
+              </div>
+              <ol>
+                <li><strong>작성 근거.</strong> 이 글은 제공된 한국어 논문 요약 노트를 공개 기사 형식으로 재구성했다. 모든 원문 문장과 수치를 별도로 대조한 문헌 검토는 아니며, 인용부호로 강조한 핵심 문장도 직접 인용이 아닌 요약·해설이다.</li>
+                <li><strong>그림과 식.</strong> 그림 3·4·5·21·24·19·7·29와 표 2는 제공된 로컬 이미지다. 원 논문 번호를 유지했고, 캡션은 노트에 근거해 재서술했다. 식 (27), (28), (S37) 역시 노트의 표기를 따랐다. 그림의 저작권은 해당 권리자에게 있다.</li>
+                <li><strong>수치의 비교.</strong> 크레인의 적합률, 탱크의 오차율, 완충조의 적합 개선, 배터리의 개선 배수는 서로 다른 평가 결과다. 하나의 공통 벤치마크로 해석하지 않는다.</li>
+                <li><strong>적용 의견.</strong> HR35 실험안과 트윈에 대한 평가는 원 노트 작성자의 의견이다. 입력 대역, 반복 횟수, 차수, 장비 특성은 논문 자체의 HR35 검증 결과가 아니다. Zhao·Egli·Janot 관련 언급은 정확한 서지정보가 제공되지 않아 정식 참고문헌에서 제외했다.</li>
+              </ol>
+              <div class="tags" aria-label="핵심 키워드">
+                <span>멀티사인</span>
+                <span>비모수 왜곡 분석</span>
+                <span>잡음 바닥</span>
+                <span>모델 팔레트</span>
+                <span>Hammerstein</span>
+                <span>구조 모델 오차</span>
+                <span>외삽</span>
+                <span>시뮬레이션 검증</span>
+                <span>OMNIPUS</span>
+              </div>
+            </section>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <footer class="page-footer">
+      <span>Research Notes · 비선형 시스템 식별 · 원 노트 작성일 2026.09.25</span>
+      <a href="#top">처음으로 ↑</a>
+    </footer>
+  </div>
+</body>
+</html>
