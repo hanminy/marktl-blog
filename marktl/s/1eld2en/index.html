@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>버킷은 경로가 아니라 저항을 따라야 한다 — 토공 자동화 연구 리뷰</title>
+  <style>
+    :root {
+      --paper: #f7f5ef;
+      --white: #fffefb;
+      --ink: #202e31;
+      --muted: #64716f;
+      --line: #d9ddd4;
+      --accent: #a7462d;
+      --accent-light: #f2e5da;
+      --green: #284e46;
+      --green-light: #e8eee6;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "Batang", Georgia, serif;
+      --sans: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 28px; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.85;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--green); text-underline-offset: 4px; }
+    a:hover { color: var(--accent); }
+    a:focus-visible, [tabindex]:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 5px;
+    }
+    ::selection { background: #e9cbb9; color: var(--ink); }
+    .skip {
+      position: absolute;
+      left: 20px;
+      top: -100px;
+      padding: 10px 18px;
+      background: var(--ink);
+      color: white;
+      z-index: 5;
+    }
+    .skip:focus { top: 14px; }
+    .shell { width: min(1160px, calc(100% - 88px)); margin-inline: auto; }
+    .masthead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding-block: 27px 22px;
+      border-bottom: 1px solid var(--ink);
+      font-size: 12px;
+      line-height: 1.4;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .masthead-brand { font-weight: 800; }
+    .masthead-note { color: var(--muted); letter-spacing: .04em; }
+    .hero { padding-block: 70px 44px; }
+    .eyebrow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      margin-bottom: 24px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .eyebrow span + span { color: var(--muted); font-weight: 500; }
+    h1, h2, h3, p, figure, blockquote { margin: 0; }
+    h1 {
+      max-width: 980px;
+      font-family: var(--serif);
+      font-size: clamp(39px, 5.4vw, 68px);
+      line-height: 1.3;
+      font-weight: 700;
+      letter-spacing: -.065em;
+      text-wrap: balance;
+    }
+    h1 em { color: var(--accent); font-style: normal; }
+    .deck {
+      max-width: 790px;
+      margin-top: 27px;
+      color: #53615e;
+      font-size: clamp(18px, 2.1vw, 22px);
+      line-height: 1.8;
+      letter-spacing: -.025em;
+    }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 24px;
+      margin-top: 30px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .hero-meta b { color: var(--ink); font-weight: 600; }
+    .abstract {
+      display: grid;
+      grid-template-columns: 170px 1fr;
+      gap: 30px;
+      padding: 33px 36px;
+      background: var(--green);
+      color: #f6f6ed;
+    }
+    .abstract-label {
+      padding-top: 3px;
+      font-size: 12px;
+      letter-spacing: .12em;
+      font-weight: 700;
+    }
+    .abstract-label span {
+      display: block;
+      margin-top: 5px;
+      color: #c1d0c4;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0;
+    }
+    .abstract p { font-size: 16px; line-height: 1.95; }
+    .abstract strong { color: #fff; }
+    .takeaways {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      margin-top: 18px;
+      border: 1px solid var(--line);
+      background: var(--white);
+    }
+    .takeaway { padding: 27px 28px 29px; }
+    .takeaway + .takeaway { border-left: 1px solid var(--line); }
+    .mini-label {
+      display: block;
+      color: var(--accent);
+      font-size: 11px;
+      letter-spacing: .1em;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .takeaway h3 { margin-block: 9px 8px; font-size: 19px; letter-spacing: -.03em; }
+    .takeaway p { font-size: 14px; line-height: 1.8; color: var(--muted); }
+    .article-grid {
+      display: grid;
+      grid-template-columns: 195px minmax(0, 1fr);
+      gap: 55px;
+      margin-top: 70px;
+    }
+    .sidebar { align-self: start; position: sticky; top: 28px; }
+    .sidebar-title {
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--ink);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .12em;
+    }
+    .toc { margin: 17px 0 0; padding: 0; list-style: none; }
+    .toc li { margin: 0 0 12px; }
+    .toc a { display: flex; gap: 12px; text-decoration: none; font-size: 13px; line-height: 1.65; }
+    .toc a span { color: var(--accent); font-size: 11px; padding-top: 2px; font-variant-numeric: tabular-nums; }
+    .sidebar-note {
+      margin-top: 29px;
+      padding-top: 17px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.85;
+    }
+    .article-body { min-width: 0; }
+    .section { padding-bottom: 53px; margin-bottom: 49px; border-bottom: 1px solid var(--line); }
+    .section-heading { margin-bottom: 24px; }
+    .section-number { font-size: 12px; font-weight: 800; letter-spacing: .1em; color: var(--accent); }
+    h2 {
+      margin-top: 9px;
+      font-family: var(--serif);
+      font-size: clamp(27px, 3vw, 35px);
+      line-height: 1.45;
+      letter-spacing: -.045em;
+      text-wrap: balance;
+    }
+    .article-body p + p { margin-top: 19px; }
+    .article-body h3 { margin-top: 31px; margin-bottom: 12px; font-size: 20px; line-height: 1.5; letter-spacing: -.025em; }
+    .article-body strong { font-weight: 750; }
+    .muted { color: var(--muted); }
+    .figure {
+      margin-block: 29px;
+      border: 1px solid var(--line);
+      background: var(--white);
+    }
+    .figure-image {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 200px;
+      padding: 30px;
+      background: #fff;
+    }
+    .figure img { display: block; height: auto; max-width: 100%; object-fit: contain; }
+    .figure-cycle img { width: 480px; }
+    .figure-control img { width: 650px; }
+    figcaption {
+      padding: 16px 22px;
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+    figcaption b { color: var(--ink); }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1px;
+      margin-block: 23px 14px;
+      padding: 1px;
+      background: var(--line);
+      list-style: none;
+    }
+    .steps li { background: var(--white); padding: 17px 12px; font-size: 13px; text-align: center; line-height: 1.65; }
+    .steps span { display: block; color: var(--muted); font-size: 10px; letter-spacing: .1em; margin-bottom: 5px; }
+    .steps .active { background: var(--green); color: white; font-weight: 700; }
+    .steps .active span { color: #c1d0c4; }
+    .note { font-size: 13px; color: var(--muted); line-height: 1.85; }
+    .case {
+      margin-block: 28px;
+      padding: 27px 30px;
+      background: var(--green-light);
+      border-top: 3px solid var(--green);
+    }
+    .article-body .case h3 { margin-top: 6px; }
+    .case-kicker { color: var(--green); font-size: 11px; letter-spacing: .1em; font-weight: 800; }
+    .numbers { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-block: 24px; }
+    .number + .number { padding-left: 28px; border-left: 1px solid #c6d0c6; }
+    .number-label { display: block; font-size: 13px; color: var(--muted); }
+    .number-value { display: block; margin-top: 7px; font-family: Georgia, serif; font-size: clamp(38px, 5vw, 56px); line-height: 1.2; letter-spacing: -.04em; color: var(--green); }
+    .number-value small { font-family: var(--sans); font-size: 18px; font-weight: 400; letter-spacing: 0; }
+    .number-detail { display: block; margin-top: 6px; font-size: 12px; color: var(--muted); }
+    .case p { font-size: 15px; }
+    .table-wrap {
+      margin-block: 23px 15px;
+      overflow-x: auto;
+      border-top: 2px solid var(--ink);
+      border-bottom: 1px solid var(--line);
+      background: var(--white);
+    }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; line-height: 1.85; }
+    caption { text-align: left; padding: 13px 17px; font-size: 12px; color: var(--muted); background: var(--paper); }
+    th, td { padding: 17px; vertical-align: top; border-bottom: 1px solid var(--line); }
+    thead th { background: #eceee7; font-size: 12px; font-weight: 700; color: #485952; }
+    tbody th { width: 20%; font-weight: 700; }
+    tbody tr:last-child > * { border-bottom: 0; }
+    .comparison { min-width: 640px; }
+    .comparison tbody th { width: 21%; }
+    .comparison td { width: 39.5%; }
+    .cell-note { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; }
+    .pullquote { margin: 35px 0; padding: 29px 0 29px 28px; border-left: 4px solid var(--accent); }
+    .pullquote blockquote { font-family: var(--serif); font-size: clamp(23px, 2.7vw, 30px); line-height: 1.7; letter-spacing: -.04em; }
+    .pullquote figcaption { padding: 12px 0 0; border: 0; font-size: 12px; }
+    .model-map {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 17px;
+      align-items: stretch;
+      margin-block: 24px;
+    }
+    .model-card { padding: 23px; background: var(--white); border: 1px solid var(--line); }
+    .model-card:last-child { border-color: #dcc4b3; background: var(--accent-light); }
+    .model-card b { display: block; margin-block: 6px 9px; font-size: 18px; }
+    .model-card p { color: #5c6862; font-size: 13px; }
+    .model-link { align-self: center; font-size: 24px; color: var(--accent); }
+    .systems { display: grid; grid-template-columns: 1fr 1fr; gap: 17px; margin-block: 26px; }
+    .system-card { padding: 23px; border: 1px solid var(--line); background: var(--white); }
+    .article-body .system-card h3 { margin-block: 8px 11px; font-size: 18px; }
+    .system-card p { font-size: 14px; color: #56645f; }
+    .agenda { margin: 22px 0 0; padding: 0; list-style: none; counter-reset: agenda; }
+    .agenda li { counter-increment: agenda; display: grid; grid-template-columns: 36px 1fr; gap: 16px; padding-block: 19px; border-bottom: 1px solid var(--line); }
+    .agenda li:last-child { border-bottom: none; }
+    .agenda li::before { content: counter(agenda, decimal-leading-zero); font-size: 13px; color: var(--accent); font-weight: 700; padding-top: 3px; }
+    .agenda b { display: block; margin-bottom: 5px; font-size: 17px; }
+    .agenda p { font-size: 15px; color: #59665f; }
+    .interpretation {
+      padding: 31px;
+      border: 1px solid #d4c7b8;
+      background: #f1ede3;
+    }
+    .interpretation .section-heading { margin-bottom: 20px; }
+    .interpretation h2 { font-size: 30px; }
+    .interpretation-intro { font-size: 14px; color: var(--muted); }
+    .article-body .interpretation h3 { font-size: 18px; margin-top: 26px; }
+    .interpretation p { font-size: 15px; }
+    .checklist { margin: 22px 0 0; padding: 18px 22px; list-style: none; background: var(--white); }
+    .checklist li { position: relative; padding: 7px 0 7px 26px; font-size: 14px; }
+    .checklist li::before { content: "□"; position: absolute; left: 0; color: var(--green); }
+    .ending { padding-block: 47px 41px; }
+    .ending h2 { margin-bottom: 21px; }
+    .ending p { font-size: 18px; }
+    .share-block { padding: 25px 28px; border: 1px solid var(--line); background: var(--white); margin-top: 29px; }
+    .share-block blockquote { margin-top: 10px; font-size: 16px; line-height: 1.85; user-select: all; }
+    .share-block .note { margin-top: 10px; font-size: 12px; }
+    .sources { margin-top: 28px; padding-top: 28px; border-top: 2px solid var(--ink); }
+    .sources h2 { font-family: var(--sans); font-size: 19px; letter-spacing: -.02em; margin-bottom: 20px; }
+    .sources p { font-size: 13px; color: var(--muted); line-height: 1.9; }
+    .sources .citation { color: var(--ink); font-size: 14px; }
+    .sources ol { padding-left: 20px; margin: 19px 0; font-size: 12px; line-height: 1.9; color: var(--muted); }
+    .sources li + li { margin-top: 10px; }
+    .keywords { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 25px; }
+    .keywords span { padding: 4px 10px; border: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin-top: 64px;
+      padding-block: 23px 34px;
+      border-top: 1px solid var(--ink);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: .04em;
+    }
+    .footer a { white-space: nowrap; }
+
+    @media (min-width: 1400px) {
+      .shell { width: 1200px; }
+      .article-grid { grid-template-columns: 210px minmax(0, 1fr); gap: 65px; }
+    }
+    @media (max-width: 900px) {
+      .shell { width: calc(100% - 48px); }
+      .hero { padding-top: 49px; }
+      .abstract { grid-template-columns: 115px 1fr; padding: 27px; gap: 20px; }
+      .takeaway { padding: 22px; }
+      .article-grid { grid-template-columns: minmax(0, 1fr); gap: 35px; margin-top: 43px; }
+      .sidebar { position: static; }
+      .toc { display: flex; flex-wrap: wrap; gap: 12px 23px; }
+      .toc li { margin: 0; }
+      .sidebar-note { margin-top: 17px; padding-top: 13px; }
+      .sidebar-title { padding-bottom: 11px; }
+    }
+    @media (max-width: 600px) {
+      body { font-size: 16px; }
+      .shell { width: calc(100% - 36px); }
+      .masthead { padding-block: 20px 17px; font-size: 10px; align-items: flex-start; }
+      .masthead-note { max-width: 120px; text-align: right; }
+      .hero { padding-block: 38px 29px; }
+      h1 { font-size: 39px; letter-spacing: -.055em; }
+      .hero-meta { gap: 7px 17px; margin-top: 23px; }
+      .abstract { grid-template-columns: 1fr; gap: 17px; padding: 24px; }
+      .abstract-label span { display: inline; margin-left: 12px; }
+      .abstract p { font-size: 15px; }
+      .takeaways { grid-template-columns: 1fr; }
+      .takeaway { padding: 21px 23px; }
+      .takeaway + .takeaway { border-left: none; border-top: 1px solid var(--line); }
+      .takeaway h3 { margin-block: 5px; }
+      .section { padding-bottom: 35px; margin-bottom: 34px; }
+      .figure-image { padding: 18px 12px; min-height: 140px; }
+      figcaption { padding: 14px 17px; font-size: 12px; }
+      .steps { grid-template-columns: 1fr; }
+      .steps li { display: flex; align-items: center; gap: 15px; text-align: left; padding: 11px 17px; }
+      .steps span { margin: 0; min-width: 49px; }
+      .case { padding: 23px; }
+      .numbers { gap: 17px; }
+      .number + .number { padding-left: 17px; }
+      .number-label { font-size: 12px; }
+      .number-value { font-size: 43px; }
+      .model-map { grid-template-columns: 1fr; gap: 10px; }
+      .model-link { text-align: center; line-height: 1; }
+      .systems { grid-template-columns: 1fr; }
+      .pullquote { padding-left: 21px; }
+      .interpretation { padding: 24px 21px; }
+      .interpretation h2 { font-size: 27px; }
+      .ending { padding-top: 35px; }
+      .ending p { font-size: 17px; }
+      .share-block { padding: 22px; }
+      .footer { margin-top: 40px; }
+      th, td { padding: 13px; }
+      .requirements { min-width: 550px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+    @media print {
+      body { background: white; color: black; font-size: 11pt; }
+      .shell { width: 100%; }
+      .sidebar, .skip, .footer a { display: none; }
+      .hero { padding-top: 24px; }
+      h1 { font-size: 34pt; }
+      .article-grid { display: block; margin-top: 28px; }
+      .section { margin-bottom: 25px; padding-bottom: 25px; }
+      .abstract { background: #eee; color: black; }
+      .abstract strong, .abstract-label span { color: black; }
+      .table-wrap { overflow: visible; }
+      table, .comparison, .requirements { min-width: 0; }
+      .figure, .case, .system-card, .share-block { break-inside: avoid; }
+      h2, h3 { break-after: avoid; }
+      a { color: inherit; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Key challenges in automation of earth-moving machines - 요약">
+<meta property="og:description" content="Key challenges in automation of earth moving machines 요약 한줄 요약 휠로더의 짧은 적재 사이클(접근–적재–후진–덤프, 25 30 s)을 중심으로 토공 기계 자동화 30년 연구를 정리한 리뷰. 결론은 &quot;기계 모델은 쉽고 버킷–매질 상호작용 모델은 사실상 불가능 하다&quot; 는 것이고, 그래서 적재 자동화는 궤적 추종이 아니라 저항력에 맞춰 궤적을 바꾸는 컴플라이언스 제어나 학습(당시엔 아직">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/1eld2en/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/1eld2en/assets/figure2.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Key challenges in automation of earth-moving machines - 요약">
+<meta name="twitter:description" content="Key challenges in automation of earth moving machines 요약 한줄 요약 휠로더의 짧은 적재 사이클(접근–적재–후진–덤프, 25 30 s)을 중심으로 토공 기계 자동화 30년 연구를 정리한 리뷰. 결론은 &quot;기계 모델은 쉽고 버킷–매질 상호작용 모델은 사실상 불가능 하다&quot; 는 것이고, 그래서 적재 자동화는 궤적 추종이 아니라 저항력에 맞춰 궤적을 바꾸는 컴플라이언스 제어나 학습(당시엔 아직">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/1eld2en/assets/figure2.png">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/dadhich2016-keychallenges/">
+</head>
+<body>
+  <a class="skip" href="#article-content">본문으로 건너뛰기</a>
+
+  <div class="shell" id="top">
+    <header class="masthead">
+      <span class="masthead-brand">Fieldnotes / Robotics Research</span>
+      <span class="masthead-note">토공 자동화 · 문헌을 읽는 관점</span>
+    </header>
+
+    <main>
+      <article aria-labelledby="article-title">
+        <header class="hero">
+          <div class="eyebrow">
+            <span>Research Review · 2016</span>
+            <span>자동 적재 / 원격 조작 / 접촉 제어</span>
+          </div>
+          <h1 id="article-title">버킷은 경로가 아니라<br><em>저항을 따라야 한다</em></h1>
+          <p class="deck">30년의 토공 자동화 연구가 마주한 벽은 기계 밖에 있었다. 흙과 암석의 불확실성을 중심으로 다시 읽는 자동 적재의 한계와 가능성.</p>
+          <div class="hero-meta">
+            <span><b>대상 논문</b> Dadhich · Bodin · Andersson</span>
+            <span><b>발표</b> Automation in Construction, 2016</span>
+            <span><b>노트 작성</b> <time datetime="2026-09-25">2026.09.25</time></span>
+          </div>
+        </header>
+
+        <section class="abstract" aria-labelledby="abstract-title">
+          <div class="abstract-label" id="abstract-title">ABSTRACT <span>리뷰의 핵심</span></div>
+          <p>휠로더의 짧은 적재 사이클은 약 <strong>25~30초</strong>다. 이 짧은 시간에 기계는 더미에 진입하고, 버킷을 채우고, 후진해 덤프 지점으로 이동한다. Dadhich 등의 2016년 리뷰는 토공 자동화 연구를 정리하며, 가장 어려운 문제가 <strong>버킷과 매질의 예측하기 힘든 상호작용</strong>이라고 진단한다. 적재 제어는 미리 정한 궤적을 고수하기보다 저항에 반응해야 하며, 중단기에는 보조 원격 조작이 현실적인 경로다. 학습 기반 제어는 당시의 해결책이 아니라 앞으로 검증할 연구 방향으로 제시된다.</p>
+        </section>
+
+        <section class="takeaways" aria-label="세 가지 핵심 발견">
+          <div class="takeaway">
+            <span class="mini-label">Finding 01 / 문제</span>
+            <h3>불확실성은 접촉에서 생긴다</h3>
+            <p>기구·유압·구동계보다 흙과 암석의 변화, 버킷이 받는 저항을 설명하기가 어렵다.</p>
+          </div>
+          <div class="takeaway">
+            <span class="mini-label">Finding 02 / 제어</span>
+            <h3>궤적은 조정할 수 있어야 한다</h3>
+            <p>밀도 높은 매질에서 위치 추종만 고집하면 구동 포화와 미끄럼이 적재를 가로막는다.</p>
+          </div>
+          <div class="takeaway">
+            <span class="mini-label">Finding 03 / 도입</span>
+            <h3>원격 조작에도 자동화가 필요하다</h3>
+            <p>조작 장소를 바꾸는 것만으로 성능이 유지되지는 않는다. 적재 보조와 피드백이 중요하다.</p>
+          </div>
+        </section>
+
+        <div class="article-grid">
+          <aside class="sidebar" aria-label="글 안내">
+            <div class="sidebar-title">IN THIS REPORT</div>
+            <nav aria-label="목차">
+              <ol class="toc">
+                <li><a href="#problem"><span>01</span>25초 안에 벌어지는 일</a></li>
+                <li><a href="#requirements"><span>02</span>무엇을 잘해야 하는가</a></li>
+                <li><a href="#control"><span>03</span>궤적에서 반응으로</a></li>
+                <li><a href="#system"><span>04</span>버킷 밖의 자동화</a></li>
+                <li><a href="#gaps"><span>05</span>남겨진 연구 질문</a></li>
+                <li><a href="#hr35"><span>06</span>HR35에 적용해 읽기</a></li>
+                <li><a href="#sources"><span>↗</span>출처와 해석의 범위</a></li>
+              </ol>
+            </nav>
+            <p class="sidebar-note">이 글의 기술 현황과 “아직 없다”는 표현은 <strong>2016년 리뷰 시점</strong>을 기준으로 한다. 마지막 HR35 절은 원문 요약과 구분한 연구 노트의 해석이다.</p>
+          </aside>
+
+          <div class="article-body" id="article-content">
+            <section class="section" id="problem" aria-labelledby="problem-title">
+              <header class="section-heading">
+                <span class="section-number">01 / THE PROBLEM</span>
+                <h2 id="problem-title">25초의 적재 사이클,<br>30년의 연구 과제</h2>
+              </header>
+              <p>접근하고, 채우고, 물러나고, 비운다. 휠로더의 작업은 단순한 반복처럼 보인다. 그러나 매번 같은 명령을 내려도 버킷이 만나는 흙·자갈·파쇄 암석·눈의 성질은 달라진다. 더미의 겉모양을 알더라도 내부의 밀도와 저항까지 알 수 있는 것은 아니다.</p>
+              <p>리뷰가 인용한 선행 연구는 오랜 연구에도 완전 자율 토공 기계가 실현되지 못한 배경으로 이러한 변동성을 지목한다. 핵심은 기계를 움직이는 방법에 더해, <strong>기계가 무엇과 어떻게 접촉하는지</strong>를 다루는 데 있다.</p>
+
+              <figure class="figure figure-cycle">
+                <div class="figure-image">
+                  <img src="assets/figure2.png" alt="휠로더가 더미와 덤프 트럭 사이를 V–Y 형태로 왕복하는 짧은 적재 사이클 도식" decoding="async">
+                </div>
+                <figcaption><b>그림 1 · 짧은 적재 사이클.</b> ① 더미 접근 → ② 적재 → ③ 후진 → ④ 덤프 트럭 접근 → ⑤ 덤프 → ⑥ 후진. 전체 사이클은 약 25~30초다. 출처: Dadhich 외(2016), 원문 Figure 2.</figcaption>
+              </figure>
+
+              <h3>완전 자율에 이르기 전의 현실적인 단계</h3>
+              <p>리뷰는 자동화를 다섯 단계로 나눈다. 중단기적으로 주목하는 단계는 사람이 원격으로 판단하면서 경로·충돌 회피·적재·덤프 기능의 도움을 받는 <strong>보조 원격 조작</strong>이다.</p>
+              <ol class="steps" aria-label="자동화의 다섯 단계">
+                <li><span>LEVEL 01</span>수동 운전</li>
+                <li><span>LEVEL 02</span>가시 원격</li>
+                <li><span>LEVEL 03</span>원격 조작</li>
+                <li class="active"><span>LEVEL 04</span>보조 원격 조작</li>
+                <li><span>LEVEL 05</span>완전 자율</li>
+              </ol>
+              <p class="note">가시 원격은 작업자가 기계를 직접 보며 조작하는 단계다. 보조 원격 조작에서는 일부 작업 기능을 자동화한다.</p>
+
+              <aside class="case" aria-labelledby="kiruna-title">
+                <span class="case-kicker">FIELD EVIDENCE / KIRUNA, 1999–2009</span>
+                <h3 id="kiruna-title">원격화가 곧 생산성 향상은 아니다</h3>
+                <p>키루나 광산의 LHD(적재·운반·덤프 장비) 운용 사례는 적재 성능의 차이를 보여준다.</p>
+                <div class="numbers">
+                  <div class="number">
+                    <span class="number-label">수동 LHD · 8대</span>
+                    <strong class="number-value">26.7 <small>t</small></strong>
+                    <span class="number-detail">연평균 버킷 적재 무게</span>
+                  </div>
+                  <div class="number">
+                    <span class="number-label">반자동 원격 LHD · 5대</span>
+                    <strong class="number-value">23.3 <small>t</small></strong>
+                    <span class="number-detail">연평균 버킷 적재 무게</span>
+                  </div>
+                </div>
+                <p>리뷰에 소개된 사례에서는 원격 조작의 적재량 저하를 보완하기 위해 붐·버킷 자동 동작을 추가했고, 약 <strong>5%의 적재량 개선</strong>이 보고됐다.</p>
+                <p class="note">해석의 한계: 파쇄 상태에 따라 같은 부피의 무게가 달라진다. 위 수치는 현장 성능 지표이며, 운전 방식만의 인과 효과나 모든 현장에 적용되는 격차로 읽어서는 안 된다.</p>
+              </aside>
+            </section>
+
+            <section class="section" id="requirements" aria-labelledby="requirements-title">
+              <header class="section-heading">
+                <span class="section-number">02 / PERFORMANCE &amp; SAFETY</span>
+                <h2 id="requirements-title">많이 채우는 것만으로는 충분하지 않다</h2>
+              </header>
+              <p>좋은 적재는 버킷을 채우면서도 타이어와 기계를 보호하고, 연료와 시간을 함께 관리해야 한다. 더 큰 출력을 쓰면 항상 더 좋은 결과가 나오는 것도 아니다. 저항이 커졌을 때 스로틀을 더 밟는 행동은 오히려 바퀴 미끄럼을 만들 수 있다.</p>
+
+              <div class="table-wrap" role="region" aria-label="안전 및 성능 요건 표, 좁은 화면에서는 가로로 스크롤" tabindex="0">
+                <table class="requirements">
+                  <caption>리뷰가 정리한 자동화의 주요 평가 요건</caption>
+                  <thead>
+                    <tr><th scope="col">평가 항목</th><th scope="col">관찰할 문제</th><th scope="col">설계에 주는 요구</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">바퀴 미끄럼<span class="cell-note">안전·유지보수</span></th>
+                      <td>과도한 구동으로 타이어 손상 발생. 노트에 정리된 관련 비용 비중은 정비비의 <strong>20~25%</strong>.</td>
+                      <td>저항 증가에 대응하는 견인 제어가 필요하다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">충돌<span class="cell-note">안전</span></th>
+                      <td>원격 후진 중 벽·낙석·배수로 등의 위험. 먼지·안개에 따른 감지 성능 제약.</td>
+                      <td>센서의 환경별 한계와 후진 시야를 고려해야 한다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">채움 인자<span class="cell-note">생산성</span></th>
+                      <td>자동 기능이 숙련자 수준의 적재량을 내기는 흙에서도 어렵다는 보고.</td>
+                      <td>실린더 압력 기반 무게 추정 등으로 실제 적재 성과를 평가한다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">연료<span class="cell-note">운영 효율</span></th>
+                      <td>리뷰에 제시된 운영비 비중은 <strong>30~60%</strong>. 전출력 적재는 연료와 마모에 불리.</td>
+                      <td>적재량과 함께 에너지 사용을 평가한다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">주기 시간<span class="cell-note">생산성</span></th>
+                      <td>적재 단계의 개선 여지가 크지만 시간 단축과 연료 절감은 상충할 수 있음.</td>
+                      <td>사이클 시간 하나로 제어기를 평가하지 않는다.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="note">비용 비중은 리뷰에 소개된 수치 범위다. 특정 장비나 현재 현장의 비용 구조를 보장하는 값은 아니다.</p>
+
+              <figure class="pullquote">
+                <blockquote>목표는 정해진 경로를 완주하는 것이 아니라,<br>버킷을 잘 채우는 것이다.</blockquote>
+                <figcaption>궤적 제어의 한계에 대한 리뷰의 논지를 재서술한 문장.</figcaption>
+              </figure>
+            </section>
+
+            <section class="section" id="control" aria-labelledby="control-title">
+              <header class="section-heading">
+                <span class="section-number">03 / CONTROL STRATEGIES</span>
+                <h2 id="control-title">기계는 모델링할 수 있다.<br>더미는 훨씬 어렵다.</h2>
+              </header>
+              <p>기구·유압·구동계의 모델은 상대적으로 다루기 쉽다. 반면 버킷–매질 상호작용은 복잡하고 확률적이다. 1960년대부터 이어진 힘 모델 연구와 여러 후속 접근에도, 리뷰는 실시간 제어에 쓸 수 있는 신뢰할 만한 상호작용 모델이 충분하지 않다고 본다.</p>
+              <p>따라서 “모델링 불가”라는 진단은 어떤 모델도 만들 수 없다는 뜻보다, <strong>다양한 매질에서 정확하고 계산 가능한 모델을 확보하기 어렵다</strong>는 실용적인 한계로 읽는 편이 적절하다.</p>
+
+              <div class="model-map" role="group" aria-label="기계 모델과 더미 모델의 차이">
+                <div class="model-card">
+                  <span class="mini-label">Machine / G<sub>m</sub></span>
+                  <b>기구 · 유압 · 구동계</b>
+                  <p>구조와 동역학을 바탕으로 비교적 체계적인 모델링이 가능하다.</p>
+                </div>
+                <div class="model-link" aria-label="상호작용">↔</div>
+                <div class="model-card">
+                  <span class="mini-label">Pile / G<sub>p</sub></span>
+                  <b>흙 · 자갈 · 파쇄 암석</b>
+                  <p>내부 상태를 알기 어렵고 작업 중에도 변한다. 접촉 저항의 예측이 핵심 난제다.</p>
+                </div>
+              </div>
+
+              <figure class="figure figure-control">
+                <div class="figure-image">
+                  <img src="assets/figure3.png" alt="적재 제어 블록도. 기계 모델 Gm과 미지의 더미 모델 Gp가 상호작용하는 제어 구조" loading="lazy" decoding="async">
+                </div>
+                <figcaption><b>그림 2 · 적재 제어의 모델 경계.</b> 기계 G<sub>m</sub>과 더미 G<sub>p</sub>를 구분하면 제어의 어려움이 어디에 집중되는지 드러난다. 출처: Dadhich 외(2016), 원문 Figure 3.</figcaption>
+              </figure>
+
+              <h3>다섯 접근은 무엇을 가정하는가</h3>
+              <p>제어 방법의 차이는 매질의 불확실성을 어디에서 처리하느냐에 있다. 정해진 경로를 따를 수도 있고, 힘에 반응해 경로를 바꿀 수도 있다. 반복 작업에서 보정값을 학습하거나 숙련자의 행동 규칙을 옮기는 방법도 있다.</p>
+
+              <div class="table-wrap" role="region" aria-label="자동 적재 제어 접근 비교 표, 좁은 화면에서는 가로로 스크롤" tabindex="0">
+                <table class="comparison">
+                  <caption>2016년 리뷰에 정리된 접근과 한계</caption>
+                  <thead>
+                    <tr><th scope="col">접근</th><th scope="col">핵심 아이디어</th><th scope="col">한계와 검증 범위</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">궤적·위치 제어</th>
+                      <td>더미 단면과 절단 궤적 사이의 부피를 최대화한다.<span class="cell-note">Mikhirev, 1983</span></td>
+                      <td>표면 형상만으로 내부 저항을 알 수 없다. 밀도 높은 매질에서는 포화·미끄럼으로 궤적을 따르기 어렵다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">컴플라이언스 제어</th>
+                      <td>저항에 따라 궤적을 수정한다. 임피던스·어드미턴스·2단 제어 등이 포함된다.<span class="cell-note">Marshall, 2008: 버킷 실린더 압력을 어드미턴스 입력으로 제안</span></td>
+                      <td>접촉에 적응하는 방향은 유망하지만, 리뷰 시점에는 실차 실험 근거가 제한적이었다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">피드포워드·외란 관측기</th>
+                      <td>더미를 외란으로 다루거나 반복 학습 제어(ILC)로 보정한다.<span class="cell-note">Liu, 2010: 시뮬레이션 / Maeda, 2013: 1.5 t 장비·균질 흙</span></td>
+                      <td>반복성이 낮은 파쇄 암석에서는 이전 작업에서 얻은 보정이 다음 작업에 통하기 어렵다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">인공지능 규칙</th>
+                      <td>퍼지·신경망·유한 상태 기계로 숙련자의 행동을 표현한다.<span class="cell-note">Xiaobo, 1996 / Lever, 2001</span></td>
+                      <td>기체별 수작업이 필요하다. 숙련자 행동을 재현해도 그것이 최적이라는 보장은 없다.</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">강화학습</th>
+                      <td>에피소드 단위의 작업에서 행동을 개선하고, 시연으로 초기화하는 방향을 제안한다.</td>
+                      <td>리뷰는 당시 굴착 적용 사례가 없다고 정리한다. 완전한 모델 없이 최적 성능을 보장하기도 어렵다.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3>압력은 제어의 입력이 될 수 있다</h3>
+              <p>특히 눈에 띄는 제안은 버킷 실린더 압력을 어드미턴스 제어의 입력으로 쓰는 것이다. 어드미턴스 제어는 힘이나 저항에 해당하는 신호를 받아 움직임을 조정한다. 압력을 단순한 상태 기록에 그치지 않고, <strong>진행 방향과 속도를 바꾸는 피드백</strong>으로 사용하는 발상이다.</p>
+              <p>학습 기반 접근도 같은 문제의식 위에 놓인다. 정확한 더미 모델을 먼저 완성하기보다 경험을 통해 적재 행동을 개선하려는 것이다. 다만 리뷰의 강화학습 논의는 가능성의 제안이며, 현장 성능이 검증된 결과와 구분해야 한다.</p>
+            </section>
+
+            <section class="section" id="system" aria-labelledby="system-title">
+              <header class="section-heading">
+                <span class="section-number">04 / THE WHOLE SYSTEM</span>
+                <h2 id="system-title">버킷 밖에서도 자동화는 막힌다</h2>
+              </header>
+              <p>적재 제어가 좋아져도 현장 전체가 자동화되는 것은 아니다. 어디를 파고 어디로 이동할지 알아야 하고, 작업자는 지연된 화면 너머의 상태를 판단해야 한다. 리뷰는 인지·항법·통신·작업자 경험을 하나의 시스템 문제로 다룬다.</p>
+
+              <div class="systems">
+                <section class="system-card" aria-labelledby="perception-title">
+                  <span class="mini-label">Perception</span>
+                  <h3 id="perception-title">더미에서 무엇을 볼 것인가</h3>
+                  <p>스테레오 카메라와 레이저로 진입 자세, 큰 돌, 채움 부피를 추정한다. 외부 형상에 관한 정보는 늘릴 수 있지만 내부 매질의 불확실성은 남는다.</p>
+                </section>
+                <section class="system-card" aria-labelledby="navigation-title">
+                  <span class="mini-label">Navigation</span>
+                  <h3 id="navigation-title">기계와 트럭의 상대 위치</h3>
+                  <p>리뷰 당시 측위·항법에서는 레이저 기반 접근이 지배적이었고 상용 제품도 존재했다. 덤프 트럭과의 상대 측위에는 UWB가 논의된다.</p>
+                </section>
+                <section class="system-card" aria-labelledby="network-title">
+                  <span class="mini-label">Communication</span>
+                  <h3 id="network-title">지연은 조작 품질의 일부다</h3>
+                  <p>WLAN 버퍼로 300 ms 이상의 지연이 생길 수 있으며, TCP의 선두 차단 문제도 다룬다. 대안으로 SCTP의 다중 홈 기능, DCCP/TFRC 등을 검토한다.</p>
+                </section>
+                <section class="system-card" aria-labelledby="operator-title">
+                  <span class="mini-label">Operator Experience</span>
+                  <h3 id="operator-title">필요한 감각을 돌려주는 일</h3>
+                  <p>필요한 정보만 제시하는 화면, 햅틱 조이스틱, 작업 계획기를 다룬다. 시각·청각·진동·힘 피드백을 통해 작업 상태를 전달하는 것이 과제다.</p>
+                </section>
+              </div>
+              <p class="note">통신 수치는 리뷰가 다룬 맥락에 한정된다. 노트에 언급된 오디오 지연 허용치 400 ms 역시 전체 원격 조작 시스템의 안전 기준으로 일반화할 수 없다.</p>
+            </section>
+
+            <section class="section" id="gaps" aria-labelledby="gaps-title">
+              <header class="section-heading">
+                <span class="section-number">05 / OPEN QUESTIONS</span>
+                <h2 id="gaps-title">리뷰가 남긴 네 가지 연구 질문</h2>
+              </header>
+              <p>리뷰의 무게중심은 더 정교한 궤적을 만드는 데서, 매질과 현장 조건의 변화에 적응하는 시스템으로 옮겨간다.</p>
+              <ol class="agenda">
+                <li>
+                  <div>
+                    <b>파쇄 암석에서도 적재할 수 있는가</b>
+                    <p>실험 근거가 특히 부족한 영역이다. 더미를 정확히 모델링하기 어렵다는 조건 아래, AI와 학습을 결합한 접근을 검증해야 한다.</p>
+                  </div>
+                </li>
+                <li>
+                  <div>
+                    <b>무선망과 프로토콜을 함께 검증했는가</b>
+                    <p>프로토콜의 기능만 비교해서는 부족하다. 실제 무선 환경에서 지연과 통신 성능이 원격 조작에 미치는 영향을 확인해야 한다.</p>
+                  </div>
+                </li>
+                <li>
+                  <div>
+                    <b>작업자는 기계의 상태를 충분히 느끼는가</b>
+                    <p>영상 외에도 소리·진동·힘 피드백이 중요하다. 어떤 정보를 어떻게 전달해야 조작 성능을 회복하는지가 남은 질문이다.</p>
+                  </div>
+                </li>
+                <li>
+                  <div>
+                    <b>적응하는 기계를 현장에 어떻게 연결할 것인가</b>
+                    <p>모델 프리 심층 강화학습, 기계 간 통신, SLAM 기반 지도, 현장 관리 소프트웨어가 향후 방향으로 거론된다. 개별 적재 동작과 현장 운영을 함께 다루는 과제다.</p>
+                  </div>
+                </li>
+              </ol>
+            </section>
+
+            <section class="interpretation" id="hr35" aria-labelledby="hr35-title">
+              <header class="section-heading">
+                <span class="section-number">06 / RESEARCH NOTE · HR35</span>
+                <h2 id="hr35-title">이 리뷰를 HR35의 질문으로 바꾸면</h2>
+              </header>
+              <p class="interpretation-intro">아래는 제공된 연구 노트의 프로젝트 관점이다. 2016년 논문의 결과가 아니라 HR35의 모델링·제어·평가를 위한 해석과 검증 제안이며, 축 A~C·F는 노트의 내부 분류를 따른다.</p>
+
+              <h3>① 기계 식별과 접촉 불확실성을 분리한다</h3>
+              <p>노트는 기계 모델을 축 A~C, 접촉 모델을 축 F의 문제로 읽는다. 기계 부분은 식별을 통해 오차를 좁히고, 토양은 단일한 정답 모델보다 파라미터 범위나 관입 상태 분류로 다루는 방향이다. Egli(2022)와 Zhao(2020)는 이 관점에서 후속 검토 대상으로 연결된다.</p>
+
+              <h3>② 궤적 오차만으로 굴착을 평가하지 않는다</h3>
+              <p>HR35 트렌칭에서는 유량 포화와 정지로 추종 오차가 커질 수 있다. 노트가 연결한 서울대 MCV의 방향 유지·속도 축소, Egli(2022)의 토크 반응처럼 저항에 따라 움직임을 조정하는 접근도 평가 대상에 넣을 필요가 있다. 이때 확인할 것은 경로의 정확도와 함께 실제 작업 성과다.</p>
+
+              <h3>③ 압력 6채널을 피드백 자원으로 본다</h3>
+              <p>버킷 실린더 압력을 어드미턴스 입력으로 쓰자는 제안은 HR35 압력 계측의 활용 범위를 넓힌다. 이를 검토하려면 <strong>센서 count→bar 보정</strong>이 선행돼야 한다. 노트는 이 보정이 축 A·B·F를 함께 뒷받침하는 전제라고 본다.</p>
+
+              <h3>④ 소형 장비의 안정성을 별도로 확인한다</h3>
+              <p>채움 인자·연료·주기 시간·미끄럼은 HR35 평가 지표의 출발점이 된다. 노트가 제기한 “3.5 t 장비는 12 t 장비보다 베이스 미끄럼·들림이 쉽게 생길 수 있다”는 우려는 장비 조건별로 검증할 가설이다. 대형 장비의 성능 기준을 그대로 옮기기 전에 안정성 지표를 확인해야 한다.</p>
+
+              <h3>⑤ 강화학습의 예측과 후속 성과를 구분한다</h3>
+              <p>노트는 2016년의 강화학습 제안을 Egli(2022)와 ETH 계열 연구로 이어 읽는다. 다만 “예측이 실현됐다”는 결론을 확정하려면 후속 논문의 작업 조건, 사용 신호, 실차 검증 범위를 대조해야 한다. HR35에 적용할 수 있는지는 그 다음의 질문이다.</p>
+
+              <ul class="checklist" aria-label="HR35 후속 검증 체크리스트">
+                <li>압력 채널의 단위 보정과 측정 신뢰도 확인</li>
+                <li>궤적 추종과 저항 반응 제어의 작업 성과 비교</li>
+                <li>적재량·에너지·시간·미끄럼·들림을 함께 기록</li>
+                <li>후속 학습 연구의 실험 조건과 HR35의 차이 대조</li>
+              </ul>
+            </section>
+
+            <section class="ending" aria-labelledby="ending-title">
+              <span class="section-number">TAKEAWAY</span>
+              <h2 id="ending-title">자동 적재의 기준을 바꾸는 질문</h2>
+              <p>이 리뷰를 읽고 나면 제어기의 성공을 묻는 방식이 달라진다. <strong>“주어진 궤적을 얼마나 정확히 따랐는가?”에 더해 “저항이 달라져도 얼마나 잘 채우고, 안전하고 효율적으로 끝냈는가?”</strong>를 물어야 한다.</p>
+              <p>2016년 리뷰가 제시한 방향은 분명하다. 모델링할 수 있는 기계는 정교하게 다루고, 불확실한 접촉에는 반응할 여지를 둔다. 보조 원격 조작, 컴플라이언스 제어, 학습 기반 접근을 비교할 때도 이 질문이 출발점이 된다.</p>
+
+              <aside class="share-block" aria-label="공유용 요약">
+                <span class="mini-label">한 문장으로 공유하기</span>
+                <blockquote>토공 자동화의 핵심은 정해진 궤적을 끝까지 따르는 데 있지 않다. 버킷이 만나는 저항에 맞춰 움직임을 바꾸며, 적재량·안전·효율을 함께 달성하는 데 있다. — Dadhich 외(2016) 리뷰를 읽고</blockquote>
+                <p class="note">위 문장은 이 글의 공유용 요약이며, 논문의 직접 인용이 아니다.</p>
+              </aside>
+            </section>
+
+            <section class="sources" id="sources" aria-labelledby="sources-title">
+              <h2 id="sources-title">출처와 해석의 범위</h2>
+              <p class="citation">Dadhich, S., Bodin, U., &amp; Andersson, U. (2016). <cite>Key challenges in automation of earth-moving machines.</cite> <i>Automation in Construction</i>, 68, 212–222.<br><a>논문 보기 · DOI 10.1016/j.autcon.2016.05.009</a></p>
+              <p>저자 소속: Luleå University of Technology · ProcessIT Innovations. 문헌 유형: 리뷰 논문.</p>
+              <ol>
+                <li><strong>작성 근거.</strong> 이 글은 제공된 Obsidian 논문 요약 노트를 편집·재구성했다. 원문 및 개별 선행 연구와의 독립 대조를 수행한 체계적 문헌고찰은 아니다.</li>
+                <li><strong>시점.</strong> 자율 운전의 실현 여부, 강화학습 적용 사례, 상용화 현황 등은 2016년 리뷰의 기술 범위를 설명한다. 노트 작성일인 2026년의 최신 동향을 뜻하지 않는다.</li>
+                <li><strong>수치.</strong> 키루나 적재량, 약 5%의 보조 기능 개선, 비용 비중과 통신 지연은 제공된 노트에 정리된 값이다. 현장 조건·분모·측정 방법의 세부 비교에는 원문과 해당 인용 문헌 확인이 필요하다.</li>
+                <li><strong>선행 연구.</strong> Maeda, Hemami, Almqvist, Vaha, Zweiri, Singh, Luengo, Marshall, Liu, Mikhirev, Xiaobo, Lever 등의 언급은 리뷰 요약을 통한 간접 참조다. Egli(2022), Zhao(2020), 서울대 MCV는 HR35 해석에 포함된 후속 참조이며, 이 노트에는 완전한 서지 정보가 없다.</li>
+                <li><strong>그림과 이용 조건.</strong> 그림 1·2는 제공된 원문 Figure 2·3 이미지다. 노트에 표시된 원문 라이선스는 CC BY-NC-ND이며, 이미지에도 원출처의 이용 조건이 적용된다. 본문 요약과 프로젝트 해석은 원문 저자의 직접 발언과 구분했다.</li>
+              </ol>
+              <div class="keywords" aria-label="핵심 키워드">
+                <span>짧은 적재 사이클</span>
+                <span>버킷–매질 상호작용</span>
+                <span>컴플라이언스 제어</span>
+                <span>채움 인자</span>
+                <span>바퀴 미끄럼</span>
+                <span>보조 원격 조작</span>
+                <span>강화학습</span>
+              </div>
+            </section>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <footer class="footer">
+      <span>FIELDNOTES · 문헌 요약과 연구 해석 · 2026.09.25</span>
+      <a href="#top">맨 위로 ↑</a>
+    </footer>
+  </div>
+</body>
+</html>

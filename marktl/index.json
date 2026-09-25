@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T12:54:13.130Z",
+  "updatedAt": "2026-09-25T12:58:44.021Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/dadhich2016-keychallenges/",
+      "excerpt": "Key challenges in automation of earth moving machines 요약 한줄 요약 휠로더의 짧은 적재 사이클(접근–적재–후진–덤프, 25 30 s)을 중심으로 토공 기계 자동화 30년 연구를 정리한 리뷰. 결론은 \"기계 모델은 쉽고 버킷–매질 상호작용 모델은 사실상 불가능 하다\" 는 것이고, 그래서 적재 자동화는 궤적 추종이 아니라 저항력에 맞춰 궤적을 바꾸는 컴플라이언스 제어나 학습(당시엔 아직",
+      "shortId": "1eld2en",
+      "slug": "dadhich2016-keychallenges",
+      "sourcePath": "02_research/필드로봇/시스템식별/dadhich2016-keychallenges.md",
+      "tags": [
+        "논문요약",
+        "문헌리뷰",
+        "토공자동화",
+        "휠로더",
+        "버킷적재",
+        "원격조작"
+      ],
+      "title": "Key challenges in automation of earth-moving machines - 요약",
+      "updatedAt": "2026-09-25T12:58:44.021Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/1eld2en/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/naya2011-unified/",
