@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T11:06:25.662Z",
+  "updatedAt": "2026-09-25T11:10:19.290Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/isarc2002-force-sensor-id/",
+      "excerpt": "Force Sensor by Driving Hydraulic Cylinders: Identification of Inertial Parameters and Tests 요약 한줄 요약 굴착기 실린더의 압력과 링크 각도만으로 힘 센서를 대신 하려면 링크의 질량·관성·실린더 마찰이 만드는 \"동적 영점(dynamic tare)\"을 알아야 한다. 이 논문은 소형 굴착기의 스틱·버킷 2링크에 대해 그 파라미터를 최소제곱으로 식별하되, 회",
+      "shortId": "mr3f4g",
+      "slug": "isarc2002-force-sensor-id",
+      "sourcePath": "02_research/필드로봇/시스템식별/isarc2002-force-sensor-id.md",
+      "tags": [
+        "논문요약",
+        "시스템식별",
+        "굴착기",
+        "여과회귀",
+        "마찰식별",
+        "힘센서"
+      ],
+      "title": "Force Sensor by Driving Hydraulic Cylinders: Identification of Inertial Parameters and Tests - 요약",
+      "updatedAt": "2026-09-25T11:10:19.290Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/mr3f4g/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/ferlibas2021-lumped/",

@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>굴착기 압력으로 힘을 읽다 — 관성·마찰 식별과 여과 회귀</title>
+  <style>
+    :root {
+      --paper: #f7f5ef;
+      --surface: #fffefa;
+      --ink: #233338;
+      --muted: #64706f;
+      --green: #183d42;
+      --green-soft: #e8efeb;
+      --accent: #ad4b31;
+      --line: #d9ded6;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "Batang", serif;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 17px; line-height: 1.85; word-break: keep-all; overflow-wrap: anywhere; }
+    a { color: var(--green); text-decoration-thickness: 1px; text-underline-offset: 4px; }
+    a:hover { color: var(--accent); }
+    a:focus-visible { outline: 3px solid var(--accent); outline-offset: 5px; }
+    .skip { position: absolute; left: 16px; top: -100px; background: var(--surface); padding: 8px 16px; z-index: 10; }
+    .skip:focus { top: 16px; }
+    .wrap { width: min(1180px, calc(100% - 80px)); margin-inline: auto; }
+    .masthead { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 26px 0; border-bottom: 1px solid var(--green); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+    .masthead strong { color: var(--green); }
+    .masthead span { color: var(--muted); text-align: right; }
+    .hero { padding: 65px 0 48px; }
+    .eyebrow { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin: 0 0 24px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+    .eyebrow::before { content: ""; width: 32px; height: 2px; background: currentColor; }
+    h1, h2, h3, p, figure, blockquote { margin-top: 0; }
+    h1 { max-width: 1050px; margin-bottom: 25px; color: var(--green); font-family: var(--serif); font-size: clamp(39px, 5.4vw, 68px); font-weight: 700; line-height: 1.3; letter-spacing: -.055em; }
+    h1 span { display: block; color: var(--ink); font-size: .62em; line-height: 1.5; margin-top: 14px; letter-spacing: -.045em; }
+    .dek { max-width: 790px; font-size: 20px; line-height: 1.85; color: #516160; margin-bottom: 30px; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px 22px; color: var(--muted); font-size: 12px; }
+    .hero-bottom { margin-top: 34px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+    .hero-bottom strong { color: var(--green); margin-right: 12px; }
+    .abstract { padding: 35px 40px; background: var(--green); color: #f4f7f0; display: grid; grid-template-columns: 155px 1fr; gap: 25px; }
+    .abstract h2 { font-family: var(--sans); color: #bfd6cb; font-size: 12px; letter-spacing: .14em; line-height: 1.7; margin: 5px 0 0; }
+    .abstract h2 span { display: block; color: #fff; letter-spacing: 0; font-size: 23px; margin-top: 5px; }
+    .abstract p { margin: 0; font-size: 17px; line-height: 1.95; }
+    .findings { padding: 38px 0 44px; }
+    .small-heading { margin: 0 0 17px; color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .finding-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+    .finding { padding-top: 19px; border-top: 2px solid var(--green); }
+    .finding .number { color: var(--accent); font-size: 12px; letter-spacing: .1em; }
+    .finding h3 { font-size: 19px; line-height: 1.6; margin: 9px 0; letter-spacing: -.03em; }
+    .finding p { color: var(--muted); font-size: 14px; line-height: 1.85; margin: 0; }
+    .body-grid { display: grid; grid-template-columns: 205px minmax(0, 1fr); gap: 64px; padding-top: 25px; }
+    .sidebar nav { position: sticky; top: 28px; padding-top: 18px; border-top: 1px solid var(--green); }
+    .sidebar ol { list-style: none; padding: 0; margin: 0; }
+    .sidebar li { margin: 0 0 12px; }
+    .sidebar a { display: flex; gap: 12px; text-decoration: none; font-size: 13px; line-height: 1.65; }
+    .sidebar a span { color: var(--accent); font-size: 11px; padding-top: 2px; }
+    .sidebar-note { color: var(--muted); border-top: 1px solid var(--line); margin-top: 27px; padding-top: 18px; font-size: 12px; line-height: 1.8; }
+    .prose { min-width: 0; max-width: 850px; }
+    .section { padding: 0 0 54px; margin-bottom: 44px; border-bottom: 1px solid var(--line); }
+    .section-label { display: block; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .15em; margin-bottom: 11px; text-transform: uppercase; }
+    h2 { color: var(--green); font-family: var(--serif); font-size: clamp(26px, 3vw, 33px); line-height: 1.5; letter-spacing: -.04em; margin-bottom: 23px; }
+    h3 { font-size: 20px; line-height: 1.6; letter-spacing: -.025em; margin: 32px 0 14px; }
+    p { margin-bottom: 20px; }
+    strong { font-weight: 750; }
+    .pullquote { margin: 33px 0; padding: 8px 0 8px 26px; border-left: 3px solid var(--accent); }
+    .pullquote p { font-family: var(--serif); color: var(--green); font-size: 25px; line-height: 1.7; letter-spacing: -.035em; margin: 0; }
+    .pullquote footer { margin-top: 12px; color: var(--muted); font-size: 11px; }
+    .table-wrap { overflow-x: auto; margin: 22px 0; border-top: 2px solid var(--green); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.8; }
+    caption { text-align: left; padding: 12px 14px; font-size: 12px; color: var(--muted); background: var(--green-soft); }
+    th, td { border-bottom: 1px solid var(--line); padding: 14px 16px; text-align: left; vertical-align: top; }
+    thead th { background: var(--green-soft); color: var(--green); font-size: 12px; }
+    tbody th { min-width: 110px; font-weight: 700; color: var(--green); }
+    figure { margin: 27px 0; }
+    .image-mat { padding: 28px; background: #fff; border: 1px solid var(--line); text-align: center; }
+    .image-mat a { display: inline-block; max-width: 100%; }
+    .image-mat img { display: block; max-width: 100%; height: auto; margin: auto; }
+    .geometry img { width: 360px; }
+    .source-table img { width: 360px; }
+    figcaption { margin-top: 11px; color: var(--muted); font-size: 12px; line-height: 1.85; }
+    figcaption b { color: var(--accent); font-weight: 700; margin-right: 8px; }
+    .equation { padding: 24px 25px; margin: 23px 0; border: 1px solid var(--line); background: var(--surface); }
+    .equation-line { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 14px; }
+    .math { font-family: Georgia, "Times New Roman", serif; font-size: clamp(19px, 2.5vw, 24px); color: var(--green); line-height: 1.9; overflow-wrap: anywhere; }
+    .eq-label { font-size: 11px; color: var(--muted); white-space: nowrap; }
+    .equation p { margin: 13px 0 0; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+    .flow { display: grid; grid-template-columns: 1fr 26px 1fr 26px 1fr; align-items: stretch; margin: 30px 0 14px; }
+    .flow-step { padding: 19px 15px; border: 1px solid var(--line); background: var(--surface); }
+    .flow-step b { display: block; font-size: 14px; color: var(--green); line-height: 1.6; }
+    .flow-step small { display: block; margin-top: 8px; font-size: 12px; color: var(--muted); line-height: 1.7; }
+    .arrow { display: grid; place-items: center; color: var(--accent); }
+    .note { background: var(--green-soft); border-left: 3px solid #7b998c; padding: 20px 24px; margin: 24px 0; font-size: 14px; }
+    .note p:last-child { margin-bottom: 0; }
+    .note-title { display: block; color: var(--green); font-size: 12px; font-weight: 800; margin-bottom: 8px; }
+    .experiment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .experiment { min-width: 0; }
+    .experiment h3 { margin-top: 5px; }
+    .experiment p { font-size: 14px; color: var(--muted); }
+    .experiment .image-mat { padding: 18px 12px; }
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; margin: 26px 0 12px; border: 1px solid var(--line); background: var(--surface); }
+    .stat { padding: 27px; }
+    .stat + .stat { border-left: 1px solid var(--line); }
+    .stat span { display: block; font-size: 12px; color: var(--muted); }
+    .stat strong { display: block; font-family: Georgia, serif; font-size: clamp(40px, 6vw, 62px); font-weight: 400; color: var(--green); line-height: 1.35; font-variant-numeric: tabular-nums; }
+    .stat:last-child strong { color: var(--accent); }
+    .stat strong small { font-size: .48em; }
+    .fine { color: var(--muted); font-size: 12px; line-height: 1.85; }
+    .reasons { margin: 24px 0; padding-left: 21px; }
+    .reasons li { margin-bottom: 12px; padding-left: 5px; }
+    .reasons li::marker { color: var(--accent); }
+    .application { background: #efeee7; border: 1px solid var(--line); padding: 28px; margin: 24px 0; }
+    .application h3 { margin-top: 0; }
+    .application p { font-size: 14px; }
+    .checklist { list-style: none; padding: 0; margin: 22px 0 0; }
+    .checklist li { position: relative; padding: 13px 0 13px 27px; border-top: 1px solid var(--line); font-size: 14px; }
+    .checklist li::before { content: "□"; position: absolute; left: 0; color: var(--accent); font-size: 17px; }
+    .closing { padding: 33px; background: var(--green); color: #eff5ef; margin-bottom: 43px; }
+    .closing h2 { color: #fff; font-size: 27px; }
+    .closing p { font-size: 16px; }
+    .closing p:last-child { margin-bottom: 0; color: #ccddd5; }
+    .sources { padding-bottom: 40px; }
+    .sources h2 { font-family: var(--sans); font-size: 18px; letter-spacing: -.02em; margin-bottom: 18px; }
+    .sources p { font-size: 13px; color: var(--muted); }
+    .citation { padding: 22px 25px; border: 1px solid var(--line); background: var(--surface); font-size: 14px; line-height: 1.85; margin-bottom: 17px; }
+    .citation cite { display: block; margin: 8px 0; font-style: normal; font-family: Georgia, serif; color: var(--green); font-size: 18px; }
+    .citation a { display: inline-block; margin: 12px 16px 0 0; font-size: 12px; }
+    .share { border-top: 1px solid var(--line); padding-top: 25px; }
+    .share blockquote { margin: 0; padding: 20px 24px; border: 1px dashed #a9b5aa; font-size: 15px; background: var(--surface); }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; padding: 20px 0 0; }
+    .tags span { padding: 4px 10px; border: 1px solid var(--line); color: var(--muted); font-size: 11px; border-radius: 3px; }
+    .page-footer { display: flex; justify-content: space-between; gap: 18px; padding: 26px 0 35px; border-top: 1px solid var(--green); color: var(--muted); font-size: 12px; margin-top: 30px; }
+    @media (max-width: 980px) {
+      .wrap { width: calc(100% - 48px); }
+      .body-grid { grid-template-columns: 155px minmax(0, 1fr); gap: 32px; }
+      .experiment-grid { grid-template-columns: 1fr; gap: 10px; }
+      .abstract { grid-template-columns: 110px 1fr; padding: 28px; }
+    }
+    @media (max-width: 700px) {
+      body { font-size: 16px; }
+      .wrap { width: calc(100% - 36px); }
+      .masthead { font-size: 10px; padding: 19px 0; letter-spacing: .07em; }
+      .hero { padding: 40px 0 30px; }
+      .dek { font-size: 17px; }
+      .abstract { grid-template-columns: 1fr; gap: 16px; padding: 25px; }
+      .abstract h2 span { display: inline; margin-left: 12px; font-size: 18px; }
+      .abstract p { font-size: 15px; }
+      .finding-grid { grid-template-columns: 1fr; gap: 23px; }
+      .findings { padding-bottom: 25px; }
+      .body-grid { display: block; padding-top: 12px; }
+      .sidebar { margin-bottom: 35px; }
+      .sidebar nav { position: static; }
+      .sidebar ol { display: grid; grid-template-columns: 1fr 1fr; column-gap: 14px; }
+      .sidebar-note { display: none; }
+      .section { padding-bottom: 35px; margin-bottom: 34px; }
+      .pullquote p { font-size: 22px; }
+      .flow { grid-template-columns: 1fr; }
+      .arrow { height: 30px; transform: rotate(90deg); }
+      .flow-step { padding: 15px 19px; }
+      th, td { padding: 12px 10px; }
+      .stat { padding: 20px; }
+      .image-mat { padding: 20px; }
+      .application, .closing { padding: 23px; }
+      .page-footer { align-items: baseline; font-size: 11px; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    @media print {
+      body { background: #fff; color: #111; font-size: 11pt; }
+      .wrap { width: 100%; }
+      .sidebar, .skip, .share, .page-footer a { display: none; }
+      .body-grid { display: block; }
+      .prose { max-width: none; }
+      .hero { padding-top: 25px; }
+      h1 { font-size: 32pt; }
+      .abstract, .closing { background: #fff; color: #111; border: 1px solid #aaa; }
+      .abstract h2, .abstract h2 span, .closing h2, .closing p:last-child { color: #111; }
+      figure, .equation, .stat-grid, .finding { break-inside: avoid; }
+      h2, h3 { break-after: avoid; }
+      .section { padding-bottom: 20px; margin-bottom: 25px; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Force Sensor by Driving Hydraulic Cylinders: Identification of Inertial Parameters and Tests - 요약">
+<meta property="og:description" content="Force Sensor by Driving Hydraulic Cylinders: Identification of Inertial Parameters and Tests 요약 한줄 요약 굴착기 실린더의 압력과 링크 각도만으로 힘 센서를 대신 하려면 링크의 질량·관성·실린더 마찰이 만드는 &quot;동적 영점(dynamic tare)&quot;을 알아야 한다. 이 논문은 소형 굴착기의 스틱·버킷 2링크에 대해 그 파라미터를 최소제곱으로 식별하되, 회">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/mr3f4g/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/mr3f4g/assets/figure2.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Force Sensor by Driving Hydraulic Cylinders: Identification of Inertial Parameters and Tests - 요약">
+<meta name="twitter:description" content="Force Sensor by Driving Hydraulic Cylinders: Identification of Inertial Parameters and Tests 요약 한줄 요약 굴착기 실린더의 압력과 링크 각도만으로 힘 센서를 대신 하려면 링크의 질량·관성·실린더 마찰이 만드는 &quot;동적 영점(dynamic tare)&quot;을 알아야 한다. 이 논문은 소형 굴착기의 스틱·버킷 2링크에 대해 그 파라미터를 최소제곱으로 식별하되, 회">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/mr3f4g/assets/figure2.png">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/isarc2002-force-sensor-id/">
+</head>
+<body>
+  <a class="skip" href="#article">본문 바로가기</a>
+
+  <div class="wrap" id="top">
+    <header class="masthead">
+      <strong>Fieldnotes / Robotics</strong>
+      <span>논문으로 읽는 건설 로보틱스 · 2002</span>
+    </header>
+
+    <main>
+      <article id="article">
+        <header class="hero">
+          <p class="eyebrow">Research Review <span>관성 · 마찰 · 시스템 식별</span></p>
+          <h1>굴착기 압력으로<br>힘을 읽다
+            <span>힘 센서를 대신하려면, 먼저 기계 자신의 힘을 알아야 한다</span>
+          </h1>
+          <p class="dek">실린더 압력에는 버킷이 받는 외력만 담겨 있지 않다. 링크의 무게와 관성, 실린더 마찰도 함께 들어 있다. 이들을 분리하기 위한 여과 회귀의 아이디어와, 실제 굴착기에서 드러난 추정의 한계를 읽는다.</p>
+          <div class="meta">
+            <span>원 논문 · Fiorenzo Malaguti &amp; S. Zaghi</span>
+            <span>ISARC 2002 · CNR-CEMOTER, Italy</span>
+            <span>노트 작성 · <time datetime="2026-09-25">2026.09.25</time></span>
+          </div>
+          <div class="hero-bottom"><strong>이 글의 질문</strong>각가속도를 직접 측정하지 않고, 압력 기반 힘 추정에 필요한 관성·마찰 파라미터를 알아낼 수 있을까?</div>
+        </header>
+
+        <section class="abstract" aria-labelledby="abstract-title">
+          <h2 id="abstract-title">ABSTRACT <span>연구 초록</span></h2>
+          <p>이 연구는 소형 굴착기의 스틱·버킷 2링크를 대상으로, 압력 기반 힘 추정에 필요한 관성·마찰 파라미터를 최소제곱으로 식별한다. 핵심은 <strong>동역학 회귀식 전체에 1차 저역통과 필터를 적용해 각가속도 측정 없이 계산 가능한 회귀식을 만드는 것</strong>이다. 약 150개의 정지 자세와 100 Hz로 40초간 수집한 동적 데이터를 사용했다. 보고된 토크 재현 오차는 스틱 18%, 버킷 26.7%. 방법의 가능성과 함께 센서 범위, 마찰, 실험 궤적의 중요성을 보여준다.</p>
+        </section>
+
+        <section class="findings" aria-labelledby="findings-title">
+          <h2 class="small-heading" id="findings-title">Key findings / 먼저 읽는 세 가지</h2>
+          <div class="finding-grid">
+            <div class="finding">
+              <span class="number">01 / METHOD</span>
+              <h3>각가속도 측정을 피한다</h3>
+              <p>회귀식 양변을 같은 필터로 처리하면 파라미터는 유지하면서 각도·각속도로 구성된 식을 얻을 수 있다.</p>
+            </div>
+            <div class="finding">
+              <span class="number">02 / EVIDENCE</span>
+              <h3>마찰을 포함해도 오차는 남는다</h3>
+              <p>동적 추정은 정적 추정보다 정확했지만, 18%와 26.7%의 토크 오차는 실용적 힘 센서 구현에 남은 과제를 드러낸다.</p>
+            </div>
+            <div class="finding">
+              <span class="number">03 / IMPLICATION</span>
+              <h3>버킷은 센서 선택에 민감하다</h3>
+              <p>낮은 작동 압력과 상대적으로 큰 마찰, 간접 각도 측정이 겹친다. 압력 센서의 풀스케일도 중요한 점검 항목이다.</p>
+            </div>
+          </div>
+        </section>
+
+        <div class="body-grid">
+          <aside class="sidebar">
+            <nav aria-label="기사 목차">
+              <p class="small-heading">In this report</p>
+              <ol>
+                <li><a href="#problem"><span>01</span>압력이 곧 외력은 아니다</a></li>
+                <li><a href="#system"><span>02</span>실험 장치와 측정</a></li>
+                <li><a href="#method"><span>03</span>여과 회귀의 원리</a></li>
+                <li><a href="#evidence"><span>04</span>실험이 보여준 결과</a></li>
+                <li><a href="#limits"><span>05</span>어디까지 해석할까</a></li>
+                <li><a href="#implications"><span>06</span>HR35에 주는 시사점</a></li>
+                <li><a href="#sources"><span>↗</span>출처와 해석 범위</a></li>
+              </ol>
+              <p class="sidebar-note">논문의 방법·결과와 노트 작성자의 HR35 적용 의견을 구분해 읽을 수 있도록 구성했다.</p>
+            </nav>
+          </aside>
+
+          <div class="prose">
+            <section class="section" id="problem">
+              <span class="section-label">01 / The problem</span>
+              <h2>압력에서 빼야 할 것들</h2>
+              <p>굴착 궤적을 계획하고, 땅속 물체를 감지하고, 버킷에 담긴 양을 추정하려면 버킷에 작용하는 힘을 알아야 한다. 하지만 직접 힘 센서를 장착하는 데에는 비용 부담이 따른다. 이미 유압으로 움직이는 굴착기라면, 실린더 압력을 힘 측정에 활용할 수 없을까?</p>
+              <p>문제는 압력으로 환산한 구동력에 <strong>링크 자체를 지탱하고 움직이는 데 필요한 힘</strong>도 포함된다는 점이다. 외력을 추정하려면 중력·관성·마찰의 기여를 먼저 계산해 빼야 한다. 이때 필요한 것이 기계의 <strong>동적 영점(dynamic tare)</strong>이다.</p>
+              <blockquote class="pullquote">
+                <p>힘을 읽기 전에,<br>기계가 스스로 움직이는 데 쓰는 힘부터 알아야 한다.</p>
+                <footer>연구의 문제의식을 요약한 문장 · 원문 직접 인용 아님</footer>
+              </blockquote>
+              <p>연구진은 뉴턴–오일러 동역학을 파라미터에 선형인 회귀식으로 정리하고, 실린더 마찰을 함께 식별했다. 여기에 여과 회귀를 적용해, 측정과 신호 처리에서 부담이 큰 각가속도 항을 다루는 방식을 바꿨다.</p>
+            </section>
+
+            <section class="section" id="system">
+              <span class="section-label">02 / Experimental system</span>
+              <h2>두 링크와 압력 센서에서 출발하다</h2>
+              <p>실험 대상은 전기 모터로 유압을 구동하고 비례 서보밸브를 장착한 소형 굴착기다. 모델은 스틱과 버킷의 2링크 운동을 다루며, 붐의 자세도 입력으로 고려한다.</p>
+              <div class="table-wrap">
+                <table>
+                  <caption>실험 구성과 관측 신호</caption>
+                  <tbody>
+                    <tr><th scope="row">구동 장치</th><td>전기 모터 기반 유압 구동, 비례 서보밸브로 개조</td></tr>
+                    <tr><th scope="row">대상 링크</th><td>스틱 θ<sub>1</sub> · 버킷 θ<sub>2</sub></td></tr>
+                    <tr><th scope="row">측정 신호</th><td>실린더 압력, 링크 각도, 붐 자세</td></tr>
+                    <tr><th scope="row">버킷 각도</th><td>간접 측정</td></tr>
+                    <tr><th scope="row">샘플링</th><td>100 Hz</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <figure class="geometry">
+                <div class="image-mat">
+                  <a href="assets/figure2.png" aria-label="실린더 구동 관절의 기하 원본 이미지 보기">
+                    <img src="assets/figure2.png" alt="원 논문 그림 2. 실린더 길이 r과 고정 길이 L, f 및 각도 θ′로 표현한 실린더 구동 관절의 기하." width="360" loading="lazy">
+                  </a>
+                </div>
+                <figcaption><b>FIG. 2</b>실린더로 구동되는 관절의 기하. 실린더 길이 r은 변하고, L과 f는 고정 길이다. 이미지를 선택하면 원본을 볼 수 있다.</figcaption>
+              </figure>
+              <p>실린더 힘을 관절 토크로 바꾸려면 기구학적 변환이 필요하다. 논문의 식 (5)는 크랭크 길이 L, 핀 사이 거리 f, 각도 θ′로 그 관계를 표현한다. 실무 구현에서는 실린더 길이의 관절각에 대한 변화율, 즉 <strong>기하학적 전달비</strong>를 다항식으로 근사하는 접근도 가능하다.</p>
+            </section>
+
+            <section class="section" id="method">
+              <span class="section-label">03 / Filtered regression</span>
+              <h2>필터로 바꾸는 것은 파라미터가 아니라 회귀식이다</h2>
+
+              <h3>먼저, 동역학을 선형 회귀로 쓴다</h3>
+              <p>링크 운동은 각도에 대해 복잡한 비선형 관계를 갖지만, 질량·관성의 묶음 파라미터에 대해서는 선형으로 정리할 수 있다. 이 성질 덕분에 최소제곱 추정이 가능해진다.</p>
+              <div class="equation">
+                <div class="equation-line">
+                  <div class="math">τ = W(θ, θ̇, θ̈) Φ</div>
+                  <span class="eq-label">원 논문 식 (2)</span>
+                </div>
+                <p>τ: 압력과 실린더 기하로 환산한 관절 토크 · W: 회귀 행렬 · Φ: m·r, I + m·r² 형태의 관성 묶음 파라미터</p>
+              </div>
+
+              <h3>회귀식 양변을 같은 필터에 통과시킨다</h3>
+              <p>직접 계산한 각가속도는 미분 과정에서 잡음에 민감해질 수 있다. 연구진은 동역학 식 전체를 안정한 선형 필터와 컨볼루션하고, 가속도 항을 부분적분으로 재구성했다. 그 결과, 각가속도를 직접 측정하지 않아도 되는 여과 회귀식을 얻는다.</p>
+              <div class="equation">
+                <div class="equation-line">
+                  <div class="math">τ<sub>f</sub> = W<sub>f</sub>(θ, θ̇) Φ</div>
+                  <span class="eq-label">여과 회귀</span>
+                </div>
+                <div class="equation-line">
+                  <div class="math">F(s) = a / (s + a), &nbsp; a ≈ 125 rad/s</div>
+                  <span class="eq-label">원 논문 식 (4)</span>
+                </div>
+                <p>필터 차단 주파수 약 20 Hz · 데이터 샘플링 100 Hz · 오프라인 처리</p>
+              </div>
+
+              <div class="flow" role="group" aria-label="여과 회귀 처리 흐름">
+                <div class="flow-step">
+                  <b>압력 · 각도</b>
+                  <small>관절 토크 환산<br>각속도 추정</small>
+                </div>
+                <div class="arrow" aria-hidden="true">→</div>
+                <div class="flow-step">
+                  <b>회귀식 전체 여과</b>
+                  <small>토크와 회귀 행렬에<br>동일한 선형 필터 적용</small>
+                </div>
+                <div class="arrow" aria-hidden="true">→</div>
+                <div class="flow-step">
+                  <b>최소제곱 식별</b>
+                  <small>관성 묶음 파라미터와<br>마찰 계수 추정</small>
+                </div>
+              </div>
+
+              <div class="note">
+                <span class="note-title">핵심 구분</span>
+                <p>여과 회귀는 측정값을 매끈하게 만드는 것만을 뜻하지 않는다. <strong>회귀식의 구조를 이용해 각가속도 의존성을 제거하는 절차</strong>다. 각속도는 여전히 필요하며, 이 연구에서는 Savitzky–Golay 필터의 국소 다항식 최소제곱 방법으로 구했다.</p>
+              </div>
+
+              <h3>마찰도 식별할 파라미터에 포함한다</h3>
+              <p>실린더 마찰은 운동 방향에 따른 쿨롱 마찰과 속도에 비례하는 점성 마찰의 합으로 모델링했다. 두 링크 각각에 계수 두 개를 두어 관성 파라미터와 함께 추정한다.</p>
+              <div class="equation">
+                <div class="equation-line">
+                  <div class="math">F<sub>f</sub> = f<sub>c</sub> sgn(v) + f<sub>v</sub> v</div>
+                  <span class="eq-label">원 논문 식 (6)</span>
+                </div>
+                <div class="equation-line">
+                  <div class="math">Φ<sub>f</sub> = [f<sub>c1</sub>, f<sub>v1</sub>, f<sub>c2</sub>, f<sub>v2</sub>]<sup>T</sup></div>
+                  <span class="eq-label">원 논문 식 (7)</span>
+                </div>
+                <p>v: 실린더 로드 속도 · f<sub>c</sub>: 쿨롱 마찰 계수 · f<sub>v</sub>: 점성 마찰 계수</p>
+              </div>
+            </section>
+
+            <section class="section" id="evidence">
+              <span class="section-label">04 / Experimental evidence</span>
+              <h2>식별은 가능했다. 정확도는 충분하지 않았다</h2>
+              <p>실험은 정지 자세를 이용한 정적 추정과, 움직이는 동안의 신호를 이용한 동적 추정으로 나뉜다. 두 조건은 마찰을 다루는 방식과 식별에 포함되는 운동 정보가 다르다.</p>
+
+              <div class="experiment-grid">
+                <div class="experiment">
+                  <h3>정적 추정 · 약 150 자세</h3>
+                  <p>로드 끝단인 엔드스톱 근처 자세는 제외했다. 정지 마찰은 유체, 씰, 정지 시간에 따라 달라지므로 모델에서 제외했다.</p>
+                  <figure class="source-table">
+                    <div class="image-mat">
+                      <a href="assets/table1.png" aria-label="정적 파라미터 추정 원본 표 보기">
+                        <img src="assets/table1.png" alt="원 논문 표 1. 정적 파라미터 네 개의 추정값과 표준편차." width="340" loading="lazy">
+                      </a>
+                    </div>
+                    <figcaption><b>TABLE 1</b>정적 파라미터와 표준편차. 제공된 요약에 따르면 표준편차가 추정값의 약 20~50%에 이른다.</figcaption>
+                  </figure>
+                </div>
+                <div class="experiment">
+                  <h3>동적 추정 · 100 Hz × 40초</h3>
+                  <p>관성·정적·마찰 관련 파라미터를 다룬다. 수동으로 조작했기 때문에 회귀 행렬의 조건수를 개선하는 최적 궤적은 사용하지 못했다.</p>
+                  <figure class="source-table">
+                    <div class="image-mat">
+                      <a href="assets/table2.png" aria-label="동적 파라미터 추정 원본 표 보기">
+                        <img src="assets/table2.png" alt="원 논문 표 2. 동적 실험에서 얻은 파라미터 추정값과 표준편차." width="360" loading="lazy">
+                      </a>
+                    </div>
+                    <figcaption><b>TABLE 2</b>동적 식별의 추정값과 표준편차. 세부 파라미터 표기는 원본 이미지를 보존했다.</figcaption>
+                  </figure>
+                </div>
+              </div>
+
+              <h3>토크 재현 오차는 버킷에서 더 컸다</h3>
+              <div class="stat-grid" aria-label="보고된 토크 재현 오차: 스틱 18%, 버킷 26.7%">
+                <div class="stat">
+                  <span>STICK / 스틱</span>
+                  <strong>18<small>%</small></strong>
+                </div>
+                <div class="stat">
+                  <span>BUCKET / 버킷</span>
+                  <strong>26.7<small>%</small></strong>
+                </div>
+              </div>
+              <p class="fine">위 수치는 제공된 노트에 정리된 토크 재현 오차다. 버킷 끝단의 외력 측정 정확도를 직접 나타내는 값으로 해석해서는 안 된다.</p>
+              <figure class="source-table">
+                <div class="image-mat">
+                  <a href="assets/table3.png" aria-label="토크 재현 오차 원본 표 보기">
+                    <img src="assets/table3.png" alt="원 논문 표 3. 스틱과 버킷의 토크 재현 오차 비교. 요약된 오차는 각각 18%와 26.7%." width="360" loading="lazy">
+                  </a>
+                </div>
+                <figcaption><b>TABLE 3</b>토크 재현 오차. 노트는 마찰을 포함한 동적 추정이 정적 추정보다 정확했다고 정리한다.</figcaption>
+              </figure>
+
+              <p>버킷에서 오차가 커지는 배경으로는 다음 조건들이 제시된다.</p>
+              <ul class="reasons">
+                <li><strong>작은 힘과 낮은 압력.</strong> 측정하려는 힘에 비해 씰 마찰이 차지하는 비중이 커진다.</li>
+                <li><strong>간접적인 각도 측정.</strong> 버킷 각도는 직접 측정되지 않아 기하 변환과 신호 처리의 영향을 받는다.</li>
+                <li><strong>너무 큰 압력 센서 풀스케일.</strong> 버킷의 실제 작동 압력에 비해 측정 범위가 커, 작은 압력 변화를 구분하는 데 불리한 조건이었다.</li>
+              </ul>
+            </section>
+
+            <section class="section" id="limits">
+              <span class="section-label">05 / Interpretation &amp; limits</span>
+              <h2>오차의 후보와 확정된 원인은 다르다</h2>
+              <p>저자들은 오차의 원인을 끝내 특정하지 못했다고 밝힌다. 센서 범위뿐 아니라 소프트웨어, 유압 구성, 신호 처리도 후보로 남는다. 따라서 이 결과를 “버킷 오차는 센서 하나만 바꾸면 해결된다”는 결론으로 좁혀서는 안 된다.</p>
+              <div class="table-wrap">
+                <table>
+                  <caption>결과를 읽을 때 함께 볼 조건</caption>
+                  <thead>
+                    <tr><th scope="col">관측·조건</th><th scope="col">해석의 경계</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><th scope="row">큰 표준편차</th><td>추정값이 계산됐다는 사실만으로 파라미터를 신뢰하기 어렵다. 자극의 충분성과 데이터 품질을 함께 봐야 한다.</td></tr>
+                    <tr><th scope="row">수동 조작 궤적</th><td>파라미터를 잘 구분하도록 설계한 입력이 아니므로 식별 조건에 한계가 있다.</td></tr>
+                    <tr><th scope="row">2링크 평면 모델</th><td>전체 굴착기의 모든 운동과 현장 조건으로 결과를 바로 일반화하기 어렵다.</td></tr>
+                    <tr><th scope="row">오프라인 처리</th><td>실시간 적용에서의 지연과 처리 성능까지 검증한 결과는 아니다.</td></tr>
+                    <tr><th scope="row">토크 재현 평가</th><td>실제 접촉 상황의 버킷 외력 추정 성능은 별도로 검증해야 한다.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>이 논문의 가치는 완성된 힘 센서의 성능보다, <strong>어떤 파라미터를 식별해야 하고 어떤 측정 조건이 결과를 제한하는지</strong>를 구체적인 실험으로 드러냈다는 데 있다.</p>
+            </section>
+
+            <section class="section" id="implications">
+              <span class="section-label">06 / Implications for HR35</span>
+              <h2>HR35에서는 무엇부터 검증할까</h2>
+              <p>여기부터는 원 논문의 실험 결과를 바탕으로 한 <strong>노트 작성자의 적용 의견</strong>이다. HR35의 장치 조건과 수치는 제공된 노트에 근거하며, 이 논문에서 검증한 내용은 아니다.</p>
+
+              <h3>1. 여과 회귀를 가져오되, 대역은 다시 설계한다</h3>
+              <p>20 Hz 경사계만 있는 HR35에서는 각가속도를 직접 구하지 않는 접근이 유용한 출발점이다. 다만 원 실험의 <strong>100 Hz 샘플링·20 Hz 차단 주파수</strong>를 그대로 옮길 수는 없다. 노트가 제안한 2~4 Hz 차단 주파수는 HR35의 운동 대역과 잡음, 필터 지연을 확인하며 검증할 초기 후보로 보는 편이 적절하다.</p>
+
+              <h3>2. 모델을 늘리기 전에 압력 채널을 확인한다</h3>
+              <p>노트에 기록된 HR35 압력은 무부하 515~1091 counts, 릴리프까지의 증가분은 약 +1700 counts다. 이 값만으로 유효 분해능이 충분한지 판단할 수는 없다. 버킷이 실제로 사용하는 신호 범위와 정지 상태의 잡음, 압력 환산 관계를 함께 확인해야 한다.</p>
+
+              <h3>3. 마찰 가설을 같은 데이터에서 비교한다</h3>
+              <p>이 논문의 쿨롱+점성 마찰 모델은 HR35 트윈의 가정과 연결된다. 노트는 Werner 2025와 Bak 2013을 언급하며 하중에 비례하는 마찰 모델도 대안으로 제시한다. HR35에서는 두 가설을 같은 데이터와 평가 기준으로 비교할 필요가 있다.</p>
+              <p class="fine">Werner 2025·Bak 2013의 상세 서지는 제공된 노트에 없다. 이 글에서는 후속 검토 대상으로만 다루며, 해당 문헌의 주장을 독립적으로 확인한 근거로 사용하지 않는다.</p>
+
+              <h3>4. 추정값 옆에 불확실성을 남긴다</h3>
+              <p>표준편차가 추정값의 상당 부분을 차지하는 결과는 중요한 경고다. 표본 수뿐 아니라 궤적이 파라미터를 충분히 자극했는지도 살펴야 한다. HR35 식별 결과에는 추정값과 함께 표준편차를 기록하고, 다른 운동 데이터에서도 토크 재현 성능을 확인하는 것이 바람직하다.</p>
+
+              <div class="application">
+                <h3>다음 실험을 위한 점검 목록</h3>
+                <p>아래 항목은 완료된 검증이 아니라, 이 연구에서 도출한 HR35의 후속 확인 사항이다.</p>
+                <ul class="checklist">
+                  <li>버킷 압력 채널의 사용 범위·잡음·유효 분해능을 확인한다.</li>
+                  <li>20 Hz 샘플링 조건에서 필터 대역과 각속도 추정 품질을 점검한다.</li>
+                  <li>쿨롱+점성과 하중 의존 마찰 모델을 동일 조건에서 비교한다.</li>
+                  <li>추정 파라미터의 표준편차와 회귀 행렬의 조건수를 기록한다.</li>
+                  <li>식별에 사용하지 않은 데이터로 토크 재현 오차를 평가한다.</li>
+                </ul>
+              </div>
+            </section>
+
+            <section class="closing" aria-labelledby="closing-title">
+              <h2 id="closing-title">좋은 힘 추정은, 좋은 영점에서 시작된다</h2>
+              <p>압력으로 외력을 읽는 일은 압력을 힘으로 환산하는 데서 끝나지 않는다. 기계의 무게와 관성, 마찰을 얼마나 정확히 설명하는지가 남는다. 여과 회귀는 각가속도 측정의 부담을 줄여 주지만, 센서의 분해능이나 부족한 운동 자극까지 해결해 주지는 않는다.</p>
+              <p>HR35에서 가져갈 핵심은 분명하다. 각가속도를 피하는 식별 구조를 출발점으로 삼고, 버킷 압력 채널과 마찰 모델을 검증하며, 추정값 옆에 불확실성을 함께 남기는 것이다.</p>
+            </section>
+
+            <section class="sources" id="sources" aria-labelledby="sources-title">
+              <h2 id="sources-title">출처와 편집 노트</h2>
+              <div class="citation">
+                <strong>Fiorenzo Malaguti · S. Zaghi</strong>
+                <cite lang="en">Force Sensor by Driving Hydraulic Cylinders: Identification of Inertial Parameters and Tests</cite>
+                <span>CNR-CEMOTER, Ferrara, Italy. ISARC 2002 — 19th International Symposium on Automation and Robotics in Construction.</span>
+                <br>
+                <a>논문 원문 PDF ↗</a>
+                <a>DOI: 10.22260/isarc2002/0067 ↗</a>
+              </div>
+              <p>이 글은 제공된 Obsidian 논문 요약 노트를 공개 기사 형식으로 재구성했다. 실험 수치와 방법 설명은 해당 노트를 바탕으로 하며, 원문을 별도로 대조한 검증 보고서는 아니다. 그림 2와 표 1~3은 제공된 원본 이미지 자산을 보존했다.</p>
+              <p>수식 번호는 노트에 기재된 원 논문 번호를 따른다. 토크 오차의 세부 정의와 표준편차 산출 방식은 원문 확인이 필요하다. HR35 적용 제안과 후속 검증 목록은 논문의 결론과 구분되는 해석이다.</p>
+
+              <div class="share">
+                <p class="small-heading">Copy-ready / 공유용 한 문장</p>
+                <blockquote>굴착기 압력으로 힘을 읽으려면, 먼저 기계 자신의 무게·관성·마찰을 알아야 한다. ISARC 2002의 여과 회귀 연구는 각가속도 측정을 피하는 방법과 버킷 힘 추정의 어려움을 함께 보여준다.</blockquote>
+              </div>
+              <div class="tags" aria-label="핵심 키워드">
+                <span>여과 회귀</span>
+                <span>각가속도 회피</span>
+                <span>쿨롱·점성 마찰</span>
+                <span>압력 기반 힘 센서</span>
+                <span>Savitzky–Golay</span>
+                <span>동적 영점</span>
+              </div>
+            </section>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <footer class="page-footer">
+      <span>Fieldnotes / Robotics · ISARC 2002 논문 리뷰</span>
+      <a href="#top">처음으로 ↑</a>
+    </footer>
+  </div>
+</body>
+</html>
