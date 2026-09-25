@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>굴착기의 정밀도는 유압에서 시작된다 — 유압 인지 제어 연구 노트</title>
+  <style>
+    :root {
+      --paper: #f5f3ec;
+      --card: #fffef9;
+      --ink: #202f2a;
+      --muted: #606e66;
+      --green: #234f40;
+      --green-soft: #e8eee6;
+      --orange: #ac4c28;
+      --orange-soft: #f5e9df;
+      --line: #d6dcd2;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "Batang", Georgia, serif;
+      --sans: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 2rem; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 17px; line-height: 1.85; word-break: keep-all; overflow-wrap: anywhere; }
+    a { color: var(--green); text-decoration-thickness: 1px; text-underline-offset: .23em; }
+    a:hover { color: var(--orange); }
+    a:focus-visible { outline: 3px solid var(--orange); outline-offset: 5px; }
+    ::selection { background: #d8e6b7; color: var(--ink); }
+    .skip { position: absolute; top: -100px; left: 1rem; background: var(--card); padding: .6rem 1rem; z-index: 10; }
+    .skip:focus { top: 1rem; }
+    .shell { max-width: 1320px; margin: auto; padding: 0 56px; }
+    .masthead { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 25px 0; border-bottom: 1px solid var(--ink); font-size: .73rem; font-weight: 700; letter-spacing: .12em; }
+    .masthead a { text-decoration: none; }
+    .masthead .mark { display: inline-block; width: 11px; height: 11px; margin-right: 10px; background: var(--orange); }
+    .hero { padding: 70px 0 42px; }
+    .eyebrow { color: var(--orange); font-size: .75rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    h1, h2, h3, h4, p { margin-top: 0; }
+    h1 { max-width: 1000px; margin: 20px 0 24px; font-family: var(--serif); font-size: clamp(2.6rem, 5.6vw, 4.9rem); font-weight: 700; line-height: 1.22; letter-spacing: -.065em; text-wrap: balance; }
+    .dek { max-width: 850px; margin-bottom: 28px; font-size: clamp(1.1rem, 2vw, 1.38rem); line-height: 1.75; color: var(--muted); letter-spacing: -.025em; }
+    .byline { display: flex; flex-wrap: wrap; gap: 8px 22px; color: var(--muted); font-size: .78rem; }
+    .hero-visual { display: grid; grid-template-columns: 1.2fr 1fr; background: var(--green); color: #fffef5; margin: 0 0 32px; }
+    .hero-visual .photo { background: white; display: flex; align-items: center; padding: 18px; }
+    .hero-visual img { display: block; width: 100%; height: auto; }
+    .hero-visual figcaption { padding: 35px 38px; display: flex; flex-direction: column; justify-content: center; }
+    .hero-visual .kicker { color: #c2d2aa; font-size: .7rem; font-weight: 700; letter-spacing: .14em; }
+    .hero-visual .statement { font-family: var(--serif); font-size: clamp(1.4rem, 2.2vw, 2rem); line-height: 1.6; margin: 15px 0 24px; letter-spacing: -.035em; }
+    .hero-visual .caption { color: #d8e2d6; font-size: .78rem; line-height: 1.8; }
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-bottom: 65px; }
+    .metric { padding: 25px 28px; border-right: 1px solid var(--line); }
+    .metric:first-child { padding-left: 0; }
+    .metric:last-child { border-right: 0; }
+    .metric .value { display: block; font-family: Georgia, serif; font-size: clamp(2rem, 3.8vw, 3.15rem); line-height: 1.2; letter-spacing: -.04em; color: var(--green); font-variant-numeric: tabular-nums; }
+    .metric .unit { font-family: var(--sans); font-size: 1rem; letter-spacing: 0; }
+    .metric .label { display: block; margin-top: 12px; font-size: .82rem; font-weight: 700; }
+    .metric .note { display: block; margin-top: 4px; color: var(--muted); font-size: .73rem; line-height: 1.6; }
+    .article-grid { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 65px; align-items: start; }
+    .rail { position: sticky; top: 26px; padding-bottom: 30px; font-size: .78rem; }
+    .rail .rail-title { padding-bottom: 13px; border-bottom: 1px solid var(--ink); font-size: .68rem; font-weight: 800; letter-spacing: .15em; }
+    .rail ol { list-style: none; padding: 0; margin: 12px 0 24px; }
+    .rail li { border-bottom: 1px solid var(--line); }
+    .rail a { display: block; padding: 10px 0; text-decoration: none; }
+    .rail .num { color: var(--orange); margin-right: 10px; font-size: .7rem; }
+    .rail-note { color: var(--muted); font-size: .72rem; line-height: 1.8; }
+    .article-body { min-width: 0; max-width: 910px; }
+    .abstract { border-top: 4px solid var(--green); padding: 28px 30px; background: var(--card); margin-bottom: 28px; }
+    .abstract h2 { margin-bottom: 12px; font-size: .78rem; letter-spacing: .08em; font-family: var(--sans); }
+    .abstract p:last-child { margin-bottom: 0; }
+    .findings { padding: 25px 0 20px; }
+    .findings h2 { font-size: .84rem; color: var(--orange); margin-bottom: 18px; }
+    .finding { display: grid; grid-template-columns: 36px 1fr; gap: 12px; border-top: 1px solid var(--line); padding: 17px 0; }
+    .finding .index { font-family: Georgia, serif; color: var(--orange); font-size: 1.3rem; }
+    .finding p { margin: 0; font-size: .95rem; }
+    .section { margin-top: 65px; padding-top: 27px; border-top: 1px solid var(--ink); }
+    .section-label { margin-bottom: 10px; color: var(--orange); font-size: .71rem; font-weight: 800; letter-spacing: .12em; }
+    h2 { font-size: clamp(1.6rem, 2.6vw, 2.1rem); line-height: 1.45; letter-spacing: -.04em; margin-bottom: 24px; text-wrap: balance; }
+    h3 { font-size: 1.19rem; letter-spacing: -.025em; line-height: 1.55; margin: 34px 0 15px; }
+    h4 { font-size: 1rem; margin-bottom: 10px; }
+    p { margin-bottom: 20px; }
+    strong { font-weight: 750; }
+    .lead { font-size: 1.1rem; }
+    .small { color: var(--muted); font-size: .8rem; line-height: 1.8; }
+    .table-wrap { width: 100%; overflow-x: auto; margin: 25px 0; border-top: 2px solid var(--green); background: var(--card); }
+    table { width: 100%; border-collapse: collapse; font-size: .82rem; line-height: 1.65; }
+    caption { text-align: left; padding: 15px 18px; color: var(--muted); font-size: .76rem; }
+    th, td { padding: 13px 16px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+    thead th { color: var(--green); font-weight: 750; background: var(--green-soft); white-space: nowrap; }
+    tbody th { font-weight: 650; }
+    tr.highlight { background: #eef3e7; }
+    .nowrap { white-space: nowrap; }
+    figure { margin: 28px 0; }
+    .figure { background: var(--card); border: 1px solid var(--line); padding: 20px; }
+    .figure img { display: block; width: 100%; height: auto; max-height: 640px; object-fit: contain; background: #fff; }
+    figcaption { margin-top: 15px; color: var(--muted); font-size: .78rem; line-height: 1.75; }
+    .fig-num { color: var(--orange); font-size: .69rem; font-weight: 800; letter-spacing: .06em; margin-right: 8px; }
+    .figure-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin: 28px 0; }
+    .figure-pair .figure { margin: 0; padding: 15px; }
+    .figure-pair img { height: 265px; }
+    blockquote { margin: 38px 0; border-left: 3px solid var(--orange); padding: 8px 0 8px 28px; }
+    blockquote p { font-family: var(--serif); font-size: clamp(1.3rem, 2vw, 1.65rem); line-height: 1.7; letter-spacing: -.035em; margin-bottom: 12px; }
+    blockquote footer { color: var(--muted); font-size: .74rem; }
+    .callout { padding: 24px 27px; margin: 27px 0; background: var(--green-soft); }
+    .callout.warm { background: var(--orange-soft); }
+    .callout h3 { margin: 0 0 10px; font-size: .92rem; }
+    .callout p { font-size: .91rem; margin-bottom: 12px; }
+    .callout p:last-child { margin-bottom: 0; }
+    .equation { margin: 24px 0; padding: 22px 24px; background: var(--card); border-left: 3px solid var(--green); overflow-x: auto; }
+    .math { font-family: "Cambria Math", "STIX Two Math", Georgia, serif; font-size: 1.13rem; white-space: nowrap; line-height: 2; }
+    .eq-label { display: block; margin-top: 8px; font-family: var(--sans); color: var(--muted); font-size: .71rem; }
+    .equation sub, .equation sup { font-size: .7em; }
+    .stack { margin: 28px 0; padding: 26px; background: var(--green-soft); }
+    .stack-title { font-size: .71rem; font-weight: 750; letter-spacing: .1em; color: var(--green); margin-bottom: 18px; }
+    .stack-row { display: grid; grid-template-columns: 115px 1fr; gap: 20px; padding: 17px 20px; background: var(--card); border: 1px solid #c9d2c3; }
+    .stack-row b { font-size: .92rem; }
+    .stack-row span { font-size: .86rem; color: var(--muted); }
+    .stack-arrow { padding: 6px 20px; color: var(--green); font-size: .78rem; text-align: center; }
+    .workflow { list-style: none; margin: 24px 0; padding: 0; counter-reset: steps; }
+    .workflow li { position: relative; padding: 17px 20px 17px 64px; border-bottom: 1px solid var(--line); counter-increment: steps; }
+    .workflow li::before { content: "0" counter(steps); position: absolute; left: 10px; top: 16px; color: var(--orange); font-family: Georgia, serif; font-size: 1.3rem; }
+    .workflow strong { display: block; font-size: .96rem; }
+    .workflow span { font-size: .88rem; color: var(--muted); }
+    .comparison { padding: 27px; background: var(--card); border: 1px solid var(--line); margin: 28px 0; }
+    .comparison h3 { margin: 0 0 5px; font-size: 1rem; }
+    .bar-row { display: grid; grid-template-columns: 125px 1fr 72px; gap: 16px; align-items: center; margin-top: 21px; font-size: .8rem; }
+    .bar-track { background: #eceee7; height: 22px; }
+    .bar { display: block; height: 100%; background: var(--green); }
+    .bar.commercial { width: 94%; background: #b26c4e; }
+    .bar.case { width: 36%; }
+    .bar.m445 { width: 28%; background: #69836c; }
+    .bar-row b { text-align: right; font-variant-numeric: tabular-nums; }
+    .comparison figcaption { margin-top: 22px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; list-style: none; margin: 25px 0; }
+    .chips li { background: var(--green-soft); padding: 5px 11px; color: var(--green); font-size: .73rem; border-radius: 3px; }
+    .checklist { padding: 0; margin: 20px 0; list-style: none; }
+    .checklist li { display: grid; grid-template-columns: 18px 1fr; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--line); font-size: .93rem; }
+    .checklist .box { width: 14px; height: 14px; margin-top: 8px; border: 1px solid var(--green); }
+    .ending { padding: 35px; margin: 45px 0; color: #fffef7; background: var(--green); }
+    .ending .eyebrow { color: #c7d4b0; }
+    .ending h2 { font-family: var(--serif); font-size: 1.9rem; margin: 12px 0 20px; }
+    .ending p { color: #e1e9dc; }
+    .ending p:last-child { margin-bottom: 0; }
+    .share { padding: 25px; background: var(--card); border: 1px solid var(--line); }
+    .share h3 { margin: 0 0 12px; font-size: .82rem; color: var(--orange); }
+    .share p { margin: 0; font-size: .93rem; }
+    .sources { margin-top: 55px; border-top: 1px solid var(--ink); padding-top: 25px; font-size: .81rem; color: var(--muted); }
+    .sources h2 { font-size: 1.1rem; color: var(--ink); }
+    .sources dl { margin: 0; }
+    .sources dt { font-weight: 750; color: var(--ink); margin-top: 18px; }
+    .sources dd { margin: 5px 0 0; }
+    .page-footer { display: flex; justify-content: space-between; gap: 20px; margin-top: 70px; border-top: 1px solid var(--ink); padding: 24px 0 36px; color: var(--muted); font-size: .72rem; }
+    @media (min-width: 1500px) { body { font-size: 18px; } }
+    @media (max-width: 1000px) {
+      .shell { padding: 0 30px; }
+      .article-grid { grid-template-columns: 150px minmax(0, 1fr); gap: 32px; }
+      .hero-visual figcaption { padding: 25px; }
+      .figure-pair { grid-template-columns: 1fr; }
+      .figure-pair img { height: auto; max-height: 460px; }
+    }
+    @media (max-width: 760px) {
+      body { font-size: 16px; }
+      .shell { padding: 0 21px; }
+      .masthead { font-size: .63rem; letter-spacing: .06em; }
+      .hero { padding: 42px 0 28px; }
+      h1 { letter-spacing: -.055em; }
+      .hero-visual { grid-template-columns: 1fr; }
+      .hero-visual figcaption { margin-top: 0; padding: 24px; }
+      .hero-visual .statement { font-size: 1.55rem; }
+      .metrics { margin-bottom: 35px; }
+      .metric { padding: 20px 12px; }
+      .metric .value { font-size: 1.9rem; }
+      .metric .unit { font-size: .75rem; }
+      .metric .label { font-size: .75rem; }
+      .metric .note { font-size: .68rem; }
+      .article-grid { display: block; }
+      .rail { position: static; margin-bottom: 25px; padding-bottom: 0; }
+      .rail ol { display: flex; flex-wrap: wrap; gap: 0 19px; }
+      .rail li { border: 0; }
+      .rail a { padding: 6px 0; }
+      .rail-note { display: none; }
+      .abstract, .callout, .ending { padding: 24px; }
+      .section { margin-top: 45px; }
+      .stack { padding: 16px; }
+      .stack-row { grid-template-columns: 1fr; gap: 5px; }
+      .figure { padding: 12px; }
+      th, td { padding: 11px 12px; min-width: 92px; }
+      .table-wide { min-width: 570px; }
+      .bar-row { grid-template-columns: 92px 1fr 55px; gap: 10px; font-size: .73rem; }
+      .comparison { padding: 20px; }
+      .equation { padding: 16px; }
+      .page-footer { flex-wrap: wrap; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    @media print {
+      body { background: white; color: #111; font-size: 10pt; }
+      .shell { padding: 0; max-width: none; }
+      .rail, .skip, .page-footer a { display: none; }
+      .article-grid { display: block; }
+      .article-body { max-width: none; }
+      .hero { padding-top: 25px; }
+      h1 { font-size: 32pt; }
+      .section { margin-top: 30px; }
+      figure, .callout, .equation, tr { break-inside: avoid; }
+      h2, h3 { break-after: avoid; }
+      .table-wrap { overflow: visible; }
+      .table-wide { min-width: 0; }
+      .hero-visual, .ending { background: #eef2eb; color: #111; }
+      .hero-visual .caption, .hero-visual .kicker, .ending p, .ending .eyebrow { color: #333; }
+      a { color: inherit; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="High Precision Hydraulic Excavator Control for Heavy-Duty Grading - 요약">
+<meta property="og:description" content="High Precision Hydraulic Excavator Control for Heavy Duty Grading 요약 한줄 요약 유압 방식이 다른 두 굴착기(11.5 t 로드센싱 M445, 25 t 네거티브 플로 컨트롤 CASE250)에 같은 제어기 구조를 20분 보정만으로 올려, 한 삽에 버킷이 차는 깊은 정지작업에서 표면 오차 RMSE 1.4 / 1.8 cm 를 얻었다. 상용 반자동 시스템(4.7 cm)보다 2.6배 ">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/o2ptff/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/o2ptff/assets/figure1.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="High Precision Hydraulic Excavator Control for Heavy-Duty Grading - 요약">
+<meta name="twitter:description" content="High Precision Hydraulic Excavator Control for Heavy Duty Grading 요약 한줄 요약 유압 방식이 다른 두 굴착기(11.5 t 로드센싱 M445, 25 t 네거티브 플로 컨트롤 CASE250)에 같은 제어기 구조를 20분 보정만으로 올려, 한 삽에 버킷이 차는 깊은 정지작업에서 표면 오차 RMSE 1.4 / 1.8 cm 를 얻었다. 상용 반자동 시스템(4.7 cm)보다 2.6배 ">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/o2ptff/assets/figure1.png">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/eth2026-grading/">
+</head>
+<body>
+  <a class="skip" href="#article">본문으로 건너뛰기</a>
+  <div class="shell" id="top">
+    <header class="masthead">
+      <a href="#top"><span class="mark" aria-hidden="true"></span>FIELD NOTES / ROBOTICS</a>
+      <span>RESEARCH REPORT · 2026.09.25</span>
+    </header>
+
+    <main id="article">
+      <article>
+        <header class="hero">
+          <div class="eyebrow">유압 제어 · 자율 건설 · 논문 읽기</div>
+          <h1>굴착기의 정밀도는<br>유압에서 시작된다</h1>
+          <p class="dek">20분의 보정으로, 서로 다른 두 굴착기에서 경로 오차 1.4·1.8cm. 깊은 정지작업의 정밀도를 높인 것은 압력으로 부하를 읽는 피드포워드와 관절의 지연을 예측하는 MPC의 조합이었다.</p>
+          <div class="byline">
+            <span>대상 연구: ETH Zürich Robotic Systems Lab · Hexagon AB</span>
+            <span>프리프린트 · 2026.05.10</span>
+            <span>노트 작성 · <time datetime="2026-09-25">2026.09.25</time></span>
+          </div>
+        </header>
+
+        <figure class="hero-visual">
+          <div class="photo">
+            <img src="assets/figure1.png" alt="M445 굴착기가 버킷 날을 목표 평면에 맞춰 깊은 정지작업을 수행하는 모습" fetchpriority="high">
+          </div>
+          <figcaption>
+            <span class="kicker">PRECISION UNDER LOAD</span>
+            <div class="statement">한 삽에 버킷이 차는 작업에서도,<br>날은 목표 평면을 따라간다.</div>
+            <span class="caption"><span class="fig-num">FIG. 01</span>11.5t M445의 깊은 정지작업. 흙의 큰 반력 속에서도 목표면을 따라 움직이는 것이 이 연구의 과제다.</span>
+          </figcaption>
+        </figure>
+
+        <div class="metrics" aria-label="연구의 주요 수치">
+          <div class="metric">
+            <span class="value">1.4 / 1.8 <span class="unit">cm</span></span>
+            <span class="label">흙 속 경로 추종 RMSE</span>
+            <span class="note">M445 / CASE250, 각 10회 작업</span>
+          </div>
+          <div class="metric">
+            <span class="value">≈ 20 <span class="unit">분</span></span>
+            <span class="label">분해 없는 보정 절차</span>
+            <span class="note">유압 모델 → PID → 관절 응답 모델</span>
+          </div>
+          <div class="metric">
+            <span class="value">≈ 62 <span class="unit">%</span></span>
+            <span class="label">CASE250의 RMSE 감소</span>
+            <span class="note">상용 4.7cm → 제안 제어기 1.8cm</span>
+          </div>
+        </div>
+
+        <div class="article-grid">
+          <aside class="rail">
+            <nav aria-label="글 목차">
+              <div class="rail-title">IN THIS REPORT</div>
+              <ol>
+                <li><a href="#abstract"><span class="num">00</span>초록과 핵심 발견</a></li>
+                <li><a href="#problem"><span class="num">01</span>왜 유압인가</a></li>
+                <li><a href="#architecture"><span class="num">02</span>두 층의 제어 구조</a></li>
+                <li><a href="#calibration"><span class="num">03</span>20분 보정의 구성</a></li>
+                <li><a href="#evidence"><span class="num">04</span>실험이 보여준 것</a></li>
+                <li><a href="#hydraulics"><span class="num">05</span>LS와 NFC의 차이</a></li>
+                <li><a href="#implications"><span class="num">06</span>한계와 HR35 적용</a></li>
+                <li><a href="#sources"><span class="num">↗</span>출처와 해석 범위</a></li>
+              </ol>
+            </nav>
+            <p class="rail-note">제공된 논문 요약 노트를 재구성한 리서치 기사입니다. 실험 결과와 HR35 적용 의견을 구분해 읽을 수 있도록 정리했습니다.</p>
+          </aside>
+
+          <div class="article-body">
+            <section class="abstract" id="abstract" aria-labelledby="abstract-title">
+              <h2 id="abstract-title">ABSTRACT / 초록</h2>
+              <p>깊은 정지작업에서는 흙의 반력이 계속 바뀌고, 그 부하가 유압 관절의 응답을 바꾼다. 이 연구는 <strong>유압 특성을 보정하는 관절 속도 제어기</strong>와 <strong>관절 지연을 고려하는 모델 예측 제어기(MPC)</strong>를 분리해 이 문제를 다룬다.</p>
+              <p>로드센싱(LS) 방식의 11.5t M445와 네거티브 플로 컨트롤(NFC) 방식의 25t CASE250에 같은 제어 구조를 적용하고, 기체별 약 20분의 보정을 거쳤다. 흙 속 경로 추종 RMSE는 각각 <strong>1.4cm와 1.8cm</strong>였다. CASE250의 상용 반자동 제어기는 같은 비교에서 4.7cm를 기록했다.</p>
+              <p>핵심은 실린더 압력으로 부하를 읽어 밸브 명령을 선제적으로 조절하는 피드포워드다. 다만 두 기체가 공유하는 것은 제어 구조이며, 유압 모델의 형태와 보정값은 방식에 맞춰 달라진다.</p>
+            </section>
+
+            <section class="findings" aria-labelledby="findings-title">
+              <h2 id="findings-title">먼저 읽는 세 가지 발견</h2>
+              <div class="finding">
+                <span class="index" aria-hidden="true">01</span>
+                <p><strong>유압 방식이 모델을 결정한다.</strong> LS에는 명령–속도 1차원 표를, NFC에는 부하를 함께 고려하는 2차원 모델을 사용한다.</p>
+              </div>
+              <div class="finding">
+                <span class="index" aria-hidden="true">02</span>
+                <p><strong>정밀도와 부하 대응을 함께 확인했다.</strong> CASE250은 RMSE를 약 62% 줄였고, 제안 제어기는 최대 기능 압력에 도달할 때까지 작업을 이어갔다.</p>
+              </div>
+              <div class="finding">
+                <span class="index" aria-hidden="true">03</span>
+                <p><strong>경로 오차와 표면 품질은 별개의 근거다.</strong> 1.4·1.8cm는 경로 추종 RMSE다. 완성된 표면은 별도의 레이저 스캔 실험으로 비교했다.</p>
+              </div>
+            </section>
+
+            <section class="section" id="problem" aria-labelledby="problem-title">
+              <div class="section-label">01 / THE PROBLEM</div>
+              <h2 id="problem-title">같은 밸브 명령이<br>같은 움직임을 만들지 않는다</h2>
+              <p class="lead">공중에서 잘 움직이는 굴착기도 흙을 깊게 밀어내기 시작하면 다른 시스템처럼 반응할 수 있다.</p>
+              <p>깊은 정지작업에서는 큰 토양 반력이 관절에 작용한다. 역기구학으로 목표 관절 속도를 계산하고 PID로 오차를 줄이는 구조만으로는 부하 변화에 따른 응답 차이를 충분히 흡수하기 어렵다. 여기에 LS·NFC·PFC처럼 서로 다른 유압 방식, 공개되지 않는 제조사 부품 정보가 겹친다.</p>
+              <p>연구의 질문은 명확하다. <strong>상세 부품 모델이나 수 시간의 기체별 학습 없이, 서로 다른 유압 굴착기에서 깊은 정지작업을 정밀하게 수행할 수 있을까?</strong></p>
+
+              <div class="table-wrap" role="region" aria-label="기존 접근과 본 연구 비교" tabindex="0">
+                <table class="table-wide">
+                  <caption>기존 연구의 위치 · 제공 노트의 논문 표 I 요약</caption>
+                  <thead>
+                    <tr><th scope="col">접근</th><th scope="col">검증 환경</th><th scope="col">보고 성능</th><th scope="col">제약</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><th scope="row">역기구학 + PI<br><span class="small">Xu, 2014</span></th><td>시뮬레이션</td><td>약 4cm</td><td>단일 기체 모델</td></tr>
+                    <tr><th scope="row">윤곽 제어 + 관측기<br><span class="small">Dao, 2021/2022</span></th><td>시뮬레이션</td><td>노트 내 수치 없음</td><td>실차 검증 없음</td></tr>
+                    <tr><th scope="row">힘 프리로드 + 교차결합<br><span class="small">Yang, 2022</span></th><td>6t LS 실차</td><td>얕은 작업 1cm</td><td>기체별 튜닝</td></tr>
+                    <tr><th scope="row">학습 모델 역변환<br><span class="small">Lee, 2022</span></th><td>실차</td><td>경로 오차 2cm 미만</td><td>수 시간의 기체별 데이터</td></tr>
+                    <tr><th scope="row">상용 시스템<br><span class="small">Trimble · Cat · Leica</span></th><td>실차</td><td>4cm 초과 또는 얕은 작업</td><td>내부 구현 비공개</td></tr>
+                    <tr class="highlight"><th scope="row">본 연구</th><td>LS·NFC 실차 2대</td><td><strong>RMSE 1.4 / 1.8cm</strong></td><td>약 20분 보정, PFC 미검증</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="small">연구마다 작업 깊이, 평가 지표, 검증 조건이 다르므로 위 표를 동일 조건의 성능 순위로 해석해서는 안 된다. 이 글의 직접적인 상용 비교는 아래 CASE250 실험을 기준으로 한다.</p>
+            </section>
+
+            <section class="section" id="architecture" aria-labelledby="architecture-title">
+              <div class="section-label">02 / CONTROL ARCHITECTURE</div>
+              <h2 id="architecture-title">아래층은 부하를 보정하고,<br>위층은 지연을 예측한다</h2>
+              <p>제어기는 두 층으로 나뉜다. 위층의 MPC는 버킷이 목표 평면을 따라가도록 관절 속도를 만든다. 아래층은 그 속도를 실제로 구현할 밸브 명령을 계산한다.</p>
+
+              <div class="stack" aria-label="제어 신호 흐름">
+                <div class="stack-title">CONTROL FLOW / 개념도</div>
+                <div class="stack-row"><b>경로 추종 MPC</b><span>목표 평면·전진 속도·버킷 자세와 관절 지연을 고려</span></div>
+                <div class="stack-arrow">↓ 목표 관절 속도</div>
+                <div class="stack-row"><b>유압 속도 제어</b><span>실린더 속도 변환 → 보정 유압 모델의 피드포워드 + 병렬 PID</span></div>
+                <div class="stack-arrow">↓ 밸브 명령</div>
+                <div class="stack-row"><b>굴착기 관절</b><span>실린더 압력으로 부하를 읽고, 실제 운동을 피드백</span></div>
+              </div>
+
+              <figure class="figure">
+                <img src="assets/figure2.png" alt="MPC 경로 추종기와 유압 모델 피드포워드 및 병렬 PID로 구성된 두 층 제어 구조" loading="lazy">
+                <figcaption><span class="fig-num">FIG. 02</span>전체 제어 구조. 유압 모델이 밸브 명령의 대부분을 만들고, PID가 모델에 남은 오차를 보정한다.</figcaption>
+              </figure>
+
+              <h3>유압 인지 피드포워드: 오차가 생기기 전에 명령을 바꾼다</h3>
+              <p>목표 관절 속도를 먼저 실린더 속도로 바꾼다. 실린더 공간에서 유압 명령과 운동의 관계가 더 선형적이기 때문이다. 보정된 유압 모델은 필요한 밸브 명령을 계산하고, 병렬 PID는 유량 분배·펌프 부스트·회생처럼 모델에 담기지 않은 효과를 보완한다.</p>
+              <p>부하를 읽는 출발점은 실린더 양쪽의 압력이다. 각 압력에 유효 단면적을 곱한 차이로 실린더 힘을 구한다.</p>
+              <div class="equation">
+                <div class="math" aria-label="실린더 힘 f m은 p a 곱하기 A a 빼기 p b 곱하기 A b">
+                  <i>f</i><sub>m</sub> = <i>p</i><sub>a</sub><i>A</i><sub>a</sub> − <i>p</i><sub>b</sub><i>A</i><sub>b</sub>
+                </div>
+                <span class="eq-label">논문 식 (10) · p: 압력, A: 실린더 각 측의 유효 단면적</span>
+              </div>
+
+              <h3>경로 추종 MPC: 관절이 늦게 반응한다는 사실을 모델에 넣는다</h3>
+              <p>MPC는 아래층의 피드포워드·PID·유압·기구를 모두 합친 폐루프 관절 응답을 <strong>2차 시스템과 데드타임</strong>으로 표현한다. 복잡한 유압 세부 모델은 아래층이 맡고, 위층은 보정 후 관절의 운동 응답을 사용한다.</p>
+              <div class="equation">
+                <div class="math">
+                  d<i>a</i><sub>i</sub>/d<i>t</i> = −2ζ<sub>i</sub>ω<sub>n,i</sub><i>a</i><sub>i</sub> − ω<sub>n,i</sub><sup>2</sup><i>v</i><sub>i</sub> + <i>K</i><sub>i</sub>ω<sub>n,i</sub><sup>2</sup><i>u</i><sub>i</sub>(<i>t</i> − τ<sub>i</sub>)
+                </div>
+                <span class="eq-label">논문 식 (1) · 관절별 2차 응답 + 입력 지연</span>
+              </div>
+              <div class="table-wrap" role="region" aria-label="관절 모델 기호" tabindex="0">
+                <table>
+                  <thead><tr><th scope="col">기호</th><th scope="col">의미</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row"><i>v</i><sub>i</sub>, <i>a</i><sub>i</sub></th><td>관절 i의 각속도·각가속도</td></tr>
+                    <tr><th scope="row"><i>u</i><sub>i</sub></th><td>명령 관절 속도</td></tr>
+                    <tr><th scope="row"><i>K</i>, ζ, ω<sub>n</sub>, τ</th><td>이득·감쇠비·고유진동수·데드타임. 스텝 응답으로 식별한다.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>데드타임은 길이 <i>N</i><sub>d</sub>의 입력 버퍼를 상태에 포함해 다룬다. 시간 간격은 0.1초, 예측 지평선은 20스텝, 제어 주기는 10Hz다. 즉, 설정된 예측 구간은 2초에 해당한다.</p>
+              <p>비용함수에는 전진 속도 오차, 수직 속도와 피치율의 0 목표, 버킷 피치, 목표 평면과의 높이차, 명령 증분에 대한 벌점이 들어간다. 시험한 속도 범위에서 영향이 작다고 본 관절 간 결합은 모델에서 제외한다.</p>
+              <blockquote>
+                <p>관절의 지연을 알면, 목표면을 파고들기 전에 명령을 줄일 수 있다.</p>
+                <footer>제어 원리에 대한 해설 · 논문 직접 인용 아님</footer>
+              </blockquote>
+            </section>
+
+            <section class="section" id="calibration" aria-labelledby="calibration-title">
+              <div class="section-label">03 / CALIBRATION</div>
+              <h2 id="calibration-title">20분 보정은 무엇을 알아내는가</h2>
+              <p>연구가 제안하는 보정은 기체를 분해하지 않고 수행한다. 관절별로 유압 모델을 만든 뒤 PID를 조정하고, 마지막으로 MPC가 사용할 폐루프 응답을 식별한다.</p>
+              <ol class="workflow">
+                <li><strong>유압 피드포워드 모델</strong><span>명령과 속도의 관계를 측정한다. NFC에서는 부하에 따른 변화도 식별한다.</span></li>
+                <li><strong>병렬 PID 조정</strong><span>Ziegler–Nichols 방법을 사용해 남은 추종 오차를 보정한다.</span></li>
+                <li><strong>MPC용 관절 모델</strong><span>스텝 응답에서 이득·감쇠·고유진동수·데드타임을 맞춘다.</span></li>
+              </ol>
+
+              <h3>① LS: 명령과 속도를 연결하는 1차원 표</h3>
+              <p>로드센싱 유압은 부하 변화에 대한 유량의 민감도가 낮다. 연구에서는 정규화 명령 −0.85~0.85를 0.1 간격으로 가하고, 3초째의 평균 실린더 속도를 정상값으로 사용해 명령–속도 표를 만든다.</p>
+              <div class="figure-pair">
+                <figure class="figure">
+                  <img src="assets/figure3.png" alt="M445 붐 관절의 단계별 밸브 명령에 따른 실린더 속도 보정 데이터" loading="lazy">
+                  <figcaption><span class="fig-num">FIG. 03</span>붐 관절의 피드포워드 데이터. 단계별 입력과 정상 속도로 명령–속도 관계를 추출한다.</figcaption>
+                </figure>
+                <figure class="figure">
+                  <img src="assets/figure4.png" alt="M445 세 관절의 정규화 명령과 실린더 속도 사이의 룩업 테이블" loading="lazy">
+                  <figcaption><span class="fig-num">FIG. 04</span>M445 세 관절의 보정 결과. LS에서는 관절별 1차원 표를 사용한다.</figcaption>
+                </figure>
+              </div>
+
+              <h3>② NFC: 현재 부하까지 포함하는 2차원 모델</h3>
+              <p>NFC에서는 같은 밸브 명령이라도 부하가 커지면 유량이 줄어든다. 따라서 원하는 유량뿐 아니라 현재 부하도 알아야 한다. 여기서 압력 기반 힘 추정이 피드포워드의 입력이 된다.</p>
+              <figure class="figure">
+                <img src="assets/figure5.png" alt="NFC 피드포워드에서 압력을 힘으로 바꾸고 관성력을 제거한 뒤 유압 모델에 입력하는 흐름" loading="lazy">
+                <figcaption><span class="fig-num">FIG. 05</span>NFC용 피드포워드. 압력으로 계산한 힘에서 관성력을 빼고 부하 의존 유압 모델에 전달한다.</figcaption>
+              </figure>
+
+              <div class="callout warm">
+                <h3>압력이 높아졌다고, 모두 외부 부하가 커진 것은 아니다</h3>
+                <p>밸브를 더 열면 가속이 커지고, 관성에 의해 압력이 상승할 수 있다. 이 상승을 외부 부하로 읽으면 피드포워드가 밸브를 더 열어 양의 되먹임을 만든다. 연구는 Werner 2025의 묶음 모델로 관성력을 추정해 제거한다.</p>
+              </div>
+
+              <p>관성 보정 후의 힘을 관절에 대응하는 면적으로 나누어 <strong>가상 배압</strong>을 정의한다. 이 값은 외력 방향에 따라 음수가 될 수도 있다.</p>
+              <div class="equation">
+                <div class="math"><i>P</i><sub>f</sub> = (<i>f</i><sub>m</sub> − <i>f</i><sub>inertia</sub>) / <i>A</i><sub>articulation</sub></div>
+                <span class="eq-label">논문 식 (11) · 관성 성분을 제거한 부하의 압력 표현</span>
+              </div>
+              <p>펌프 압력 설정값은 명령 <i>x</i>에 대한 표 <i>P</i><sub>p</sub>(<i>x</i>)로 나타낸다. 방향 제어 밸브의 가변 오리피스 저항은 아래 식으로 모델링하며, 작은 저항값도 적합에서 충분히 반영하도록 로그 오차를 사용한다.</p>
+              <div class="equation">
+                <div class="math"><i>R</i>(<i>x</i>) = <i>a</i> / [<i>b</i>(<i>x</i> + <i>c</i>)<sup>2</sup>]</div>
+                <div class="math">Δ<i>P</i> = <i>R</i> · <i>Q</i><sup>2</sup></div>
+                <div class="math">min<sub>a,b,c</sub> ∑<sub>x</sub> | log <i>R</i>(<i>x</i>) − log <i>R</i><sub>test,x</sub> |</div>
+                <span class="eq-label">논문 식 (12), (14), (15) · R: 오리피스 저항, Q: 기능 라인 유량, a·b·c: 적합 파라미터</span>
+              </div>
+              <p><i>Q</i>는 실린더 속도에 면적을 곱해 구한다. 스틱과 버킷은 일정한 밸브 열림을 유지하면서 버킷을 땅에 밀어 서서히 정지시키는 시험을 사용한다. 이 과정의 가상 배압 증가와 유량 감소 궤적으로 저항을 맞춘다. 붐의 들어 올리는 방향에는 같은 정지 방식을 쓰기 어려워 접힘·펼침·만재의 세 자세에서 데이터를 얻는다.</p>
+
+              <div class="figure-pair">
+                <figure class="figure">
+                  <img src="assets/figure6.png" alt="스틱 오리피스 저항의 실측 데이터와 저항 모델 적합 곡선" loading="lazy">
+                  <figcaption><span class="fig-num">FIG. 06</span>스틱 오리피스 저항의 실측점과 모델 적합.</figcaption>
+                </figure>
+                <figure class="figure">
+                  <img src="assets/figure7.png" alt="CASE250 스틱에서 원하는 유량과 가상 배압에 따라 필요한 밸브 명령을 나타낸 2차원 유압 모델" loading="lazy">
+                  <figcaption><span class="fig-num">FIG. 07</span>CASE250 스틱의 2차원 모델. 같은 유량을 내려면 큰 부하에서 더 큰 명령이 필요하다.</figcaption>
+                </figure>
+              </div>
+
+              <h3>③ 보정된 관절을 다시 측정한다</h3>
+              <p>마지막 단계는 유압 제어가 적용된 상태의 스텝 응답을 측정하는 것이다. MPC는 이 응답에 맞춘 2차 시스템과 데드타임을 사용한다. 아래 예시는 CASE250 붐의 0.05rad/s 명령이다.</p>
+              <figure class="figure">
+                <img src="assets/figure8.png" alt="CASE250 붐의 0.05rad/s 스텝 응답과 2차 시스템 및 데드타임 모델의 적합 결과" loading="lazy">
+                <figcaption><span class="fig-num">FIG. 08</span>관절의 실제 속도 응답과 식별 모델. 명령 직후의 지연도 MPC 모델의 일부가 된다.</figcaption>
+              </figure>
+            </section>
+
+            <section class="section" id="evidence" aria-labelledby="evidence-title">
+              <div class="section-label">04 / EXPERIMENTAL EVIDENCE</div>
+              <h2 id="evidence-title">오차는 줄고,<br>작업은 더 높은 부하까지 이어졌다</h2>
+
+              <h3>근거 A · 피드포워드만으로 부하 변화에 대응하는가</h3>
+              <p>LS 방식의 M445에서는 표 검증으로 관절 속도 추종 오차 약 2%를 보고했다. NFC 방식의 CASE250에서는 PID를 끄고 붐에 0.05rad/s를 명령했다. 빈 버킷·접힘·만재처럼 부하가 다른 조건에서 피드포워드 항이 달라지며 목표 속도를 추종했다.</p>
+              <figure class="figure">
+                <img src="assets/figure9.png" alt="PID를 끈 CASE250 붐에서 빈 버킷, 접힘, 만재 조건에 따라 변화하는 피드포워드와 속도 응답" loading="lazy">
+                <figcaption><span class="fig-num">FIG. 09</span>부하 적응형 피드포워드 검증. 들어 올리는 동안 중력 부하가 달라져도 모델이 명령을 조절한다.</figcaption>
+              </figure>
+
+              <h3>근거 B · 다진 흙 속에서 경로를 유지하는가</h3>
+              <p>경로 추종 실험은 다진 흙에서 작업 깊이 2~40cm, 버킷 날 속도 약 0.5m/s로 수행했다. 제공 노트에 정리된 각 조건의 작업 횟수는 10회다.</p>
+
+              <figure class="comparison">
+                <h3>경로 추종 RMSE</h3>
+                <p class="small">낮을수록 목표 경로에 가깝다 · 막대 공통 기준 5cm</p>
+                <div class="bar-row"><span>CASE250 상용</span><div class="bar-track" aria-hidden="true"><span class="bar commercial"></span></div><b>4.7cm</b></div>
+                <div class="bar-row"><span>CASE250 제안</span><div class="bar-track" aria-hidden="true"><span class="bar case"></span></div><b>1.8cm</b></div>
+                <div class="bar-row"><span>M445 제안</span><div class="bar-track" aria-hidden="true"><span class="bar m445"></span></div><b>1.4cm</b></div>
+                <figcaption>노트의 수치를 재구성한 도표. 직접적인 제어기 비교는 같은 CASE250의 4.7cm와 1.8cm다. M445 결과는 다른 기체·유압 방식에서의 적용 사례다.</figcaption>
+              </figure>
+
+              <div class="table-wrap" role="region" aria-label="흙 속 경로 추종 정량 결과" tabindex="0">
+                <table class="table-wide">
+                  <caption>경로 추종 성능과 정지 양상</caption>
+                  <thead><tr><th scope="col">기체 · 제어기</th><th scope="col">RMSE</th><th scope="col">최대 편차</th><th scope="col">관찰된 정지 양상</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">CASE250 · 상용</th><td class="nowrap">4.7cm</td><td class="nowrap">17cm</td><td>최대 기능 압력보다 낮은 상태에서 조기 정지</td></tr>
+                    <tr class="highlight"><th scope="row">CASE250 · 제안</th><td class="nowrap"><strong>1.8cm</strong></td><td class="nowrap">5cm</td><td>최대 기능 압력에 도달할 때 정지</td></tr>
+                    <tr class="highlight"><th scope="row">M445 · 제안</th><td class="nowrap"><strong>1.4cm</strong></td><td class="nowrap">4cm</td><td>최대 기능 압력에 도달할 때 정지</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <p>CASE250의 상용 제어기는 단단한 흙에서 목표 깊이에 미치지 못했고, 약 5m 지점에서 일찍 멈췄다. 제안 제어기는 약 1m의 진입 구간 이후 목표를 유지했으며, 정지 시 스틱 압력은 최대 350bar에 도달했다.</p>
+              <p>같은 CASE250에서 RMSE 비율은 4.7 ÷ 1.8 ≈ 2.6이다. 이를 감소율로 표현하면 <strong>약 62%의 경로 오차 감소</strong>다. 이 결과는 해당 실험 조건의 비교이며, 모든 상용 시스템과 작업 조건에 대한 성능 보장은 아니다.</p>
+
+              <div class="figure-pair">
+                <figure class="figure">
+                  <img src="assets/figure10.png" alt="CASE250 상용 제어기 10회 작업의 경로 추종 결과, RMSE 4.7cm 및 최대 편차 17cm" loading="lazy">
+                  <figcaption><span class="fig-num">FIG. 10</span>CASE250 상용 제어기. 단단한 흙에서 목표 깊이에 도달하지 못하고 조기 정지하는 양상이 나타난다.</figcaption>
+                </figure>
+                <figure class="figure">
+                  <img src="assets/figure11.png" alt="CASE250 제안 제어기 10회 작업의 경로 추종 결과, RMSE 1.8cm 및 최대 편차 5cm" loading="lazy">
+                  <figcaption><span class="fig-num">FIG. 11</span>CASE250 제안 제어기. 진입 후 목표 경로를 유지하며, 정지 시 최대 기능 압력에 도달한다.</figcaption>
+                </figure>
+              </div>
+              <figure class="figure">
+                <img src="assets/figure12.png" alt="M445 제안 제어기의 10회 작업 경로 추종 결과, RMSE 1.4cm 및 최대 편차 4cm" loading="lazy">
+                <figcaption><span class="fig-num">FIG. 12</span>LS 방식 M445의 결과. 같은 제어 구조를 다른 유압 방식에 적용해 RMSE 1.4cm를 보고했다.</figcaption>
+              </figure>
+
+              <h3>근거 C · 완성된 표면도 더 평탄한가</h3>
+              <p>경로 데이터와 별개로, 깊이 25cm에서 5회 겹침 작업을 수행한 뒤 Leica MS60 레이저 스캐너로 표면을 측정했다. 상용 제어기는 중간 구간까지 목표 깊이에 못 미치고 10cm 이상의 높이 변동을 보인 반면, 제안 제어기의 표면은 더 평탄한 양상을 보였다.</p>
+              <figure class="figure">
+                <img src="assets/figure14.png" alt="목표면 대비 표면 높이의 레이저 스캔 비교. 왼쪽 상용 제어기보다 오른쪽 제안 제어기의 표면이 평탄한 양상" loading="lazy">
+                <figcaption><span class="fig-num">FIG. 14</span>완성 표면의 높이 비교. 왼쪽은 상용, 오른쪽은 제안 제어기다. 그림 번호는 원 노트를 따른다.</figcaption>
+              </figure>
+              <div class="callout">
+                <h3>수치를 읽을 때의 기준</h3>
+                <p>1.4·1.8cm는 흙 속 <strong>경로 추종 RMSE</strong>다. 레이저 스캔으로 얻은 최종 표면의 RMSE 수치는 제공 노트에 별도로 제시되지 않았다. 경로 추종 성능과 표면 품질 개선을 구분해 해석해야 한다.</p>
+              </div>
+            </section>
+
+            <section class="section" id="hydraulics" aria-labelledby="hydraulics-title">
+              <div class="section-label">05 / HYDRAULIC PRIMER</div>
+              <h2 id="hydraulics-title">LS는 부하를 따라가고,<br>NFC는 별도의 부하 보정이 필요하다</h2>
+              <p>두 방식의 차이는 펌프가 무엇을 기준으로 반응하는지에 있다. 이 차이가 피드포워드 모델의 차원을 결정한다.</p>
+
+              <div class="table-wrap" role="region" aria-label="LS와 NFC 작동 원리 비교" tabindex="0">
+                <table>
+                  <thead><tr><th scope="col">비교 축</th><th scope="col">LS · 로드센싱</th><th scope="col">NFC · 네거티브 플로 컨트롤</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">펌프 제어</th><td>밸브 전후 압력차를 일정하게 유지하도록 반응</td><td>중앙 바이패스 압력으로 제어</td></tr>
+                    <tr><th scope="row">부하가 커지면</th><td>같은 명령의 유량을 상대적으로 잘 유지</td><td>같은 명령에서 기능 유량 감소</td></tr>
+                    <tr><th scope="row">응답의 비유</th><td>부하에 대해 ‘뻣뻣함’</td><td>부하에 대해 ‘무름’</td></tr>
+                    <tr><th scope="row">본 연구의 모델</th><td>명령–실린더 속도 1차원 표</td><td>원하는 유량·가상 배압에 따른 2차원 모델</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="figure-pair">
+                <figure class="figure">
+                  <img src="assets/figure16.png" alt="중앙 바이패스 압력으로 펌프를 제어하는 NFC 한 기능의 단순화 유압 회로" loading="lazy">
+                  <figcaption><span class="fig-num">FIG. 16</span>NFC 단순화 회로. 펌프는 기능 부하를 직접 추종하는 대신 중앙 바이패스의 압력으로 제어된다.</figcaption>
+                </figure>
+                <figure class="figure">
+                  <img src="assets/figure17.png" alt="NFC 유압 모델의 저항 요소 R1 바이패스, R2 기준 오리피스, R3 기능 오리피스를 나타낸 회로" loading="lazy">
+                  <figcaption><span class="fig-num">FIG. 17</span>모델링용 분해. 스풀 변위에 따라 R1과 R3가 서로 반대 방향으로 변하며, R2는 기준 오리피스다.</figcaption>
+                </figure>
+              </div>
+              <p class="small">이 비교는 연구의 모델링 관점에서 단순화한 설명이다. 실제 유압계의 유량 분배와 회생 등은 피드포워드만으로 완전히 표현되지 않으며, 아래층 PID가 남은 영향을 보완한다.</p>
+            </section>
+
+            <section class="section" id="implications" aria-labelledby="implications-title">
+              <div class="section-label">06 / LIMITS &amp; IMPLICATIONS</div>
+              <h2 id="implications-title">HR35에 가져올 것은<br>수치보다 식별의 순서다</h2>
+
+              <h3>연구가 확인한 범위와 남은 과제</h3>
+              <p>실차 검증은 LS와 NFC 두 방식에 한정된다. PFC, 즉 포지티브 플로 컨트롤 기체는 시험하지 못했다. 관절 간 결합도 모델에 포함하지 않았으므로 속도를 더 높일 때는 이 가정을 다시 검토해야 한다.</p>
+              <p>향후 과제로는 임의 형상 추종, 그리고 MPC 비용함수에 말단 힘을 포함하는 방법이 제시된다. 후자는 다짐이나 흙더미 재배치처럼 경로뿐 아니라 힘의 사용이 중요한 작업으로 확장하기 위한 방향이다.</p>
+
+              <div class="callout warm">
+                <h3>여기부터는 HR35 적용에 대한 해석과 제안</h3>
+                <p>아래 내용은 원 노트의 적용 의견을 정리한 것이다. 논문은 HR35에서의 이식 가능성, 보정 소요 시간, 정지 시험의 안전성을 검증하지 않았다. 특히 ‘20분 절차를 그대로 옮길 수 있다’는 생각은 실차 조건을 확인할 적용 가설로 다루는 편이 정확하다.</p>
+              </div>
+
+              <ol class="workflow">
+                <li>
+                  <strong>가장 먼저 펌프 제어 방식을 확정한다</strong>
+                  <span>실차 자료 요청의 첫 항목은 LS·NFC·PFC 여부다. 유압 방식이 정해져야 피드포워드 모델의 형태를 결정할 수 있다.</span>
+                </li>
+                <li>
+                  <strong>명령–속도 보정을 실차 계측 조건에 맞춰 설계한다</strong>
+                  <span>조이스틱 CAN 명령과 정상 속도를 대응시키는 시험은 트윈의 밸브 유량 이득을 대조할 후보가 된다. 논문의 명령 범위와 3초 측정 시점은 참고값이며, HR35의 명령 스케일·기구 변환·계측 성능에 맞는지 확인해야 한다.</span>
+                </li>
+                <li>
+                  <strong>관성 식별을 유압 피드포워드와 연결한다</strong>
+                  <span>NFC 방식이라면 압력에서 관성 성분을 제거하는 모델이 필요하다. 원 노트의 ‘축 A: 묶음 파라미터 식별’은 ‘축 B: 유압 피드포워드’를 뒷받침하는 작업으로 연결된다.</span>
+                </li>
+                <li>
+                  <strong>트윈과 실차를 같은 응답 지표로 비교한다</strong>
+                  <span>스텝 응답에서 얻는 K·ζ·ωn·τ를 공통 비교 지표로 삼는다. 한 번의 응답 적합을 출발점으로, 방향·자세·부하가 달라져도 모델이 유효한지 검증한다.</span>
+                </li>
+                <li>
+                  <strong>MPC와 유압 보정의 역할을 나눈다</strong>
+                  <span>원 노트에서 언급한 서울대 MPC 작업과의 접점은 계층 분리다. 경로 추종기는 관절 응답을 예측하고, 아래층이 유압 방식과 부하 차이를 흡수하도록 인터페이스를 정리할 수 있다.</span>
+                </li>
+                <li>
+                  <strong>정지 시험은 조건을 정의한 실험 후보로 둔다</strong>
+                  <span>버킷을 지면에 밀어 서서히 멈추는 시험은 ‘축 G: 실험 설계’의 후보가 된다. 실제 수행 여부는 HR35의 압력 한계, 자세 안정성, 작업 범위와 정지 조건을 확인한 뒤 결정해야 한다.</span>
+                </li>
+              </ol>
+
+              <h3>다음 실차 검토에 가져갈 체크리스트</h3>
+              <ul class="checklist" aria-label="HR35 적용 전 확인 사항">
+                <li><span class="box" aria-hidden="true"></span><span>펌프 제어 방식과 관절별 유압 회로를 확인했는가?</span></li>
+                <li><span class="box" aria-hidden="true"></span><span>압력·자세·속도 계측으로 필요한 힘과 실린더 속도를 계산할 수 있는가?</span></li>
+                <li><span class="box" aria-hidden="true"></span><span>CAN 명령의 스케일, 데드밴드, 방향별 응답을 확인했는가?</span></li>
+                <li><span class="box" aria-hidden="true"></span><span>관성 보정과 부하 시험의 조건을 정의했는가?</span></li>
+                <li><span class="box" aria-hidden="true"></span><span>경로 RMSE와 최종 표면 품질을 별도로 평가할 계획인가?</span></li>
+              </ul>
+            </section>
+
+            <section class="ending" aria-labelledby="ending-title">
+              <div class="eyebrow">THE TAKEAWAY</div>
+              <h2 id="ending-title">정밀한 궤적의 출발점은<br>기계가 부하에 반응하는 방식을 아는 것</h2>
+              <p>이 연구의 설득력은 피드포워드와 MPC 사이의 역할 분담에 있다. 압력으로 현재 부하를 읽어 필요한 유량을 만들고, 그 위에서 관절의 지연을 예측한다. 두 층이 각자의 문제를 맡을 때 깊은 흙 속에서도 경로 오차를 줄일 수 있었다.</p>
+              <p>새로운 기체에 적용할 때 첫 질문도 분명해진다. <strong>이 굴착기는 부하가 달라지면 유량을 어떻게 바꾸는가?</strong> 그 답이 모델의 형태와 다음 실험을 결정한다.</p>
+            </section>
+
+            <aside class="share" aria-labelledby="share-title">
+              <h3 id="share-title">공유용 요약 · 선택해 복사할 수 있는 문장</h3>
+              <p>굴착기의 정밀도는 유압에서 시작된다. ETH Zürich·Hexagon 연구는 부하를 읽는 피드포워드와 지연을 고려한 MPC를 결합해, LS·NFC 두 굴착기에서 약 20분 보정 후 경로 RMSE 1.4·1.8cm를 보고했다. 핵심은 유압 방식에 맞는 모델과 제어 계층의 역할 분담이다.</p>
+            </aside>
+
+            <ul class="chips" aria-label="핵심 키워드">
+              <li>로드센싱</li>
+              <li>네거티브 플로 컨트롤</li>
+              <li>가상 배압</li>
+              <li>오리피스 저항</li>
+              <li>관성 보상</li>
+              <li>2차 시스템 + 데드타임</li>
+              <li>정지 시험</li>
+              <li>MPC 경로 추종</li>
+            </ul>
+
+            <section class="sources" id="sources" aria-labelledby="sources-title">
+              <h2 id="sources-title">출처와 해석 범위</h2>
+              <dl>
+                <dt>대상 논문</dt>
+                <dd><cite lang="en">High Precision Hydraulic Excavator Control for Heavy-Duty Grading</cite><br>Lennart Werner, Pol Eyschen, Sean Costello, Andrei Cramariuc, Marco Hutter.<br>ETH Zürich Robotic Systems Lab · Hexagon AB.<br>arXiv:2605.09465v1 [cs.RO] · 2026-05-10 · 프리프린트.<br><a rel="noreferrer">arXiv에서 논문 정보 보기 ↗</a></dd>
+
+                <dt>기사의 작성 근거</dt>
+                <dd>제공된 Obsidian 요약 노트와 첨부 그림을 바탕으로 재구성했다. 서지 정보, 식 번호, 실험 조건과 수치는 해당 노트 기준이며, 이 변환 과정에서 논문 원문을 별도로 대조하지 않았다. 프리프린트 정보만으로 동료 심사 완료 여부를 판단하지 않는다.</dd>
+
+                <dt>그림과 수치</dt>
+                <dd>그림은 제공된 로컬 이미지이며 원 노트의 번호를 유지했다. 13·15번은 제공 자산에 포함되지 않았다. 경로 RMSE 비교 막대는 노트 수치로 재작성했으며, 약 62% 감소는 (4.7 − 1.8) ÷ 4.7로 계산한 값이다.</dd>
+
+                <dt>기존 연구와 모델 참조</dt>
+                <dd>Xu 2014, Dao 2021/2022, Yang 2022, Lee 2022 및 Werner 2025에 관한 설명은 제공 노트의 요약을 따른다. 전체 서지사항과 개별 연구의 평가 조건은 대상 논문의 참고문헌 확인이 필요하다.</dd>
+
+                <dt>적용 의견</dt>
+                <dd>HR35, 디지털 트윈, 서울대 MPC 작업, 축 A·B·G와의 연결은 원 노트의 프로젝트 관점에 기반한 적용 제안이다. 논문의 실험 결과와 구분되며, HR35 성능이나 보정 시간에 대한 검증된 결론이 아니다.</dd>
+              </dl>
+            </section>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <footer class="page-footer">
+      <span>FIELD NOTES / HYDRAULIC CONTROL · 연구를 현장 질문으로 연결하는 기록</span>
+      <a href="#top">처음으로 ↑</a>
+    </footer>
+  </div>
+</body>
+</html>

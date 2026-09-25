@@ -1,7 +1,28 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T11:20:52.108Z",
+  "updatedAt": "2026-09-25T11:26:29.731Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/eth2026-grading/",
+      "excerpt": "High Precision Hydraulic Excavator Control for Heavy Duty Grading 요약 한줄 요약 유압 방식이 다른 두 굴착기(11.5 t 로드센싱 M445, 25 t 네거티브 플로 컨트롤 CASE250)에 같은 제어기 구조를 20분 보정만으로 올려, 한 삽에 버킷이 차는 깊은 정지작업에서 표면 오차 RMSE 1.4 / 1.8 cm 를 얻었다. 상용 반자동 시스템(4.7 cm)보다 2.6배 ",
+      "shortId": "o2ptff",
+      "slug": "eth2026-grading",
+      "sourcePath": "02_research/필드로봇/시스템식별/eth2026-grading.md",
+      "tags": [
+        "논문요약",
+        "유압보정",
+        "굴착기",
+        "정지작업",
+        "로드센싱",
+        "NFC",
+        "MPC",
+        "ETH"
+      ],
+      "title": "High Precision Hydraulic Excavator Control for Heavy-Duty Grading - 요약",
+      "updatedAt": "2026-09-25T11:26:29.731Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/o2ptff/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/egli2020-towards/",
