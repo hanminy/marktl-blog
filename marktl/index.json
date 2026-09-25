@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T10:46:16.694Z",
+  "updatedAt": "2026-09-25T11:06:25.662Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/ferlibas2021-lumped/",
+      "excerpt": "Load weight estimation on an excavator in static and dynamic motions 요약 한줄 요약 13 t 급 Komatsu PC138US 8 굴착기에 IMU 4개와 실린더 압력센서 6개 만 달고, 붐·스틱·버킷을 수직면 3관절 로봇으로 보아 관절 토크식을 \"묶음 파라미터 × 자세 함수\"의 선형식 으로 다시 쓴 뒤 최소제곱으로 파라미터를 구한다. 그 모델이 예측한 무부하 토크와 실측 토",
+      "shortId": "1l93fdu",
+      "slug": "ferlibas2021-lumped",
+      "sourcePath": "02_research/필드로봇/시스템식별/ferlibas2021-lumped.md",
+      "tags": [
+        "논문요약",
+        "시스템식별",
+        "굴착기",
+        "페이로드추정",
+        "묶음파라미터",
+        "Tampere"
+      ],
+      "title": "Load weight estimation on an excavator in static and dynamic motions - 요약",
+      "updatedAt": "2026-09-25T11:06:25.662Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/1l93fdu/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/wensing2018-lmi/",
