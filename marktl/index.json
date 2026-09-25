@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T11:26:29.731Z",
+  "updatedAt": "2026-09-25T11:31:56.201Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/egli2021-general/",
+      "excerpt": "A General Approach for the Automation of Hydraulic Excavator Arms Using Reinforcement Learning 요약 한줄 요약 2020 IROS 논문(위치 제어)을 속도 추종 + 버킷 자세 추종 으로 바꾼 후속작. 실차 100분 데이터로 학습한 액추에이터 신경망 위에서 PPO 로 정책을 학습해 M545 에 그대로 올렸더니, 공중 원 궤적 평균 오차가 7.8 cm → 1",
+      "shortId": "2nc9no",
+      "slug": "egli2021-general",
+      "sourcePath": "02_research/필드로봇/시스템식별/egli2021-general.md",
+      "tags": [
+        "논문요약",
+        "시스템식별",
+        "굴착기",
+        "데이터기반액추에이터모델",
+        "강화학습",
+        "ETH"
+      ],
+      "title": "A General Approach for the Automation of Hydraulic Excavator Arms Using Reinforcement Learning - 요약",
+      "updatedAt": "2026-09-25T11:31:56.201Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/2nc9no/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/eth2026-grading/",
