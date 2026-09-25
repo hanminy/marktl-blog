@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T11:10:19.290Z",
+  "updatedAt": "2026-09-25T11:15:17.371Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/casoli2015-sim/",
+      "excerpt": "Simulation of an Excavator Hydraulic System Using Nonlinear Mathematical Models 요약 한줄 요약 굴착기 유압 회로 전체(가변용량 로드센싱 펌프 + 유량 분배(flow sharing) 밸브 블록 + 붐·암·버킷 2차원 기구)를 AMESim 으로 만든 논문. 펌프는 보상기(compensator)는 물리식(white box), 사판 액추에이터 압력은 실측 곡면(black",
+      "shortId": "qzt6ym",
+      "slug": "casoli2015-sim",
+      "sourcePath": "02_research/필드로봇/시스템식별/casoli2015-sim.md",
+      "tags": [
+        "논문요약",
+        "유압모델",
+        "굴착기",
+        "그레이박스",
+        "로드센싱펌프",
+        "AMESim"
+      ],
+      "title": "Simulation of an Excavator Hydraulic System Using Nonlinear Mathematical Models - 요약",
+      "updatedAt": "2026-09-25T11:15:17.371Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/qzt6ym/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/isarc2002-force-sensor-id/",
