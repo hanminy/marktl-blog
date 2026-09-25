@@ -1,7 +1,25 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T12:25:20.590Z",
+  "updatedAt": "2026-09-25T12:29:27.976Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/villaverde2018-input-dependent/",
+      "excerpt": "Input Dependent Structural Identifiability of Nonlinear Systems 요약 한줄 요약 파라미터를 \"이론적으로라도 구할 수 있는가\"(구조적 식별가능성)는 모델 식·출력뿐 아니라 입력의 모양 에도 달려 있다. 이 논문은 파라미터를 미분이 0 인 상태로 붙인 확장 관측 행렬의 계수(rank)로 식별가능성을 판정하되, 확장 리 미분 으로 입력의 시간 미분을 행렬에 넣어 \"입력의 몇 차 미분",
+      "shortId": "173eoh3",
+      "slug": "villaverde2018-input-dependent",
+      "sourcePath": "02_research/필드로봇/시스템식별/villaverde2018-input-dependent.md",
+      "tags": [
+        "논문요약",
+        "구조적식별가능성",
+        "실험설계",
+        "확장리미분",
+        "STRIKE-GOLDD"
+      ],
+      "title": "Input-Dependent Structural Identifiability of Nonlinear Systems - 요약",
+      "updatedAt": "2026-09-25T12:29:27.976Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/173eoh3/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/autcon2022-fullbody-pose/",

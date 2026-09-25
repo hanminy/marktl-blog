@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>파라미터가 보이지 않는 이유, 입력에 있다 — 구조적 식별가능성 연구 노트</title>
+  <style>
+    :root {
+      --paper: #f6f4ed;
+      --white: #fffef9;
+      --ink: #202d2b;
+      --muted: #606b64;
+      --green: #174f43;
+      --green-soft: #e7eee5;
+      --line: #d4d8cb;
+      --accent: #b7492e;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "AppleMyungjo", "Batang", serif;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 2rem; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.85;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--green); text-underline-offset: .22em; }
+    a:hover { color: var(--accent); }
+    a:focus-visible { outline: 3px solid var(--accent); outline-offset: 5px; }
+    ::selection { background: #d4e4ba; color: var(--ink); }
+    .skip-link {
+      position: absolute;
+      top: -100px;
+      left: 1rem;
+      padding: .6rem 1rem;
+      z-index: 2;
+      background: var(--white);
+    }
+    .skip-link:focus { top: 1rem; }
+    .shell { max-width: 1240px; margin: 0 auto; padding: 0 54px; }
+    .masthead {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: center;
+      padding: 25px 0;
+      border-bottom: 1px solid var(--ink);
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .13em;
+    }
+    .masthead a { text-decoration: none; color: inherit; }
+    .masthead span:last-child { color: var(--muted); }
+    .hero { padding: 73px 0 54px; }
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin: 0 0 27px;
+      color: var(--green);
+      font-size: .75rem;
+      font-weight: 750;
+      letter-spacing: .12em;
+    }
+    .eyebrow::before { content: ""; width: 28px; height: 3px; background: var(--accent); }
+    h1, h2, h3, p, figure, blockquote { margin: 0; }
+    h1 {
+      max-width: 960px;
+      font-family: var(--serif);
+      font-size: clamp(2.6rem, 5.4vw, 4.6rem);
+      font-weight: 700;
+      line-height: 1.27;
+      letter-spacing: -.065em;
+      text-wrap: balance;
+    }
+    h1 em { color: var(--green); font-style: normal; }
+    .deck {
+      max-width: 760px;
+      margin-top: 30px;
+      font-size: clamp(1.08rem, 2vw, 1.3rem);
+      line-height: 1.85;
+      color: #48564f;
+    }
+    .hero-meta {
+      display: flex;
+      gap: 12px 23px;
+      flex-wrap: wrap;
+      margin-top: 33px;
+      color: var(--muted);
+      font-size: .77rem;
+    }
+    .hero-meta span + span { border-left: 1px solid var(--line); padding-left: 23px; }
+    .abstract {
+      display: grid;
+      grid-template-columns: 165px 1fr;
+      gap: 35px;
+      padding: 33px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .label {
+      color: var(--green);
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+    .abstract p { max-width: 800px; font-size: .96rem; }
+    .findings { padding: 43px 0 51px; }
+    .findings > h2 {
+      font-size: .82rem;
+      letter-spacing: .08em;
+      margin-bottom: 20px;
+      color: var(--green);
+    }
+    .finding-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 19px; }
+    .finding {
+      padding: 23px 25px 26px;
+      background: var(--green-soft);
+      border-top: 3px solid var(--green);
+    }
+    .finding .number { font-family: var(--serif); color: var(--green); font-size: 1.6rem; }
+    .finding h3 { margin: 10px 0; font-size: 1.06rem; line-height: 1.5; letter-spacing: -.03em; }
+    .finding p { color: #4d5d52; font-size: .87rem; line-height: 1.8; }
+    .reading-layout {
+      display: grid;
+      grid-template-columns: 165px minmax(0, 1fr);
+      gap: 35px;
+      align-items: start;
+      padding-bottom: 70px;
+    }
+    .contents { position: sticky; top: 30px; padding-top: 10px; }
+    .contents ol { list-style: none; padding: 0; margin: 17px 0 25px; }
+    .contents li { margin-bottom: 12px; font-size: .79rem; line-height: 1.65; }
+    .contents a { text-decoration: none; color: var(--muted); }
+    .contents a:hover { color: var(--green); text-decoration: underline; }
+    .contents .index { color: var(--accent); font-size: .68rem; margin-right: 8px; font-variant-numeric: tabular-nums; }
+    .contents .scope { border-top: 1px solid var(--line); padding-top: 18px; font-size: .73rem; color: var(--muted); line-height: 1.8; }
+    .article-body { min-width: 0; }
+    .section { padding: 44px 0; border-top: 1px solid var(--line); }
+    .section:first-child { padding-top: 0; border-top: 0; }
+    .section-number { margin-bottom: 9px; font-size: .71rem; font-weight: 800; letter-spacing: .12em; color: var(--accent); }
+    h2 {
+      font-size: clamp(1.5rem, 2.7vw, 2rem);
+      line-height: 1.45;
+      letter-spacing: -.045em;
+      text-wrap: balance;
+      margin-bottom: 24px;
+    }
+    .article-body p + p { margin-top: 19px; }
+    .article-body h3 { font-size: 1.17rem; letter-spacing: -.03em; line-height: 1.55; margin: 31px 0 14px; }
+    strong { font-weight: 750; }
+    .pullquote {
+      margin: 33px 0;
+      padding: 8px 0 8px 26px;
+      border-left: 3px solid var(--accent);
+      color: var(--green);
+      font-family: var(--serif);
+      font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+      line-height: 1.7;
+      letter-spacing: -.035em;
+    }
+    .pullquote footer { font-family: var(--sans); font-size: .73rem; color: var(--muted); margin-top: 13px; letter-spacing: 0; }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 28px 0 14px;
+      padding: 0;
+      list-style: none;
+      counter-reset: flow;
+    }
+    .flow li { position: relative; padding: 22px 19px; border: 1px solid var(--line); background: var(--white); counter-increment: flow; }
+    .flow li::before { content: "0" counter(flow); display: block; color: var(--accent); font-size: .72rem; font-weight: 700; margin-bottom: 8px; }
+    .flow strong { display: block; font-size: .92rem; line-height: 1.6; }
+    .flow span { display: block; margin-top: 8px; color: var(--muted); font-size: .79rem; line-height: 1.75; }
+    .small-note { font-size: .8rem; color: var(--muted); line-height: 1.8; }
+    .equation {
+      margin: 23px 0;
+      padding: 23px 25px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      overflow-x: auto;
+    }
+    .equation .eq-label { display: block; font-family: var(--sans); font-size: .69rem; color: var(--muted); letter-spacing: .05em; margin-bottom: 12px; }
+    .math { font-family: "Cambria Math", "Times New Roman", serif; font-size: 1.18rem; line-height: 2; }
+    .math-line { display: block; white-space: nowrap; }
+    .math sub, .math sup { font-size: .7em; }
+    .eq-conclusion { margin-top: 13px; color: var(--green); font-size: .85rem; }
+    math { font-size: 1.2rem; }
+    .table-wrap { margin: 25px 0; overflow-x: auto; border: 1px solid var(--line); background: var(--white); }
+    table { width: 100%; border-collapse: collapse; font-size: .85rem; text-align: left; }
+    caption { text-align: left; padding: 16px 19px; font-size: .78rem; font-weight: 700; color: var(--green); background: #eef0e8; }
+    th, td { padding: 16px 19px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    thead th { color: var(--muted); font-size: .75rem; font-weight: 700; background: #f7f8f1; }
+    tbody th { font-weight: 700; }
+    tbody tr:last-child > * { border-bottom: 0; }
+    .status { display: inline-block; padding: 1px 8px; border-radius: 3px; font-size: .75rem; white-space: nowrap; background: var(--green-soft); color: var(--green); }
+    .status.limited { background: #f6e7dd; color: #93412e; }
+    .note-box { margin: 25px 0; padding: 22px 25px; border-left: 3px solid var(--green); background: var(--green-soft); font-size: .89rem; }
+    .note-box strong:first-child { display: block; margin-bottom: 7px; }
+    .figure { margin: 30px 0; }
+    .image-mat { background: #fff; border: 1px solid var(--line); padding: 25px; }
+    .image-mat img { display: block; width: 100%; height: auto; margin: auto; }
+    .figure-models img { max-width: 680px; }
+    .figure-output img { max-width: 490px; }
+    figcaption { margin-top: 13px; font-size: .78rem; line-height: 1.8; color: var(--muted); }
+    .fig-label { color: var(--green); font-weight: 800; margin-right: 9px; }
+    .case-header { display: flex; gap: 15px; align-items: baseline; margin: 34px 0 12px; }
+    .case-header h3 { margin: 0; }
+    .case-letter { color: var(--accent); font-family: var(--serif); font-size: 1.45rem; }
+    .case-meta { color: var(--muted); font-size: .77rem; margin-bottom: 15px; }
+    .comparison { min-width: 620px; }
+    .limitations { padding-left: 21px; margin: 0; }
+    .limitations li { margin: 12px 0; padding-left: 5px; }
+    .application {
+      background: #eeeee4;
+      padding: 32px;
+      border: 1px solid var(--line);
+      margin-top: 22px;
+    }
+    .application h3:first-child { margin-top: 0; }
+    .application h3 { font-size: 1.03rem; }
+    .application p { font-size: .9rem; }
+    code { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: .86em; background: #e3e5db; padding: .12em .3em; border-radius: 3px; }
+    .checklist { list-style: none; padding: 0; margin: 25px 0 0; }
+    .checklist li { position: relative; padding: 13px 0 13px 29px; border-bottom: 1px solid var(--line); font-size: .91rem; }
+    .checklist li::before { content: "□"; color: var(--green); position: absolute; left: 0; }
+    .ending { padding: 34px; background: var(--green); color: var(--white); margin-top: 31px; }
+    .ending .label { color: #c6d8ad; }
+    .ending h3 { color: var(--white); font-family: var(--serif); font-size: 1.65rem; margin: 15px 0; }
+    .ending p { font-size: .94rem; color: #e1e9df; }
+    .share-copy { border: 1px solid var(--line); padding: 25px; margin-top: 25px; background: var(--white); }
+    .share-copy blockquote { margin-top: 11px; font-size: .96rem; }
+    .sources { font-size: .84rem; }
+    .source-card { padding: 23px 25px; background: var(--white); border: 1px solid var(--line); }
+    .source-title { display: block; font-family: var(--serif); font-size: 1.17rem; line-height: 1.6; margin-bottom: 12px; }
+    .source-card p + p { margin-top: 10px; }
+    .source-notes { padding-left: 21px; color: var(--muted); margin: 23px 0 0; }
+    .source-notes li { padding-left: 4px; margin: 10px 0; }
+    .tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 25px; }
+    .tags span { border: 1px solid var(--line); border-radius: 30px; padding: 4px 11px; font-size: .71rem; color: var(--muted); }
+    .page-footer { display: flex; justify-content: space-between; gap: 15px; padding: 24px 0 33px; border-top: 1px solid var(--ink); color: var(--muted); font-size: .72rem; }
+    @media (max-width: 1000px) {
+      .shell { padding: 0 32px; }
+      .reading-layout { grid-template-columns: 125px minmax(0, 1fr); gap: 27px; }
+      .abstract { grid-template-columns: 125px 1fr; gap: 27px; }
+      .finding { padding: 20px; }
+    }
+    @media (max-width: 760px) {
+      body { font-size: 16px; }
+      .shell { padding: 0 22px; }
+      .masthead { padding: 19px 0; font-size: .63rem; letter-spacing: .07em; }
+      .hero { padding: 43px 0 35px; }
+      .eyebrow { font-size: .65rem; margin-bottom: 21px; }
+      h1 { font-size: clamp(2.4rem, 8.8vw, 3.8rem); }
+      .deck { margin-top: 23px; }
+      .hero-meta { margin-top: 25px; gap: 8px 16px; }
+      .hero-meta span + span { padding-left: 16px; }
+      .abstract { display: block; padding: 26px 0; }
+      .abstract .label { margin-bottom: 13px; }
+      .finding-grid { grid-template-columns: 1fr; gap: 12px; }
+      .finding { position: relative; padding: 21px 22px 21px 69px; border-top: 0; border-left: 3px solid var(--green); }
+      .finding .number { position: absolute; left: 20px; top: 18px; }
+      .finding h3 { margin-top: 0; }
+      .findings { padding: 31px 0; }
+      .reading-layout { display: block; padding-bottom: 40px; }
+      .contents { position: static; padding: 21px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-bottom: 35px; }
+      .contents ol { display: flex; flex-wrap: wrap; gap: 12px 21px; margin: 12px 0 0; }
+      .contents li { margin: 0; }
+      .contents .scope { display: none; }
+      .section { padding: 33px 0; }
+      .flow { grid-template-columns: 1fr; }
+      .flow li { padding: 16px 19px; }
+      .flow li::before { float: left; margin: 2px 15px 20px 0; }
+      .flow span { margin-top: 4px; }
+      .equation { padding: 19px; }
+      .image-mat { padding: 13px; }
+      .application, .ending { padding: 24px; }
+      th, td { padding: 13px; }
+      .page-footer { flex-wrap: wrap; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    @media print {
+      body { background: white; color: black; font-size: 10pt; }
+      .shell { max-width: none; padding: 0; }
+      .hero { padding: 28px 0; }
+      h1 { font-size: 30pt; }
+      .contents, .skip-link, .page-footer a { display: none; }
+      .reading-layout { display: block; }
+      .section { padding: 24px 0; }
+      .finding, .equation, figure, .source-card, .ending { break-inside: avoid; }
+      .ending { color: black; background: #eee; }
+      .ending h3, .ending p, .ending .label { color: black; }
+      .table-wrap { overflow: visible; }
+      .comparison { min-width: 0; }
+      a { color: inherit; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Input-Dependent Structural Identifiability of Nonlinear Systems - 요약">
+<meta property="og:description" content="Input Dependent Structural Identifiability of Nonlinear Systems 요약 한줄 요약 파라미터를 &quot;이론적으로라도 구할 수 있는가&quot;(구조적 식별가능성)는 모델 식·출력뿐 아니라 입력의 모양 에도 달려 있다. 이 논문은 파라미터를 미분이 0 인 상태로 붙인 확장 관측 행렬의 계수(rank)로 식별가능성을 판정하되, 확장 리 미분 으로 입력의 시간 미분을 행렬에 넣어 &quot;입력의 몇 차 미분">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/173eoh3/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/173eoh3/assets/figure1.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Input-Dependent Structural Identifiability of Nonlinear Systems - 요약">
+<meta name="twitter:description" content="Input Dependent Structural Identifiability of Nonlinear Systems 요약 한줄 요약 파라미터를 &quot;이론적으로라도 구할 수 있는가&quot;(구조적 식별가능성)는 모델 식·출력뿐 아니라 입력의 모양 에도 달려 있다. 이 논문은 파라미터를 미분이 0 인 상태로 붙인 확장 관측 행렬의 계수(rank)로 식별가능성을 판정하되, 확장 리 미분 으로 입력의 시간 미분을 행렬에 넣어 &quot;입력의 몇 차 미분">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/173eoh3/assets/figure1.png">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/villaverde2018-input-dependent/">
+</head>
+<body>
+  <a class="skip-link" href="#article-content">본문으로 바로 가기</a>
+  <div class="shell" id="top">
+    <header class="masthead" aria-label="연구 노트">
+      <a href="#top">RESEARCH NOTES / SYSTEMS &amp; CONTROL</a>
+      <span>논문 해설 · 2019</span>
+    </header>
+
+    <main>
+      <article aria-labelledby="article-title">
+        <header class="hero">
+          <p class="eyebrow">EXPERIMENT DESIGN · 구조적 식별가능성</p>
+          <h1 id="article-title">파라미터가 보이지 않는 이유,<br><em>입력에 있다</em></h1>
+          <p class="deck">같은 모델, 같은 출력도 입력의 모양에 따라 다른 답을 준다. 상수에서 램프로 바꾸는 작은 차이가 어떻게 파라미터 식별의 가능성을 바꾸는가.</p>
+          <div class="hero-meta">
+            <span>Villaverde 외 3인 논문 해설</span>
+            <span>IEEE Control Systems Letters · 2019</span>
+            <span>노트 작성 <time datetime="2026-09-25">2026.09.25</time></span>
+          </div>
+        </header>
+
+        <section class="abstract" aria-labelledby="abstract-title">
+          <h2 class="label" id="abstract-title">Abstract / 초록</h2>
+          <p>구조적 식별가능성은 모델의 파라미터를 이상적인 관측으로도 구할 수 있는지를 묻는다. 이 논문은 그 답이 모델 식과 측정 출력뿐 아니라 <strong>입력의 시간적 형태</strong>에도 달려 있음을 분석한다. 파라미터를 확장 상태에 포함하고, 확장 리 미분으로 입력의 시간 미분을 관측·식별가능성 행렬에 반영한다. 이어 입력 미분에 제약을 주며 행렬의 계수(rank)를 검사해 필요한 자극의 형태를 찾는다. 세 가지 사례는 램프 입력의 효과와 다중 상수 입력 실험의 가능성, 그리고 그 대체 전략의 한계를 보여준다.</p>
+        </section>
+
+        <section class="findings" aria-labelledby="findings-title">
+          <h2 id="findings-title">먼저 읽는 세 가지 발견</h2>
+          <div class="finding-grid">
+            <div class="finding">
+              <span class="number">01</span>
+              <h3>입력도 식별가능성의 조건이다</h3>
+              <p>2구획 모델은 상수 입력에서 rank가 5에 머물지만, 램프 입력에서는 필요한 6에 도달한다.</p>
+            </div>
+            <div class="finding">
+              <span class="number">02</span>
+              <h3>모든 입력을 바꿀 필요는 없다</h3>
+              <p>5입력 생물공정 모델에서는 두 입력만 램프로 바꾸어 전체 파라미터의 국소 식별가능성을 확보한다.</p>
+            </div>
+            <div class="finding">
+              <span class="number">03</span>
+              <h3>여러 상수 실험이 대안이 되기도 한다</h3>
+              <p>이온 채널과 생물공정 사례에서는 서로 다른 상수 입력 실험 4회가 대안이 된다. 모든 모델에 통하는 규칙은 아니다.</p>
+            </div>
+          </div>
+        </section>
+
+        <div class="reading-layout">
+          <nav class="contents" aria-label="목차">
+            <p class="label">In this report</p>
+            <ol>
+              <li><a href="#question"><span class="index">01</span>실험 전의 질문</a></li>
+              <li><a href="#method"><span class="index">02</span>분석의 원리</a></li>
+              <li><a href="#evidence"><span class="index">03</span>세 가지 사례</a></li>
+              <li><a href="#limits"><span class="index">04</span>해석의 경계</a></li>
+              <li><a href="#implications"><span class="index">05</span>HR35 적용 시사점</a></li>
+              <li><a href="#takeaway"><span class="index">06</span>실험 설계의 순서</a></li>
+              <li><a href="#sources"><span class="index">07</span>출처와 주석</a></li>
+            </ol>
+            <p class="scope">읽기의 범위<br>구조적·국소 식별가능성<br>입력 설계와 다중 실험<br>기호적 rank 분석</p>
+          </nav>
+
+          <div class="article-body" id="article-content">
+            <section class="section" id="question" aria-labelledby="question-title">
+              <p class="section-number">01 / THE QUESTION</p>
+              <h2 id="question-title">얼마나 측정할지보다 먼저,<br>무엇으로 자극할지를 묻다</h2>
+              <p>파라미터 추정이 잘되지 않을 때 측정 횟수나 최적화 알고리즘부터 바꾸기 쉽다. 하지만 그보다 앞선 질문이 있다. <strong>지금의 모델·출력·입력 조합으로 서로 다른 파라미터를 구별할 수 있는가?</strong> 구조적으로 구별할 수 없다면 같은 조건에서 데이터를 더 모으는 것만으로는 문제가 풀리지 않는다.</p>
+              <p>기존의 구조적 식별가능성 분석은 흔히 “충분히 자극하는 입력”을 전제한다. 이 표현은 중요한 조건을 담고 있지만, 실험가에게 어떤 파형을 넣어야 하는지까지 알려주지는 않는다. 이 논문은 그 빈칸을 입력의 시간 미분에 대한 조건으로 구체화한다.</p>
+
+              <blockquote class="pullquote">
+                충분한 자극이란 무엇인가?<br>이 논문은 그 질문을<br>입력 미분과 행렬의 rank로 바꾼다.
+                <footer>논문의 문제의식을 재구성한 문장 · 직접 인용 아님</footer>
+              </blockquote>
+
+              <p>실험 설계에는 자극의 형태, 측정할 출력, 초기조건을 정하는 <strong>정성적 단계</strong>가 있다. 그다음에 샘플 수와 측정 시각 등을 정하는 정량적 설계가 이어진다. 논문의 초점은 이 첫 단계 중에서도 입력이다.</p>
+              <ol class="flow" aria-label="논문이 제안하는 분석 흐름">
+                <li><strong>모델과 관측을 정한다</strong><span>상태, 미지 파라미터, 측정 출력과 초기조건을 명시한다.</span></li>
+                <li><strong>입력의 형태를 검사한다</strong><span>상수·램프 등 입력 조건에 따라 rank가 달라지는지 본다.</span></li>
+                <li><strong>실험 조건을 구체화한다</strong><span>가능한 자극을 바탕으로 측정 일정과 추정 절차를 설계한다.</span></li>
+              </ol>
+            </section>
+
+            <section class="section" id="method" aria-labelledby="method-title">
+              <p class="section-number">02 / THE METHOD</p>
+              <h2 id="method-title">파라미터를 ‘움직이지 않는 상태’로 본다</h2>
+              <p>핵심 아이디어는 상태 벡터에 미지 파라미터를 붙이는 것이다. 파라미터는 시간에 따라 변하지 않으므로 그 미분은 0이다. 이렇게 확장하면 출력을 통해 상태를 알아내는 관측가능성 문제와 파라미터를 알아내는 식별가능성 문제를 함께 다룰 수 있다.</p>
+
+              <div class="equation" role="group" aria-label="상태와 파라미터를 포함하는 확장 시스템">
+                <span class="eq-label">확장 시스템 · 원문 식 (1)에 대응</span>
+                <div class="math">
+                  <span class="math-line">ẋ = f(x, u, p), &nbsp; y = g(x, p)</span>
+                  <span class="math-line">x̃ = (x, p), &nbsp; ṗ = 0</span>
+                </div>
+              </div>
+
+              <p>출력과 그 시간 미분을 확장 상태에 대해 편미분해 행렬을 쌓는다. 상태 수가 <i>n</i>, 파라미터 수가 <i>q</i>라면, 이 행렬이 <i>n + q</i>의 rank에 도달하는지가 핵심 검사다.</p>
+
+              <div class="equation" role="group" aria-label="관측 식별가능성 행렬의 정의와 full rank 조건">
+                <span class="eq-label">관측·식별가능성 행렬 · 원문 식 (4)에 대응</span>
+                <div class="math">
+                  <span class="math-line">O<sub>I</sub>(x̃) = col(∂y/∂x̃, ∂ẏ/∂x̃, …, ∂y<sup>(n+q−1)</sup>/∂x̃)</span>
+                  <span class="math-line">rank O<sub>I</sub> = n + q</span>
+                </div>
+                <p class="eq-conclusion">적용 가정 아래 확장 상태의 국소 관측가능성과 파라미터의 국소 식별가능성을 판정한다.</p>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <caption>분석을 읽기 위한 최소한의 기호</caption>
+                  <thead><tr><th scope="col">기호·검사</th><th scope="col">의미</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row"><i>n, q, m</i></th><td>각각 상태 수, 파라미터 수, 출력 수</td></tr>
+                    <tr><th scope="row">x̃</th><td>상태와 미지 파라미터를 결합한 확장 상태</td></tr>
+                    <tr><th scope="row">col(…)</th><td>각 편미분 블록을 세로로 쌓는 표기</td></tr>
+                    <tr><th scope="row">열 제거 검사</th><td>파라미터에 해당하는 열을 제거해도 rank가 변하지 않으면, 그 파라미터의 비식별성을 판별하는 근거가 된다.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3>입력이 움직이면, 미분도 달라진다</h3>
+              <p>상수 입력에서 쓰던 미분을 그대로 적용하면 시변 입력의 영향을 놓칠 수 있다. 확장 리 미분은 상태 변화뿐 아니라 입력과 그 고차 미분의 변화까지 포함한다. 반복 미분으로 만들어지는 함수 <i>h</i>에 대해 이를 다음처럼 쓸 수 있다.</p>
+
+              <div class="equation" role="group" aria-label="확장 리 미분">
+                <span class="eq-label">확장 리 미분 · 원문 식 (7), (10)의 구조</span>
+                
+                <p class="small-note">여기서 f̃ = (f, 0)은 확장 상태의 동역학이다. 출력에서 시작해 이 연산을 반복한다. 각 단계의 함수가 의존하는 입력 미분은 유한하므로 실제 계산에 남는 항도 유한하다.</p>
+              </div>
+
+              <p>이 처리는 단순한 표기 변경이 아니다. 제공된 요약에 따르면, 기존 STRIKE-GOLDD는 시변 입력이 필요한 모델을 비식별로 판정할 수 있었다. 논문은 입력 미분을 반영한 분석을 <strong>MATLAB 도구 STRIKE-GOLDD2</strong>로 구현하고, 다중 입력과 비유리 모델에도 적용했다.</p>
+
+              <h3>입력 미분을 제한하며 필요한 파형을 찾는다</h3>
+              <p>입력의 <i>k</i>차 이상 미분을 0으로 놓고 rank를 다시 계산한다. 이 제약은 한 시점에서만 성립하는 조건이 아니라, 고려하는 시간 구간에 걸친 입력 형태의 조건이다.</p>
+
+              <div class="table-wrap">
+                <table>
+                  <caption>입력 형태를 기호적 조건으로 표현하기</caption>
+                  <thead><tr><th scope="col">입력 후보</th><th scope="col">미분 조건</th><th scope="col">확인할 내용</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">상수</th><td>u̇ = 0</td><td>시간 변화가 없어도 full rank에 도달하는가?</td></tr>
+                    <tr><th scope="row">램프</th><td>u̇ ≠ 0, ü = 0</td><td>일정한 기울기를 추가하면 rank가 회복되는가?</td></tr>
+                    <tr><th scope="row">다중 입력</th><td>입력 성분별로 조건 부여</td><td>어떤 입력만 시간에 따라 바꾸면 되는가?</td></tr>
+                    <tr><th scope="row">특정 파형</th><td>u(t)를 직접 대입</td><td>실제로 사용할 입력식이 조건을 만족하는가?</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="note-box">
+                <strong>램프가 충분하다는 것과 유일한 해답이라는 것은 다르다.</strong>
+                상수 입력에서 부족했던 rank가 램프에서 회복되면, 해당 모델에서 램프가 충분한 입력임을 알 수 있다. 다른 시변 파형의 가능성은 별도 검사 대상이다.
+              </div>
+
+              <h3>한 번의 시변 실험을 여러 번의 상수 실험으로</h3>
+              <p>여러 실험의 상태·출력·입력을 각각 복제하고 공통 파라미터를 공유하는 큰 모델로 묶으면, 실험들을 함께 분석할 수 있다. 논문은 GenSSI 2.0의 다중 실험 방식과 연결해, <strong>서로 다른 값의 상수 입력</strong>이 시변 입력을 대신할 수 있는 사례를 제시한다. 관건은 반복 횟수 자체보다 결합된 실험이 추가적인 식별 정보를 주는가이다.</p>
+            </section>
+
+            <section class="section" id="evidence" aria-labelledby="evidence-title">
+              <p class="section-number">03 / THE EVIDENCE</p>
+              <h2 id="evidence-title">세 모델이 보여주는 입력의 역할</h2>
+              <p>논문은 2구획 모델, 이온 채널 마르코프 모델, 다중 입력 생물공정 모델을 비교한다. 입력 형태를 바꾸면 식별가능성이 달라진다는 공통점과, 다중 상수 입력 실험의 효과가 모델마다 다르다는 차이가 드러난다.</p>
+
+              <figure class="figure figure-models">
+                <div class="image-mat">
+                  <img src="assets/figure1.png" alt="논문에서 분석한 세 모델: A는 2구획 모델, B는 이온 채널 마르코프 모델, C는 5입력 생물공정 모델." loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-label">FIGURE 01</span>분석 대상 모델. (A) 2구획 모델, (B) 이온 채널 마르코프 모델, (C) 5입력 생물공정 모델. 제공된 노트의 논문 그림.</figcaption>
+              </figure>
+
+              <div class="case-header">
+                <span class="case-letter">A.</span>
+                <h3>2구획 모델: 상수에서 겹치고, 램프에서 갈라진다</h3>
+              </div>
+              <p class="case-meta">상태 2개 · 출력 x₁ · 파라미터 4개 · 미지 초기조건 1개</p>
+              <p>관측하는 것은 첫 번째 구획의 상태 x₁이다. 네 파라미터와 두 상태를 포함하는 확장 행렬에서 필요한 rank는 6이다. 미지 초기조건은 상태의 초기값에 해당하므로 확장 상태 차원에 별도의 파라미터처럼 다시 더하지 않는다.</p>
+
+              <div class="equation" role="group" aria-label="2구획 모델 방정식">
+                <span class="eq-label">2구획 모델 · 원문 식 (12)에 대응</span>
+                <div class="math">
+                  <span class="math-line">ẋ<sub>1</sub> = −(k<sub>1e</sub> + k<sub>12</sub>)x<sub>1</sub> + k<sub>21</sub>x<sub>2</sub> + bu</span>
+                  <span class="math-line">ẋ<sub>2</sub> = k<sub>12</sub>x<sub>1</sub> − k<sub>21</sub>x<sub>2</sub>, &nbsp; y = x<sub>1</sub></span>
+                </div>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <caption>필요 rank 6에 대한 입력별 결과</caption>
+                  <thead><tr><th scope="col">입력</th><th scope="col">rank(O<sub>I</sub>)</th><th scope="col">판정</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">상수</th><td>5 / 6</td><td><span class="status limited">비식별</span></td></tr>
+                    <tr><th scope="row">램프</th><td>6 / 6</td><td><span class="status">국소 식별 가능</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <figure class="figure figure-output">
+                <div class="image-mat">
+                  <img src="assets/figure2.png" alt="서로 다른 두 파라미터 벡터의 출력 비교. 위쪽 상수 입력에서는 출력이 겹치고, 아래쪽 램프 입력에서는 출력이 갈라진다." loading="lazy" decoding="async">
+                </div>
+                <figcaption><span class="fig-label">FIGURE 02</span>파라미터 벡터 p₁ = [1, 1, 1, 2], p₂ = [0.5, 0.5, 2, 1]의 출력 비교. 상수 입력에서는 두 출력을 구별할 수 없지만 램프 입력에서는 차이가 드러난다. 이 곡선은 사례를 시각화하며, 식별가능성 판정의 근거는 rank 분석이다.</figcaption>
+              </figure>
+
+              <p>이 모델에서는 상수 입력 실험을 여러 번 수행하는 방식으로 시변 입력을 대체할 수 없었다. “상수로 안 되면 서로 다른 상수로 반복하면 된다”는 전략이 보편적인 해법은 아니라는 뜻이다.</p>
+
+              <div class="case-header">
+                <span class="case-letter">B.</span>
+                <h3>이온 채널: 서로 다른 상수 전압 네 번의 힘</h3>
+              </div>
+              <p class="case-meta">환원 후 상태 2개 · 파라미터 10개</p>
+              <p>막전위 입력 <i>u</i>는 전이율 M<sub>ij</sub> = exp(a<sub>ij</sub> + b<sub>ij</sub>u)에 들어간다. 상수 입력에서는 비식별이지만 램프 형태의 시변 입력에서는 식별가능성을 확보한다.</p>
+              <p>2구획 모델과 달리, 여기서는 <strong>값이 다른 상수 입력 실험 4회</strong>가 시변 입력을 대체한다. 이는 여러 전압 수준을 사용하는 실험의 효과를 이해하는 이론적 근거가 된다. 다만 개별 상수 실험의 결합과 하나의 구간 상수 프로토콜을 대응시킬 때에는 각 구간의 상태와 초기조건 설정도 함께 고려해야 한다.</p>
+
+              <div class="case-header">
+                <span class="case-letter">C.</span>
+                <h3>생물공정: 다섯 입력 중 두 개만 바꾼다</h3>
+              </div>
+              <p class="case-meta">상태 5개 모두 측정 · 파라미터 8개 · 알려진 상수 7개 · 입력 5개</p>
+              <p>모든 입력을 상수로 두면 p₄부터 p₇까지가 비식별이다. 하지만 u₃와 u₄ 두 입력만 램프로 바꾸면 전체 파라미터가 국소적으로 식별 가능해진다.</p>
+              <div class="equation" role="group" aria-label="세 번째와 네 번째 입력만 램프인 생물공정 입력 벡터">
+                <span class="eq-label">식별가능성을 확보하는 입력 형태</span>
+                <div class="math">
+                  <span class="math-line">u(t) = [c<sub>1</sub>, c<sub>2</sub>, c<sub>3a</sub> + c<sub>3b</sub>t, c<sub>4a</sub> + c<sub>4b</sub>t, c<sub>5</sub>]</span>
+                </div>
+                <p class="small-note">u₃, u₄의 기울기는 0이 아닌 램프 조건으로 둔다.</p>
+              </div>
+              <p>이 모델 역시 서로 다른 상수 입력 실험 4회로 대체할 수 있다. 입력이 여러 개일 때 모든 채널을 복잡하게 자극하기보다, 식별에 필요한 채널을 먼저 찾는 접근의 가치를 보여준다.</p>
+
+              <div class="table-wrap" tabindex="0" role="region" aria-label="세 모델 비교표, 작은 화면에서는 가로로 스크롤할 수 있습니다">
+                <table class="comparison">
+                  <caption>세 사례의 결론을 한눈에</caption>
+                  <thead>
+                    <tr><th scope="col">모델</th><th scope="col">상수 입력 1회</th><th scope="col">충분한 시변 입력</th><th scope="col">다중 상수 실험으로 대체</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><th scope="row">2구획</th><td>rank 5, 비식별</td><td>램프 → rank 6</td><td>불가한 사례</td></tr>
+                    <tr><th scope="row">이온 채널</th><td>비식별</td><td>램프</td><td>서로 다른 입력 4회</td></tr>
+                    <tr><th scope="row">생물공정</th><td>p₄–p₇ 비식별</td><td>u₃, u₄만 램프</td><td>서로 다른 입력 4회</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="small-note">‘4회’는 제시된 모델과 실험 설정의 결과다. 모든 시스템에 필요한 횟수나 일반적인 최소 횟수를 뜻하지 않는다.</p>
+            </section>
+
+            <section class="section" id="limits" aria-labelledby="limits-title">
+              <p class="section-number">04 / BOUNDARIES</p>
+              <h2 id="limits-title">이 결과가 보장하는 것의 범위</h2>
+              <ul class="limitations">
+                <li><strong>국소 식별가능성이다.</strong> 가까운 파라미터 값들을 구별할 수 있다는 판정이며, 전체 파라미터 공간에서 해가 유일하다는 전역 식별가능성은 별도로 다뤄야 한다.</li>
+                <li><strong>구조적 가능성과 실제 추정 성능은 구분된다.</strong> 식별 가능하더라도 잡음, 표본 수, 측정 정밀도와 민감도에 따라 실제 추정은 어려울 수 있다.</li>
+                <li><strong>기호 계산의 비용이 있다.</strong> 큰 모델에서는 행렬과 반복 미분 계산이 무거워진다. STRIKE-GOLDD의 분해·부분 분석이 활용될 수 있다.</li>
+                <li><strong>다중 상수 실험의 대체 조건은 일반화되지 않았다.</strong> 어떤 모델에서 시변 입력을 여러 상수 실험으로 바꿀 수 있는지는 후속 연구 과제로 남는다.</li>
+              </ul>
+            </section>
+
+            <section class="section" id="implications" aria-labelledby="implications-title">
+              <p class="section-number">05 / APPLICATION PERSPECTIVE</p>
+              <h2 id="implications-title">HR35 유압 모델에 던지는 질문</h2>
+              <p>다음은 원 논문의 검증 결과가 아니라, 제공된 노트의 HR35 관점에서 도출한 적용 아이디어다. 실제 식별가능성은 HR35의 구체적인 동역학 식, 측정 출력, 초기조건을 넣어 확인해야 한다.</p>
+
+              <div class="application">
+                <h3>입력의 세기를 정하기 전에 형태를 검사한다</h3>
+                <p>노트에서 ‘축 G’로 지칭한 실험 설계 관점에서, Swevers의 푸리에 급수 설계가 자극을 얼마나 줄지 정하는 문제라면 이 논문은 어떤 형태의 자극이 필요한지 먼저 묻는다. 밸브 명령에서 압력, 속도로 이어지는 HR35 모델에 대해 상수 조이스틱 명령만으로 체적 탄성계수 β, 면적, 마찰을 구별할 수 있는지 검사할 수 있다.</p>
+
+                <h3>여러 정적 자세가 제공하는 정보를 분리한다</h3>
+                <p>노트는 Ferlibas·Werner의 정지 자세 세트를 다중 실험 관점과 연결한다. 여러 자세의 정적 시험이 시변 자극을 어느 정도 대신하는지는 유용한 질문이다. 다만 자세 변화와 입력 변화가 모델에서 어떻게 표현되는지 정의한 뒤, 무엇을 식별하고 무엇을 식별하지 못하는지 판정해야 한다.</p>
+
+                <h3>비선형 입력과 비매끄러운 입력 특성을 구분한다</h3>
+                <p>이 방법은 입력이 비선형으로 들어가는 모델도 다룬다. 다만 데드밴드처럼 비매끄러운 특성은 해석성 가정을 점검해야 한다. 매끄러운 근사를 사용한다면 근사 모델에서 얻은 결론임을 명시하고, 제곱근 압력차 항 역시 적용 영역과 경계를 확인해야 한다.</p>
+
+                <h3>파라미터 장부를 먼저 정리한다</h3>
+                <p>트윈 장부의 <code>assumed</code> 값 중 현재 모델·출력·허용 입력 조건에서 구조적으로 비식별인 항목을 먼저 찾는다. 이를 바탕으로 고정할 값, 추가 측정이 필요한 값, 실험으로 식별할 값을 구분한다. 입력이나 관측을 바꾸면 판정이 달라질 수 있으므로, 비식별이라는 꼬리표에는 반드시 분석 조건을 함께 기록한다.</p>
+              </div>
+            </section>
+
+            <section class="section" id="takeaway" aria-labelledby="takeaway-title">
+              <p class="section-number">06 / WHAT TO DO NEXT</p>
+              <h2 id="takeaway-title">좋은 실험은 구별 가능한 질문에서 시작한다</h2>
+              <p>이 논문의 실용적인 메시지는 “램프를 쓰라”는 처방보다 넓다. 먼저 모델이 어떤 입력 변화에서 파라미터 차이를 출력에 드러내는지 알아내라는 것이다. 그 조건을 확인해야 정량적 실험 설계도 의미 있는 출발점을 갖는다.</p>
+
+              <ul class="checklist" aria-label="실험 설계 전 확인 목록">
+                <li>미지 파라미터, 측정 출력, 초기조건의 가정을 명시한다.</li>
+                <li>상수 입력에서 확장 행렬의 rank와 비식별 파라미터를 확인한다.</li>
+                <li>입력 미분 조건을 바꾸며 충분한 파형과 필요한 입력 채널을 찾는다.</li>
+                <li>시변 입력이 어렵다면 서로 다른 상수 입력 실험을 결합해 검사한다.</li>
+                <li>구조적 조건을 확보한 뒤 잡음과 실제 추정 성능을 평가한다.</li>
+              </ul>
+
+              <div class="ending">
+                <p class="label">The takeaway</p>
+                <h3>데이터를 더 모으기 전에,<br>데이터가 차이를 드러낼 수 있는지 확인하자.</h3>
+                <p>입력은 시스템을 움직이는 수단이자 파라미터를 구별하는 조건이다. 실험의 첫 질문을 “얼마나 오래 측정할까?”에서 “어떤 입력이면 차이가 보일까?”로 옮기는 것. 이 논문이 제안하는 설계의 출발점이다.</p>
+              </div>
+
+              <aside class="share-copy" aria-labelledby="share-title">
+                <p class="label" id="share-title">공유용 한 문장 · 선택하여 복사</p>
+                <blockquote>같은 모델도 상수 입력에서는 파라미터를 구별하지 못하고, 램프 입력에서는 구별할 수 있다. 실험 설계의 첫 단계는 측정량을 늘리는 것이 아니라 입력의 형태가 식별가능성을 확보하는지 확인하는 일이다.</blockquote>
+              </aside>
+            </section>
+
+            <section class="section sources" id="sources" aria-labelledby="sources-title">
+              <p class="section-number">07 / SOURCE NOTES</p>
+              <h2 id="sources-title">논문 정보와 해설의 범위</h2>
+              <div class="source-card">
+                <cite class="source-title">Input-Dependent Structural Identifiability of Nonlinear Systems</cite>
+                <p>Alejandro F. Villaverde · Neil D. Evans · Michael J. Chappell · Julio R. Banga</p>
+                <p>IIM-CSIC, Vigo · University of Warwick</p>
+                <p><em>IEEE Control Systems Letters</em>, 3(2), 272–277, 2019.<br>온라인 출판: 2018년 9월</p>
+                <p><a>원 논문 보기 · DOI: 10.1109/LCSYS.2018.2868608 ↗</a></p>
+              </div>
+              <ol class="source-notes">
+                <li>이 글은 제공된 Obsidian 논문 요약 노트를 공개 해설 형식으로 재구성했다. 수식은 웹에서 읽기 쉽도록 표기를 일부 압축했으며, 식 번호는 노트에 기재된 원문 번호를 따른다.</li>
+                <li>두 그림은 노트에 포함된 로컬 이미지를 사용했다. 그림 2의 파라미터 값과 세 모델의 rank·실험 횟수는 제공된 요약에 근거한다.</li>
+                <li>본문의 강조 문장과 공유 문구는 해설을 위한 재서술이며 원 논문의 직접 인용이 아니다.</li>
+                <li>HR35, Swevers, Ferlibas·Werner 및 Villaverde의 2016년 STRIKE-GOLDD 연구와의 연결은 노트 작성자의 적용 관점이다. 해당 관련 연구의 상세 서지정보는 제공된 노트에 포함되어 있지 않다.</li>
+              </ol>
+              <div class="tags" aria-label="주제 키워드">
+                <span>구조적 식별가능성</span>
+                <span>확장 관측 행렬</span>
+                <span>확장 리 미분</span>
+                <span>실험 설계</span>
+                <span>다중 실험</span>
+                <span>STRIKE-GOLDD2</span>
+              </div>
+            </section>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <footer class="page-footer">
+      <span>RESEARCH NOTES · 입력 설계와 구조적 식별가능성</span>
+      <a href="#top">처음으로 돌아가기 ↑</a>
+    </footer>
+  </div>
+</body>
+</html>
