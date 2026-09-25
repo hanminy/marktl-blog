@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T11:52:26.421Z",
+  "updatedAt": "2026-09-25T11:56:50.796Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/anzcc2020-delay-review/",
+      "excerpt": "Unknown and Time Varying Time Delays in the Modelling and Control of Hydraulic Actuators: Literature Review 요약 한줄 요약 유압 매니퓰레이터에서 \"전압을 바꾼 뒤 팔이 움직이기까지\" 의 지연이 실험마다, 그리고 운전 중에도 변한다 는 사실을 실험실 기체(HYDROLEK HLK 7W 2대)로 보이고, 그 원인과 대처 문헌을 정리한 리뷰. 같은 ",
+      "shortId": "106kr4v",
+      "slug": "anzcc2020-delay-review",
+      "sourcePath": "02_research/필드로봇/시스템식별/anzcc2020-delay-review.md",
+      "tags": [
+        "논문요약",
+        "시스템식별",
+        "유압액추에이터",
+        "시간지연",
+        "문헌리뷰",
+        "상태의존파라미터"
+      ],
+      "title": "Unknown and Time-Varying Time Delays in the Modelling and Control of Hydraulic Actuators: Literature Review - 요약",
+      "updatedAt": "2026-09-25T11:56:50.796Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/106kr4v/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/lmn2024-cylinder-velocity/",

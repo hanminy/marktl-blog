@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>유압 로봇의 지연은 상수가 아니다 — 시변 지연 문헌 리뷰</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      --paper: #f6f3ed;
+      --surface: #fffdf8;
+      --ink: #232b29;
+      --muted: #626b65;
+      --line: #d9ded5;
+      --green: #244d42;
+      --green-soft: #e8eee7;
+      --orange: #a74425;
+      --orange-soft: #f4e7dc;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "Batang", Georgia, serif;
+      --sans: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.85;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: #d7e5d6; color: #17382e; }
+    a { color: var(--green); text-underline-offset: .22em; }
+    a:hover { color: var(--orange); }
+    a:focus-visible, [tabindex]:focus-visible {
+      outline: 3px solid var(--orange);
+      outline-offset: 5px;
+    }
+    .skip {
+      position: absolute;
+      top: -100px;
+      left: 16px;
+      padding: 12px 20px;
+      background: var(--surface);
+      z-index: 10;
+    }
+    .skip:focus { top: 12px; }
+    .wrap { width: min(1160px, calc(100% - 64px)); margin-inline: auto; }
+    .masthead {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: center;
+      padding-block: 23px;
+      border-bottom: 1px solid var(--ink);
+      font-size: 12px;
+      letter-spacing: .12em;
+    }
+    .masthead strong { font-size: 13px; letter-spacing: .16em; }
+    .masthead span { color: var(--muted); }
+    .hero { padding: 70px 0 44px; }
+    .eyebrow {
+      margin: 0 0 22px;
+      color: var(--orange);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      max-width: 1000px;
+      margin-bottom: 27px;
+      font-family: var(--serif);
+      font-size: clamp(40px, 5.5vw, 70px);
+      font-weight: 700;
+      line-height: 1.28;
+      letter-spacing: -.055em;
+    }
+    h1 em { color: var(--green); font-style: normal; }
+    .deck {
+      max-width: 760px;
+      margin-bottom: 30px;
+      color: #4d5852;
+      font-size: clamp(18px, 2vw, 22px);
+      line-height: 1.8;
+      letter-spacing: -.025em;
+    }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 12px; color: var(--muted); }
+    .meta b { color: var(--ink); font-weight: 600; }
+    .hero-bottom {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 40px;
+      align-items: center;
+      margin-top: 40px;
+      padding: 30px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .hero-bottom p { margin: 0; font-size: 14px; color: var(--muted); }
+    .signal { display: flex; gap: 7px; align-items: center; }
+    .signal span { flex: 1; height: 5px; background: var(--line); }
+    .signal span:nth-child(4), .signal span:nth-child(5), .signal span:nth-child(6) { background: var(--orange); }
+    .signal span:nth-child(n+7) { background: var(--green); }
+    .signal-caption { display: flex; justify-content: space-between; margin-top: 9px; font-size: 11px; color: var(--muted); }
+    .layout { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 70px; align-items: start; }
+    .sidebar { position: sticky; top: 30px; padding-top: 14px; font-size: 13px; }
+    .sidebar .label { font-size: 10px; letter-spacing: .18em; color: var(--muted); }
+    .sidebar ol { list-style: none; padding: 0; margin: 20px 0 30px; }
+    .sidebar li { border-bottom: 1px solid var(--line); }
+    .sidebar a { display: block; padding: 11px 0; text-decoration: none; color: #4b5650; }
+    .sidebar a span { display: inline-block; width: 25px; color: var(--orange); font-size: 10px; }
+    .sidebar .note { color: var(--muted); font-size: 12px; line-height: 1.8; }
+    .article-body { min-width: 0; }
+    section { margin-bottom: 64px; }
+    .section-head { margin-bottom: 26px; padding-top: 24px; border-top: 1px solid var(--ink); }
+    .section-number { display: block; margin-bottom: 10px; color: var(--orange); font-size: 11px; letter-spacing: .14em; font-weight: 700; }
+    h2 {
+      margin-bottom: 0;
+      font-size: clamp(25px, 3vw, 34px);
+      line-height: 1.45;
+      letter-spacing: -.045em;
+    }
+    h3 { margin: 34px 0 14px; font-size: 20px; line-height: 1.5; letter-spacing: -.025em; }
+    p { margin-bottom: 21px; }
+    strong { font-weight: 750; }
+    .abstract {
+      padding: 32px 36px;
+      border-left: 3px solid var(--green);
+      background: var(--green-soft);
+      margin-bottom: 30px;
+    }
+    .abstract h2 { margin-bottom: 16px; font-size: 12px; letter-spacing: .13em; color: var(--green); }
+    .abstract p { margin: 0; font-size: 17px; line-height: 1.9; }
+    .findings { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .finding { padding: 24px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: 3px; }
+    .finding .index { display: block; font-size: 11px; color: var(--orange); margin-bottom: 14px; letter-spacing: .1em; }
+    .finding h3 { font-size: 17px; margin: 0 0 10px; }
+    .finding p { font-size: 14px; line-height: 1.75; margin: 0; color: var(--muted); }
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin: 28px 0;
+      padding: 25px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .stat strong { display: block; font-size: clamp(30px, 4vw, 43px); line-height: 1.3; letter-spacing: -.045em; color: var(--green); font-variant-numeric: tabular-nums; }
+    .stat strong small { font-size: 17px; font-weight: 500; letter-spacing: 0; }
+    .stat span { display: block; margin-top: 9px; font-size: 13px; color: var(--muted); }
+    figure { margin: 30px 0; }
+    .image-frame { background: #fff; border: 1px solid var(--line); padding: 20px; border-radius: 3px; }
+    img { display: block; max-width: 100%; height: auto; margin-inline: auto; }
+    .apparatus img { max-height: 510px; object-fit: contain; }
+    .chart img { width: 100%; }
+    figcaption { margin-top: 12px; font-size: 13px; line-height: 1.75; color: var(--muted); }
+    figcaption b { color: var(--green); margin-right: 6px; }
+    .table-scroll { margin: 23px 0; overflow-x: auto; border: 1px solid var(--line); border-radius: 3px; background: var(--surface); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.75; text-align: left; }
+    caption { padding: 15px 18px; text-align: left; font-size: 12px; font-weight: 700; color: var(--green); }
+    th, td { padding: 15px 18px; vertical-align: top; border-top: 1px solid var(--line); }
+    thead th { background: #edf0e9; color: var(--green); font-size: 12px; }
+    tbody th { width: 23%; font-weight: 650; }
+    .comparison { min-width: 620px; }
+    .comparison tbody th { width: 26%; }
+    td p:last-child { margin-bottom: 0; }
+    .small { font-size: 13px; color: var(--muted); line-height: 1.8; }
+    .equations { padding: 25px 28px; margin: 24px 0; background: var(--surface); border: 1px solid var(--line); }
+    .equation { display: flex; align-items: baseline; justify-content: space-between; gap: 18px; padding: 12px 0; }
+    .math { font-family: "Cambria Math", "STIX Two Math", Georgia, serif; font-size: clamp(17px, 2.2vw, 23px); letter-spacing: .015em; overflow-wrap: anywhere; }
+    .eqno { color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .equations .small { margin: 15px 0 0; border-top: 1px solid var(--line); padding-top: 15px; }
+    .pullquote { margin: 40px 0; padding: 28px 0 28px 28px; border-left: 3px solid var(--orange); }
+    .pullquote p { font-family: var(--serif); font-size: clamp(24px, 3vw, 32px); line-height: 1.65; letter-spacing: -.03em; margin: 0; }
+    .pullquote footer { margin-top: 14px; color: var(--muted); font-size: 12px; }
+    .callout { padding: 23px 27px; margin: 26px 0; background: var(--orange-soft); border-radius: 3px; }
+    .callout strong { color: #823719; }
+    .callout p { font-size: 15px; margin: 0; }
+    .region-map { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 22px; border: 1px solid var(--line); background: var(--surface); }
+    .region { padding: 20px 15px; border-top: 3px solid #9ba79d; background: #f2f3ef; }
+    .region:nth-child(2) { border-color: var(--green); background: var(--green-soft); }
+    .region:nth-child(3) { border-color: var(--orange); background: var(--orange-soft); }
+    .region span { display: block; font-size: 10px; letter-spacing: .1em; color: var(--muted); }
+    .region b { display: block; margin: 7px 0; font-size: 18px; }
+    .region p { margin: 0; font-size: 13px; line-height: 1.75; }
+    .map-footer { grid-column: 1 / -1; text-align: center; border-top: 1px solid var(--line); padding-top: 17px; color: var(--green); font-size: 13px; }
+    .cascade { display: flex; align-items: stretch; gap: 10px; margin: 22px 0; }
+    .cascade .node { flex: 1; padding: 17px; border: 1px solid var(--line); background: var(--surface); font-size: 14px; }
+    .node small { display: block; margin-top: 6px; color: var(--muted); font-size: 12px; }
+    .arrow { align-self: center; color: var(--orange); }
+    .interpretation { padding: 32px; border: 1px solid #bdcbbb; background: #eef2eb; }
+    .interpretation .section-head { border-top: 0; padding-top: 0; }
+    .interpretation ol { padding-left: 24px; margin: 24px 0 0; }
+    .interpretation li { padding-left: 7px; margin-bottom: 23px; }
+    .interpretation li:last-child { margin-bottom: 0; }
+    .interpretation li::marker { color: var(--green); font-weight: 700; }
+    .interpretation li p { margin: 7px 0 0; font-size: 15px; }
+    .checklist { list-style: none; padding: 0; margin: 23px 0 0; }
+    .checklist li { position: relative; margin: 0; padding: 13px 0 13px 28px; border-bottom: 1px solid var(--line); font-size: 15px; }
+    .checklist li::before { content: "□"; position: absolute; left: 0; color: var(--green); }
+    .closing { padding: 37px; background: #213f36; color: #f8f7ef; border-radius: 4px; }
+    .closing .section-number { color: #d8bba1; }
+    .closing h2 { margin-bottom: 20px; font-family: var(--serif); }
+    .closing p { color: #e0e8df; }
+    .closing p:last-child { margin-bottom: 0; }
+    .sources { font-size: 14px; }
+    .sources h2 { font-size: 22px; margin-bottom: 20px; }
+    .source-card { padding: 24px; background: var(--surface); border: 1px solid var(--line); }
+    .source-title { font-family: Georgia, var(--serif); font-size: 18px; line-height: 1.6; word-break: normal; }
+    .source-card p:last-child { margin-bottom: 0; }
+    .source-links { display: flex; flex-wrap: wrap; gap: 10px 24px; }
+    .source-notes { padding-left: 20px; color: var(--muted); }
+    .source-notes li { margin-bottom: 12px; }
+    .share { border-block: 1px solid var(--line); padding: 25px 0; margin-top: 30px; }
+    .share h3 { font-size: 12px; letter-spacing: .08em; color: var(--orange); margin: 0 0 12px; }
+    .share blockquote { margin: 0; user-select: all; font-size: 15px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 25px; }
+    .tags span { border: 1px solid var(--line); padding: 4px 10px; border-radius: 20px; font-size: 11px; color: var(--muted); }
+    .page-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; padding: 25px 0 35px; border-top: 1px solid var(--ink); font-size: 12px; color: var(--muted); }
+    @media (max-width: 1000px) {
+      .layout { grid-template-columns: 160px minmax(0, 1fr); gap: 35px; }
+      .findings { grid-template-columns: 1fr; }
+      .finding { padding: 20px 24px; }
+      .finding .index { margin-bottom: 7px; }
+    }
+    @media (max-width: 760px) {
+      .wrap { width: calc(100% - 36px); }
+      .masthead { font-size: 10px; gap: 12px; }
+      .masthead strong { font-size: 11px; }
+      .hero { padding-top: 42px; }
+      .hero-bottom { grid-template-columns: 1fr; gap: 22px; margin-top: 30px; }
+      .layout { display: block; }
+      .sidebar { position: static; padding: 0; margin-bottom: 32px; }
+      .sidebar ol { display: flex; flex-wrap: wrap; gap: 0 20px; margin: 10px 0; }
+      .sidebar li { border: 0; }
+      .sidebar a { padding: 6px 0; }
+      .sidebar .note { display: none; }
+      .abstract, .interpretation, .closing { padding: 25px 22px; }
+      section { margin-bottom: 45px; }
+      .stat-row { gap: 18px; }
+      .image-frame { padding: 10px; }
+      th, td { padding: 12px 14px; }
+      .equations { padding: 16px; }
+      .region-map { grid-template-columns: 1fr; padding: 15px; }
+      .region { padding: 15px; }
+      .cascade { flex-direction: column; }
+      .arrow { transform: rotate(90deg); line-height: 1; }
+      .pullquote { padding-left: 21px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+    @media print {
+      body { background: white; font-size: 11pt; color: black; }
+      .wrap { width: 100%; }
+      .hero { padding-top: 25px; }
+      h1 { font-size: 34pt; }
+      .layout { display: block; }
+      .sidebar, .skip, .share, .page-footer a { display: none; }
+      section { margin-bottom: 28px; }
+      figure, .finding, .source-card { break-inside: avoid; }
+      .table-scroll { overflow: visible; }
+      .comparison { min-width: 0; }
+      .closing { color: black; background: #eee; }
+      .closing p, .closing .section-number { color: black; }
+      a { color: inherit; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unknown and Time-Varying Time Delays in the Modelling and Control of Hydraulic Actuators: Literature Review - 요약">
+<meta property="og:description" content="Unknown and Time Varying Time Delays in the Modelling and Control of Hydraulic Actuators: Literature Review 요약 한줄 요약 유압 매니퓰레이터에서 &quot;전압을 바꾼 뒤 팔이 움직이기까지&quot; 의 지연이 실험마다, 그리고 운전 중에도 변한다 는 사실을 실험실 기체(HYDROLEK HLK 7W 2대)로 보이고, 그 원인과 대처 문헌을 정리한 리뷰. 같은 ">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/106kr4v/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/106kr4v/assets/figure1.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Unknown and Time-Varying Time Delays in the Modelling and Control of Hydraulic Actuators: Literature Review - 요약">
+<meta name="twitter:description" content="Unknown and Time Varying Time Delays in the Modelling and Control of Hydraulic Actuators: Literature Review 요약 한줄 요약 유압 매니퓰레이터에서 &quot;전압을 바꾼 뒤 팔이 움직이기까지&quot; 의 지연이 실험마다, 그리고 운전 중에도 변한다 는 사실을 실험실 기체(HYDROLEK HLK 7W 2대)로 보이고, 그 원인과 대처 문헌을 정리한 리뷰. 같은 ">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/106kr4v/assets/figure1.png">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/anzcc2020-delay-review/">
+</head>
+<body>
+  <a class="skip" href="#article-content">본문으로 건너뛰기</a>
+  <div class="wrap" id="top">
+    <header class="masthead">
+      <strong>CONTROL / RESEARCH NOTES</strong>
+      <span>유압 시스템 · 문헌 리뷰 · 2020</span>
+    </header>
+
+    <main>
+      <article aria-labelledby="article-title">
+        <header class="hero">
+          <p class="eyebrow">Research review · Hydraulic actuators</p>
+          <h1 id="article-title">유압 로봇의 지연은<br><em>상수가 아니다</em></h1>
+          <p class="deck">전압을 바꾼 뒤 관절이 움직이기까지, 얼마나 기다려야 할까? 같은 관절에서도 달라지는 180~290ms의 응답 지연은 모델 식별과 제어 설계에 다른 질문을 요구한다.</p>
+          <div class="meta">
+            <span><b>원 논문</b> Olivia L. R. Albrecht · C. James Taylor</span>
+            <span><b>발표</b> ANZCC 2020</span>
+            <span><b>노트 작성</b> <time datetime="2026-09-25">2026.09.25</time></span>
+          </div>
+          <div class="hero-bottom">
+            <p>실험실의 두 유압 매니퓰레이터에서 출발해, 시변 지연의 원인과 제어 문헌을 연결한다. 마지막에는 HR35의 실차·트윈 비교를 위한 시험 관점으로 확장한다.</p>
+            <div aria-label="명령 입력에서 관절 응답까지의 지연을 표현한 개념 도식. 정량 척도가 아님.">
+              <div class="signal" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="signal-caption"><span>명령 입력</span><span>변하는 대기 구간</span><span>관절 응답</span></div>
+            </div>
+          </div>
+        </header>
+
+        <div class="layout">
+          <nav class="sidebar" aria-label="글 목차">
+            <div class="label">IN THIS ARTICLE</div>
+            <ol>
+              <li><a href="#overview"><span>00</span>초록과 핵심 발견</a></li>
+              <li><a href="#evidence"><span>01</span>실험이 보여 준 지연</a></li>
+              <li><a href="#causes"><span>02</span>지연을 바꾸는 원인</a></li>
+              <li><a href="#methods"><span>03</span>제어 문헌의 선택지</a></li>
+              <li><a href="#proposal"><span>04</span>저자가 제안한 방향</a></li>
+              <li><a href="#hr35"><span>05</span>HR35에 적용한다면</a></li>
+              <li><a href="#takeaway"><span>06</span>남는 질문과 실천</a></li>
+            </ol>
+            <p class="note">읽기 안내<br>논문의 관측·문헌 검토와 노트 작성자의 HR35 적용 해석을 구분해 읽을 수 있도록 구성했다.</p>
+            <a href="#sources">출처 및 해석 범위 ↗</a>
+          </nav>
+
+          <div class="article-body" id="article-content">
+            <section id="overview" aria-labelledby="abstract-title">
+              <div class="abstract">
+                <h2 id="abstract-title">ABSTRACT / 초록</h2>
+                <p>원자력 시설 해체용 유압 매니퓰레이터의 저수준 제어를 개선하려면, 입력과 움직임 사이의 지연부터 제대로 식별해야 한다. 이 리뷰는 HYDROLEK HLK-7W 두 대의 실험 사례를 통해 지연이 시험마다 달라지며, 운전 중에도 변할 수 있다는 문제를 다룬다. 압력 동역학·데드밴드·압축성·마찰 등의 원인을 검토하고, 시간지연 제어와 온라인 지연 추정 등 관련 접근을 정리한다. 핵심은 완성된 새 제어기의 제시보다 <strong>고정 지연 모델의 한계를 드러내고 후속 연구의 방향을 제안하는 데</strong> 있다.</p>
+              </div>
+              <div class="findings">
+                <div class="finding">
+                  <span class="index">FINDING 01</span>
+                  <h3>한 관절, 여러 지연</h3>
+                  <p>어깨 관절 스텝 응답의 지연은 18~29샘플로 흩어졌다. 10ms 샘플링에서는 180~290ms다.</p>
+                </div>
+                <div class="finding">
+                  <span class="index">FINDING 02</span>
+                  <h3>후보 방법과 검증은 별개</h3>
+                  <p>TDC, 다중 모델, 확률적 추정, Smith 예측기가 검토되지만 유압의 가변·미지 지연에 대한 검증 범위는 다르다.</p>
+                </div>
+                <div class="finding">
+                  <span class="index">FINDING 03</span>
+                  <h3>운전 영역을 나눠 보라</h3>
+                  <p>저자는 데드밴드·속도 상승·포화 영역별 모델과 유량 피드백을 활용하는 캐스케이드 구조를 제안한다.</p>
+                </div>
+              </div>
+            </section>
+
+            <section id="evidence" aria-labelledby="evidence-title">
+              <header class="section-head">
+                <span class="section-number">01 / EXPERIMENTAL EVIDENCE</span>
+                <h2 id="evidence-title">명령은 같아 보여도,<br>움직임의 시작은 달라진다</h2>
+              </header>
+              <p>논문의 출발점은 실제 장비의 모델 식별이다. 유압 시스템에서는 데드밴드와 지연 같은 불확실성이 제어 성능을 좌우하지만, 저자들은 특히 <strong>변하는 지연</strong>이 기존 문헌에서 충분히 다뤄지지 않았다고 지적한다.</p>
+              <figure class="apparatus">
+                <div class="image-frame">
+                  <img src="assets/figure1.png" alt="실험에 사용한 HYDROLEK HLK-7W 유압 매니퓰레이터 두 대." decoding="async">
+                </div>
+                <figcaption><b>원문 그림 1.</b> HYDROLEK HLK-7W 매니퓰레이터 두 대. 각 기체는 6자유도와 그리퍼로 구성된다. 이미지 출처: 리뷰 대상 논문.</figcaption>
+              </figure>
+
+              <div class="table-scroll" tabindex="0" role="region" aria-label="실험 장치 구성 표">
+                <table>
+                  <caption>실험 장치와 데이터 수집 조건</caption>
+                  <tbody>
+                    <tr><th scope="row">유압원</th><td>Bosch Rexroth 파워 유닛 · 5.5 L/min · 220 bar · 탱크 15 L</td></tr>
+                    <tr><th scope="row">제어 장치</th><td>NI cDAQ 9132, ADC 32ch + DAC 16ch 구성 ×2, P02AD1 밸브</td></tr>
+                    <tr><th scope="row">센서</th><td>회전 전위차계로 관절각 측정</td></tr>
+                    <tr><th scope="row">입력·샘플링</th><td>±10 스케일 신호 · 샘플링 간격 10ms</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3>상수 τ에서 시간에 따라 변하는 τ(t)로</h3>
+              <p>관절 모델은 지연된 입력을 받는 1차 식에서 시작한다. 개루프 데이터에 SRIVC를 적용해 파라미터를 추정하면, <i>a</i><sub>1</sub>은 거의 0이어서 관절은 적분기처럼 거동한다. 입력과 각속도 사이의 정적 비선형성을 <i>q</i>로 표현하고, 여기에 시변 지연을 도입하는 것이 문제 설정의 핵심이다.</p>
+
+              <div class="equations" aria-label="관절 모델과 시변 지연 모델">
+                <div class="equation">
+                  <span class="math">θ̇(t) = −a<sub>1</sub>θ(t) + b<sub>1</sub>u(t − τ)</span>
+                  <span class="eqno">(1)</span>
+                </div>
+                <div class="equation">
+                  <span class="math">θ̇(t) = q{u(t − τ)}</span>
+                  <span class="eqno">(2)</span>
+                </div>
+                <div class="equation">
+                  <span class="math">θ̇(t) = q{u(t − τ(t))}</span>
+                  <span class="eqno">(3)</span>
+                </div>
+                <p class="small">θ: 관절각 · u: 입력 · τ: 지연. a<sub>1</sub>, b<sub>1</sub>, τ는 CAPTAIN 툴박스의 SRIVC로 추정한다. a<sub>1</sub> ≈ 0이며, b<sub>1</sub>의 상태 의존성은 입력에 대한 정적 비선형 q{·}로 표현된다.</p>
+              </div>
+
+              <div class="stat-row">
+                <div class="stat">
+                  <strong>180–290 <small>ms</small></strong>
+                  <span>어깨 관절 스텝 시험에서 관측한 지연</span>
+                </div>
+                <div class="stat">
+                  <strong>0–1.2 <small>s 초과</small></strong>
+                  <span>기체 전체에서 보고된 지연 범위</span>
+                </div>
+              </div>
+              <p>두 범위는 관측 대상이 다르다. 전자는 특정 어깨 관절의 스텝 시험이고, 후자는 기체 전체의 범위다. 이를 하나의 확률분포나 모든 관절의 공통 특성으로 읽어서는 안 된다.</p>
+
+              <figure class="chart">
+                <div class="image-frame">
+                  <img src="assets/figure3.png" alt="여러 입력 크기와 올림·내림 방향에 대한 어깨 관절 개루프 스텝 응답. 실제 지연은 18~29샘플로 분산되며 선형 모델은 30샘플 지연을 사용한다." loading="lazy" decoding="async">
+                </div>
+                <figcaption><b>원문 그림 3.</b> 어깨 관절의 개루프 스텝 응답. 선형 모델의 지연은 30샘플, 실제 지연은 18~29샘플이다. 샘플링 간격은 10ms다.</figcaption>
+              </figure>
+
+              <p>30샘플, 즉 300ms의 고정 지연을 기준으로 보면 실제 응답 시작과의 차이는 <strong>10~120ms</strong>다. 관측 지연 자체의 최대·최소 차이는 110ms다. 모든 시험에서 100ms 이상 어긋난다는 뜻은 아니지만, 하나의 지연값만으로는 시험 사이의 차이를 설명하기 어렵다.</p>
+
+              <figure class="chart">
+                <div class="image-frame">
+                  <img src="assets/figure4.png" alt="추정 지연과 각속도의 관계를 나타낸 그래프. 지연의 속도 의존성을 살펴보기 위한 실험 결과." loading="lazy" decoding="async">
+                </div>
+                <figcaption><b>원문 그림 4.</b> 추정 지연과 각속도의 관계. 속도 의존성의 단서이며, 구체적인 관계식과 인과 설명은 후속 검증이 필요하다.</figcaption>
+              </figure>
+
+              <blockquote class="pullquote">
+                <p>지연을 하나의 숫자로 맞추기 전에,<br>어떤 조건에서 달라지는지 물어야 한다.</p>
+                <footer>실험 결과에서 도출한 이 글의 해석 · 원문 직접 인용 아님</footer>
+              </blockquote>
+            </section>
+
+            <section id="causes" aria-labelledby="causes-title">
+              <header class="section-head">
+                <span class="section-number">02 / POSSIBLE MECHANISMS</span>
+                <h2 id="causes-title">지연은 어디에서 생기는가</h2>
+              </header>
+              <p>측정된 지연에는 여러 현상이 겹칠 수 있다. 밸브와 유체의 동역학, 움직임이 시작되기 위한 마찰 극복, 계산과 통신이 모두 후보에 들어간다. 아래 표는 리뷰가 다루는 원인 목록이며, 각 원인의 기여도를 실험적으로 분리한 결과는 아니다.</p>
+
+              <div class="table-scroll" tabindex="0" role="region" aria-label="유압 지연의 원인과 설명">
+                <table>
+                  <caption>지연을 만들거나 변화시킬 수 있는 요인</caption>
+                  <thead><tr><th scope="col">요인</th><th scope="col">리뷰에서 다루는 설명</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">계산 지연</th><td>위치 신호에서 제어 오차를 계산하는 데 걸리는 시간. Magyar(2010) 관련 논의.</td></tr>
+                    <tr><th scope="row">압력 동역학</th><td>압력이 축적되는 과정에 따라 밸브를 통과하는 유동이 달라진다. 개루프에서도 나타나는 현상이다.</td></tr>
+                    <tr><th scope="row">데드밴드</th><td>펌프·밸브의 방향 전환과 관련한 불연속 및 입력에 반응하지 않는 구간.</td></tr>
+                    <tr><th scope="row">기름 압축성</th><td>공기 혼입, 부품의 탄성 변형과 노화, 압력·온도 변화 등의 영향.</td></tr>
+                    <tr><th scope="row">밸브 유동</th><td>밸브에서 발생하는 압력 손실, 과도 유동 및 난류.</td></tr>
+                    <tr><th scope="row">마찰</th><td>정지·쿨롱·점성 마찰과 스틱슬립 현상.</td></tr>
+                    <tr><th scope="row">통신 지연</th><td>고정 성분과 무작위 성분으로 구분되는 지연. Pan(2006) 관련 논의.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="callout">
+                <p><strong>실험을 읽는 기준.</strong> 개루프에서도 지연이 나타난다는 점은 계산이나 피드백 구조만으로 전체 현상을 설명하기 어렵다는 단서다. 다만 관측된 지연만으로 압축성·마찰·밸브 유동의 영향을 각각 특정할 수는 없다.</p>
+              </div>
+            </section>
+
+            <section id="methods" aria-labelledby="methods-title">
+              <header class="section-head">
+                <span class="section-number">03 / LITERATURE MAP</span>
+                <h2 id="methods-title">제어 방법은 많다.<br>무엇을 검증했는지가 중요하다</h2>
+              </header>
+              <p>리뷰의 문헌 지도는 두 갈래다. 하나는 유압 매니퓰레이터에 적용된 제어 방법이고, 다른 하나는 일반 제어 이론에서 발전한 시변 지연의 모델링·추정 방법이다. 두 갈래를 연결할 때는 <strong>적용 가능성과 실제 검증을 구분</strong>해야 한다.</p>
+
+              <h3>유압 매니퓰레이터의 제어 접근</h3>
+              <div class="table-scroll" tabindex="0" role="region" aria-label="유압 매니퓰레이터 제어 접근 비교. 좁은 화면에서 가로로 스크롤할 수 있습니다.">
+                <table class="comparison">
+                  <caption>방법별 지연 처리와 검증 범위</caption>
+                  <thead><tr><th scope="col">접근</th><th scope="col">대표 문헌</th><th scope="col">지연 관점에서 읽을 점</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">일반화 예측 제어<br><span class="small">GPC</span></th><td>Kotzev, 1992</td><td>원리상 가변·미지 지연을 다룰 수 있지만, 리뷰에서는 해당 유압 적용의 검증이 남아 있다고 정리한다.</td></tr>
+                    <tr><th scope="row">백스테핑·슬라이딩 모드·적응 제어</th><td>Sirouspour, 2001 등</td><td>상세 모델과 튜닝이 필요하다.</td></tr>
+                    <tr><th scope="row">H₂ / H∞ PI·피드포워드</th><td>Lin, 2011</td><td>선형 모델에 기반하며 비선형성은 고려하지 않는다.</td></tr>
+                    <tr><th scope="row">시간지연 제어·추정<br><span class="small">TDC / TDE</span></th><td>Wang, 2017</td><td>지연된 신호로 묶음 동역학을 추정·상쇄한다. 이산 TDC에 데드밴드 보상과 안티와인드업을 결합했으며, 부하 변화에 대한 강인성과 지연 불확실성의 검증은 구분해야 한다.</td></tr>
+                    <tr><th scope="row">명령 필터 + TDC</th><td>Lee, 2012</td><td>위상 지연 보정을 다룬다.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="callout">
+                <p><strong>이름 때문에 혼동하기 쉬운 TDC.</strong> 시간지연 제어는 과거 신호를 이용해 동역학을 추정하는 접근이다. 이 이름 자체가 액추에이터의 미지·시변 입력 지연을 추정하거나 보상했다는 뜻은 아니다.</p>
+              </div>
+
+              <h3>일반 제어 이론의 시변 지연 접근</h3>
+              <div class="table-scroll" tabindex="0" role="region" aria-label="일반 제어 이론의 시변 지연 방법. 좁은 화면에서 가로로 스크롤할 수 있습니다.">
+                <table class="comparison">
+                  <caption>유압 시스템으로 연결할 수 있는 후보 문헌</caption>
+                  <thead><tr><th scope="col">접근</th><th scope="col">대표 문헌</th><th scope="col">리뷰의 연결점</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">내부 다중 모델 + 온라인 지연 추정</th><td>Ben Atia, 2017</td><td>여러 지연 후보의 모델 출력을 비교하고 실측과 가장 가까운 모델을 선택한다.</td></tr>
+                    <tr><th scope="row">마르코프 체인 + EM</th><td>Zhao, 2017</td><td>지연을 확률적 상태 변화로 모델링하는 접근.</td></tr>
+                    <tr><th scope="row">변분 베이즈 추정</th><td>Ma, 2018</td><td>지연을 추정하는 확률적 접근.</td></tr>
+                    <tr><th scope="row">신경망 예측 제어</th><td>Huang &amp; Lewis, 2003</td><td>통신 지연을 대상으로 한 예측 제어.</td></tr>
+                    <tr><th scope="row">Smith 예측기 유사 구조</th><td>Sbarciog, 2008</td><td>지연을 고려하는 예측기 구조.</td></tr>
+                    <tr><th scope="row">PIP + Smith 예측기</th><td>Taylor, 1998</td><td>리뷰에서 소개된 검증은 시뮬레이션 수준.</td></tr>
+                    <tr><th scope="row">기타 지연 추정</th><td>Barbot, 2012<br>Chen, 2015<br>Padilla, 2019<br>Tan, 2004</td><td>지연 추정 관련 문헌군. Tan의 접근은 신경망을 활용한다.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="small">표의 저자·연도는 제공된 노트에 기록된 인용 식별자다. 개별 연구의 세부 조건과 서지정보는 원 리뷰의 참고문헌에서 확인해야 한다. 이 표는 성능 순위나 동일 조건의 비교 결과가 아니다.</p>
+            </section>
+
+            <section id="proposal" aria-labelledby="proposal-title">
+              <header class="section-head">
+                <span class="section-number">04 / PROPOSED DIRECTIONS</span>
+                <h2 id="proposal-title">하나의 모델 대신,<br>운전 영역별로 나누는 접근</h2>
+              </header>
+              <p>저자들이 제안하는 첫 방향은 관절의 전체 거동을 한 번에 설명하려 하기보다, 운전 영역을 나누어 각각 선형 모델을 식별하는 것이다. 이를 Ben Atia의 다중 모델 접근과 연결한다.</p>
+
+              <figure>
+                <div class="region-map" role="group" aria-label="데드밴드, 속도 상승, 포화 영역별 모델을 식별하고 다중 모델 방식으로 결합하는 개념도">
+                  <div class="region">
+                    <span>REGION 01</span>
+                    <b>데드밴드</b>
+                    <p>입력에 대한 움직임이 제한되는 영역의 모델</p>
+                  </div>
+                  <div class="region">
+                    <span>REGION 02</span>
+                    <b>속도 상승</b>
+                    <p>데드밴드 밖에서 속도가 커지는 영역의 모델</p>
+                  </div>
+                  <div class="region">
+                    <span>REGION 03</span>
+                    <b>포화</b>
+                    <p>입력 증가에 대한 응답이 포화되는 영역의 모델</p>
+                  </div>
+                  <div class="map-footer">영역별 모델 식별 → 다중 모델 방식으로 결합 · 지연 후보와 실측 응답 비교</div>
+                </div>
+                <figcaption><b>개념도.</b> 노트에 정리된 저자 제안을 도식화했다. 영역의 경계값이나 모델 전환 규칙을 실험 결과로 제시한 그림은 아니다.</figcaption>
+              </figure>
+
+              <p>관절은 개별적으로 제어하고, 목표 관절값은 역기구학으로 구하는 방향이다. 리뷰는 이와 관련해 Hsia(1991)를 언급한다. 영역별 식별과 지연 추정을 결합하는 발상은 유용하지만, 제공된 노트에서 완성된 통합 제어기의 성능 검증까지 확인되지는 않는다.</p>
+
+              <h3>두 번째 방향: 유량을 측정하는 캐스케이드</h3>
+              <p>안쪽 루프는 유량을 측정해 밸브 전압을 조절하고, 바깥 루프는 유량 목표를 정한다. 저자들은 이 구조가 지연과 마찰의 영향을 완화할 가능성을 제시한다.</p>
+              <div class="cascade" role="group" aria-label="바깥 루프에서 유량 목표를 정하고, 안쪽 루프에서 유량 피드백으로 밸브 전압을 조절하는 구조">
+                <div class="node"><strong>바깥 루프</strong><small>유량 목표 결정</small></div>
+                <span class="arrow" aria-hidden="true">→</span>
+                <div class="node"><strong>안쪽 루프</strong><small>측정 유량을 피드백</small></div>
+                <span class="arrow" aria-hidden="true">→</span>
+                <div class="node"><strong>밸브·액추에이터</strong><small>밸브 전압 조절</small></div>
+              </div>
+              <p>대가는 센서다. 추가 유량 측정이 필요하며, 논문이 염두에 둔 방사선 환경에서는 센서 도입이 쉽지 않을 수 있다. 제어 구조의 장점과 현장 계측의 제약을 함께 평가해야 한다.</p>
+            </section>
+
+            <section id="hr35" class="interpretation" aria-labelledby="hr35-title">
+              <header class="section-head">
+                <span class="section-number">05 / APPLICATION NOTES</span>
+                <h2 id="hr35-title">HR35에서는 무엇부터 확인할까</h2>
+              </header>
+              <p class="small">이 절은 원 논문의 결론이 아니라 노트 작성자의 HR35 적용 해석이다. ETH 2026, Taheri 2022 및 연구 축 B·G는 기존 프로젝트 맥락의 참조이며, 제공된 노트에는 해당 문헌의 전체 서지정보가 없다.</p>
+              <ol>
+                <li>
+                  <strong>지연 지표를 평균에서 조건별 분포로 넓힌다.</strong>
+                  <p>20Hz, 즉 50ms 간격으로 샘플링하면 0.2~1초 지연은 4~20샘플에 해당한다. 이 환산은 HR35 실측값을 뜻하지 않는다. 실차·트윈 비교에서는 명령 크기와 방향별로 반복 측정해 범위와 분포를 살핀다. 노트에서 언급한 ETH 2026의 관절별 상수 τ 가정도 HR35에서는 검증할 가정이다.</p>
+                </li>
+                <li>
+                  <strong>명령 크기와 방향을 바꿔 스텝 시험을 구성한다.</strong>
+                  <p>속도 의존성의 단서는 한 크기의 스텝만으로 부족할 수 있음을 시사한다. 노트가 참조하는 ETH 2026의 −0.85~0.85 단계 시험처럼 여러 명령 수준을 포함하고, 이를 연구 축 G의 시험 설계에 반영한다.</p>
+                </li>
+                <li>
+                  <strong>트윈과 실차의 차이를 원인 후보로 연결하되, 단정하지 않는다.</strong>
+                  <p>노트에 따르면 HR35 트윈에는 압력 동역학(β)과 데드밴드가 있고, 공기 혼입·노화·통신 지연은 없다. 실차의 지연 분포가 더 넓다면 이 누락 요인들은 조사 후보가 된다. 다만 분포 차이만으로 세 요인 중 어느 것이 원인인지 판별할 수는 없다.</p>
+                </li>
+                <li>
+                  <strong>밸브 곡선의 세 영역을 첫 시험 단위로 삼는다.</strong>
+                  <p>데드밴드·상승·포화 영역별 지연 측정은 비교적 부담이 작은 출발점이다. 노트는 이를 Taheri 2022의 GP 특성곡선과 유사한 구간 구조로 해석한다. 이는 시험을 설계하기 위한 연결이며, 두 방법의 동등성을 확인한 결과는 아니다.</p>
+                </li>
+              </ol>
+            </section>
+
+            <section aria-labelledby="checklist-title">
+              <header class="section-head">
+                <span class="section-number">FROM READING TO MEASUREMENT</span>
+                <h2 id="checklist-title">첫 시험에서 남겨야 할 기록</h2>
+              </header>
+              <p>이 리뷰를 실험으로 옮긴다면, 제어기를 바꾸기 전에 지연 측정의 기준과 조건을 먼저 맞추는 것이 좋다. 아래는 논문 내용에서 확장한 시험 준비용 체크리스트다.</p>
+              <ul class="checklist">
+                <li>명령 입력 시점과 움직임 시작 시점의 판정 기준을 명시한다.</li>
+                <li>샘플링 간격과 지연 환산 단위를 함께 기록한다.</li>
+                <li>명령 크기·방향·운전 영역을 구분하고 같은 조건을 반복한다.</li>
+                <li>조건별 지연 범위와 분포를 실차·트윈에 같은 기준으로 적용한다.</li>
+                <li>관측된 차이와 그 차이를 설명하려는 원인 가설을 별도로 기록한다.</li>
+              </ul>
+            </section>
+
+            <section id="takeaway" class="closing" aria-labelledby="takeaway-title">
+              <span class="section-number">06 / TAKEAWAY</span>
+              <h2 id="takeaway-title">좋은 지연 모델은<br>좋은 측정 질문에서 시작된다</h2>
+              <p>이 리뷰의 가치는 새 제어 알고리즘 하나보다, 유압 지연을 바라보는 관점을 정리한 데 있다. 지연은 고정된 장비 사양 하나로 끝나지 않는다. 입력과 운전 조건에 따라 달라질 수 있고, 그 변화는 모델 식별과 제어기의 가정을 흔든다.</p>
+              <p>HR35의 다음 단계도 구체적이다. <strong>명령 크기와 방향을 바꾸며 지연을 반복 측정하고, 데드밴드·상승·포화 영역별로 비교한다.</strong> 상수 τ가 충분한지는 그 결과를 보고 판단할 수 있다.</p>
+            </section>
+
+            <section id="sources" class="sources" aria-labelledby="sources-title">
+              <h2 id="sources-title">출처와 읽기의 범위</h2>
+              <div class="source-card">
+                <p class="eyebrow">PRIMARY REVIEW</p>
+                <p class="source-title" lang="en">Unknown and Time-Varying Time Delays in the Modelling and Control of Hydraulic Actuators: Literature Review</p>
+                <p>Olivia L. R. Albrecht · C. James Taylor<br>Lancaster University, Engineering Department<br><cite>2020 Australian and New Zealand Control Conference (ANZCC)</cite></p>
+                <p class="small">DOI: 10.1109/ANZCC50923.2020.9318375<br>노트에 명시된 열람본: Lancaster eprint 147172</p>
+                <div class="source-links">
+                  <a>Lancaster 원문 PDF ↗</a>
+                  <a>DOI 출판 정보 ↗</a>
+                </div>
+              </div>
+              <ul class="source-notes">
+                <li><strong>편집 범위.</strong> 제공된 논문 요약 노트를 바탕으로 재구성한 해설이다. 개별 인용 문헌을 별도로 검증한 체계적 문헌고찰은 아니다.</li>
+                <li><strong>수치 해석.</strong> 180~290ms는 18~29샘플 × 10ms, 고정 모델과의 10~120ms 차이는 300ms와 해당 범위의 차이에서 계산했다.</li>
+                <li><strong>그림.</strong> 원문 그림 1·3·4에 해당하는 제공 이미지를 사용했다. 운전 영역 및 캐스케이드 도식은 노트 내용을 설명하기 위한 개념도다.</li>
+                <li><strong>해석의 경계.</strong> 속도 의존성은 단서로, 다중 모델과 캐스케이드는 제안으로 읽는다. HR35 관련 판단은 적용 가설이며 원 논문에서 검증된 결과가 아니다.</li>
+              </ul>
+
+              <div class="share">
+                <h3>공유용 한 문장 · 선택하여 복사</h3>
+                <blockquote>유압 로봇의 지연은 상수가 아니다. 같은 관절에서도 180~290ms로 달라진 응답은, 평균 하나보다 명령 크기·방향·운전 영역별 지연 분포를 먼저 살펴야 한다는 질문을 남긴다.</blockquote>
+              </div>
+              <div class="tags" aria-label="핵심 키워드">
+                <span>시변 지연</span>
+                <span>유압 액추에이터</span>
+                <span>상태 의존 파라미터</span>
+                <span>SRIVC</span>
+                <span>데드밴드</span>
+                <span>시간지연 제어</span>
+                <span>다중 모델</span>
+                <span>Smith 예측기</span>
+              </div>
+            </section>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <footer class="page-footer">
+      <span>CONTROL / RESEARCH NOTES · ANZCC 2020 논문 해설</span>
+      <a href="#top">맨 위로 ↑</a>
+    </footer>
+  </div>
+</body>
+</html>
