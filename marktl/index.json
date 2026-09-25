@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T10:26:14.023Z",
+  "updatedAt": "2026-09-25T10:34:36.433Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/werner2025-calibrated/",
+      "excerpt": "Calibrated Dynamic Modeling for Force and Payload Estimation in Hydraulic Machinery 요약 한줄 요약 13.5 t 와 25 t 실제 굴착기에 링크 IMU 와 실린더 압력 센서 만 붙이고, 링크 질량·관성을 개별로 모른 채 묶음(lumped) 파라미터 를 실린더 면적 → 관성 → 마찰 → 중력 순서로 30분 안에 보정한 뒤, 측정 토크와 예측 토크의 차이로 버킷 페",
+      "shortId": "lm0m9n",
+      "slug": "werner2025-calibrated",
+      "sourcePath": "02_research/필드로봇/시스템식별/werner2025-calibrated.md",
+      "tags": [
+        "논문요약",
+        "시스템식별",
+        "굴착기",
+        "페이로드추정",
+        "묶음파라미터",
+        "ETH"
+      ],
+      "title": "Calibrated Dynamic Modeling for Force and Payload Estimation in Hydraulic Machinery - 요약",
+      "updatedAt": "2026-09-25T10:34:36.433Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/lm0m9n/"
+    },
     {
       "artifactType": "faithful-note",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/mic2013-knuckle-crane-id/",
@@ -21,26 +40,6 @@
       "title": "Analysis of Offshore Knuckle Boom Crane — Part One: Modeling and Parameter Identification",
       "updatedAt": "2026-09-25T10:26:14.023Z",
       "url": "https://hanminy.github.io/marktl-blog/marktl/s/6bfdf8/"
-    },
-    {
-      "artifactType": "faithful-note",
-      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/werner2025-calibrated/",
-      "excerpt": "[!info] 관련 자료 공개 원문: https://arxiv.org/abs/2510.11574 (저자 공개본, v1) 저널판: Construction Robotics 2025, DOI 10.1007/s41693 025 00169 7 (미확보 — 초록 수치 불일치 확인용으로 필요) 같은 연구실 선행: Egli & Hutter 2020/2022 (RL 기반 굴착기 제어), Jud 2021 HEAP, Egli 2024 버킷 채움 ",
-      "shortId": "lm0m9n",
-      "slug": "werner2025-calibrated",
-      "sourcePath": "02_research/필드로봇/시스템식별/werner2025-calibrated.md",
-      "tags": [
-        "논문요약",
-        "시스템식별",
-        "굴착기",
-        "페이로드추정",
-        "묶음파라미터",
-        "마찰모델",
-        "ETH"
-      ],
-      "title": "Calibrated Dynamic Modeling for Force and Payload Estimation in Hydraulic Machinery",
-      "updatedAt": "2026-09-25T10:17:04.899Z",
-      "url": "https://hanminy.github.io/marktl-blog/marktl/s/lm0m9n/"
     },
     {
       "artifactType": "faithful-note",
