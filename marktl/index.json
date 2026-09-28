@@ -1,7 +1,22 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-25T13:03:46.509Z",
+  "updatedAt": "2026-09-28T12:14:00.985Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-ep-116-%EC%B0%BD%EC%9D%98%EC%84%B1%EC%9D%84-%EB%B0%B0%EC%9A%B4-ai-opus-5-5-gpt-6-sol-%EC%9A%94%EC%95%BD/",
+      "excerpt": "EP 116. 창의성을 배운 AI (Opus 5.5·GPT 6 Sol) 영상 정보 채널 : AI Frontier Korea (노정석) 게시일 : 2026 09 27 길이 : 58분 44초 (3,524초) 출연 : 노정석, 최승준, 박종현 (박종현은 샌프란시스코에서 원격 참여) 녹화 시점 : 2026년 9월 27일 일요일 아침 (영상 도입부 발언 기준) 영문 제목 : EP 116. AI That Learned Creativity",
+      "shortId": "141s756",
+      "slug": "yt-ep-116-창의성을-배운-ai-opus-5-5-gpt-6-sol-요약",
+      "sourcePath": "02_research/AI/노정석/yt_EP 116. 창의성을 배운 AI (Opus 5.5·GPT-6 Sol)_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료"
+      ],
+      "title": "EP 116. 창의성을 배운 AI (Opus 5.5·GPT-6 Sol)",
+      "updatedAt": "2026-09-28T12:14:00.985Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/141s756/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/schoukens2019-roadmap/",
