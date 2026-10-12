@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-05T12:24:35.769Z",
+  "updatedAt": "2026-10-12T12:20:46.697Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-ep-118-%ED%8A%B9%EC%9D%B4%EC%A0%90%EC%9D%98-%ED%95%9C%EA%B0%80%EC%9A%B4%EB%8D%B0-ai-%ED%88%AC%EC%9E%90-%EC%82%AC%EC%9D%B4%ED%81%B4-%EC%88%98%ED%95%99-%EC%87%BC%ED%81%AC-%EC%83%8C%ED%94%84%EB%9E%80%EC%8B%9C%EC%8A%A4%EC%BD%94-%EB%B6%84%EC%9C%84%EA%B8%B0-%EC%9A%94%EC%95%BD/",
+      "excerpt": "EP 118. 특이점의 한가운데: AI 투자 사이클, 수학 쇼크, 샌프란시스코 분위기 영상 정보 채널 : AI Frontier Korea (노정석) 게시일 : 2026 10 11 길이 : 1시간 30분 9초 (5,409초) 출연 : 노정석, 최승준, 박종현 / 편집: 김유진 녹화 시점 : 2026년 10월 11일 일요일 아침 (도입부 발언 기준). 박종현은 샌프란시스코에서 원격 참여 영문 제목 : EP 118. Inside t",
+      "shortId": "unimoc",
+      "slug": "yt-ep-118-특이점의-한가운데-ai-투자-사이클-수학-쇼크-샌프란시스코-분위기-요약",
+      "sourcePath": "02_research/AI/노정석/yt_EP 118. 특이점의 한가운데 - AI 투자 사이클, 수학 쇼크, 샌프란시스코 분위기_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료",
+        "AI투자",
+        "철도붐",
+        "Mathpocalypse",
+        "샌프란시스코"
+      ],
+      "title": "EP 118. 특이점의 한가운데: AI 투자 사이클, 수학 쇼크, 샌프란시스코 분위기",
+      "updatedAt": "2026-10-12T12:20:46.697Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/unimoc/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-ep-117-%EA%B0%95%EB%B6%81%EC%9D%98-it%EA%B0%80-%EB%B0%94%EB%80%90%EB%8B%A4-ai-%EC%8B%9C%EB%8C%80%EC%9D%98-erp%EC%99%80-%EC%A7%80%EC%8B%9D-%EB%85%B8%EB%8F%99-%EC%9A%94%EC%95%BD/",
