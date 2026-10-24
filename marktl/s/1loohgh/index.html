@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>영상은 코드가 되고, 가치는 선택에 남는다 — Video as Code와 생성형 오독</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      --paper: #f5f3ec;
+      --surface: #fffef9;
+      --ink: #203331;
+      --muted: #576761;
+      --line: #d6dcd0;
+      --green: #265e51;
+      --green-soft: #e6ede4;
+      --orange: #aa4b2b;
+      --orange-soft: #f1e5d9;
+      --dark: #1c3530;
+      --white: #fffef9;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "Batang", serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-padding-top: 24px; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 21px;
+      line-height: 1.85;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+      -webkit-font-smoothing: antialiased;
+    }
+    a {
+      color: var(--green);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 5px;
+    }
+    a:hover { color: var(--orange); }
+    a:focus-visible { outline: 3px solid var(--orange); outline-offset: 5px; }
+    ::selection { background: #d8e6b8; color: var(--ink); }
+    h1, h2, h3, h4, p, figure, blockquote { margin: 0; }
+    h1, h2, h3, h4 { text-wrap: balance; }
+    p + p { margin-top: 20px; }
+    strong { font-weight: 750; }
+    img { display: block; width: 100%; height: auto; }
+    ul, ol { padding-left: 1.3em; }
+    li + li { margin-top: 12px; }
+    code { font-family: var(--mono); font-size: .87em; }
+    p code, li code, td code {
+      padding: 2px 6px;
+      border-radius: 3px;
+      background: var(--green-soft);
+      overflow-wrap: anywhere;
+    }
+    .skip-link {
+      position: absolute;
+      top: -100px;
+      left: 16px;
+      z-index: 10;
+      padding: 10px 18px;
+      background: var(--surface);
+    }
+    .skip-link:focus { top: 16px; }
+    .shell { width: min(1180px, calc(100% - 80px)); margin-inline: auto; }
+    .masthead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      padding-block: 28px 23px;
+      border-bottom: 1px solid var(--ink);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .12em;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark { width: 13px; height: 13px; background: var(--orange); }
+    .masthead span:last-child { letter-spacing: .04em; }
+    .hero { padding-block: 72px 52px; }
+    .eyebrow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      align-items: center;
+      color: var(--green);
+      font-size: 14px;
+      font-weight: 750;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .eyebrow .pill {
+      border: 1px solid var(--green);
+      padding: 3px 11px;
+      border-radius: 100px;
+      letter-spacing: .04em;
+    }
+    h1 {
+      margin-top: 26px;
+      max-width: 1080px;
+      font-size: clamp(44px, 6.25vw, 80px);
+      line-height: 1.2;
+      letter-spacing: -.065em;
+      font-weight: 800;
+    }
+    h1 em { font-style: normal; color: var(--orange); }
+    .hero-deck {
+      max-width: 840px;
+      margin-top: 28px;
+      color: var(--muted);
+      font-size: clamp(22px, 2.2vw, 27px);
+      line-height: 1.7;
+      letter-spacing: -.025em;
+    }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 24px;
+      margin-top: 30px;
+      font-size: 16px;
+      color: var(--muted);
+    }
+    .hero-bottom {
+      display: grid;
+      grid-template-columns: 1.45fr 1fr;
+      gap: 50px;
+      align-items: end;
+      margin-top: 42px;
+      padding-top: 30px;
+      border-top: 1px solid var(--line);
+    }
+    .original-title { font-size: 17px; color: var(--muted); }
+    .original-title strong { display: block; color: var(--ink); font-size: 19px; }
+    .hero-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; }
+    .button-link {
+      display: inline-block;
+      padding: 10px 18px;
+      border: 1px solid var(--green);
+      border-radius: 3px;
+      font-size: 17px;
+      font-weight: 700;
+      text-decoration: none;
+      line-height: 1.6;
+    }
+    .button-link.solid { color: var(--white); background: var(--green); }
+    .button-link:hover { border-color: var(--orange); }
+    .button-link.solid:hover { background: var(--orange); }
+
+    .opening {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 0;
+      background: var(--dark);
+      color: var(--white);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .abstract { padding: 44px 46px; }
+    .mini-label {
+      display: block;
+      margin-bottom: 18px;
+      color: var(--green);
+      font-size: 14px;
+      font-weight: 750;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .abstract .mini-label { color: #bed1b3; }
+    .abstract h2 { font-size: 31px; line-height: 1.45; letter-spacing: -.035em; margin-bottom: 20px; }
+    .abstract p { font-size: 20px; color: #e4eae0; }
+    .opening-aside {
+      padding: 44px 38px;
+      border-left: 1px solid #49615a;
+      background: #28443b;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 28px;
+    }
+    .opening-aside .mini-label { color: #bed1b3; }
+    .big-question { font-family: var(--serif); font-size: 29px; line-height: 1.65; letter-spacing: -.04em; }
+    .opening-aside p:last-child { font-size: 17px; color: #d0ddcf; }
+    .reading-note {
+      padding: 22px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 17px;
+      color: var(--muted);
+    }
+    .reading-note a { white-space: nowrap; }
+    .findings { padding-block: 66px 52px; }
+    .small-heading { font-size: 28px; letter-spacing: -.035em; margin-bottom: 24px; }
+    .findings-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+    .finding { padding-top: 22px; border-top: 3px solid var(--green); }
+    .finding-num { color: var(--orange); font: 15px var(--mono); }
+    .finding h3 { font-size: 25px; line-height: 1.5; letter-spacing: -.035em; margin-block: 14px 12px; }
+    .finding p { font-size: 19px; color: var(--muted); }
+    .toc {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 20px;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding-block: 24px;
+      margin-bottom: 20px;
+    }
+    .toc h2 { font-size: 17px; padding-top: 3px; }
+    .toc ol {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 25px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      font-size: 17px;
+    }
+    .toc a { text-decoration: none; }
+    .toc a span { color: var(--orange); font-family: var(--mono); margin-right: 7px; font-size: 13px; }
+
+    .chapter { padding-block: 76px 8px; }
+    .section-heading {
+      display: grid;
+      grid-template-columns: 70px 1fr;
+      align-items: start;
+      gap: 18px;
+      margin-bottom: 30px;
+      padding-top: 25px;
+      border-top: 1px solid var(--ink);
+    }
+    .section-number {
+      color: var(--orange);
+      font-family: var(--serif);
+      font-size: 46px;
+      line-height: 1.2;
+    }
+    .section-heading h2 { font-size: clamp(32px, 4vw, 46px); line-height: 1.35; letter-spacing: -.055em; }
+    .section-heading .mini-label { margin-bottom: 8px; }
+    .prose { max-width: 840px; margin-inline: auto; }
+    .prose h3 { font-size: 29px; line-height: 1.45; letter-spacing: -.035em; margin-block: 42px 18px; }
+    .prose p { letter-spacing: -.015em; }
+    .lead { font-size: 24px; line-height: 1.8; }
+    .media { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; margin-block: 32px; }
+    .media > a { display: block; background: #171f21; }
+    .media img { aspect-ratio: 16 / 9; object-fit: contain; background: #171f21; }
+    figcaption { padding: 20px 24px 24px; font-size: 17px; line-height: 1.75; color: var(--muted); }
+    .caption-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px 14px; margin-bottom: 8px; }
+    .caption-head strong { color: var(--ink); font-size: 19px; font-weight: 700; }
+    .timestamp { color: var(--orange); font: 13px/1.7 var(--mono); white-space: nowrap; text-decoration: none; }
+    .media-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px; margin-block: 32px; }
+    .media-pair .media { margin: 0; }
+    .media-wide { max-width: 920px; margin-inline: auto; }
+    .media-note { font-size: 16px; color: var(--muted); margin-top: -15px; margin-bottom: 28px; }
+    .pathways { background: var(--green-soft); padding: 30px; border-radius: 4px; margin-block: 32px; }
+    .pathway { display: grid; grid-template-columns: 145px 1fr; align-items: center; gap: 18px; }
+    .pathway + .pathway { border-top: 1px solid #cbd8c8; padding-top: 22px; margin-top: 22px; }
+    .pathway-label { font-size: 19px; font-weight: 750; }
+    .pathway-label small { display: block; color: var(--muted); font-size: 14px; font-weight: 400; }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      gap: 26px;
+    }
+    .steps li {
+      position: relative;
+      text-align: center;
+      background: var(--surface);
+      padding: 16px 10px;
+      border: 1px solid #d2ddcc;
+      border-radius: 3px;
+      font-size: 18px;
+      line-height: 1.5;
+      margin: 0;
+    }
+    .steps li:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      right: -22px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--green);
+    }
+    .diagram-note { font-size: 15px; color: var(--muted); margin-top: 18px; }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+      margin-block: 32px;
+    }
+    .metric { background: var(--surface); padding: 27px 25px; }
+    .metric strong { display: block; font-size: clamp(34px, 4vw, 48px); color: var(--green); letter-spacing: -.05em; line-height: 1.25; }
+    .metric strong small { font-size: 23px; }
+    .metric span { display: block; font-size: 18px; font-weight: 700; margin-top: 10px; }
+    .metric p { font-size: 15px; color: var(--muted); line-height: 1.65; margin-top: 8px; }
+    .callout {
+      max-width: 840px;
+      margin: 30px auto;
+      padding: 25px 30px;
+      border-left: 4px solid var(--orange);
+      background: var(--orange-soft);
+      border-radius: 0 4px 4px 0;
+    }
+    .callout h3 { font-size: 22px; margin-bottom: 10px; }
+    .callout p { font-size: 19px; }
+    .callout .mini-label { color: var(--orange); margin-bottom: 10px; }
+    .quote {
+      max-width: 920px;
+      margin: 52px auto;
+      padding: 30px 34px;
+      border-top: 1px solid var(--green);
+      border-bottom: 1px solid var(--green);
+      text-align: center;
+    }
+    .quote p { font-family: var(--serif); font-size: clamp(28px, 3.4vw, 41px); line-height: 1.65; letter-spacing: -.04em; }
+    .quote cite { display: block; margin-top: 18px; font-style: normal; font-size: 16px; color: var(--muted); }
+    .table-wrap { overflow-x: auto; margin-block: 28px; border: 1px solid var(--line); border-radius: 4px; }
+    table { border-collapse: collapse; width: 100%; background: var(--surface); font-size: 18px; line-height: 1.7; }
+    caption { text-align: left; padding: 20px 23px; font-size: 19px; font-weight: 700; background: var(--green-soft); color: var(--ink); }
+    th, td { text-align: left; vertical-align: top; padding: 18px 22px; border-bottom: 1px solid var(--line); }
+    thead th { background: #eef1e9; font-size: 16px; color: var(--muted); }
+    tbody th { font-weight: 700; }
+    tr:last-child td, tr:last-child th { border-bottom: 0; }
+    .numeric { white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .table-foot { font-size: 16px; color: var(--muted); margin-top: -14px; margin-bottom: 28px; }
+    .tech-note { max-width: 840px; margin: 30px auto; padding: 26px 30px; background: #ebeee7; border-radius: 4px; }
+    .tech-note h3 { font-size: 23px; margin-bottom: 14px; }
+    .tech-note p, .tech-note li { font-size: 18px; line-height: 1.8; }
+    .tech-note ul { margin-block: 14px 0; }
+    .code-display {
+      background: var(--dark);
+      color: #e2efc5;
+      padding: 26px 30px;
+      margin: 24px 0;
+      border-radius: 4px;
+      overflow-wrap: anywhere;
+      font-size: 24px;
+      line-height: 1.65;
+    }
+    .chain {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      padding: 0;
+      margin: 28px 0;
+      counter-reset: chain;
+    }
+    .chain li {
+      counter-increment: chain;
+      margin: 0;
+      padding: 22px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--green);
+      border-radius: 3px;
+    }
+    .chain li::before { content: "0" counter(chain); display: block; color: var(--orange); font: 13px var(--mono); margin-bottom: 12px; }
+    .chain strong { display: block; font-size: 21px; margin-bottom: 5px; }
+    .chain span { display: block; font-size: 16px; color: var(--muted); line-height: 1.7; }
+    .chain li:last-child { background: var(--green-soft); }
+    .split-note { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-block: 32px; }
+    .split-note > section { padding: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; }
+    .split-note h3 { font-size: 25px; margin-bottom: 14px; letter-spacing: -.035em; }
+    .split-note p { font-size: 19px; }
+    .split-note .mini-label { margin-bottom: 12px; }
+    .boundary { background: var(--dark); color: var(--white); border-radius: 5px; margin-block: 38px; padding: 40px; }
+    .boundary h3 { font-size: 31px; line-height: 1.5; margin-bottom: 25px; letter-spacing: -.04em; }
+    .boundary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 38px; }
+    .boundary-grid > div + div { border-left: 1px solid #577063; padding-left: 38px; }
+    .boundary .mini-label { color: #bdd1b2; }
+    .boundary p { color: #e3eae0; font-size: 20px; }
+    .boundary strong { color: #e0edb5; }
+    .checklist { list-style: none; padding: 0; margin: 24px 0 0; }
+    .checklist li { position: relative; padding: 17px 0 17px 38px; border-bottom: 1px solid var(--line); margin: 0; }
+    .checklist li::before { content: "□"; position: absolute; left: 0; color: var(--green); font-size: 25px; line-height: 1.5; }
+    .checklist strong { display: block; font-size: 21px; }
+    .checklist span { display: block; color: var(--muted); font-size: 18px; margin-top: 5px; }
+    .ending { max-width: 840px; margin: 60px auto 24px; }
+    .ending h3 { font-size: 34px; line-height: 1.45; letter-spacing: -.045em; margin-bottom: 24px; }
+    .share-frame { margin: 42px auto; padding: 30px 34px; max-width: 840px; background: var(--green-soft); border: 1px solid #cad8c3; border-radius: 4px; }
+    .share-frame p { font-family: var(--serif); font-size: 25px; line-height: 1.7; }
+    .share-frame small { display: block; margin-top: 15px; color: var(--muted); font-size: 15px; }
+    .sources { border-top: 1px solid var(--ink); padding-block: 46px; margin-top: 70px; }
+    .sources h2 { font-size: 32px; letter-spacing: -.04em; margin-bottom: 24px; }
+    .source-layout { display: grid; grid-template-columns: 1.3fr 1fr; gap: 46px; align-items: start; }
+    .source-list { padding: 0; list-style: none; margin: 0; }
+    .source-list li { font-size: 17px; color: var(--muted); margin: 0 0 22px; }
+    .source-list strong { display: block; color: var(--ink); font-size: 19px; margin-bottom: 5px; }
+    .source-list .inline-strong { display: inline; font-size: inherit; }
+    .source-layout .media { margin: 0; }
+    .source-meta { font-size: 16px; color: var(--muted); padding: 20px 24px; border: 1px solid var(--line); border-radius: 4px; margin-top: 24px; }
+    .source-meta p + p { margin-top: 12px; }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 18px;
+      border-top: 1px solid var(--line);
+      padding-block: 25px 40px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+    footer a { text-decoration: none; }
+    @media (max-width: 900px) {
+      .shell { width: calc(100% - 48px); }
+      .hero { padding-top: 48px; }
+      .opening { grid-template-columns: 1fr; }
+      .opening-aside { border-left: 0; border-top: 1px solid #49615a; padding: 32px 38px; }
+      .big-question { font-size: 28px; }
+      .findings-grid { gap: 20px; }
+      .finding h3 { font-size: 23px; }
+      .hero-bottom { grid-template-columns: 1fr; gap: 24px; }
+      .hero-actions { justify-content: flex-start; }
+      .chain { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .source-layout { grid-template-columns: 1fr; gap: 28px; }
+      .source-layout .media { max-width: 640px; }
+      .pathway { grid-template-columns: 1fr; }
+      .pathway-label small { display: inline; margin-left: 10px; }
+      .toc { grid-template-columns: 1fr; gap: 12px; }
+    }
+    @media (max-width: 620px) {
+      body { font-size: 20px; line-height: 1.85; }
+      .shell { width: calc(100% - 36px); }
+      .masthead { font-size: 11px; padding-block: 20px; gap: 12px; }
+      .brand { gap: 8px; }
+      .brand-mark { width: 10px; height: 10px; flex-shrink: 0; }
+      .hero { padding-block: 38px; }
+      h1 { font-size: clamp(40px, 10vw, 58px); letter-spacing: -.065em; }
+      .hero-deck { font-size: 22px; }
+      .hero-meta { font-size: 15px; gap: 7px 16px; }
+      .hero-bottom { margin-top: 28px; }
+      .abstract { padding: 28px 24px; }
+      .abstract h2 { font-size: 27px; }
+      .opening-aside { padding: 27px 24px; }
+      .big-question { font-size: 25px; }
+      .reading-note { font-size: 16px; }
+      .findings { padding-block: 40px; }
+      .findings-grid { grid-template-columns: 1fr; gap: 26px; }
+      .finding { padding-top: 15px; }
+      .finding h3 { margin-block: 8px; font-size: 24px; }
+      .finding p { font-size: 20px; }
+      .toc ol { gap: 11px 20px; }
+      .chapter { padding-top: 54px; }
+      .section-heading { grid-template-columns: 39px 1fr; gap: 12px; padding-top: 21px; }
+      .section-number { font-size: 31px; }
+      .section-heading h2 { font-size: 31px; }
+      .section-heading .mini-label { font-size: 12px; letter-spacing: .08em; }
+      .lead { font-size: 22px; }
+      .prose h3 { font-size: 27px; }
+      .media-pair { grid-template-columns: 1fr; gap: 24px; }
+      figcaption { padding: 18px 20px 22px; }
+      .caption-head strong { font-size: 19px; }
+      .metrics { grid-template-columns: 1fr; }
+      .metric { padding: 22px 24px; }
+      .metric strong { font-size: 42px; }
+      .metric p { font-size: 16px; }
+      .pathways { padding: 22px 18px; }
+      .steps { grid-template-columns: 1fr; gap: 24px; }
+      .steps li:not(:last-child)::after { content: "↓"; right: 50%; top: auto; bottom: -24px; transform: translateX(50%); }
+      .quote { padding: 25px 10px; margin-block: 38px; }
+      .quote p { font-size: 28px; }
+      .callout, .tech-note { padding: 23px; }
+      .callout p { font-size: 20px; }
+      .chain { gap: 12px; }
+      .chain li { padding: 18px; }
+      .chain strong { font-size: 20px; }
+      .split-note { grid-template-columns: 1fr; }
+      .split-note > section { padding: 24px; }
+      .split-note p { font-size: 20px; }
+      .boundary { padding: 28px 24px; }
+      .boundary h3 { font-size: 27px; }
+      .boundary-grid { grid-template-columns: 1fr; gap: 26px; }
+      .boundary-grid > div + div { border-left: 0; border-top: 1px solid #577063; padding-left: 0; padding-top: 24px; }
+      .table-wrap table { min-width: 590px; }
+      th, td { padding: 15px 18px; }
+      .ending { margin-top: 42px; }
+      .ending h3 { font-size: 29px; }
+      .share-frame { padding: 26px 24px; }
+      .share-frame p { font-size: 23px; }
+      .sources { margin-top: 46px; }
+    }
+    @media print {
+      body { background: white; color: black; font-size: 11pt; }
+      .shell { width: 100%; max-width: none; }
+      .skip-link, .hero-actions, .toc, footer a { display: none; }
+      .hero { padding-top: 25px; }
+      h1 { font-size: 34pt; }
+      .hero-deck { font-size: 15pt; }
+      .chapter { padding-top: 30px; }
+      .section-heading h2 { font-size: 24pt; }
+      .opening, .opening-aside, .boundary, .code-display { background: #eef1e9; color: black; }
+      .abstract p, .opening .mini-label, .opening-aside p:last-child, .boundary p, .boundary strong, .boundary .mini-label { color: black; }
+      .media, .finding, .callout, .tech-note, .share-frame { break-inside: avoid; }
+      .media-pair { gap: 16px; }
+      figcaption { font-size: 10pt; }
+      .table-wrap { overflow: visible; }
+      .table-wrap table { min-width: 0; font-size: 10pt; }
+      a { color: inherit; }
+      h2, h3 { break-after: avoid; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="EP 119. 코드로 재생하는 AI: Video as Code와 생성형 오독">
+<meta property="og:description" content="EP 119. 코드로 재생하는 AI: Video as Code와 생성형 오독 영상 정보 채널 : AI Frontier Korea (노정석) 게시일 : 2026 10 23 길이 : 1시간 3분 29초 (3,809초) 출연 : 최승준, 박종현 / 편집: 김유진 (노정석은 이번 회차 불참) 녹화 시점 : 2026년 10월 18일 저녁 (도입부 발언 기준). 박종현은 샌프란시스코 체류 마지막 밤에 원격 참여 영문 제목 : EP 119">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/1loohgh/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/1loohgh/assets/ezyjidjo72y-ts-00-00-17.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="EP 119. 코드로 재생하는 AI: Video as Code와 생성형 오독">
+<meta name="twitter:description" content="EP 119. 코드로 재생하는 AI: Video as Code와 생성형 오독 영상 정보 채널 : AI Frontier Korea (노정석) 게시일 : 2026 10 23 길이 : 1시간 3분 29초 (3,809초) 출연 : 최승준, 박종현 / 편집: 김유진 (노정석은 이번 회차 불참) 녹화 시점 : 2026년 10월 18일 저녁 (도입부 발언 기준). 박종현은 샌프란시스코 체류 마지막 밤에 원격 참여 영문 제목 : EP 119">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/1loohgh/assets/ezyjidjo72y-ts-00-00-17.jpg">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-ep-119-%EC%BD%94%EB%93%9C%EB%A1%9C-%EC%9E%AC%EC%83%9D%ED%95%98%EB%8A%94-ai-video-as-code%EC%99%80-%EC%83%9D%EC%84%B1%ED%98%95-%EC%98%A4%EB%8F%85-%EC%9A%94%EC%95%BD/">
+</head>
+<body id="top">
+  <a class="skip-link" href="#article">본문으로 바로가기</a>
+
+  <div class="shell">
+    <header class="masthead">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span> AI FRONTIER · RESEARCH NOTES</div>
+      <span>EP 119 / 2026.10.23</span>
+    </header>
+
+    <main id="article">
+      <article aria-labelledby="article-title">
+        <header class="hero">
+          <div class="eyebrow">
+            <span class="pill">영상 기반 연구 리포트</span>
+            <span>Video as Code × Generative Misreading</span>
+          </div>
+          <h1 id="article-title">영상은 코드가 되고,<br>가치는 <em>선택에 남는다</em></h1>
+          <p class="hero-deck">AI가 영상을 만드는 시대의 다음 질문. 더 많이 만드는 능력, 좋은 결과를 가리는 판단, 그리고 생성하지 않아야 할 원본의 가치.</p>
+          <div class="hero-meta">
+            <span>AI Frontier Korea (노정석)</span>
+            <span>출연 최승준 · 박종현</span>
+            <span>영상 게시 <time datetime="2026-10-23">2026년 10월 23일</time></span>
+            <span>63분 29초 · 장면 35개</span>
+          </div>
+          <div class="hero-bottom">
+            <p class="original-title">원본 에피소드<strong>EP 119. 코드로 재생하는 AI: Video as Code와 생성형 오독</strong></p>
+            <div class="hero-actions">
+              <a class="button-link solid">원본 영상 보기 ↗</a>
+              <a class="button-link" href="#findings">핵심 발견 읽기 ↓</a>
+            </div>
+          </div>
+        </header>
+
+        <section class="opening" aria-labelledby="abstract-title">
+          <div class="abstract">
+            <span class="mini-label">Abstract / 초록</span>
+            <h2 id="abstract-title">제작의 자동화가 드러낸<br>판단과 참여의 가치</h2>
+            <p>이번 회차는 픽셀을 직접 생성하는 비디오 모델 대신, LLM이 프로그램을 작성해 영상을 만드는 <strong>Video as Code</strong>를 두 방향에서 탐색함. 박종현은 실제 녹화 영상을 AI로 편집·증강한 채널 실험을, 최승준은 bytebeat 코드를 소리·이미지·이모지·이야기로 바꾼 <strong>‘생성형 오독’</strong>을 소개함.</p>
+            <p>두 사례를 관통하는 쟁점은 결과를 만드는 능력과 결과의 가치를 판단하는 능력 사이의 간극. 제작 도구가 좋아져도 큐레이션은 남고, 참여자의 손길이 의미인 작업에서는 생성으로 대체하지 않을 부분을 정해야 함.</p>
+          </div>
+          <aside class="opening-aside" aria-label="이 글의 중심 질문">
+            <div>
+              <span class="mini-label">The central question</span>
+              <p class="big-question">만들 수 있게 된 다음,<br>무엇을 고르고<br>무엇을 남길 것인가.</p>
+            </div>
+            <p>코드 기반 제작 → 시청자 반응 → 창의적 오독 → 인간의 참여.<br>기술의 가능성과 가치의 조건을 함께 읽는 기록.</p>
+          </aside>
+        </section>
+
+        <p class="reading-note"><strong>읽기 기준</strong> · 제공된 영상 노트를 편집·재구성한 글. 발언은 한국어 수동 자막에, 장면 설명은 360p 추출 이미지에 근거함. 채널 성과와 모델 비교는 출연자 발표이며 독립 검증되지 않음. <a href="#sources">출처와 한계 ↓</a></p>
+
+        <section class="findings" id="findings" aria-labelledby="findings-title">
+          <span class="mini-label">Key findings</span>
+          <h2 class="small-heading" id="findings-title">먼저 읽는 세 가지 발견</h2>
+          <div class="findings-grid">
+            <section class="finding">
+              <span class="finding-num">01 / PRODUCTION</span>
+              <h3>먼저 확인된 이점은<br>제작 처리량</h3>
+              <p>박종현은 AI 편집 이후의 성장을 “더 많이 올릴 수 있었기 때문”으로 설명함. 편당 품질 향상과 총조회수 증가는 분리해서 읽어야 함.</p>
+            </section>
+            <section class="finding">
+              <span class="finding-num">02 / JUDGMENT</span>
+              <h3>준수한 결과 다음의 병목은<br>좋은 결과를 고르는 일</h3>
+              <p>여러 모델과 라이브러리가 쓸 만한 모션 그래픽을 만들었다는 평가. 그러나 AI 사용을 눈치채지 못했다는 사실만으로 콘텐츠의 가치를 입증할 수는 없음.</p>
+            </section>
+            <section class="finding">
+              <span class="finding-num">03 / MEANING</span>
+              <h3>어떤 원본은<br>참여했다는 사실이 가치</h3>
+              <p>유치원 원가 영상에서 아이들이 직접 그린 그림을 남긴 선택. 생성의 경계는 화면의 완성도뿐 아니라 작품이 누구에게 어떤 의미인지에 달려 있음.</p>
+            </section>
+          </div>
+        </section>
+
+        <nav class="toc" aria-label="글의 목차">
+          <h2>이 글의 흐름</h2>
+          <ol>
+            <li><a href="#code"><span>01</span>코드가 만드는 영상</a></li>
+            <li><a href="#editing"><span>02</span>AI 편집의 성과</a></li>
+            <li><a href="#curation"><span>03</span>평가와 큐레이션</a></li>
+            <li><a href="#misreading"><span>04</span>생성형 오독</a></li>
+            <li><a href="#creativity"><span>05</span>창의성과 설명자</a></li>
+            <li><a href="#original"><span>06</span>남겨야 할 원본</a></li>
+            <li><a href="#implications"><span>07</span>제작자를 위한 시사점</a></li>
+          </ol>
+        </nav>
+
+        <section class="chapter" id="code" aria-labelledby="code-title">
+          <header class="section-heading">
+            <span class="section-number" aria-hidden="true">01</span>
+            <div>
+              <span class="mini-label">A new production language</span>
+              <h2 id="code-title">픽셀 대신, 프로그램을 생성한다</h2>
+            </div>
+          </header>
+
+          <div class="prose">
+            <p class="lead">Video as Code의 핵심은 LLM이 애니메이션 코드를 작성하거나 Blender 같은 도구를 다루고, 그 실행 결과를 영상으로 렌더링하는 방식.</p>
+            <p>박종현은 샌프란시스코에서 공동 개최한 행사로 이야기를 시작함. 질문은 “AI가 픽셀을 생성해야 하는가, 프로그램을 작성해야 하는가?”였음. Seedance처럼 픽셀을 직접 생성하는 접근과 구별하며, 당시 용어는 Video as Code와 Code as Video로 혼용된다고 설명함.</p>
+            <p>같은 행사에서 두 제작 방향이 만남. 공동 호스트 Sina Atalay는 개념을 코드로 시각화하는 설명 영상을 만들고, 박종현은 사람이 말하고 행동한 녹화 원본을 더 좋은 콘텐츠로 편집하는 데 집중함.</p>
+          </div>
+
+          <figure class="media media-wide">
+            <a aria-label="원본 영상 00:00:17의 이벤트 페이지 보기">
+              <img src="assets/ezyjidjo72y-ts-00-00-17.jpg" width="640" height="360" alt="Video as Code: Should AI Generate Pixels, or Write Programs? 제목이 표시된 Luma 행사 페이지" fetchpriority="high" decoding="async">
+            </a>
+            <figcaption>
+              <div class="caption-head"><a class="timestamp">00:00:17 ↗</a><strong>질문을 먼저 던진 샌프란시스코 행사</strong></div>
+              화면상 일정은 10월 16일 금요일 17:45–20:30, 장소는 2300 Mason St. 호스트는 Park Jong Hyun과 Sina Atalay. 약 100명을 승인했으나 공간 문제로 약 40명이 참석했다는 박종현의 설명.
+            </figcaption>
+          </figure>
+
+          <div class="pathways" role="group" aria-label="코드 기반 영상 제작의 두 경로">
+            <span class="mini-label">Two routes / 두 제작 경로</span>
+            <div class="pathway">
+              <div class="pathway-label">개념에서 출발<small>Sina의 설명 영상</small></div>
+              <ol class="steps">
+                <li>설명할 개념</li>
+                <li>LLM이 코드 작성</li>
+                <li>시뮬레이션·영상</li>
+              </ol>
+            </div>
+            <div class="pathway">
+              <div class="pathway-label">원본에서 출발<small>박종현의 편집 영상</small></div>
+              <ol class="steps">
+                <li>실제 녹화 원본</li>
+                <li>자동 편집·클리핑</li>
+                <li>코드로 시각적 증강</li>
+              </ol>
+            </div>
+            <p class="diagram-note">발표 내용을 바탕으로 재구성한 개념도. 제품의 전체 기술 구조를 뜻하지 않음.</p>
+          </div>
+
+          <div class="prose">
+            <h3>설명 영상의 사례: ManimGX</h3>
+            <p>Sina는 약 18개월 동안 3Blue1Brown의 Manim을 확장한 <strong>ManimGX</strong>를 개발해 왔다고 소개됨. 발표에서는 Manim과 1:1 호환되는 라이브러리로 설명되며, 영상의 시각 요소뿐 아니라 오디오·음악까지 코드로 제작했다고 함.</p>
+            <p>Instagram 계정 academaai에는 ray tracing, 반사, 자동차 주행 같은 개념을 설명하는 영상이 등장함. 박종현에 따르면 하루 한 편씩 올린 10개 남짓의 영상 중 75만·96만 회를 기록한 사례가 있었고, ray tracing 영상부터 반응이 커져 약 10일 만에 100만 회 단위 조회수에 도달함. 이는 발표에서 소개된 성과이며 별도 확인된 지표는 아님.</p>
+          </div>
+
+          <div class="media-pair">
+            <figure class="media">
+              <a aria-label="원본 영상 00:02:13 보기">
+                <img src="assets/ezyjidjo72y-ts-00-02-13.jpg" width="640" height="360" alt="ManimGX와 컴퓨터 그래픽 개념 설명 영상들이 배열된 academaai Instagram 계정" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:02:13 ↗</a><strong>코드로 만든 개념 설명</strong></div>
+                ‘ManimGX’, ‘How does a computer draw a reflection?’, ‘Nobody taught them to drive’ 등의 섬네일. 목표는 어려운 개념을 시각화해 교육을 발전시키는 것.
+              </figcaption>
+            </figure>
+            <figure class="media">
+              <a aria-label="원본 영상 00:03:13 보기">
+                <img src="assets/ezyjidjo72y-ts-00-03-13.jpg" width="640" height="360" alt="GEN 1 자동차 시뮬레이션과 Training an AI to Drive with Natural Selection 게시물 설명" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:03:13 ↗</a><strong>자연선택으로 주행을 설명하기</strong></div>
+                게시물은 434개 가중치의 작은 신경망이 가속·제동·조향을 결정한다고 설명함. 멀리 간 모델을 부모로 선택해 33세대에 첫 랩, 4,000세대에 모든 코너 통과라는 진행을 제시함.
+              </figcaption>
+            </figure>
+          </div>
+
+          <aside class="tech-note">
+            <h3>기술 구분 · 주행 사례는 neuroevolution</h3>
+            <p>박종현은 이 영상을 RL 학습 설명이 아니라 “가장 기본적인 neural network로 주행이 어떻게 되는지” 보여 주는 사례로 소개함. 제공 노트에 기록된 절차는 무작위 모델 중 주행 성과가 좋은 모델을 선택하는 진화 방식. 상세 실험 설정과 재현 코드는 이 자료에 포함되지 않음.</p>
+          </aside>
+        </section>
+
+        <section class="chapter" id="editing" aria-labelledby="editing-title">
+          <header class="section-heading">
+            <span class="section-number" aria-hidden="true">02</span>
+            <div>
+              <span class="mini-label">Evidence / AI-assisted editing</span>
+              <h2 id="editing-title">AI 편집이 먼저 바꾼 것은 업로드의 양</h2>
+            </div>
+          </header>
+
+          <div class="prose">
+            <p class="lead">박종현의 출발점은 이미 녹화된 footage. 한 에피소드에 최소 20시간 이상 들던 편집을 AI에 맡기면서, 더 자주 발행할 수 있는 구조를 만들었다는 설명.</p>
+            <p>처음에는 사람이 편집한 영상과 AI 편집 영상을 섞어 올림. 조회수가 비슷하고 구독자들이 AI 편집인 줄 몰랐다는 반응을 보이자, 현재 sudoremove 채널의 편집은 <strong>99%를 AI에 맡긴다</strong>고 밝힘. 다만 조회수 증가의 원인을 AI의 편집 품질 향상으로 단정하지는 않음.</p>
+          </div>
+
+          <div class="media-pair">
+            <figure class="media">
+              <a aria-label="원본 영상 00:06:31 보기">
+                <img src="assets/ezyjidjo72y-ts-00-06-31.jpg" width="640" height="360" alt="I'll keep making better videos 문구가 적힌 SudoCut 발표 표지" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:06:31 ↗</a><strong>더 좋은 영상이라는 목표</strong></div>
+                발표 표지의 문구는 “I'll keep making better videos.” 시청자가 좋아하는 영상, 더 많은 조회수와 참여를 목표로 제시함.
+              </figcaption>
+            </figure>
+            <figure class="media">
+              <a aria-label="원본 영상 00:07:00 보기">
+                <img src="assets/ezyjidjo72y-ts-00-07-00.jpg" width="640" height="360" alt="푸른 배경에 스위치와 0과 1을 배치한 컴퓨터 계산 원리 애니메이션" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:07:00 ↗</a><strong>계산 원리를 설명하는 애니메이션</strong></div>
+                공동 창업자가 제작한 Kurzgesagt 스타일의 회로 설명 영상. 제작 과정은 뒤의 강의 학습·반복 피드백 사례로 연결됨.
+              </figcaption>
+            </figure>
+          </div>
+
+          <div class="metrics" aria-label="박종현이 발표한 편집 경험과 성과">
+            <div class="metric">
+              <strong>20<small>시간+</small></strong>
+              <span>기존 에피소드 편집 시간</span>
+              <p>부업 유튜버로서 한 편에 들던 최소 시간이라는 본인 설명.</p>
+            </div>
+            <div class="metric">
+              <strong>99<small>%</small></strong>
+              <span>현재 AI 편집 비중</span>
+              <p>sudoremove 채널 운영 방식에 관한 발표자의 진술.</p>
+            </div>
+            <div class="metric">
+              <strong>1.4<small>M</small></strong>
+              <span>발표 화면의 조회수</span>
+              <p>YouTube Studio 표시값. AI 편집의 순수한 효과를 뜻하지 않음.</p>
+            </div>
+          </div>
+
+          <figure class="media media-wide">
+            <a aria-label="원본 영상 00:09:03의 성과 화면 보기">
+              <img src="assets/ezyjidjo72y-ts-00-09-03.jpg" width="640" height="360" alt="Growth after AI editing 슬라이드에 표시된 YouTube Studio 조회수와 성장 그래프" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="caption-head"><a class="timestamp">00:09:03 ↗</a><strong>성장 그래프를 읽는 주의점</strong></div>
+              화면의 지표는 조회수 1.4M, 시청 시간 46.0K시간, 구독자 +8.5K, 추정 수익 $686.79. 빨간 화살표가 AI 편집 적용 시점을 가리킴. 박종현은 더 많이 업로드한 것이 총조회수 증가의 이유라고 설명함.
+            </figcaption>
+          </figure>
+
+          <div class="prose">
+            <h3>같은 원본, 서로 다른 채널</h3>
+            <p>운동선수 인플루언서의 라이브를 허락받아, 구독자 0명에서 시작한 팬 채널에 AI 편집본을 올린 실험도 소개됨. 발표 화면에서는 AI 편집본의 조회수가 사람 편집본보다 높았음.</p>
+            <p>박종현은 원래 채널 운영자 역시 전문 편집자가 아니었다는 조건을 짚으며, AI가 비전문 편집자보다 나은 결과를 낼 수 있는 상태로 해석함. 이후 원래 운영자의 요청으로 메인 채널에도 AI 편집본을 올렸고 조회수가 눈에 띄게 올랐다고 함. 다만 스스로 표본이 작다는 한계를 인정함.</p>
+          </div>
+
+          <div class="table-wrap" role="region" aria-label="같은 원본의 사람 편집과 AI 편집 비교 표" tabindex="0">
+            <table>
+              <caption>발표 사례 · 같은 원본 영상의 편집본 비교</caption>
+              <thead>
+                <tr><th scope="col">항목</th><th scope="col">Channel A · 사람 편집</th><th scope="col">Channel B · AI 편집</th></tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">화면상 구독자</th><td class="numeric">12K</td><td class="numeric">213</td></tr>
+                <tr><th scope="row">조회수</th><td class="numeric">33,138회</td><td class="numeric">66,338회</td></tr>
+                <tr><th scope="row">비교 기간</th><td colspan="2">9월 18일–10월 12일</td></tr>
+                <tr><th scope="row">해석에 필요한 조건</th><td>원본 채널 운영자는 비전문 편집자</td><td>구독자 0명 팬 채널에서 시작했다는 설명</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="table-foot">자료: 00:10:02 발표 슬라이드와 발언. 채널 조건과 노출이 통제된 실험은 아니므로 편집 방식의 인과효과로 일반화할 수 없음.</p>
+
+          <figure class="media media-wide">
+            <a aria-label="원본 영상 00:10:02의 채널 비교 보기">
+              <img src="assets/ezyjidjo72y-ts-00-10-02.jpg" width="640" height="360" alt="Same footage. Can AI beat a human? 제목 아래 AI edit 66,338회와 Human edit 33,138회를 비교한 슬라이드" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="caption-head"><a class="timestamp">00:10:02 ↗</a><strong>조회수 차이는 관찰값, 우열은 해석</strong></div>
+              같은 원본을 썼다는 점은 비교의 단서. 채널 나이, 업로드 수, 노출 조건 등은 제공 노트에 공개되지 않아 전문 편집자 전반과의 비교로 확대하기 어려움.
+            </figcaption>
+          </figure>
+
+          <div class="prose">
+            <h3>롱폼에서 쇼츠, 모션 그래픽과 더빙까지</h3>
+            <p>SudoCut의 작업 흐름은 <strong>2~3시간 라이브 → 1~2시간 편집본 → 하이라이트 쇼츠</strong>로 이어짐. 처음에는 좋은 구간을 골라내는 데 집중했고, 이후 LLM이 클립 내용에 맞는 모션 그래픽 코드를 쓰도록 확장함.</p>
+            <p>예시에서는 한국어 라이브를 영어로 자동 더빙함. 최승준은 원래 목소리와 많이 다르다고 반응했고, 박종현은 한국어 버전도 가능하다고 답함. 모션 그래픽을 결합한 시도는 녹화 시점 기준 약 2주 전부터 진행했다고 설명함.</p>
+          </div>
+
+          <div class="media-pair">
+            <figure class="media">
+              <a aria-label="원본 영상 00:12:28 보기">
+                <img src="assets/ezyjidjo72y-ts-00-12-28.jpg" width="640" height="360" alt="Find the good moments 문구와 세 개의 세로형 하이라이트 쇼츠" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:12:28 ↗</a><strong>첫 단계는 좋은 구간 찾기</strong></div>
+                롱폼에서 시청자가 좋아할 순간을 골라 쇼츠로 만드는 클리핑. 박종현은 이 기능을 SudoCut 서비스로 출시했다고 밝힘.
+              </figcaption>
+            </figure>
+            <figure class="media">
+              <a aria-label="원본 영상 00:13:50 보기">
+                <img src="assets/ezyjidjo72y-ts-00-13-50.jpg" width="640" height="360" alt="창업자 벤 다이어그램, 부동산 검색, 추론 토큰 설명을 모션 그래픽으로 덧붙인 영어 더빙 쇼츠" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:13:50 ↗</a><strong>발언을 시각적 설명으로 증강</strong></div>
+                ‘One in Five Uber Drivers Is a Founder’, ‘Find Short-Term Rental Areas with AI’, ‘Great Content? Think Reasoning Tokens’ 예시. 클립의 의미에 맞는 그래픽을 코드로 생성함.
+              </figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <section class="chapter" id="curation" aria-labelledby="curation-title">
+          <header class="section-heading">
+            <span class="section-number" aria-hidden="true">03</span>
+            <div>
+              <span class="mini-label">The evaluation bottleneck</span>
+              <h2 id="curation-title">잘 만드는 도구가 많아질수록, 고르기가 어려워진다</h2>
+            </div>
+          </header>
+
+          <div class="prose">
+            <p class="lead">발표의 모델·라이브러리 비교는 “어느 하나가 압도적”이라는 결론으로 끝나지 않음. 여러 결과가 준수해진 뒤에는 무엇이 정말 좋은지 판단하는 일이 남음.</p>
+            <p>박종현은 Opus 5.5부터 Video as Code가 본격적으로 떠올랐다고 평가함. 같은 클립으로 Opus 5.5와 GPT-6 계열을 비교한 뒤에는 “요즘 모델은 다 나쁘지 않다”는 취지로 정리함. 이는 발표자의 정성 평가이며, 정량 벤치마크 결과는 아님.</p>
+          </div>
+
+          <div class="media-pair">
+            <figure class="media">
+              <a aria-label="원본 영상 00:14:55의 모델 비교 보기">
+                <img src="assets/ezyjidjo72y-ts-00-14-55.jpg" width="640" height="360" alt="Opus 5.5와 GPT-6.1 Sol, GPT-6 Astra가 만든 네 개의 모션 그래픽 비교 화면" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:14:55 ↗</a><strong>모델을 바꾼 비교</strong></div>
+                화면 표기는 Opus 5.5(medium), Opus 5.5(xhigh), GPT-6.1 Sol(medium), GPT-6 Astra(medium). 모두 ManimGX를 사용한 결과.
+              </figcaption>
+            </figure>
+            <figure class="media">
+              <a aria-label="원본 영상 00:15:56의 라이브러리 비교 보기">
+                <img src="assets/ezyjidjo72y-ts-00-15-56.jpg" width="640" height="360" alt="ManimGX, Canvas, Remotion, HyperFrames로 제작한 동일 클립의 모션 그래픽 비교" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:15:56 ↗</a><strong>도구를 바꾼 비교</strong></div>
+                모델은 모두 Opus 5.5 · medium. ManimGX, Canvas, Remotion, HyperFrames를 비교하고, 전용 라이브러리 없이 vanilla 코드로 만들어도 나쁘지 않다고 평가함.
+              </figcaption>
+            </figure>
+          </div>
+
+          <div class="prose">
+            <h3>강의를 참고한 생성, 사람의 피드백으로 완성</h3>
+            <p>앞서 본 Kurzgesagt 스타일 영상의 제작자는 공동 창업자 양지호. 유료 강의를 구매해 Codex에게 모션 그래픽 제작법을 공부하도록 시킨 뒤, 결과물을 보며 여러 차례 피드백을 반복했다고 설명함.</p>
+            <p>v3에서 v4로 넘어가는 단계에는 ‘craft pass’라는 이름을 붙임. 별도 자동 평가 기법을 가리키는 용어가 아니라, 마음에 들지 않는 부분을 고친 개발 과정의 별칭. <strong>평가는 사람이 했음.</strong></p>
+          </div>
+
+          <div class="media-pair">
+            <figure class="media">
+              <a aria-label="원본 영상 00:16:39 보기">
+                <img src="assets/ezyjidjo72y-ts-00-16-39.jpg" width="640" height="360" alt="Open Codex. Tell it to study 문구와 모션 그래픽 강의 화면이 포함된 제작 과정 슬라이드" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:16:39 ↗</a><strong>제작법을 공부시킨 뒤 반복</strong></div>
+                Codex 화면과 ‘Motion Graphics with Kurzgesagt – Part 1’ 강의 화면. 강의 참고 후 영상 생성과 피드백을 반복했다는 제작 설명.
+              </figcaption>
+            </figure>
+            <figure class="media">
+              <a aria-label="원본 영상 00:17:14 보기">
+                <img src="assets/ezyjidjo72y-ts-00-17-14.jpg" width="640" height="360" alt="곰 캐릭터 애니메이션의 v3와 v4 craft pass를 비교한 슬라이드" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:17:14 ↗</a><strong>마지막 완성도는 사람이 평가</strong></div>
+                곰 캐릭터가 등장하는 v3와 v4(craft pass). 결과를 다듬는 판단은 인간 제작자가 담당함.
+              </figcaption>
+            </figure>
+          </div>
+
+          <blockquote class="quote">
+            <p>“But is it good content?”</p>
+            <cite>박종현의 발표 슬라이드 · 00:18:30</cite>
+          </blockquote>
+
+          <div class="prose">
+            <p>박종현은 초기 AI 프런트엔드 결과물을 떠올림. 처음에는 불가능하던 일이 가능해졌다는 이유로 놀랐지만, 시간이 지나고 보면 조악한 결과물이기도 했다는 것. 영상도 지금 같은 단계를 지나고 있을 수 있으므로, <strong>생성이 가능하다는 사실과 콘텐츠가 좋다는 판단을 분리</strong>해야 한다고 봄.</p>
+            <p>이 질문을 실제 시청자에게 던지기 위해 Vtuber·정치·스포츠·테크 리뷰 등 여러 카테고리의 채널을 자동 운영했다고 설명함. 원본은 허락받았거나 사용이 허용된 것만 활용했다고 밝힘.</p>
+          </div>
+
+          <div class="media-pair">
+            <figure class="media">
+              <a aria-label="원본 영상 00:18:30 보기">
+                <img src="assets/ezyjidjo72y-ts-00-18-30.jpg" width="640" height="360" alt="But is it good content? 한 문장만 적힌 발표 슬라이드" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:18:30 ↗</a><strong>기술 시연에서 콘텐츠 평가로</strong></div>
+                “안 되던 게 돼서 신기했을 뿐”인 단계가 아닌지 되묻는 장면. 제작 가능성만으로 좋은 콘텐츠임을 보장할 수 없다는 문제 제기.
+              </figcaption>
+            </figure>
+            <figure class="media">
+              <a aria-label="원본 영상 00:21:37 보기">
+                <img src="assets/ezyjidjo72y-ts-00-21-37.jpg" width="640" height="360" alt="Vtuber, Politics, Sports의 성과와 Tech Review의 빨간 X가 표시된 카테고리별 결과 슬라이드" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:21:37 ↗</a><strong>카테고리에 따라 달랐던 반응</strong></div>
+                Vtuber 22.7K회·구독자 +70, Politics 358.8K회·+990, Sports 66,990회. Tech Review에는 빨간 X가 표시됨.
+              </figcaption>
+            </figure>
+          </div>
+
+          <aside class="callout">
+            <span class="mini-label">Evidence limit / 해석의 경계</span>
+            <h3>AI를 알아채지 못했다는 것과 좋아했다는 것은 다른 지표</h3>
+            <p>박종현은 약 한 달의 실험에서 <strong>약 20%의 카테고리</strong>만 시청자들이 정말 좋아했다고 설명함. 1,000개 이상의 댓글 중 “AI로 한 건가요?”라는 댓글은 없었다고 덧붙임. 그러나 카테고리의 전체 수, ‘좋아함’의 기준, 댓글 분석 절차는 제공 노트에 없음. 시청자가 AI 사용을 인지했는지 자체를 측정한 실험도 아님.</p>
+          </aside>
+
+          <figure class="media media-wide">
+            <a aria-label="원본 영상 00:23:17 보기">
+              <img src="assets/ezyjidjo72y-ts-00-23-17.jpg" width="640" height="360" alt="I made a few channels. 100% automated 문구와 여러 카테고리의 채널 섬네일" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="caption-head"><a class="timestamp">00:23:17 ↗</a><strong>자동화의 공통 구조, 서로 다른 편집 기준</strong></div>
+              현지 청중은 구현 방식과 카테고리별 기준을 질문함. 박종현은 자신의 편집 스타일을 AI가 따르게 했으며 fine-tuning은 아직 하지 않았다고 답함. 다만 fine-tuning이 필요하다고 느낀 지점은 있었고, 편집 기준과 모션 그래픽 스타일은 카테고리마다 달라야 한다고 봄.
+            </figcaption>
+          </figure>
+
+          <div class="prose">
+            <p>이 사례에서 가져갈 판단은 도구 하나의 승패보다 <strong>카테고리별 평가 기준의 필요성</strong>. 박종현은 좋은지 확신하기 어려운 결과를 시장에 공개하고, 시청자 반응을 본 뒤 해석하는 방식을 택함. 최승준은 이를 그로스 해킹과 비슷한 접근으로 설명함.</p>
+          </div>
+        </section>
+
+        <section class="chapter" id="misreading" aria-labelledby="misreading-title">
+          <header class="section-heading">
+            <span class="section-number" aria-hidden="true">04</span>
+            <div>
+              <span class="mini-label">Experiment / Generative misreading</span>
+              <h2 id="misreading-title">잘못 읽기를 거듭하면, 이야기가 생길까</h2>
+            </div>
+          </header>
+
+          <div class="prose">
+            <p class="lead">최승준의 실험은 간단한 bytebeat 식에서 출발함. 코드를 소리로 읽고, 소리를 이미지로, 이미지를 이모지로 읽은 뒤, 그 이름들을 이야기와 게임으로 이어 붙임.</p>
+            <p>작업의 배경은 PROTOROOM의 ‘0.000001GB Matter Matters’. 후니다 킴·김승범으로 구성된 PROTOROOM은 bytebeat 코드를 실제 장치로 연주하는 공연·전시를 진행해 왔다고 소개됨. 최승준은 신승백 작가와 10여 년 이어 온 모임의 맥락에서, 동묘의 ‘백남준을 기억하는 집’에 초청 작가로 참여함. 올해 초 모임의 화두는 ‘Uneven Futures’였음.</p>
+            <p>맡은 역할은 원래 작업을 다르게 읽는 것. misalignment나 마술의 misdirection에 빗대어, 생성형으로 잘못 읽는다는 것이 무엇인지 탐색함.</p>
+          </div>
+
+          <figure class="media media-wide">
+            <a aria-label="원본 영상 00:27:45의 생성형 오독 시작 화면 보기">
+              <img src="assets/ezyjidjo72y-ts-00-27-45.jpg" width="640" height="360" alt="생성형 오독이라는 손글씨 제목 아래 재생 버튼과 bytebeat 식이 있는 화면" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="caption-head"><a class="timestamp">00:27:45 ↗</a><strong>짧은 식에서 시작한 긴 오독</strong></div>
+              화면의 기본 식은 <code>(t * 8) | (t &gt;&gt; 8)</code>. 그 직전에는 발표 덱의 넓은 행간과 크림색을 보고 모델의 디자인 스타일을 추측하는 대화가 이어짐.
+            </figcaption>
+          </figure>
+
+          <div class="media-pair">
+            <figure class="media">
+              <a aria-label="원본 영상 00:28:04 보기">
+                <img src="assets/ezyjidjo72y-ts-00-28-04.jpg" width="640" height="360" alt="PROTOROOM의 0.000001GB Matter Matters 2025 작품 페이지와 전시 장치 사진" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:28:04 ↗</a><strong>코드가 실제 장치에서 연주될 때</strong></div>
+                PROTOROOM 작품 페이지에 표시된 ‘0.000001GB Matter Matters (2025)’. 소리의 생성과 물리적 연주를 잇는 작업을 배경으로 소개함.
+              </figcaption>
+            </figure>
+            <figure class="media">
+              <a aria-label="원본 영상 00:28:39 보기">
+                <img src="assets/ezyjidjo72y-ts-00-28-39.jpg" width="640" height="360" alt="Matter Matters 탐색을 기다리며와 매터 매터스 탐색적 작곡의 퍼포먼스 기록 페이지" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:28:39 ↗</a><strong>퍼포먼스의 맥락</strong></div>
+                화면에는 2025년 6월 17일 서울시립미술관 〈메가트론 랩소디〉 연계 공연 ‘Matter Matters: 탐색을 기다리며’와 2025년 10월 25일 ‘매터 매터스: 탐색적 작곡’ 항목이 보임.
+              </figcaption>
+            </figure>
+          </div>
+
+          <aside class="tech-note">
+            <span class="mini-label">Technical note / Bytebeat</span>
+            <h3>시간에 따른 연산을 소리로 읽기</h3>
+            <div class="code-display"><code>(t * 8) | (t &gt;&gt; 8)</code></div>
+            <p>최승준은 Viznut이 발견한 코드로 소개함. 시간에 따라 변하는 <code>t</code>의 계산 결과를 소리로 바꾸면 음악처럼 들린다는 설명. <code>*</code>는 곱셈, <code>|</code>는 비트 OR, <code>&gt;&gt;</code>는 비트 우측 시프트를 뜻함.</p>
+            <p><strong>재현 조건의 한계:</strong> 제공 노트에는 샘플레이트, 출력값의 정수 폭, 값의 범위를 처리하는 규칙 등이 기록되지 않음. 식만으로 원본과 동일한 음원을 재현했다고 볼 수는 없음.</p>
+          </aside>
+
+          <div class="prose">
+            <h3>첫 단계: 소리를 잘 읽으려는 탐색</h3>
+            <p>코드의 상수와 연산자 조합을 진화 알고리즘으로 탐색하고, 그리드의 셀을 눌러 즉시 소리를 듣는 도구를 만듦. 낮은 음에서는 드럼 같은 pulse가 나오는 등 소리 공간을 빠르게 훑을 수 있었지만, 최승준은 <strong>사람이 고생해서 만든 결과보다 품질이 훨씬 낮았다</strong>고 평가함.</p>
+            <p>작가들에게 받은 12개 샘플 중 3번과 9번이 특히 재미있었다고 회상함. 여러 채널을 동시에 연주하면 다양한 악기처럼 들렸고, UMAP으로 latent를 살펴보는 지도도 보여 줌. 이 부분은 별도로 코딩하지 않았다고 설명함. 여기까지는 원래 작업을 ‘잘 읽기’ 위한 과정이었음.</p>
+          </div>
+
+          <div class="media-pair">
+            <figure class="media">
+              <a aria-label="원본 영상 00:31:07 보기">
+                <img src="assets/ezyjidjo72y-ts-00-31-07.jpg" width="640" height="360" alt="변수 페이지의 셀 그리드와 n1 n2 상수 조절 패널" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:31:07 ↗</a><strong>‘변수’ · 소리 공간 탐색</strong></div>
+                상수와 연산자 조합을 자동 탐색하고 셀을 눌러 재생하는 구조. 탐색 속도와 결과의 음악적 품질은 별개였다는 평가.
+              </figcaption>
+            </figure>
+            <figure class="media">
+              <a aria-label="원본 영상 00:31:11 보기">
+                <img src="assets/ezyjidjo72y-ts-00-31-11.jpg" width="640" height="360" alt="아틀라스 페이지의 UMAP 2차원 점 지도와 오른쪽 파형 막대" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:31:11 ↗</a><strong>‘아틀라스’ · 소리의 분포 보기</strong></div>
+                UMAP으로 latent를 살펴본 2차원 지도. 임베딩의 구성과 UMAP 설정 등 구체적 재현 조건은 제공 노트에 없음.
+              </figcaption>
+            </figure>
+          </div>
+
+          <div class="prose">
+            <h3>두 번째 단계: 닮은 그림에 이름 붙이기</h3>
+            <p>본격적인 오독은 소리를 이미지로 바꾸면서 시작됨. 이미지의 구간별 픽셀과 비슷한 이모지를 회귀 방식으로 찾자, 원래 아무 관계 없던 패턴에 곰·주판·별똥별 같은 이름이 붙음.</p>
+            <p>구름에서 얼굴을 찾는 pareidolia와 닮은 과정. 최승준은 이름이 임의적이어도 이름을 알면 조작할 수 있다는 기호학적 관점을 제시하며, 변수 이름과 어슐러 K. 르 귄의 『어스시 연대기』를 언급함. 박종현은 이모지가 결국 소리 구간의 별칭이 된 것으로 정리함.</p>
+          </div>
+
+          <figure class="media media-wide">
+            <a aria-label="원본 영상 00:34:16의 소리 이미지 이모지 변환 보기">
+              <img src="assets/ezyjidjo72y-ts-00-34-16.jpg" width="640" height="360" alt="bytebeat 식 아래 소리의 이미지 패턴, 이모지 격자, 수학적 매듭 궤적이 나란히 배치된 화면" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="caption-head"><a class="timestamp">00:34:16 ↗</a><strong>소리 → 이미지 → 이모지, 그리고 매듭</strong></div>
+              왼쪽은 소리를 바꾼 이미지 패턴, 가운데는 닮은 이모지 격자, 오른쪽은 수학적 매듭 궤적. 화면의 식은 <code>(t * (t &gt;&gt; (50 / 10) | t &gt;&gt; (80 / 10))) &gt;&gt; (t &gt;&gt; ((80 / 10) * 2))</code>.
+            </figcaption>
+          </figure>
+
+          <div role="group" aria-label="생성형 오독의 변환 순서">
+            <span class="mini-label">The misreading chain / 발언 기반 재구성</span>
+            <ol class="chain">
+              <li><strong>코드</strong><span>bytebeat 식과 변수</span></li>
+              <li><strong>소리</strong><span>연산 결과의 재생</span></li>
+              <li><strong>이미지</strong><span>소리를 시각 패턴으로 변환</span></li>
+              <li><strong>이모지</strong><span>닮은 픽셀에 별칭 부여</span></li>
+              <li><strong>합성 규칙</strong><span>별칭 사이의 관계 생성</span></li>
+              <li><strong>프롬프트</strong><span>규칙을 템플릿에 투입</span></li>
+              <li><strong>이야기 형식</strong><span>형식 선택까지 모델에 위임</span></li>
+              <li><strong>게임</strong><span>「알 하나에 별 하나」</span></li>
+            </ol>
+          </div>
+
+          <div class="prose">
+            <h3>세 번째 단계: 별칭의 조합이 놀이가 되기까지</h3>
+            <p>Little Alchemy의 합성 방식을 참고해 LLM이 이모지 사이의 규칙을 만들도록 함. ‘주판 + 플로피디스크 → 계산하는 기계’, ‘건반 + 곰 → 노래’, ‘별똥별 + 사과 → 꽃밭’ 같은 관계가 생김.</p>
+            <p>그 규칙을 템플릿에 넣어 프롬프트 자체를 생성하고, 결과물의 형식 선택까지 모델에게 맡김. 나온 것은 픽셀 아트 게임 <strong>「알 하나에 별 하나」</strong>. 최승준도 퍼포먼스 현장에서 플레이 방법을 모른 채 추측하며 진행했으며, 주판알로 무언가를 해서 창에 불을 모두 켜면 이야기가 끝나는 형식이었다고 설명함.</p>
+          </div>
+
+          <div class="media-pair">
+            <figure class="media">
+              <a aria-label="원본 영상 00:37:14 보기">
+                <img src="assets/ezyjidjo72y-ts-00-37-14.jpg" width="640" height="360" alt="이야기로 이어지는 합성 규칙 패널에 주판과 플로피디스크 등을 결합하는 규칙이 표시된 화면" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:37:14 ↗</a><strong>이모지 사이에 관계 만들기</strong></div>
+                Little Alchemy에서 아이디어를 얻은 합성 규칙. 앞선 관련 실험으로 신승백 작가가 YAMNet으로 소리를 분류하고 거꾸로 연주한 작업도 소개함.
+              </figcaption>
+            </figure>
+            <figure class="media">
+              <a aria-label="원본 영상 00:39:52 보기">
+                <img src="assets/ezyjidjo72y-ts-00-39-52.jpg" width="640" height="360" alt="밤하늘 픽셀 아트 배경에 알 하나에 별 하나, 집 없는 문어의 밤, 톡 눌러 시작 문구가 있는 게임 화면" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:39:52 ↗</a><strong>코드에서 멀리 떠나온 게임</strong></div>
+                파일명은 <code>al-hana-byeol-hana.html</code>, 부제는 ‘집 없는 문어의 밤’. 왼쪽 위 작은 글씨는 ‘이름 없는 악보’로 읽히지만 360p 화면이라 판독이 불확실함.
+              </figcaption>
+            </figure>
+          </div>
+
+          <aside class="tech-note">
+            <h3>평가 문제 · 소리를 어떻게 판단할 것인가</h3>
+            <p>대화에서는 모델이 소리를 직접 듣는 대신 spectrogram을 이미지로 보고 회귀·최적화하는 가능성이 거론됨. 이는 해당 작업에서 제시된 접근과 전망이며, 모든 모델의 오디오 능력에 대한 일반적 결론은 아님.</p>
+            <p>YAMNet 사례의 ‘약 20만 개 오디오 샘플’ 역시 출연자가 소개한 수치. 제공 노트만으로 데이터셋 구성이나 분류 체계를 확인할 수 없음. 최승준은 소리에 대한 취향을 모델이 내재화하면 탐색도 나아질 수 있다고 봄.</p>
+          </aside>
+
+          <figure class="media media-wide">
+            <a aria-label="원본 영상 00:41:20 보기">
+              <img src="assets/ezyjidjo72y-ts-00-41-20.jpg" width="640" height="360" alt="합성 규칙과 소리, 놀이 섹션에 bytebeat 상수와 식, 해석을 정리한 문서 화면" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="caption-head"><a class="timestamp">00:41:20 ↗</a><strong>오독의 경로를 문서로 남기기</strong></div>
+              <code>const a = 50, b = 80</code>, bytebeat 식, 출력 해석과 놀이가 한 문서에 정리됨. 최승준은 이 작업을 John Cage·백남준, 더 거슬러 Mozart까지 이어지는 우연과 무작위성의 해석이라는 계보에 놓음.
+            </figcaption>
+          </figure>
+
+          <div class="prose">
+            <p>여기서 제시된 가설은 조건부임. <strong>프롬프트를 대량으로 만들고 이야기의 품질을 측정할 수 있다면</strong> 대량 생산한 결과 중 좋은 것을 찾을 수 있다는 것. 실험은 생성 경로를 보여 주지만, 이야기의 품질을 자동으로 판정하는 문제가 해결됐음을 보여 주지는 않음.</p>
+          </div>
+        </section>
+
+        <section class="chapter" id="creativity" aria-labelledby="creativity-title">
+          <header class="section-heading">
+            <span class="section-number" aria-hidden="true">05</span>
+            <div>
+              <span class="mini-label">Discussion / Creativity &amp; explainers</span>
+              <h2 id="creativity-title">분포의 바깥과, 질문을 추천하는 사람</h2>
+            </div>
+          </header>
+
+          <div class="prose">
+            <p class="lead">생성형 오독은 모델이 기존의 그럴듯한 답에서 얼마나 멀리 갈 수 있는지 묻는 실험. 두 사람은 창의성을 학습 분포의 안과 밖이라는 비유로 논의함.</p>
+            <p>박종현은 LLM과 diffusion 모델의 결과가 비슷해지는 현상을 “쇠 맛”으로 표현함. 인간 작품의 분포에서 벗어나면서도 얼토당토않지 않은 결과가 창의성의 한 조건이라면, 의도적인 오독이 실마리가 될 수 있다고 봄.</p>
+            <p>최승준은 지난 회차의 <em>convex hull of ideas</em>를 다시 꺼냄. 서로 멀리 떨어진 분야를 연결하는 것만으로도 예상하지 못한 결과가 나올 수 있다는 관점. 가까이 비어 있는 영역을 메우는 이득이 있고, 모델 역량과 탐색 공간이 커지면 새 빈틈이 생기며 영토가 확장될 수 있다고 봄.</p>
+          </div>
+
+          <div class="split-note">
+            <section aria-labelledby="interpolation-title">
+              <span class="mini-label">Interpolation</span>
+              <h3 id="interpolation-title">익숙한 요소의 새로운 조합</h3>
+              <p>박종현이 든 DALL·E 2의 ‘말 탄 우주비행사’ 예시. 아는 요소 사이의 빈자리를 찾는 창의성의 첫 단계로 설명함. 최승준은 이런 조합 안에도 의외성이 충분히 존재할 수 있다고 봄.</p>
+            </section>
+            <section aria-labelledby="ood-title">
+              <span class="mini-label">Out of distribution</span>
+              <h3 id="ood-title">낯설지만 볼 만한 결과</h3>
+              <p>본 적 없는 요소로 의미 있는 결과를 만드는 다음 단계. 다만 낯설다는 것만으로 충분하지 않으며, 볼 만한 결과가 아니라면 무작위 노이즈에 머물 수 있다는 박종현의 구분.</p>
+            </section>
+          </div>
+
+          <p class="prose media-note">개념상 주의: ‘분포’와 ‘볼록 껍질’은 이 대화의 창의성 논의를 요약한 표현. 창의성을 정량 측정하거나 모델의 학습 분포 이탈을 검증한 결과는 아님.</p>
+
+          <div class="prose">
+            <h3>수학을 둘러싼 상반된 정서</h3>
+            <p>최승준은 AI가 수학에 주는 충격을 10년 전 바둑의 경험과 연결함. Terence Tao의 대담을 소개하며 수학이 낭만적인 시절에서 산업혁명의 시기로 이동해야 한다는 취지의 발언과 그 안의 씁쓸함을 전함. 정서에 대한 평가는 최승준의 해석임.</p>
+            <p>반면 3Blue1Brown의 Grant Sanderson은 수학에 들어가기 좋은 시기라는 낙관을 제시한 것으로 소개됨. 모델이 발전해도 탐구할 대상과 알고 싶어 하는 사람은 남는다는 관점. 최승준은 이 영상을 AI 요약으로 접했다고 밝혔으며, 수학자들의 상황에 먼저 공감해야 한다는 비판도 있었다고 전함.</p>
+          </div>
+
+          <div class="media-pair">
+            <figure class="media">
+              <a aria-label="원본 영상 00:47:06 보기">
+                <img src="assets/ezyjidjo72y-ts-00-47-06.jpg" width="640" height="360" alt="Numberphile의 Terence Tao Talks to Numberphile About AI 영상이 재생되는 화면" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:47:06 ↗</a><strong>수학의 일하는 방식이 바뀔 때</strong></div>
+                Numberphile 대담 화면. 이 글의 내용은 해당 대담을 직접 검증한 것이 아니라, 회차에서 최승준이 소개한 발언과 해석에 근거함.
+              </figcaption>
+            </figure>
+            <figure class="media">
+              <a aria-label="원본 영상 00:48:22 보기">
+                <img src="assets/ezyjidjo72y-ts-00-48-22.jpg" width="640" height="360" alt="3Blue1Brown의 There's never been a better time to go into math 영상 화면" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:48:22 ↗</a><strong>설명자에게 열린 가능성</strong></div>
+                Grant Sanderson의 영상. 화면 자막은 “It feels like the whole math world is on fire”. 낙관적 메시지에 관한 소개는 AI 요약을 거친 최승준의 설명임.
+              </figcaption>
+            </figure>
+          </div>
+
+          <div class="prose">
+            <h3>설명자의 역할은 ‘무엇을 궁금해할지’로 이동할까</h3>
+            <p>Sina의 꿈은 “Fourier transform이 궁금해”라고 말하면 그 자리에서 시각 자료가 생성되는 인터랙티브 학습 플랫폼. Sina는 핵심 개념을 만드는 사람이 알아야 한다고 보지만, 박종현은 그 필요성에 동의하지 않음.</p>
+            <p>그렇다고 박종현이 설명자의 소멸을 전망한 것은 아님. 사람들은 자신이 무엇을 궁금해하는지도 모르는 경우가 많으므로, <strong>“이 개념이 가치 있으니 봐 보라”고 권하는 추천자의 역할</strong>이 남는다고 봄.</p>
+            <p>노정석이 지난 회차에서 제시한 “가치는 희소한 곳으로 간다”는 논지도 이어짐. 박종현은 AI가 판단하기 어려운 곳에 희소성이 남을 가능성이 높다고 봄. AI가 판단할 수 있는 것이 늘면 비슷한 결과도 많아지고, 다시 그 바깥이 사랑받을 것이라는 전망.</p>
+          </div>
+        </section>
+
+        <section class="chapter" id="original" aria-labelledby="original-title">
+          <header class="section-heading">
+            <span class="section-number" aria-hidden="true">06</span>
+            <div>
+              <span class="mini-label">The value of participation</span>
+              <h2 id="original-title">생성할 수 있어도, 남겨야 하는 원본</h2>
+            </div>
+          </header>
+
+          <div class="prose">
+            <p class="lead">가장 구체적인 경계는 유치원 원가 영상에서 드러남. 음악과 애니메이션에는 AI를 활용했지만, 아이들이 그린 그림은 그대로 남김.</p>
+            <p>최승준은 피아노 녹음만 있던 원가 ‘놀이는 어린이의 삶이다’를 영상으로 제작함. 악보에서 음악을 추출하는 도구를 만들어 MP3를 뽑았고, 그 결과가 SoundFont·샘플링보다 품질이 낮아 Suno로 마무리했다고 설명함.</p>
+            <p>손글씨 애니메이션은 Opus가 제작함. 이전 폰트 작업에서 모델이 한글 획을 잘 이해한다는 경험을 바탕으로 시도했으며, 목적은 악보에 맞춰 타이밍을 정확히 조정하는 것. 아이들의 글씨를 스캔해 획으로 바꾸는 방법도 있었지만 훨씬 많은 노력이 필요했다고 함.</p>
+          </div>
+
+          <div class="media-pair">
+            <figure class="media">
+              <a aria-label="원본 영상 00:54:38 보기">
+                <img src="assets/ezyjidjo72y-ts-00-54-38.jpg" width="640" height="360" alt="놀이는 어린이의 삶이다 원가의 코드와 가사가 적힌 오선보 PDF" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:54:38 ↗</a><strong>원가는 악보에서 출발</strong></div>
+                최승준의 본업인 유치원 작업. 원가의 악보를 바탕으로 음악을 추출하는 도구를 직접 제작함.
+              </figcaption>
+            </figure>
+            <figure class="media">
+              <a aria-label="원본 영상 00:55:38 보기">
+                <img src="assets/ezyjidjo72y-ts-00-55-38.jpg" width="640" height="360" alt="흰 화면 위에 우리는 서로 다른이라는 문장이 손글씨처럼 나타나는 애니메이션" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:55:38 ↗</a><strong>타이밍을 위한 손글씨 생성</strong></div>
+                손글씨와 애니메이션은 Opus가 제작하고 그림은 어린이들이 그림. 어린이가 쓴 듯하다는 반응에 최승준은 만 3세는 글을 못 쓴다며 웃음.
+              </figcaption>
+            </figure>
+          </div>
+
+          <blockquote class="quote">
+            <p>“그건 안 해야 되는 것.”</p>
+            <cite>최승준 · 아이들의 그림까지 생성하는 선택에 대해, 00:58:25</cite>
+          </blockquote>
+
+          <div class="prose">
+            <p>그림도 얼마든지 생성할 수 있었지만, 최승준은 그 부분을 대체해서는 안 된다고 판단함. 주변에서도 그림까지 생성했다면 무슨 가치가 있겠느냐는 반응이 있었다고 함. 박종현 역시 <strong>자기 그림이 들어갔다는 사실만으로 아이들에게 가치 있는 작품</strong>이 된다고 동의함.</p>
+            <p>이때의 품질은 화면만으로 평가되지 않음. 아이가 참여했고 가족과 친구가 그 참여를 알아본다는 관계가 작품의 일부. 최승준은 이런 영역에는 마찰과 느림이 필요하며, 같은 방식으로 규모를 키우기 어렵다고 봄.</p>
+          </div>
+
+          <figure class="media media-wide">
+            <a aria-label="원본 영상 00:58:25의 원가 완성 화면 보기">
+              <img src="assets/ezyjidjo72y-ts-00-58-25.jpg" width="640" height="360" alt="놀이는 어린이의 삶이다 가사 전체가 색깔 손글씨로 배치된 원가 영상의 엔딩" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="caption-head"><a class="timestamp">00:58:25 ↗</a><strong>작품의 의미가 완성되는 지점</strong></div>
+              박종현은 기본기를 갖춘 영상에 아이들의 그림이 더해져 학부모와 친구 모두가 즐길 콘텐츠가 된 것으로 해석함. 원본의 참여 사실이 가치의 핵심으로 드러나는 장면.
+            </figcaption>
+          </figure>
+
+          <aside class="boundary" aria-labelledby="boundary-title">
+            <span class="mini-label">A practical boundary / 사례에서 읽은 경계</span>
+            <h3 id="boundary-title">무엇을 위임하고, 무엇을 붙잡을 것인가</h3>
+            <div class="boundary-grid">
+              <div>
+                <span class="mini-label">이 사례에서 위임한 부분</span>
+                <p>악보 처리 도구, 음악 마무리, 손글씨 애니메이션과 타이밍 조정. <strong>표현을 구현하는 작업</strong>에 AI를 활용함.</p>
+              </div>
+              <div>
+                <span class="mini-label">이 사례에서 남긴 부분</span>
+                <p>아이들이 직접 그린 그림. <strong>누가 참여했는가</strong>가 의미를 만드는 재료를 보존함.</p>
+              </div>
+            </div>
+          </aside>
+
+          <div class="prose">
+            <h3>도구를 덜 쓰게 되어도, 결정하는 시간은 남는다</h3>
+            <p>최승준은 음악을 다루는 트래커형 도구와 조합형 한글 폰트도 보여 줌. 여름부터 작업한 폰트는 11,172자를 공간에 맞게 배치할 수 있게 됐지만, 그 결과가 정말 좋은 폰트인지는 여전히 의문이라고 평가함.</p>
+            <p>최근 영상과 디자인 작업에서는 영상 편집 프로그램이나 벡터 편집 프로그램을 한 번도 켜지 않고, 사진 분할과 레이아웃까지 Claude Code 앱에서 처리했다고 함. 그러나 <strong>총작업 시간은 줄지 않았음.</strong> 어느 자리에 어떤 사진과 문구를 놓을지 결정하는 단계가 계속 남았기 때문.</p>
+          </div>
+
+          <div class="media-pair">
+            <figure class="media">
+              <a aria-label="원본 영상 00:58:40 보기">
+                <img src="assets/ezyjidjo72y-ts-00-58-40.jpg" width="640" height="360" alt="놀이는 어린이의 삶이다 제목 아래 음표 피아노롤과 파트별 슬라이더가 있는 트래커 도구" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:58:40 ↗</a><strong>음악을 다루는 도구도 직접 제작</strong></div>
+                D/C# 표기, 파트별 슬라이더와 피아노롤이 보이는 트래커형 편집 화면. 악보 기반 음원 추출 과정을 보여 줌.
+              </figcaption>
+            </figure>
+            <figure class="media">
+              <a aria-label="원본 영상 00:59:24 보기">
+                <img src="assets/ezyjidjo72y-ts-00-59-24.jpg" width="640" height="360" alt="사이 폰트 도구에서 큰 한 글자와 형태 사이의 균형 패널이 보이는 화면" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">00:59:24 ↗</a><strong>11,172자를 채우는 것 다음의 질문</strong></div>
+                조합형 한글 폰트 도구 ‘사이’. 구현이 진전됐어도 좋은 폰트인지에 대한 미적 판단은 남아 있음.
+              </figcaption>
+            </figure>
+          </div>
+
+          <div class="media-pair">
+            <figure class="media">
+              <a aria-label="원본 영상 01:00:14 보기">
+                <img src="assets/ezyjidjo72y-ts-01-00-14.jpg" width="640" height="360" alt="하 할 함 합 항과 한 핸 햰 헌 헨 등 조합형 한글 글리프가 배열된 격자" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">01:00:14 ↗</a><strong>한 번의 수정이 여러 음절로</strong></div>
+                한 글자 요소를 고치면 조합된 음절 전체가 함께 바뀌는 구조. 코드 기반 제작의 수정 가능성을 보여 주는 사례.
+              </figcaption>
+            </figure>
+            <figure class="media">
+              <a aria-label="원본 영상 01:00:24 보기">
+                <img src="assets/ezyjidjo72y-ts-01-00-24.jpg" width="640" height="360" alt="사진과 문단으로 구성된 교육 자료 레이아웃 PDF" loading="lazy" decoding="async">
+              </a>
+              <figcaption>
+                <div class="caption-head"><a class="timestamp">01:00:24 ↗</a><strong>편집 도구의 시간을 결정의 시간으로</strong></div>
+                Claude Code만으로 사진 분할과 레이아웃을 구성한 자료. 결과에 모델의 디자인 톤이 나타나지만, 배치와 문구를 고르는 시간은 직접 디자인할 때와 비슷했다고 함.
+              </figcaption>
+            </figure>
+          </div>
+
+          <aside class="tech-note">
+            <h3>디자인의 흔적은 현재 모델만의 것일까</h3>
+            <p>최승준은 박종현 발표 덱의 넓은 행간과 크림색을 보고 Claude 디자인으로 추측함. 실제 제작 모델은 GPT-6.1 Sol이었으나, 과거 Claude와 만든 디자인 문서·무드보드·디자인 시스템을 바탕으로 여러 모델을 섞었다는 답변.</p>
+            <p>이 사례에서는 결과물의 인상을 현재 사용한 모델 하나로 설명하기 어려움. 앞서 정한 디자인 기준이 후속 제작에도 이어졌다는 점이 드러남.</p>
+          </aside>
+        </section>
+
+        <section class="chapter" id="implications" aria-labelledby="implications-title">
+          <header class="section-heading">
+            <span class="section-number" aria-hidden="true">07</span>
+            <div>
+              <span class="mini-label">Implications / 편집적 해석</span>
+              <h2 id="implications-title">다음 제작에서 먼저 정할 것들</h2>
+            </div>
+          </header>
+
+          <div class="prose">
+            <p class="lead">이 회차의 실용적 메시지는 더 많은 생성 기능을 붙이는 데서 끝나지 않음. 설명할 대상, 평가할 기준, 보존할 원본을 먼저 정하는 일로 이어짐.</p>
+            <p>코드 기반 영상은 수정과 버전 관리, 재현 가능한 제작 절차를 설계할 수 있는 방향을 제시함. 연구 설명, 실험 결과 애니메이션, 발표용 모션 그래픽처럼 정확성이 필요한 콘텐츠에 활용 여지가 있음. 다만 <strong>코드로 만들었다는 사실 자체가 설명의 정확성을 보장하지는 않음.</strong> 내용과 렌더링 결과를 확인하는 검증은 별도로 필요함.</p>
+          </div>
+
+          <div class="table-wrap" role="region" aria-label="관찰과 제작 시사점 비교 표" tabindex="0">
+            <table>
+              <caption>사례에서 읽은 관찰과 적용 방향</caption>
+              <thead>
+                <tr><th scope="col">회차의 관찰</th><th scope="col">제작에 적용할 판단</th><th scope="col">남은 확인 사항</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">AI 편집 이후 업로드 증가</th>
+                  <td>편당 품질과 발행 처리량을 별도 지표로 관리</td>
+                  <td>업로드 수와 노출 차이를 고려한 성과 비교</td>
+                </tr>
+                <tr>
+                  <th scope="row">여러 모델·도구가 준수한 결과 생성</th>
+                  <td>도구 선정과 함께 큐레이션 기준 수립</td>
+                  <td>동일 조건의 반복 평가와 선호도 확인</td>
+                </tr>
+                <tr>
+                  <th scope="row">카테고리별 반응 차이</th>
+                  <td>길이·편집 리듬·그래픽을 독자와 주제에 맞춤</td>
+                  <td>‘좋은 콘텐츠’를 판정할 기준과 충분한 표본</td>
+                </tr>
+                <tr>
+                  <th scope="row">오독의 연쇄가 게임으로 연결</th>
+                  <td>다른 표현 형식 사이의 변환을 창작 실험에 활용</td>
+                  <td>새로움과 완성도를 구분하는 평가 방법</td>
+                </tr>
+                <tr>
+                  <th scope="row">아이 그림의 참여 가치</th>
+                  <td>생성으로 대체하지 않을 재료를 명시</td>
+                  <td>참여자와 관객이 중요하게 여기는 의미 확인</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="prose">
+            <h3>평준화될수록, 기준과 원본이 차이를 만든다</h3>
+            <p>모션 그래픽이 비슷해지면 처음에는 신선했던 스타일도 희소성을 잃을 수 있음. 자체 디자인 시스템, 실제 현장, 원본 발언처럼 콘텐츠의 고유한 조건을 활용하는 것이 한 대응 방향. 이는 회차의 사례를 바탕으로 한 해석이며, 특정 방식의 성공을 보장하는 결론은 아님.</p>
+            <p>박종현은 알아서 PPT나 포스터를 잘 만드는 일이 1년 전과 크게 다르지 않다고 느낀다고 말함. 정답이 없고 보상을 주기 어려운 작업이기 때문이라는 설명. 검증 가능한 보상을 활용하는 RLVR 영역과 달리, 창작 자동화에는 좋은 결과를 판단할 기준이 계속 과제로 남을 수 있다는 전망으로 읽힘.</p>
+
+            <h3>제작을 시작하기 전의 네 가지 확인</h3>
+            <ul class="checklist">
+              <li><strong>이번 작업이 설명할 것은 무엇인가</strong><span>대상 독자, 이해시킬 개념, 남길 한 문장을 먼저 정의.</span></li>
+              <li><strong>좋은 결과를 무엇으로 판단할 것인가</strong><span>내용 정확성, 전달력, 완성도와 시청자 반응을 구분. 조회수 하나에 모든 판단을 맡기지 않기.</span></li>
+              <li><strong>무엇을 생성으로 대체하지 않을 것인가</strong><span>참여자의 그림, 현장 경험, 실제 발언처럼 출처와 과정이 의미인 재료 확인.</span></li>
+              <li><strong>어디까지 다시 만들 수 있게 남길 것인가</strong><span>원본, 코드, 버전, 생성 조건과 인간의 수정·판단 기록 보존.</span></li>
+            </ul>
+          </div>
+
+          <div class="ending">
+            <h3>영상이 코드가 되어도,<br>작품의 의미까지 자동으로 정해지지는 않는다</h3>
+            <p>박종현의 채널 실험은 제작 처리량의 가능성을, 최승준의 오독 실험은 다른 표현으로 건너가는 창작의 가능성을 보여 줌. 유치원 원가 영상은 그 모든 가능성 앞에서도 남겨야 할 인간의 참여가 있음을 보여 줌.</p>
+            <p>다음 작업에서는 생성할 부분을 정하는 데 더해, 끝까지 남길 원본 하나를 정해 볼 수 있음. 그 선택이 무엇을 위한 작품인지 가장 분명하게 설명해 줄 수 있음.</p>
+          </div>
+
+          <aside class="share-frame" aria-label="복사해 공유할 수 있는 요약 문장">
+            <span class="mini-label">공유용 한 문장 · 편집 요약</span>
+            <p>AI가 영상을 만드는 능력이 커질수록, 좋은 결과를 고르고 생성하지 않을 원본을 정하는 판단의 가치가 드러난다.</p>
+            <small>Video as Code와 생성형 오독으로 읽은 AI Frontier Korea EP 119</small>
+          </aside>
+        </section>
+
+        <section class="sources" id="sources" aria-labelledby="sources-title">
+          <span class="mini-label">Source notes &amp; limitations</span>
+          <h2 id="sources-title">출처, 기록 방식, 해석의 한계</h2>
+          <div class="source-layout">
+            <div>
+              <ol class="source-list">
+                <li>
+                  <strong>01 · 1차 자료와 제작 정보</strong>
+                  <a>AI Frontier Korea — EP 119. 코드로 재생하는 AI: Video as Code와 생성형 오독</a><br>
+                  제공 노트상 게시일 2026년 10월 23일, 길이 1시간 3분 29초(3,809초). 출연 최승준·박종현, 편집 김유진. 채널명에 포함된 노정석은 이번 회차에 불참.
+                </li>
+                <li>
+                  <strong>02 · 녹화 시점</strong>
+                  도입부 발언 기준 2026년 10월 18일 저녁. 박종현은 샌프란시스코 체류 마지막 밤에 원격 참여했으며 다음 날 귀국 예정이라고 설명함.
+                </li>
+                <li>
+                  <strong>03 · 자막과 편집 범위</strong>
+                  제공 노트는 화자 표기가 포함된 YouTube 한국어 수동 자막을 사용함. 이 문서는 해당 노트의 내용을 주제별로 재구성한 것으로, 영상·자막을 별도로 재검증하지 않음. 직접 인용, 출연자의 평가, 편집적 시사점을 문맥상 구분함.
+                </li>
+                <li>
+                  <strong>04 · 이미지 자료</strong>
+                  노트 작성 당시 720p 이상 스트림 다운로드가 HTTP 403으로 실패했고 로그인 쿠키는 사용하지 않았다고 기록됨. 이 글에 사용한 35장은 모두 360p(640×360) 추출 프레임. 작은 글씨와 픽셀 폰트의 판독에는 한계가 있음.
+                </li>
+                <li>
+                  <strong>05 · 성과 수치와 비교 조건</strong>
+                  조회수·구독자·댓글 수·편집 비중은 발표 화면과 출연자 발언에 근거하며 독립 검증되지 않음. 약 한 달의 채널 실험은 표본이 작고, 카테고리별 ‘20%’의 정의와 채널 나이·업로드 수 등 비교 조건이 충분히 공개되지 않음.
+                </li>
+                <li>
+                  <strong>06 · 기술 명칭과 외부 자료</strong>
+                  모델·라이브러리 명칭은 제공 노트와 발표 화면의 표기를 따름. 비교는 정성 평가이며 제품 성능에 대한 검증 자료가 아님. PROTOROOM, Numberphile, 3Blue1Brown 등은 회차 안에서 소개된 자료로, 이 글에서는 각각의 원문을 별도로 확인하지 않음.
+                </li>
+                <li>
+                  <strong>07 · 재현에 필요한 정보</strong>
+                  프롬프트 전문, 모델 실행 조건, 평가 표본, bytebeat 오디오 설정, 임베딩·UMAP 설정 등은 제공 노트에 없음. 이 글은 사례와 논의를 정리한 리포트이며 재현 실험 보고서는 아님.
+                </li>
+              </ol>
+            </div>
+
+            <div>
+              <figure class="media">
+                <a aria-label="원본 영상 01:03:02의 마무리 보기">
+                  <img src="assets/ezyjidjo72y-ts-01-03-02.jpg" width="640" height="360" alt="마무리 대화를 나누는 최승준과 박종현의 2분할 화면" loading="lazy" decoding="async">
+                </a>
+                <figcaption>
+                  <div class="caption-head"><a class="timestamp">01:03:02 ↗</a><strong>대화의 끝에 남은 소식</strong></div>
+                  최승준은 다루지 못한 뉴스로 DeepSeek Flash 10월 17일 버전과 Muse Wonder 출시를 짧게 언급함. 프런티어를 위협한다는 평가가 나온다고 전했으나, 이 회차에서는 상세히 검토하지 않음.
+                </figcaption>
+              </figure>
+              <div class="source-meta">
+                <p><strong>원본 영문 제목</strong><br>EP 119. AI That Plays Back Code | Video as Code and Generative Misreading</p>
+                <p><strong>찾아보기</strong><br>Video as Code · 모션 그래픽 · 생성형 오독 · bytebeat · AI 창의성 · 인간의 참여</p>
+                <p><strong>장면 탐색</strong><br>각 이미지와 타임스탬프 링크는 원본 영상의 해당 시점으로 연결됨.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </article>
+    </main>
+
+    <footer>
+      <span>EP 119 · 영상 노트 기반 편집 리포트</span>
+      <a href="#top">처음으로 ↑</a>
+    </footer>
+  </div>
+</body>
+</html>
