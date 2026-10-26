@@ -1,7 +1,27 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-24T12:14:59.483Z",
+  "updatedAt": "2026-10-26T12:21:40.702Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-ep-120-%EA%B0%80%EC%B9%98%EB%8A%94-%EC%96%B4%EB%94%94%EB%A1%9C-%EA%B0%80%EB%8A%94%EA%B0%80-ai-%EC%8B%9C%EC%9E%A5-%EC%A1%B0%EC%A0%95-coreweave-%EC%9C%84%EA%B8%B0%EC%99%80-operation-loop-%EC%9A%94%EC%95%BD/",
+      "excerpt": "EP 120. 가치는 어디로 가는가: AI 시장 조정, CoreWeave 위기와 operation loop 영상 정보 채널 : AI Frontier Korea (노정석) 게시일 : 2026 10 25 길이 : 1시간 20분 26초 (4,826초) 출연 : 노정석, 박종현 / 편집: 김유진 (최승준은 이번 회차 불참) 녹화 시점 : 2026년 10월 24일(토) 아침 (도입부 발언 기준) 영문 제목 : EP 120. Where ",
+      "shortId": "1fh8oow",
+      "slug": "yt-ep-120-가치는-어디로-가는가-ai-시장-조정-coreweave-위기와-operation-loop-요약",
+      "sourcePath": "02_research/AI/노정석/yt_EP 120. 가치는 어디로 가는가 - AI 시장 조정, CoreWeave 위기와 operation loop_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료",
+        "AI시장",
+        "CoreWeave",
+        "valuecapture",
+        "operationloop",
+        "FrontierLab"
+      ],
+      "title": "EP 120. 가치는 어디로 가는가: AI 시장 조정, CoreWeave 위기와 operation loop",
+      "updatedAt": "2026-10-26T12:21:40.702Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/1fh8oow/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-ep-119-%EC%BD%94%EB%93%9C%EB%A1%9C-%EC%9E%AC%EC%83%9D%ED%95%98%EB%8A%94-ai-video-as-code%EC%99%80-%EC%83%9D%EC%84%B1%ED%98%95-%EC%98%A4%EB%8F%85-%EC%9A%94%EC%95%BD/",
