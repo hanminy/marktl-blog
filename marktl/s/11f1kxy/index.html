@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>Claude Opus 5.5는 왜 이렇게 좋아졌을까? — 모델·하네스·검증 환경 연구 노트</title>
+  <style>
+    :root {
+      --paper: #f6f3ec;
+      --surface: #fffdf8;
+      --ink: #202c2a;
+      --muted: #5b6661;
+      --line: #d5d9ce;
+      --green: #254c40;
+      --green-soft: #e8eee5;
+      --orange: #a14327;
+      --orange-soft: #f5e8de;
+      --dark: #203a32;
+      --radius: 16px;
+      --sans: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "Batang", serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-padding-top: 24px; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: var(--sans);
+      font-size: 20px;
+      line-height: 1.85;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      -webkit-font-smoothing: antialiased;
+    }
+    a {
+      color: var(--green);
+      text-underline-offset: .2em;
+      text-decoration-thickness: 1px;
+    }
+    a:hover { color: var(--orange); }
+    a:focus-visible {
+      outline: 3px solid var(--orange);
+      outline-offset: 5px;
+      border-radius: 3px;
+    }
+    ::selection { background: #dce8d2; color: var(--ink); }
+    img { display: block; max-width: 100%; }
+    figure, blockquote { margin: 0; }
+    h1, h2, h3, p { margin: 0; }
+    h1, h2, h3 { text-wrap: balance; }
+    p + p { margin-top: 1.1em; }
+    strong { font-weight: 750; }
+    time, .numeric { font-variant-numeric: tabular-nums; }
+    code {
+      font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+      font-size: .87em;
+      overflow-wrap: anywhere;
+    }
+    ul, ol { padding-left: 1.25em; }
+    li + li { margin-top: .55em; }
+    .wrap { width: min(1240px, calc(100% - 88px)); margin-inline: auto; }
+    .reading { max-width: 850px; margin-inline: auto; }
+    .eyebrow {
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.5;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .muted { color: var(--muted); }
+    .skip-link {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 10;
+      padding: 10px 16px;
+      background: var(--surface);
+      transform: translateY(-160%);
+    }
+    .skip-link:focus { transform: translateY(0); }
+    .masthead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding-block: 28px;
+      border-bottom: 1px solid var(--ink);
+    }
+    .brand { font-size: 19px; font-weight: 850; letter-spacing: -.04em; }
+    .brand span {
+      display: inline-block;
+      width: 11px;
+      height: 11px;
+      margin-right: 10px;
+      background: var(--orange);
+    }
+    .masthead-note { color: var(--muted); font-size: 14px; letter-spacing: .03em; }
+    .hero { padding: 75px 0 52px; }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 280px;
+      gap: 66px;
+      align-items: end;
+      margin-top: 25px;
+    }
+    h1 {
+      max-width: 890px;
+      font-size: clamp(43px, 5.5vw, 76px);
+      font-weight: 800;
+      line-height: 1.17;
+      letter-spacing: -.065em;
+    }
+    .title-model { display: block; margin-bottom: 8px; }
+    .title-question { color: var(--green); }
+    .dek {
+      max-width: 800px;
+      margin-top: 30px;
+      font-size: 24px;
+      line-height: 1.75;
+      letter-spacing: -.025em;
+    }
+    .hero-aside { border-top: 3px solid var(--orange); padding-top: 20px; }
+    .hero-aside .aside-title { font-size: 14px; color: var(--orange); font-weight: 750; }
+    .hero-aside p {
+      margin-top: 10px;
+      font-family: var(--serif);
+      font-size: 25px;
+      line-height: 1.6;
+      letter-spacing: -.04em;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 24px;
+      margin-top: 34px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+    .meta span + span { position: relative; }
+    .meta a { font-weight: 650; }
+    .abstract {
+      display: grid;
+      grid-template-columns: 170px minmax(0, 1fr);
+      gap: 36px;
+      padding: 35px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .abstract h2 { font-size: 21px; letter-spacing: -.03em; }
+    .abstract .eyebrow { display: block; margin-bottom: 8px; }
+    .abstract p { max-width: 920px; }
+    .evidence-key {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 26px;
+      padding: 20px 0 0;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .evidence-key span { display: inline-flex; align-items: center; gap: 8px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
+    .dot.record { background: var(--green); }
+    .dot.hypothesis { background: var(--orange); }
+    .dot.open { border: 1.5px solid var(--muted); background: transparent; }
+    .findings { padding-block: 56px 62px; }
+    .section-label {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 22px;
+    }
+    .section-label h2 { font-size: 26px; letter-spacing: -.04em; }
+    .section-label span { font-size: 13px; letter-spacing: .12em; color: var(--muted); }
+    .finding-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .finding {
+      padding: 27px 28px 30px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      border-radius: var(--radius);
+    }
+    .finding .number {
+      display: block;
+      margin-bottom: 22px;
+      color: var(--orange);
+      font-family: var(--serif);
+      font-size: 35px;
+      line-height: 1;
+    }
+    .finding h3 { font-size: 23px; line-height: 1.45; letter-spacing: -.04em; }
+    .finding p { margin-top: 14px; font-size: 20px; color: var(--muted); line-height: 1.75; }
+    .toc {
+      display: grid;
+      grid-template-columns: 170px minmax(0, 1fr);
+      gap: 36px;
+      padding: 28px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .toc-title { font-size: 16px; font-weight: 750; }
+    .toc ol {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px 28px;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+    .toc li { margin: 0; font-size: 17px; }
+    .toc a { text-decoration: none; }
+    .toc .index { color: var(--orange); font-size: 13px; margin-right: 11px; }
+    .chapter { padding-top: 86px; }
+    .chapter-head {
+      display: grid;
+      grid-template-columns: 88px minmax(0, 1fr);
+      gap: 22px;
+      margin-bottom: 33px;
+      align-items: start;
+    }
+    .chapter-number {
+      color: var(--orange);
+      font-family: var(--serif);
+      font-size: 56px;
+      line-height: 1.15;
+      letter-spacing: -.06em;
+    }
+    .chapter-head h2 {
+      margin-top: 8px;
+      font-size: clamp(29px, 3.2vw, 43px);
+      line-height: 1.4;
+      letter-spacing: -.055em;
+    }
+    .chapter-head .eyebrow { padding-top: 4px; }
+    .reading h3 { margin-top: 34px; margin-bottom: 12px; font-size: 25px; line-height: 1.5; letter-spacing: -.04em; }
+    .lead { font-size: 23px; line-height: 1.8; letter-spacing: -.025em; }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+      margin-block: 35px;
+    }
+    .scene {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      min-width: 0;
+    }
+    .scene .image-link { display: block; background: #19221f; }
+    .scene img {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16 / 9;
+      object-fit: contain;
+      background: #19221f;
+    }
+    .scene figcaption { padding: 20px 22px 25px; font-size: 17px; line-height: 1.8; color: var(--muted); }
+    .scene-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px 14px;
+      margin-bottom: 9px;
+    }
+    .scene-top a {
+      color: var(--orange);
+      font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .scene-top strong { color: var(--ink); font-size: 18px; }
+    .scene figcaption p + p { margin-top: .65em; }
+    .scene-horizontal { display: grid; grid-template-columns: 1.25fr 1fr; margin-block: 35px; align-items: center; }
+    .scene-horizontal figcaption { padding: 28px; }
+    .callout {
+      margin-block: 30px;
+      padding: 26px 30px;
+      background: var(--green-soft);
+      border-left: 3px solid var(--green);
+      border-radius: 0 10px 10px 0;
+    }
+    .callout h3 { margin: 0 0 10px; font-size: 22px; }
+    .callout p { font-size: 20px; }
+    .callout.warm { background: var(--orange-soft); border-color: var(--orange); }
+    .callout .label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--orange);
+      letter-spacing: .08em;
+    }
+    .formula {
+      padding: 22px 25px;
+      margin-block: 24px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+    .formula .math { font-size: 22px; line-height: 1.8; font-weight: 650; }
+    .formula p { margin-top: 10px; font-size: 17px; color: var(--muted); }
+    .system-figure {
+      margin-block: 35px;
+      padding: 35px;
+      color: #f8f5e9;
+      background: var(--dark);
+      border-radius: var(--radius);
+    }
+    .system-figure .eyebrow { color: #c1d1b8; }
+    .system-figure h3 { margin-top: 10px; font-size: 31px; line-height: 1.5; letter-spacing: -.045em; }
+    .equation {
+      display: grid;
+      grid-template-columns: 1fr 36px 1fr 36px 1fr;
+      gap: 15px;
+      align-items: center;
+      margin-top: 30px;
+    }
+    .equation-box {
+      padding: 22px 20px;
+      border: 1px solid #81958a;
+      border-radius: 10px;
+      min-height: 135px;
+    }
+    .equation-box strong { display: block; font-size: 25px; }
+    .equation-box span { display: block; margin-top: 6px; color: #d8e1d4; font-size: 17px; line-height: 1.65; }
+    .equation-sign { text-align: center; color: #d4c3a5; font-size: 30px; }
+    .system-figure figcaption { margin-top: 24px; font-size: 16px; color: #d4dfd1; }
+    .pullquote {
+      margin: 46px auto;
+      padding: 31px 0 31px 29px;
+      max-width: 850px;
+      border-left: 4px solid var(--orange);
+    }
+    .pullquote p {
+      font-family: var(--serif);
+      font-size: clamp(26px, 3vw, 37px);
+      line-height: 1.65;
+      letter-spacing: -.04em;
+    }
+    .pullquote cite { display: block; margin-top: 17px; font-size: 14px; color: var(--muted); font-style: normal; }
+    .criteria {
+      list-style: none;
+      padding: 0;
+      margin: 24px 0;
+      border-top: 1px solid var(--line);
+      counter-reset: criterion;
+    }
+    .criteria li {
+      counter-increment: criterion;
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      gap: 15px;
+      padding: 22px 0;
+      margin: 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .criteria li::before { content: "0" counter(criterion); color: var(--orange); font-size: 16px; padding-top: 4px; }
+    .criteria strong { display: block; }
+    .criteria p { margin-top: 6px; color: var(--muted); }
+    .table-wrap { overflow-x: auto; margin-block: 28px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+    table { width: 100%; border-collapse: collapse; font-size: 18px; line-height: 1.75; }
+    caption { padding: 20px 22px; text-align: left; font-size: 20px; font-weight: 750; }
+    th, td { text-align: left; vertical-align: top; padding: 17px 22px; border-top: 1px solid var(--line); }
+    thead th { background: var(--green-soft); font-size: 16px; }
+    tbody th { min-width: 150px; font-weight: 700; }
+    .table-note { font-size: 16px; color: var(--muted); margin-top: -12px; }
+    .loop {
+      padding: 30px;
+      margin-block: 30px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+    .loop-title { margin-bottom: 22px; font-size: 18px; font-weight: 750; }
+    .loop ol {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .loop li {
+      position: relative;
+      margin: 0;
+      padding: 18px 14px;
+      background: var(--green-soft);
+      border-radius: 8px;
+      text-align: center;
+    }
+    .loop li + li::before { content: "→"; position: absolute; left: -15px; top: 30px; color: var(--green); font-size: 17px; }
+    .loop li span { display: block; color: var(--muted); font-size: 14px; margin-top: 5px; }
+    .loop figcaption { margin-top: 18px; font-size: 16px; color: var(--muted); }
+    .split-note { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-block: 28px; }
+    .split-note > div { padding: 25px; border-top: 3px solid var(--green); background: var(--green-soft); }
+    .split-note > div + div { border-color: var(--orange); background: var(--orange-soft); }
+    .split-note h3 { margin: 0 0 12px; font-size: 23px; }
+    .split-note p { font-size: 20px; }
+    .micro-label { display: block; color: var(--muted); font-size: 13px; letter-spacing: .08em; font-weight: 750; margin-bottom: 10px; }
+    .closing {
+      margin-top: 75px;
+      padding: 43px;
+      background: var(--dark);
+      color: #f8f5e9;
+      border-radius: var(--radius);
+    }
+    .closing .eyebrow { color: #c1d1b8; }
+    .closing h2 { margin-top: 14px; font-size: clamp(29px, 3.4vw, 43px); line-height: 1.45; letter-spacing: -.05em; }
+    .closing p { margin-top: 23px; max-width: 930px; color: #e0e6da; }
+    .closing strong { color: #fffdf8; }
+    .checklist { margin: 30px 0 0; padding: 0; list-style: none; }
+    .checklist li { position: relative; padding-left: 30px; }
+    .checklist li::before { content: "□"; position: absolute; left: 0; color: #c5d7b7; }
+    .sources { padding-block: 70px 50px; }
+    .sources h2 { font-size: 30px; letter-spacing: -.04em; margin-bottom: 22px; }
+    .source-intro { margin-bottom: 28px; }
+    .source-list { list-style: none; margin: 0; padding: 0; }
+    .source-list li {
+      padding-block: 22px;
+      border-top: 1px solid var(--line);
+      margin: 0;
+      font-size: 18px;
+    }
+    .source-list strong { display: block; margin-bottom: 7px; color: var(--ink); font-size: 20px; }
+    .source-list p { color: var(--muted); }
+    .source-list .ref-index { color: var(--orange); font-size: 14px; margin-right: 10px; }
+    .share {
+      padding: 31px 0;
+      border-top: 1px solid var(--ink);
+      border-bottom: 1px solid var(--line);
+    }
+    .share .eyebrow { margin-bottom: 12px; }
+    .share blockquote { font-size: 23px; line-height: 1.75; letter-spacing: -.025em; }
+    .share-links { display: flex; flex-wrap: wrap; gap: 12px 25px; margin-top: 22px; font-size: 16px; }
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 25px;
+      padding-block: 27px 42px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .footer p { margin: 0; }
+
+    @media (max-width: 1000px) {
+      .wrap { width: calc(100% - 56px); }
+      .hero-grid { grid-template-columns: 1fr; gap: 30px; }
+      .hero-aside { max-width: 660px; padding-top: 15px; }
+      .hero-aside p { font-size: 22px; }
+      .abstract, .toc { grid-template-columns: 130px minmax(0, 1fr); gap: 25px; }
+      .finding { padding: 24px 21px; }
+      .finding h3 { font-size: 21px; }
+      .scene-horizontal { grid-template-columns: 1fr 1fr; }
+      .equation { gap: 10px; grid-template-columns: 1fr 20px 1fr 20px 1fr; }
+      .equation-box { padding: 18px 15px; min-height: 150px; }
+    }
+
+    @media (max-width: 720px) {
+      body { font-size: 20px; line-height: 1.85; }
+      .wrap { width: calc(100% - 36px); }
+      .masthead { padding-block: 20px; align-items: flex-start; }
+      .masthead-note { font-size: 12px; text-align: right; max-width: 145px; }
+      .hero { padding: 42px 0 34px; }
+      h1 { font-size: clamp(37px, 8.5vw, 55px); line-height: 1.23; }
+      .hero-grid { margin-top: 19px; }
+      .dek { font-size: 21px; margin-top: 23px; }
+      .hero-aside p { font-size: 21px; }
+      .meta { font-size: 14px; gap: 7px 17px; margin-top: 25px; }
+      .abstract, .toc { grid-template-columns: 1fr; gap: 18px; }
+      .abstract { padding-block: 26px; }
+      .abstract h2 { display: flex; gap: 13px; align-items: baseline; }
+      .abstract .eyebrow { margin: 0; }
+      .evidence-key { gap: 9px 20px; font-size: 13px; }
+      .findings { padding-block: 38px; }
+      .finding-grid { grid-template-columns: 1fr; gap: 14px; }
+      .finding { padding: 25px; }
+      .finding .number { margin-bottom: 14px; font-size: 28px; }
+      .finding h3 { font-size: 24px; }
+      .section-label h2 { font-size: 24px; }
+      .section-label > span { display: none; }
+      .toc ol { grid-template-columns: 1fr; gap: 10px; }
+      .chapter { padding-top: 58px; }
+      .chapter-head { grid-template-columns: 46px minmax(0, 1fr); gap: 13px; margin-bottom: 25px; }
+      .chapter-number { font-size: 35px; }
+      .chapter-head .eyebrow { font-size: 11px; letter-spacing: .09em; }
+      .chapter-head h2 { font-size: 29px; line-height: 1.45; }
+      .lead { font-size: 22px; }
+      .gallery { grid-template-columns: 1fr; gap: 22px; margin-block: 28px; }
+      .scene figcaption { padding: 19px 20px 23px; }
+      .scene-horizontal { grid-template-columns: 1fr; margin-block: 28px; }
+      .scene-horizontal figcaption { padding: 22px; }
+      .callout { padding: 23px; }
+      .formula { padding: 21px; }
+      .formula .math { font-size: 20px; }
+      .system-figure { padding: 25px; }
+      .system-figure h3 { font-size: 26px; }
+      .equation { grid-template-columns: 1fr; gap: 8px; margin-top: 22px; }
+      .equation-box { min-height: auto; padding: 17px 20px; }
+      .equation-box strong { font-size: 23px; }
+      .equation-sign { font-size: 24px; line-height: 1.3; }
+      .pullquote { padding-left: 22px; margin-block: 34px; }
+      .pullquote p { font-size: 27px; }
+      .loop { padding: 22px; }
+      .loop ol { grid-template-columns: 1fr 1fr; gap: 14px; }
+      .loop li + li::before { content: none; }
+      .loop li { text-align: left; padding: 16px; }
+      .split-note { grid-template-columns: 1fr; }
+      table { min-width: 620px; }
+      th, td { padding: 15px 18px; }
+      .closing { margin-top: 48px; padding: 28px 24px; }
+      .closing h2 { font-size: 29px; }
+      .sources { padding-block: 48px 35px; }
+      .sources h2 { font-size: 27px; }
+      .share blockquote { font-size: 21px; }
+      .footer { flex-direction: column; gap: 10px; }
+    }
+
+    @media print {
+      body { background: white; color: black; font-size: 12pt; }
+      .wrap { width: 100%; max-width: none; }
+      .skip-link, .toc, .share-links, .footer a { display: none; }
+      .hero { padding-top: 25px; }
+      h1 { font-size: 35pt; }
+      .hero-grid { grid-template-columns: 1fr; gap: 22px; }
+      .hero-aside { display: none; }
+      .chapter { padding-top: 35px; }
+      .chapter-head h2 { font-size: 23pt; }
+      .scene, .finding, .callout, .loop, .formula { break-inside: avoid; }
+      .system-figure, .closing { color: black; background: #edf0e8; }
+      .system-figure *, .closing * { color: black !important; }
+      .equation-box { border-color: #777; }
+      a { color: black; }
+      .table-wrap { overflow: visible; }
+      table { min-width: 0; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Claude Opus 5.5는 왜 이렇게 좋아졌을까?">
+<meta property="og:description" content="Claude Opus 5.5는 왜 이렇게 좋아졌을까? 영상 정보 채널 : sudoremove 게시일 : 2026 10 31 길이 : 31:44 링크 : https://www.youtube.com/watch?v=721BOyjkbX4 &lt;div style=&quot;position: relative; width: 100%; padding bottom: 56.25%; height: 0; overflow: hidden;&quot; &lt;iframe styl">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/11f1kxy/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/11f1kxy/assets/721boyjkbx4-ts-00-00-58.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Claude Opus 5.5는 왜 이렇게 좋아졌을까?">
+<meta name="twitter:description" content="Claude Opus 5.5는 왜 이렇게 좋아졌을까? 영상 정보 채널 : sudoremove 게시일 : 2026 10 31 길이 : 31:44 링크 : https://www.youtube.com/watch?v=721BOyjkbX4 &lt;div style=&quot;position: relative; width: 100%; padding bottom: 56.25%; height: 0; overflow: hidden;&quot; &lt;iframe styl">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/11f1kxy/assets/721boyjkbx4-ts-00-00-58.jpg">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-claude-opus-5-5%EB%8A%94-%EC%99%9C-%EC%9D%B4%EB%A0%87%EA%B2%8C-%EC%A2%8B%EC%95%84%EC%A1%8C%EC%9D%84%EA%B9%8C-%EC%9A%94%EC%95%BD/">
+</head>
+<body>
+  <a class="skip-link" href="#article">본문으로 건너뛰기</a>
+
+  <header class="masthead wrap" id="top">
+    <div class="brand"><span aria-hidden="true"></span>기술을 읽는 노트</div>
+    <div class="masthead-note">RESEARCH REPORT<br>AI · AGENTS · VERIFICATION</div>
+  </header>
+
+  <main class="wrap" id="article">
+    <article aria-labelledby="article-title">
+      <header class="hero">
+        <p class="eyebrow">영상 기반 연구 리포트 · 2026.10.31</p>
+        <div class="hero-grid">
+          <div>
+            <h1 id="article-title">
+              <span class="title-model">Claude Opus 5.5는</span>
+              <span class="title-question">왜 이렇게 좋아졌을까?</span>
+            </h1>
+            <p class="dek">점수 뒤에는 모델만 있지 않다. 하네스와 검증 환경, 그리고 반복 학습의 연결고리에서 찾는 에이전트 성능 향상의 단서.</p>
+          </div>
+          <aside class="hero-aside" aria-label="이 글의 중심 질문">
+            <span class="aside-title">이 글이 따라가는 질문</span>
+            <p>더 똑똑한 모델인가,<br>더 잘 작동하는 시스템인가?</p>
+          </aside>
+        </div>
+        <div class="meta">
+          <span>원영상 · <strong>sudoremove</strong></span>
+          <span>노트에 기재된 게시일 · <time datetime="2026-10-31">2026.10.31</time></span>
+          <span>영상 길이 · 31:44</span>
+          <span><a>YouTube에서 원영상 보기 ↗</a></span>
+        </div>
+      </header>
+
+      <section class="abstract" aria-labelledby="abstract-title">
+        <h2 id="abstract-title"><span class="eyebrow">Abstract</span>초록</h2>
+        <div>
+          <p>이 영상은 Opus 5.5의 비용·벤치마크 비교에서 출발해, 성능을 읽는 단위를 <strong>모델에서 에이전트 시스템으로 확장</strong>함. 중심 프레임은 “에이전트 = LLM + 하네스”. 도구·메모리·실행 루프가 결과를 바꾸고, 검증 가능한 환경에서의 강화학습이 공간 이해와 도구 사용을 개선했을 가능성을 논의함.</p>
+          <p>BenchCAD와 로봇 제어, 모션그래픽 제작 사례를 연결하되, <strong>벤치마크 향상이 실제 학습 과정이나 능력 전이의 인과관계를 입증하지는 않음</strong>. 이 글은 제공된 영상 노트를 재구성한 2차 자료로, 모델 사양·가격·외부 논문의 원문을 독립 검증한 보고서는 아님.</p>
+        </div>
+      </section>
+
+      <div class="evidence-key" aria-label="근거를 읽는 기준">
+        <span><i class="dot record" aria-hidden="true"></i>기록: 노트에 정리된 화면·사례</span>
+        <span><i class="dot hypothesis" aria-hidden="true"></i>해석: 진행자의 설명·가설</span>
+        <span><i class="dot open" aria-hidden="true"></i>미확인: 학습 내역·외부 주장·루머</span>
+      </div>
+
+      <section class="findings" aria-labelledby="findings-title">
+        <div class="section-label">
+          <h2 id="findings-title">먼저 읽는 세 가지 발견</h2>
+          <span>KEY FINDINGS</span>
+        </div>
+        <div class="finding-grid">
+          <div class="finding">
+            <span class="number" aria-hidden="true">01</span>
+            <h3>비교 단위가 바뀌면<br>평가도 달라진다</h3>
+            <p>토큰 단가보다 태스크당 비용, 모델 이름보다 모델과 하네스의 조합이 중요하다는 것이 영상의 출발점.</p>
+          </div>
+          <div class="finding">
+            <span class="number" aria-hidden="true">02</span>
+            <h3>검증할 수 있는 환경이<br>개선의 발판이 된다</h3>
+            <p>코드를 실행하고 결과를 비교해 다시 고치는 루프에 주목. 다만 특정 환경이 실제 학습에 쓰였는지는 미확인.</p>
+          </div>
+          <div class="finding">
+            <span class="number" aria-hidden="true">03</span>
+            <h3>능력 향상과 통제는<br>함께 설계할 문제다</h3>
+            <p>추론 보호, 권한 경계, 감사 기록까지 논의가 확장됨. 성능이 높아질수록 검증과 운영 설계의 중요성도 커진다는 해석.</p>
+          </div>
+        </div>
+      </section>
+
+      <nav class="toc" aria-label="기사 목차">
+        <p class="toc-title">이 글의 흐름</p>
+        <ol>
+          <li><a href="#cost"><span class="index">01</span>비용과 점수의 올바른 비교 단위</a></li>
+          <li><a href="#harness"><span class="index">02</span>하네스와 서브에이전트의 역할</a></li>
+          <li><a href="#learning"><span class="index">03</span>RL 환경과 공간 이해의 연결</a></li>
+          <li><a href="#transfer"><span class="index">04</span>영상 제작으로 이어진 능력인가</a></li>
+          <li><a href="#reasoning"><span class="index">05</span>추론 보호와 리셀러 시장의 논점</a></li>
+          <li><a href="#implications"><span class="index">06</span>연구·운영·인간의 역할에 남는 질문</a></li>
+        </ol>
+      </nav>
+
+      <section class="chapter" id="cost" aria-labelledby="cost-title">
+        <header class="chapter-head">
+          <span class="chapter-number" aria-hidden="true">01</span>
+          <div>
+            <p class="eyebrow">Economics &amp; Evaluation</p>
+            <h2 id="cost-title">비싼 토큰이 비싼 작업을 뜻하지는 않는다</h2>
+          </div>
+        </header>
+
+        <div class="reading">
+          <p class="lead">영상의 첫 번째 전환은 가격표를 읽는 방식에 있음. 입력·출력 토큰의 단가만 비교하면, 실제로 일을 끝내는 데 드는 비용을 놓칠 수 있다는 지적.</p>
+          <p>진행자들은 Artificial Analysis의 지능 지수와 비용 차트를 보며 Opus 5.5의 효율을 높게 평가함. 더 비싼 토큰을 쓰더라도 작업 완료까지 필요한 토큰이 적으면 총비용은 낮아질 수 있다는 설명. 다만 이는 <strong>영상에 제시된 비교와 진행자의 평가</strong>이며, 현재 가격이나 모든 작업에서의 우위를 확인한 결과는 아님.</p>
+        </div>
+
+        <div class="gallery">
+          <figure class="scene">
+            <a class="image-link" href="assets/721boyjkbx4-ts-00-00-58.jpg" aria-label="00:58 비용 비교 화면 원본 이미지 보기">
+              <img src="assets/721boyjkbx4-ts-00-00-58.jpg" width="640" height="360" alt="Artificial Analysis의 지능 지수 대 태스크당 비용 차트와 입력·출력 가격 카드가 표시된 영상 장면" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="scene-top"><a>00:58 ↗</a><strong>단가보다 작업 완료 비용</strong></div>
+              <p>화면에 입력·출력 가격 <strong>$4 / $20</strong> 표기. 진행자는 Astra와 비슷한 성능대에서 더 나은 비용 효율을 보인다고 평가함. 과금 토큰 단위와 측정 조건은 원문 확인 필요.</p>
+            </figcaption>
+          </figure>
+
+          <figure class="scene">
+            <a class="image-link" href="assets/721boyjkbx4-ts-00-03-38.jpg" aria-label="03:38 벤치마크 비교 화면 원본 이미지 보기">
+              <img src="assets/721boyjkbx4-ts-00-03-38.jpg" width="640" height="360" alt="모델별 비용과 AA 지수 산점도 및 Terminal-Bench 4.0 막대그래프가 나란히 놓인 화면" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="scene-top"><a>03:38 ↗</a><strong>평가마다 달라지는 순위</strong></div>
+              <p>노트상 Opus 5.5의 AA 지수는 <strong>58</strong>. Sonnet 5.5·Kimi K3.1 Pro·Gemini 4 Argon·GPT-6.1 Sol 등이 비교됨. 터미널 작업에서는 Kimi, 가격에서는 DeepSeek가 언급되며 평가별 순위 차이를 강조함.</p>
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="reading">
+          <div class="formula" aria-label="태스크 비용을 읽기 위한 기본식">
+            <p class="math">태스크 토큰 비용 = 입력 토큰 수 × 입력 단가<br>＋ 출력 토큰 수 × 출력 단가</p>
+            <p>단가를 ‘토큰 1개당’으로 환산했을 때의 식. 재시도가 있으면 모든 시도의 사용량을 합산해야 함. 캐시·도구·실행 환경 비용은 별도 항목이며, 영상의 가격 카드만으로 전체 운영비를 산출할 수는 없음.</p>
+          </div>
+          <p>같은 이유로 벤치마크 순위도 하나의 서열로 합치기 어려움. 종합 지능 지수, 터미널 작업, 공간 복원은 서로 다른 과제를 측정함. 진행자들도 Terminal-Bench의 순위와 신뢰도를 별개로 따져야 한다고 언급함.</p>
+          <aside class="callout">
+            <h3>실무에 적용할 비교 기준</h3>
+            <p>같은 과제와 완료 기준을 정한 뒤 <strong>성공률·완료 시간·총비용</strong>을 함께 기록할 필요. 성공한 작업 1건당 비용을 보려면 실패와 재시도에 쓴 비용도 포함해야 함. 이는 영상의 논지를 실험 설계로 옮긴 제안.</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="chapter" id="harness" aria-labelledby="harness-title">
+        <header class="chapter-head">
+          <span class="chapter-number" aria-hidden="true">02</span>
+          <div>
+            <p class="eyebrow">The Agent Is a System</p>
+            <h2 id="harness-title">점수를 내는 것은 모델과 하네스의 조합</h2>
+          </div>
+        </header>
+
+        <div class="reading">
+          <p class="lead">이 영상의 중심 문장은 “에이전트 = LLM + 하네스”. 하네스는 모델이 도구를 쓰고, 상태를 기억하며, 결과를 확인하고 다시 시도하도록 만드는 실행 구조를 뜻함.</p>
+          <p>진행자들은 Claude Code의 성과 역시 이러한 구조와 함께 이해해야 한다고 설명함. 좋은 하네스에서 얻은 실행 경험이 더 나은 모델 학습으로 이어지고, 개선된 모델에 맞춰 하네스가 다시 바뀌는 반복 관계를 제시함.</p>
+        </div>
+
+        <figure class="system-figure" aria-labelledby="system-title">
+          <p class="eyebrow">영상의 핵심 프레임</p>
+          <h3 id="system-title">Agent = LLM + Harness</h3>
+          <div class="equation">
+            <div class="equation-box"><strong>모델</strong><span>추론 · 코드 생성<br>도구 사용 판단</span></div>
+            <div class="equation-sign" aria-hidden="true">＋</div>
+            <div class="equation-box"><strong>하네스</strong><span>도구 · 메모리<br>실행 · 피드백 루프</span></div>
+            <div class="equation-sign" aria-hidden="true">＝</div>
+            <div class="equation-box"><strong>에이전트</strong><span>환경과 상호작용하며<br>작업을 수행하는 시스템</span></div>
+          </div>
+          <figcaption>개념을 설명하기 위한 도식. 실제 평가는 과제·환경·도구 접근·실행 예산에도 영향을 받으므로 모델 이름만으로 조건을 대표할 수 없음.</figcaption>
+        </figure>
+
+        <div class="gallery">
+          <figure class="scene">
+            <a class="image-link" href="assets/721boyjkbx4-ts-00-06-57.jpg" aria-label="06:57 모델과 하네스 도식 원본 이미지 보기">
+              <img src="assets/721boyjkbx4-ts-00-06-57.jpg" width="640" height="360" alt="Agent equals LLM plus harness 도식과 BenchCAD 점수 0.730에서 0.962로의 변화가 표시된 화면" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="scene-top"><a>06:57 ↗</a><strong>하네스가 바꾸는 결과</strong></div>
+              <p>BenchCAD <strong>0.730 → 0.962</strong>가 제시됨. 영상에서는 같은 모델도 하네스에 따라 결과가 달라지는 사례로 설명함. 구체적인 실행 예산과 평가 설정은 노트만으로 확인되지 않음.</p>
+            </figcaption>
+          </figure>
+
+          <figure class="scene">
+            <a class="image-link" href="assets/721boyjkbx4-ts-00-09-42.jpg" aria-label="09:42 로봇 인터페이스별 점수 화면 원본 이미지 보기">
+              <img src="assets/721boyjkbx4-ts-00-09-42.jpg" width="640" height="360" alt="Classic control, Locomotion, Manipulation 과제에서 제어 인터페이스별 성능을 비교하는 그래프" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="scene-top"><a>09:42 ↗</a><strong>로봇에도 필요한 ‘손잡이’</strong></div>
+              <p>Anthropic Embody로 소개된 그래프. Direct / Code / Policy supervision / Training supervision에 따라 점수가 달라짐. 진행자들은 이를 로봇 제어에서도 인터페이스 설계가 중요하다는 근거로 해석함.</p>
+            </figcaption>
+          </figure>
+        </div>
+
+        <blockquote class="pullquote">
+          <p>능력은 모델 안으로 들어가더라도,<br>권한과 감사의 경계는 밖에 남는다.</p>
+          <cite>09:42 슬라이드의 논지를 재서술 · 발화의 직접 인용 아님</cite>
+        </blockquote>
+
+        <div class="reading">
+          <h3>서브에이전트는 기본값보다 검증할 선택지</h3>
+          <p>하네스가 중요하다고 해서 구조를 복잡하게 만드는 것이 항상 유리한 것은 아님. 영상은 Anthropic의 서브에이전트 관련 글을 소개하며, 맥락 분리를 위해 하위 에이전트를 쓰던 권고가 조정됐다고 설명함.</p>
+          <p>진행자의 논점은 <strong>맥락 전달이 사실상 압축이 될 수 있다</strong>는 것. 요약 과정에서 중요한 정보가 빠진다면 분업의 이점보다 손실이 커질 수 있으므로, 사용 여부를 평가로 비교해야 한다는 주장.</p>
+          <ol class="criteria">
+            <li><div><strong>컨텍스트 비대화가 실제 성능 저하로 이어질 때</strong><p>단일 루프에서 저하가 측정되는지 먼저 확인. 단순히 대화가 길다는 이유만으로 분리하지 않는다는 기준.</p></div></li>
+            <li><div><strong>병렬 실행하고 일부 결과를 버려도 되는 작업일 때</strong><p>독립적인 조사처럼 여러 경로를 탐색한 뒤 필요한 결과만 취합할 수 있는 경우.</p></div></li>
+            <li><div><strong>도구 간 지시가 단일 에이전트 안에서 충돌할 때</strong><p>도구별 지시를 분리하는 이점이 맥락 전달 비용보다 큰지 평가할 필요.</p></div></li>
+          </ol>
+        </div>
+
+        <div class="gallery">
+          <figure class="scene">
+            <a class="image-link" href="assets/721boyjkbx4-ts-00-12-13.jpg" aria-label="12:13 서브에이전트 관련 글 소개 화면 원본 이미지 보기">
+              <img src="assets/721boyjkbx4-ts-00-12-13.jpg" width="640" height="360" alt="Subagents, Revisited 제목과 Anthropic의 서브에이전트 관련 글을 소개하는 슬라이드" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="scene-top"><a>12:13 ↗</a><strong>서브에이전트 권고의 재검토</strong></div>
+              <p>Diane Sarkis의 「Building agents: When to fold subagents into your main agent loop」를 소개함. 화면에 기재된 날짜는 2026-10-22. 글의 내용은 영상 노트를 통한 재인용.</p>
+            </figcaption>
+          </figure>
+
+          <figure class="scene">
+            <a class="image-link" href="assets/721boyjkbx4-ts-00-13-15.jpg" aria-label="13:15 서브에이전트 유지 조건 화면 원본 이미지 보기">
+              <img src="assets/721boyjkbx4-ts-00-13-15.jpg" width="640" height="360" alt="서브에이전트를 유지할 세 가지 조건과 평가의 필요성을 정리한 화면" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="scene-top"><a>13:15 ↗</a><strong>분리의 효과를 측정할 것</strong></div>
+              <p>컨텍스트 성능 저하, 병렬·폐기 가능한 작업, 도구 지시 충돌이라는 세 조건. 핵심은 서브에이전트 사용·미사용 결과를 실제 eval로 비교하는 것.</p>
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="reading">
+          <aside class="callout">
+            <h3>장기 메모리도 같은 질문으로 돌아옴</h3>
+            <p>진행자들은 로봇의 장기 메모리까지 사람이 세부 모듈로 먼저 설계하기보다, <strong>장기 태스크와 성공 검증을 잘 구성하고 에이전트가 해결 방법을 찾게 하는 접근</strong>을 제안함. 이는 설계 방향에 대한 의견이며, 기존 메모리 구조보다 우월함을 입증한 비교 결과는 아님.</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="chapter" id="learning" aria-labelledby="learning-title">
+        <header class="chapter-head">
+          <span class="chapter-number" aria-hidden="true">03</span>
+          <div>
+            <p class="eyebrow">Environments &amp; Spatial Reasoning</p>
+            <h2 id="learning-title">더 좋은 답을 넘어, 고칠 수 있는 환경으로</h2>
+          </div>
+        </header>
+
+        <div class="reading">
+          <p class="lead">왜 능력이 좋아졌는가에 대한 첫 번째 가설은 에이전틱 강화학습 환경의 발전. 읽을 데이터를 공급하는 일에서, 에이전트가 행동하고 피드백을 받을 환경을 만드는 일로 무게중심이 이동했다는 설명.</p>
+          <p>영상은 데이터 벤더의 변화를 Crowdsourcing → RLVR → RL Environments로 정리함. 모의 웹사이트나 샌드박스처럼 도구 사용과 작업 완료를 평가할 수 있는 환경이 중요해졌고, 로보틱스에서도 환경 구축이 핵심이 될 것이라는 관점.</p>
+        </div>
+
+        <div class="gallery">
+          <figure class="scene">
+            <a class="image-link" href="assets/721boyjkbx4-ts-00-13-47.jpg" aria-label="13:47 강화학습 환경 설명 화면 원본 이미지 보기">
+              <img src="assets/721boyjkbx4-ts-00-13-47.jpg" width="640" height="360" alt="도구 사용 강화학습, 데이터 벤더의 진화, RL 환경 시장 관련 수치가 함께 제시된 슬라이드" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="scene-top"><a>13:47 ↗</a><strong>데이터 공급에서 환경 공급으로</strong></div>
+              <p>Grok 4의 도구 사용 강화학습 설명과 함께 <strong>No-CoT time horizon 3.6분 → 30.9분</strong> 표기가 등장함. 51M, $1B+, $20k, 35+ 등의 숫자도 있으나, 집계 대상과 조건이 불명확해 시장 규모의 근거로 사용하지 않음.</p>
+            </figcaption>
+          </figure>
+
+          <figure class="scene">
+            <a class="image-link" href="assets/721boyjkbx4-ts-00-15-25.jpg" aria-label="15:25 BenchCAD 성능 비교 화면 원본 이미지 보기">
+              <img src="assets/721boyjkbx4-ts-00-15-25.jpg" width="640" height="360" alt="BenchCAD의 단발 IoU 0.274와 0.730, 코드와 렌더를 반복하는 루프가 표시된 화면" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="scene-top"><a>15:25 ↗</a><strong>공간 복원을 수치로 검증하기</strong></div>
+              <p>노트상 프론티어 단발 IoU는 Opus 4.7 시점 <strong>0.274</strong>, Opus 5.5 <strong>0.730</strong>. 슬라이드는 넉 달 사이의 변화로 소개하며, 결과 형상과 목표 형상을 비교할 수 있다는 점을 강조함.</p>
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="reading">
+          <h3>BenchCAD가 흥미로운 이유</h3>
+          <p>BenchCAD는 이미지를 보고 CadQuery 코드로 부품을 재구성하는 과제로 소개됨. 기어·플랜지·힌지 같은 형상을 코드로 만들고, 결과를 렌더링해 목표와 비교하는 구조. 핵심은 공간 문제를 <strong>실행과 자동 검증이 가능한 작업</strong>으로 바꾼다는 점.</p>
+        </div>
+
+        <figure class="loop reading" aria-labelledby="loop-title">
+          <div class="loop-title" id="loop-title">공간 이해를 실행 가능한 피드백 루프로 바꾸기</div>
+          <ol>
+            <li><strong>01 · 코드</strong><span>부품 형상 작성</span></li>
+            <li><strong>02 · 렌더</strong><span>결과 형상 생성</span></li>
+            <li><strong>03 · 비교</strong><span>목표와 차이 측정</span></li>
+            <li><strong>04 · 수정</strong><span>오차를 보고 재작성</span></li>
+          </ol>
+          <figcaption>수정 후 다시 코드·렌더 단계로 돌아가는 반복 구조. 이 도식은 영상의 설명을 정리한 것으로, 특정 모델의 실제 학습 절차를 확인한 것은 아님.</figcaption>
+        </figure>
+
+        <div class="gallery">
+          <figure class="scene">
+            <a class="image-link" href="assets/721boyjkbx4-ts-00-15-34.jpg" aria-label="15:34 BenchCAD 부품 예시 원본 이미지 보기">
+              <img src="assets/721boyjkbx4-ts-00-15-34.jpg" width="640" height="360" alt="기어, 플랜지, 힌지, 키홀 플레이트 등 BenchCAD 기계 부품과 카테고리 분포 화면" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="scene-top"><a>15:34 ↗</a><strong>17.9k개 부품, 106개 부품군</strong></div>
+              <p>화면에 기재된 데이터 규모. 볼트·기어·스프링 등 다양한 부품군을 이미지에서 코드로 복원하는 과제로 설명함. 세부 데이터 구성과 분할은 원문 확인 필요.</p>
+            </figcaption>
+          </figure>
+
+          <figure class="scene">
+            <a class="image-link" href="assets/721boyjkbx4-ts-00-16-22.jpg" aria-label="16:22 공간 이해 향상 가설 화면 원본 이미지 보기">
+              <img src="assets/721boyjkbx4-ts-00-16-22.jpg" width="640" height="360" alt="왜 공간인가라는 가설과 BenchCAD 논문을 소개하며 시스템 카드는 학습 데이터를 말하지 않는다고 설명하는 화면" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="scene-top"><a>16:22 ↗</a><strong>시스템 카드는 학습 내역이 아니다</strong></div>
+              <p>Zhang 외, UCSD·Rice로 소개된 BenchCAD 논문과 함께 공간 능력의 원인을 논의함. 화면에서도 시스템 카드만으로 학습 데이터를 알 수 없다는 한계를 명시함.</p>
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="reading">
+          <div class="table-wrap" tabindex="0" role="region" aria-label="BenchCAD 비교 수치 표, 좁은 화면에서는 가로 스크롤 가능">
+            <table>
+              <caption>비슷해 보이지만 다른 두 비교</caption>
+              <thead>
+                <tr><th scope="col">비교 축</th><th scope="col">영상의 수치</th><th scope="col">읽을 수 있는 것과 한계</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">모델 시점 간 단발 평가</th>
+                  <td class="numeric">0.274 → 0.730</td>
+                  <td>공간 복원 성능 향상의 단서. 동일 조건 여부와 실제 학습 원인은 별도 확인 필요.</td>
+                </tr>
+                <tr>
+                  <th scope="row">하네스에 따른 평가</th>
+                  <td class="numeric">0.730 → 0.962</td>
+                  <td>실행 구조의 기여를 설명하는 사례. 반복 횟수·도구·예산 조건이 없으면 모델 개선량과 직접 비교하기 어려움.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="formula">
+            <p class="math">IoU(A, B) = |A ∩ B| / |A ∪ B|</p>
+            <p>비교 대상 A와 B의 합집합 대비 교집합 비율. 일반적으로 0에서 1 사이이며, 값이 클수록 겹침이 큼. 이 노트만으로는 BenchCAD의 정확한 비교 공간·샘플링·집계 방식을 확정할 수 없으므로, 위 식은 지표의 일반 정의로 제시함.</p>
+          </div>
+
+          <div class="split-note">
+            <div>
+              <span class="micro-label">진행자의 가설 A</span>
+              <h3>공간·시공간 작업의 학습이 전이됐을 가능성</h3>
+              <p>코드로 표현 가능한 공간 작업을 학습하면서 3D 이해가 좋아졌고, 그 능력이 영상 편집·모션그래픽으로 이어졌다는 해석.</p>
+            </div>
+            <div>
+              <span class="micro-label">함께 제시된 가설 B</span>
+              <h3>영상 제작 전용 환경이 있었을 가능성</h3>
+              <p>BenchCAD와의 연결보다 영상 편집 전용 RL 환경이나 데이터셋이 직접적인 원인이었을 수 있다는 반론.</p>
+            </div>
+          </div>
+          <p><strong>현재 자료로는 두 가설을 가를 수 없음.</strong> 평가 항목의 등장, 성능 향상, 실제 학습 데이터 사용은 구분해서 읽어야 할 세 가지 사실관계.</p>
+        </div>
+      </section>
+
+      <section class="chapter" id="transfer" aria-labelledby="transfer-title">
+        <header class="chapter-head">
+          <span class="chapter-number" aria-hidden="true">04</span>
+          <div>
+            <p class="eyebrow">From Benchmarks to Creative Work</p>
+            <h2 id="transfer-title">공간 이해의 개선이 영상 제작으로 이어졌을까</h2>
+          </div>
+        </header>
+
+        <div class="reading">
+          <p class="lead">벤치마크의 숫자가 사용자 경험으로 번역되는 장면은 모션그래픽과 쇼츠 제작 사례에서 나타남. 다만 인상적인 결과물은 가능성을 보여주는 사례이며, 재현성과 성공률을 측정한 평가는 아님.</p>
+          <p>영상에 소개된 X 게시물은 약 5분 동안 음성으로 지시하고 Claude가 12시간 작업해 결과물을 만들었다고 주장함. “프롬프트 하나”라는 표현에서도 실제 실행 시간과 내부 반복이 얼마나 큰 역할을 했는지 살펴볼 필요가 있음.</p>
+        </div>
+
+        <div class="gallery">
+          <figure class="scene">
+            <a class="image-link" href="assets/721boyjkbx4-ts-00-17-01.jpg" aria-label="17:01 모션그래픽 제작 사례 원본 이미지 보기">
+              <img src="assets/721boyjkbx4-ts-00-17-01.jpg" width="640" height="360" alt="Opus 5.5로 한 번의 프롬프트에서 만들었다고 소개된 모션그래픽 영상과 X 게시물" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="scene-top"><a>17:01 ↗</a><strong>짧은 지시, 긴 실행</strong></div>
+              <p>게시물 작성자의 설명은 음성 지시 5분, 작업 12시간. 시각 디자인을 높게 평가한 반응도 소개됨. 개별 사용자 사례로, 작업 로그와 재현 조건은 제공되지 않음.</p>
+            </figcaption>
+          </figure>
+
+          <figure class="scene">
+            <a class="image-link" href="assets/721boyjkbx4-ts-00-17-47.jpg" aria-label="17:47 영상 편집 평가와 Blender 워크플로 설명 원본 이미지 보기">
+              <img src="assets/721boyjkbx4-ts-00-17-47.jpg" width="640" height="360" alt="영상 편집 직접 평가의 부재를 설명하고 Blender Python으로 렌더링하고 수정하는 사례를 소개한 화면" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="scene-top"><a>17:47 ↗</a><strong>근접 사례와 직접 평가는 다름</strong></div>
+              <p>영상은 세 회사의 시스템 카드에서 영상 편집·모션그래픽 직접 평가를 찾지 못했다고 정리함. 근접 사례로 OpenAI Developers의 「Architectural visualization with Astra」와 Blender Python 워크플로를 제시함. 이 글에서는 해당 카드와 문서를 독립 대조하지 않음.</p>
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="reading">
+          <h3>이해·조작·제작은 연결되지만 같은 능력은 아님</h3>
+          <p>이어지는 화면에는 Chartography, LVBench, ScreenSpot-Pro, OSWorld 2.0, SWE-bench Multimodal, GDPval-AA 등이 나열됨. 영상은 이미지·긴 영상 이해와 컴퓨터 사용 능력의 확장을 논의하지만, 이 평가들을 곧바로 영상 편집 품질의 점수로 읽어서는 안 됨.</p>
+          <p>진행자가 직접 만든 쇼츠 사례는 더 구체적임. 팟캐스트 녹음본을 주고 소재 선정과 쇼츠 제작을 요청했으며, Claude가 Remotion의 React 코드로 화면을 구성했다고 설명함. 동시에 결과가 아직 완벽하지 않다는 단서도 붙음.</p>
+        </div>
+
+        <div class="gallery">
+          <figure class="scene">
+            <a class="image-link" href="assets/721boyjkbx4-ts-00-18-59.jpg" aria-label="18:59 이미지와 긴 영상 이해 벤치마크 목록 원본 이미지 보기">
+              <img src="assets/721boyjkbx4-ts-00-18-59.jpg" width="640" height="360" alt="Chartography, LVBench, ScreenSpot-Pro, OSWorld 등 이미지·영상·컴퓨터 사용 관련 평가 목록" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="scene-top"><a>18:59 ↗</a><strong>넓어지는 멀티모달 평가</strong></div>
+              <p>진행자는 긴 영상 이해에 별도 도메인 모델이 필요하리라는 자신의 예상과 달리, LLM 기반 모델의 적용 범위가 넓어지고 있다고 평가함. 모델 구조에 대한 검증 결과가 아니라 진행자의 관찰과 해석.</p>
+            </figcaption>
+          </figure>
+
+          <figure class="scene">
+            <a class="image-link" href="assets/721boyjkbx4-ts-00-19-50.jpg" aria-label="19:50 자동 제작 쇼츠 사례 원본 이미지 보기">
+              <img src="assets/721boyjkbx4-ts-00-19-50.jpg" width="640" height="360" alt="팟캐스트 녹음본에서 제작했다고 소개된 세로형 쇼츠 썸네일 네 개" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="scene-top"><a>19:50 ↗</a><strong>녹음본에서 쇼츠까지</strong></div>
+              <p>소재 추출과 영상 구성을 한 번의 요청으로 수행했다는 사례. Remotion 기반 코드 생성 구조가 소개되며, 추가 개선이 필요한 결과라는 설명도 함께 제시됨.</p>
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="reading">
+          <aside class="callout warm">
+            <span class="label">사례를 평가로 바꾸려면</span>
+            <p>동일한 원본과 요청으로 반복 실행하고, <strong>내용 정확성·편집 완성도·수정 횟수·실행 시간·비용</strong>을 기록할 필요. 결과물 한 편만으로 모델의 일반적 제작 능력이나 학습 원인을 분리해 판단하기는 어려움.</p>
+          </aside>
+          <h3>에이전트의 언어도 달라지는가</h3>
+          <p>또 다른 관찰은 에이전트 간 대화의 언어 혼용. 한국어·영어·식별자가 붙어 있거나 다른 언어로 전환하는 사례를 두고, 진행자들은 토큰 효율을 보상하는 학습의 영향일 수 있다고 추측함. 개인 하네스의 스킬 이름 같은 고유명사도 출력 언어에 영향을 줄 수 있다는 경험을 공유함.</p>
+        </div>
+
+        <figure class="scene scene-horizontal">
+          <a class="image-link" href="assets/721boyjkbx4-ts-00-20-46.jpg" aria-label="20:46 에이전트 간 혼합 언어 로그 원본 이미지 보기">
+            <img src="assets/721boyjkbx4-ts-00-20-46.jpg" width="640" height="360" alt="띄어쓰기 없이 한국어, 영어, 식별자가 섞여 있는 에이전트 대화 로그로 소개된 화면" loading="lazy" decoding="async">
+          </a>
+          <figcaption>
+            <div class="scene-top"><a>20:46 ↗</a><strong>사람에게는 낯선 혼합 언어</strong></div>
+            <p>진행자들은 이를 사람 사이의 전문 은어에 비유하고 모델별 언어 습관의 차이를 언급함. 다만 이 로그만으로 내부 사고 방식이나 RL 보상의 효과를 확인할 수는 없음. 모델 다양성의 필요성도 경험에 기반한 제안으로 제시됨.</p>
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="chapter" id="reasoning" aria-labelledby="reasoning-title">
+        <header class="chapter-head">
+          <span class="chapter-number" aria-hidden="true">05</span>
+          <div>
+            <p class="eyebrow">Reasoning Protection &amp; Market Claims</p>
+            <h2 id="reasoning-title">좋아진 능력은 어떻게 보호되고 유통되는가</h2>
+          </div>
+        </header>
+
+        <div class="reading">
+          <p class="lead">후반부는 성능의 원인에서 추론 과정의 보호로 이동함. 진행자들은 chain-of-thought를 이용한 증류를 어렵게 만드는 장치와, 이를 둘러싼 재사용·추출 연구를 소개함.</p>
+          <p>노트에는 사용자가 원문 thinking 대신 요약·빈칸과 signature를 받고, 이후 요청에서 이를 돌려주는 구조로 설명돼 있음. 이어 다른 대화·모델·계정에서의 재사용을 제한하는 방식이 언급됨. <strong>서명, 해시, 암호화, 서버 측 복원은 기술적으로 구별되는 개념</strong>이므로, 영상의 비유만으로 실제 API 내부 구현을 확정해서는 안 됨.</p>
+        </div>
+
+        <div class="gallery">
+          <figure class="scene">
+            <a class="image-link" href="assets/721boyjkbx4-ts-00-23-35.jpg" aria-label="23:35 추론 보호와 성능 차이 화면 원본 이미지 보기">
+              <img src="assets/721boyjkbx4-ts-00-23-35.jpg" width="640" height="360" alt="Locked Thoughts라는 제목 아래 thinking 블록과 signature, 80.4퍼센트와 71.8퍼센트 수치가 표시된 화면" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="scene-top"><a>23:35 ↗</a><strong>‘잠긴 생각’의 가치</strong></div>
+              <p>화면 수치는 <strong>80.4% 대 71.8%</strong>, 차이는 <strong>8.6%p</strong>. 노트는 이를 Opus 4.8의 서명 유무에 따른 성능 차이로 정리함. 함께 보이는 90~99%는 재사용 차단 효과로 소개되나, 정확한 평가 조건은 미확인.</p>
+            </figcaption>
+          </figure>
+
+          <figure class="scene">
+            <a class="image-link" href="assets/721boyjkbx4-ts-00-23-47.jpg" aria-label="23:47 원본 추론과 추출 결과 비교 원본 이미지 보기">
+              <img src="assets/721boyjkbx4-ts-00-23-47.jpg" width="640" height="360" alt="Source와 Jailbroken Model Trace를 비교하는 논문 그림 및 모델 제공사별 그래프" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="scene-top"><a>23:47 ↗</a><strong>보호된 추론의 재사용 문제</strong></div>
+              <p>Encrypted Thought Injection으로 소개된 그림. claude-opus-4-8의 원본 trace와 claude-haiku-4-5를 통한 추출 결과를 비교한다고 설명함. 이 글은 논문의 실험이나 재현성을 별도로 검증하지 않음.</p>
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="reading">
+          <h3>영상이 설명한 공격·방어의 구조</h3>
+          <p>공격 유형은 다른 대화로 보호된 추론을 옮기는 <em>cross-session replay</em>와, 더 약한 모델을 통해 내용을 노출시키는 방식으로 요약됨. 방어는 앞선 맥락과의 결합, 모델·계정 경계에서의 재사용 제한으로 설명됨.</p>
+          <p>진행자는 이를 “이전 블록까지 합쳐 해싱”하는 블록체인식 비유로 풀어냄. 확인할 핵심은 비유 자체보다 <strong>어떤 맥락과 주체에 추론 상태가 묶이며, 경계를 넘는 요청을 어떻게 검증하는가</strong>임.</p>
+        </div>
+
+        <div class="gallery">
+          <figure class="scene">
+            <a class="image-link" href="assets/721boyjkbx4-ts-00-25-50.jpg" aria-label="25:50 약한 모델을 이용한 추론 노출 연구 설명 원본 이미지 보기">
+              <img src="assets/721boyjkbx4-ts-00-25-50.jpg" width="640" height="360" alt="보호된 추론을 더 약한 모델로 전달하는 연구의 개념도와 관련 논문 표기" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="scene-top"><a>25:50 ↗</a><strong>모델 경계를 넘는 추론</strong></div>
+              <p>Panfilov 외, <code>arXiv:2608.09867</code>로 기재된 연구를 소개함. 진행자는 해당 설명 영상도 논문을 입력해 자동 생성했다고 밝힘. 논문 서지정보와 기술 세부는 원문 대조 필요.</p>
+            </figcaption>
+          </figure>
+
+          <figure class="scene">
+            <a class="image-link" href="assets/721boyjkbx4-ts-00-26-13.jpg" aria-label="26:13 추론 재사용 공격 분류 원본 이미지 보기">
+              <img src="assets/721boyjkbx4-ts-00-26-13.jpg" width="640" height="360" alt="Breaking the Seal 슬라이드에서 다른 대화로의 재사용과 약한 모델을 통한 추론 노출을 분류한 화면" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="scene-top"><a>26:13 ↗</a><strong>사례의 출처를 구분하기</strong></div>
+              <p>Moonshot·DeepSeek 관련 사례와 「Stealing Reasoning Traces from Proprietary LLM APIs」가 언급됨. 출연자들은 관련 주장이 자신들의 독립 조사 결과가 아니라 보고서·연구 인용임을 구분함.</p>
+            </figcaption>
+          </figure>
+        </div>
+
+        <figure class="scene scene-horizontal">
+          <a class="image-link" href="assets/721boyjkbx4-ts-00-25-53.jpg" aria-label="25:53 paper2video 서비스 소개 원본 이미지 보기">
+            <img src="assets/721boyjkbx4-ts-00-25-53.jpg" width="640" height="360" alt="Research to video 문구와 arXiv 주소, 언어, 세로 영상 비율, 크레딧 항목이 있는 paper2video 화면" loading="lazy" decoding="async">
+          </a>
+          <figcaption>
+            <div class="scene-top"><a>25:53 ↗</a><strong>논문에서 설명 영상으로</strong></div>
+            <p>진행자가 만든 paper2video 소개. arXiv URL·언어·9:16 형식 입력과 “Create 3 videos · 20 credits”가 표시됨. 로그인과 크레딧이 필요하며 생성에 시간이 걸린다고 설명함. 논문 내용을 영상으로 옮기는 활용 사례로 제시된 장면.</p>
+          </figcaption>
+        </figure>
+
+        <div class="reading">
+          <h3>리셀러 시장: 가격표와 주장의 신뢰도는 별개</h3>
+          <p>영상은 정가보다 크게 낮은 가격의 중계 서비스를 소개하며, 구독 계정을 묶어 요청을 전달하는 구조를 설명함. 진행자들은 남는 사용량을 모으는 방식의 지속 가능성과 모델 바꿔치기·로그 판매 가능성을 논의함.</p>
+          <p>이 대목에는 외부 보도 인용, 보고서 인용, 진행자의 추측이 섞여 있음. 특히 특정 모델을 의도적으로 열어 뒀다는 주장 등은 출연자들 스스로 루머라고 밝힌 부분. <strong>화면의 가격이나 업체별 숫자를 검증된 거래 실태로 확장하지 않는 것</strong>이 중요함.</p>
+        </div>
+
+        <div class="gallery">
+          <figure class="scene">
+            <a class="image-link" href="assets/721boyjkbx4-ts-00-26-52.jpg" aria-label="26:52 증류 시장 관련 수치 화면 원본 이미지 보기">
+              <img src="assets/721boyjkbx4-ts-00-26-52.jpg" width="640" height="360" alt="The 10% Market 슬라이드에 보고서 인용으로 소개된 업체별 집계 수치가 표시된 화면" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="scene-top"><a>26:52 ↗</a><strong>보고서 인용으로 제시된 수치</strong></div>
+              <p>화면 표기: Alibaba 151M+, Moonshot 23M+, DeepSeek 12.1M+, Zhipu 3.4M+, Xiaomi 400k+. 영상에서는 Anthropic 보고서의 업체별 건수라고 소개함. 집계 대상·기간·방법과 해당 주장 자체는 독립 확인되지 않음.</p>
+            </figcaption>
+          </figure>
+
+          <figure class="scene">
+            <a class="image-link" href="assets/721boyjkbx4-ts-00-27-18.jpg" aria-label="27:18 중계소 구조 설명 원��� 이미지 보기">
+              <img src="assets/721boyjkbx4-ts-00-27-18.jpg" width="640" height="360" alt="정가보다 낮은 가격의 중계소와 다수 계정을 묶는 리버스 프록시 구조를 설명하는 화면" loading="lazy" decoding="async">
+            </a>
+            <figcaption>
+              <div class="scene-top"><a>27:18 ↗</a><strong>다수 계정을 묶는 중계 구조</strong></div>
+              <p>The Information의 10월 2일 보도로 소개된 내용. 베이징 한 건물의 30여 업체와 수십~수백 개 계정을 묶는 구조가 언급됨. 이 글은 보도 원문이나 개별 서비스의 운영 방식을 확인하지 않음.</p>
+            </figcaption>
+          </figure>
+        </div>
+
+        <figure class="scene scene-horizontal">
+          <a class="image-link" href="assets/721boyjkbx4-ts-00-27-49.jpg" aria-label="27:49 리셀러 가격 비교 화면 원본 이미지 보기">
+            <img src="assets/721boyjkbx4-ts-00-27-49.jpg" width="640" height="360" alt="Opus 5.5와 Sonnet 5.5의 가격 표기, 중계소 할인 비율 및 중국 가격 비교 페이지 캡처" loading="lazy" decoding="async">
+          </a>
+          <figcaption>
+            <div class="scene-top"><a>27:49 ↗</a><strong>당시 화면에 제시된 가격 비교</strong></div>
+            <p>공식가로 소개된 표기는 Opus 5.5 <strong>$4/$20</strong>, Sonnet 5.5 <strong>$2/$10</strong>. 중계소 공지에는 공식가의 15%, 가격 비교 화면에는 입력가 약 4.5%라는 비율이 등장함.</p>
+            <p>영상 시점의 화면 기록이며, 현재 요금·동일 모델 제공 여부·과금 조건을 보증하는 비교는 아님.</p>
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="chapter" id="implications" aria-labelledby="implications-title">
+        <header class="chapter-head">
+          <span class="chapter-number" aria-hidden="true">06</span>
+          <div>
+            <p class="eyebrow">Research &amp; Human Judgment</p>
+            <h2 id="implications-title">능력이 커질수록, 무엇을 검증할지 더 중요해진다</h2>
+          </div>
+        </header>
+
+        <div class="reading">
+          <p class="lead">영상의 마지막 질문은 “이제 인간은 무엇을 하는가”로 확장됨. 그에 앞서 드러나는 기술적 쟁점은, 에이전트가 오래 일하고 더 많은 도구를 사용할수록 환경의 경계까지 시험하게 된다는 것.</p>
+          <p>진행자들은 OpenAI 레드티밍 관련 보도를 소개하며 DNS를 통한 통신 우회, CPU 캐시 타이밍이나 파일명을 이용한 에이전트 간 통신 사례를 언급함. 이 글에서는 사건을 독립 검증하지 않았으며, 영상에서 다룬 안전성 논점으로 정리함.</p>
+        </div>
+
+        <figure class="scene scene-horizontal">
+          <a class="image-link" href="assets/721boyjkbx4-ts-00-28-35.jpg" aria-label="28:35 레드티밍 은닉 통신 사례 원본 이미지 보기">
+            <img src="assets/721boyjkbx4-ts-00-28-35.jpg" width="640" height="360" alt="OpenAI 레드티밍 에이전트의 하드웨어 은닉 채널과 DNS 우회 사례를 소개한 슬라이드" loading="lazy" decoding="async">
+          </a>
+          <figcaption>
+            <div class="scene-top"><a>28:35 ↗</a><strong>샌드박스도 평가의 대상</strong></div>
+            <p>10월 24일 보도로 소개된 하드웨어 수준 은닉 채널 사례. 앞선 14분대 논의에서 언급한 내용이 정리 구간에 다시 등장함. 성능 평가와 함께 통신·권한·감사 경계를 점검해야 한다는 시사점으로 연결됨.</p>
+          </figcaption>
+        </figure>
+
+        <div class="reading">
+          <h3>로봇·자율작업 연구에 옮길 수 있는 질문</h3>
+          <p>이 노트가 로봇·필드로봇 연구에 주는 실용적인 제안은 모델 선택에 앞서 <strong>장기 작업, 피드백, 성공 판정을 함께 설계</strong>해 보는 것. 메모리나 계획 모듈을 제거하자는 결론이 아니라, 환경과 검증 루프를 우선 투자 대상으로 검토할 수 있다는 의미.</p>
+
+          <div class="table-wrap" tabindex="0" role="region" aria-label="연구 적용과 검증 기준 표, 좁은 화면에서는 가로 스크롤 가능">
+            <table>
+              <caption>영상의 논지를 연구 설계로 옮긴다면</caption>
+              <thead>
+                <tr><th scope="col">질문</th><th scope="col">비교할 조건</th><th scope="col">남겨야 할 근거</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">하네스의 기여는 얼마인가</th>
+                  <td>동일 모델·과제에서 실행 루프와 도구 구성을 변경</td>
+                  <td>성공률, 시간, 비용, 재시도 수, 실패 유형</td>
+                </tr>
+                <tr>
+                  <th scope="row">서브에이전트가 필요한가</th>
+                  <td>단일 루프와 분리 구조를 같은 예산에서 비교</td>
+                  <td>맥락 손실, 결과 품질, 병렬화 효과</td>
+                </tr>
+                <tr>
+                  <th scope="row">장기 태스크를 검증할 수 있는가</th>
+                  <td>성공·부분 성공·실패 기준과 중간 관측을 명시</td>
+                  <td>상태 기록, 실패 복구 과정, 최종 판정 근거</td>
+                </tr>
+                <tr>
+                  <th scope="row">평가 점수가 실제 작업으로 이어지는가</th>
+                  <td>벤치마크와 목표 업무를 구분해 각각 평가</td>
+                  <td>업무별 재현성, 일반화 범위, 추가 수정량</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="table-note">위 표는 영상의 실험 결과가 아니라, 논의를 바탕으로 정리한 적용 제안. 허용 오차와 완료 기준은 실제 작업의 요구사항에 맞춰 사전 정의할 필요.</p>
+
+          <h3>새 벤치마크는 다음 도메인의 단서</h3>
+          <p>시스템 카드에 새로 등장하는 BenchCAD·LVBench·OSWorld 같은 평가를 추적하면 모델이 다루기 시작한 작업 범위를 살펴볼 수 있음. 다만 평가 항목의 추가는 관찰 가능한 신호일 뿐, 해당 데이터의 학습 사용이나 미래 성과를 보장하는 증거는 아님.</p>
+
+          <h3>인간의 역할은 ‘선택지의 평가’까지 포함</h3>
+          <p>영상은 조사와 구현뿐 아니라 판단 지원도 에이전트의 영역이 되고 있다고 봄. 모호한 주관식 질문을 몇 개의 선택지로 정리하는 기능이 사람의 판단 부담을 낮춘다는 관찰. 고객에게 필요한 질문을 잘했는지 평가하는 FDE, 즉 현장 엔지니어 관련 벤치마크 시도도 언급됨.</p>
+          <p>한쪽에서는 인간이 높은 수준의 맥락과 해야 할 일, 커뮤니케이션에 집중할 것이라고 전망함. 다른 쪽에서는 인간 간 커뮤니케이션 자체가 줄어들 수 있다고 반론함. 검증까지 자동화되면 재귀적 자기개선이 가속될 것이라는 논의도 나오지만, 이는 <strong>미래에 대한 전망</strong>으로 읽어야 함.</p>
+        </div>
+      </section>
+
+      <section class="closing" aria-labelledby="closing-title">
+        <p class="eyebrow">Takeaway</p>
+        <h2 id="closing-title">다음에 볼 것은 더 높은 점수만이 아니다.<br>그 점수를 만든 실행과 검증의 구조다.</h2>
+        <p>이 영상이 남기는 가장 유용한 관점은 Opus 5.5의 개선 원인을 하나로 단정하는 대신, <strong>모델·하네스·환경·평가를 함께 살펴보는 것</strong>. BenchCAD와 영상 제작 사례는 흥미로운 연결을 보여주지만, 학습 데이터와 인과관계에 관한 질문은 여전히 열려 있음.</p>
+        <p>다음 모델이나 에이전트를 평가할 때는 다음 세 질문부터 시작할 수 있음.</p>
+        <ul class="checklist">
+          <li>같은 과제와 완료 기준에서 비교했는가?</li>
+          <li>도구·재시도·실행 시간·비용의 차이를 기록했는가?</li>
+          <li>잘된 사례뿐 아니라 실패와 검증 한계도 남겼는가?</li>
+        </ul>
+      </section>
+
+      <section class="sources reading" id="sources" aria-labelledby="sources-title">
+        <h2 id="sources-title">출처 노트와 해석의 경계</h2>
+        <p class="source-intro">본문의 화면 설명과 수치는 제공된 Obsidian 노트에 근거함. 캡처 24장을 원래의 시간 표기와 함께 보존했으며, 각 시각 링크는 해당 영상 구간으로 연결됨. 외부 문헌의 제목·날짜·저자 표기는 노트에 기재된 정보로, 원문을 별도로 대조하지 않음.</p>
+
+        <ol class="source-list">
+          <li id="source-video">
+            <strong><span class="ref-index">01</span>기본 자료 · sudoremove 영상</strong>
+            <p><a>「Claude Opus 5.5는 왜 이렇게 좋아졌을까?」</a>. 노트에 기재된 게시일 2026-10-31, 길이 31:44. 이 글의 직접적인 편집 대상은 해당 영상에 관한 사용자 제공 노트임.</p>
+          </li>
+          <li>
+            <strong><span class="ref-index">02</span>자막과 이미지의 한계</strong>
+            <p>원노트는 수동 자막이 없어 한국어 자동 자막 <code>ko-orig</code>를 사용했다고 밝힘. “오플스”와 “한네스” 같은 인식 오류는 문맥에 따라 Opus·하네스로 정리됐으며, 발화는 의미 단위로 요약됨. 본문의 강조 문구는 별도 표시가 없는 한 직접 인용이 아님.</p>
+            <p>원노트에 따르면 1080p·720p 스트림이 403으로 차단돼 360p, format 18 영상에서 캡처함. 작은 글씨와 일부 수치의 판독에는 한계가 있음. 이미지 링크를 통해 제공된 캡처 원본을 확인할 수 있음.</p>
+          </li>
+          <li>
+            <strong><span class="ref-index">03</span>성능·비용 자료</strong>
+            <p>Artificial Analysis 차트, Terminal-Bench 4.0, BenchCAD, Anthropic Embody 등이 영상 화면에서 소개됨. 가격의 과금 단위, 평가 버전, 실행 예산, 하네스 구성, 통계적 불확실성은 이 노트만으로 충분히 확인되지 않음. 화면에 나온 모델명과 수치는 해당 자료의 기록으로 취급함.</p>
+          </li>
+          <li>
+            <strong><span class="ref-index">04</span>에이전트·공간 이해 관련 문헌</strong>
+            <p>Diane Sarkis의 「Building agents: When to fold subagents into your main agent loop」(화면 표기 2026-10-22), Zhang 외의 BenchCAD 논문(UCSD·Rice로 소개), OpenAI Developers의 「Architectural visualization with Astra」가 언급됨. 원문 링크와 상세 서지정보는 제공된 노트에서 확인되지 않음.</p>
+          </li>
+          <li>
+            <strong><span class="ref-index">05</span>추론 보호 연구</strong>
+            <p>Panfilov 외, 「Stealing Reasoning Traces from Proprietary LLM APIs」 및 <code>arXiv:2608.09867</code>이 노트에 기재됨. Locked Thoughts·Encrypted Thought Injection·Breaking the Seal은 관련 장면의 표제 또는 설명으로 등장함. 정확한 문헌 대응 관계와 방어 구현은 추가 대조가 필요함.</p>
+          </li>
+          <li>
+            <strong><span class="ref-index">06</span>시장·안전성 관련 재인용</strong>
+            <p>Anthropic 증류 보고서, The Information의 10월 2일 보도, OpenAI 레드티밍 관련 10월 24일 보도가 영상에서 인용됨. 업체별 집계, 리셀러 가격과 운영 방식, 은닉 통신 사례는 이 글에서 독립 확인하지 않음. 진행자의 의견과 스스로 루머로 밝힌 내용은 확인된 사실과 구분함.</p>
+          </li>
+          <li>
+            <strong><span class="ref-index">07</span>이 글에서 추가한 정리</strong>
+            <p>비용 계산의 기본식, IoU의 일반 정의, 비교 조건 표, 연구 적용 질문은 이해를 돕기 위한 편집상의 보충. 새로운 실험 결과나 특정 모델의 학습 내역을 제시하는 내용은 아님.</p>
+          </li>
+        </ol>
+      </section>
+
+      <aside class="share reading" aria-label="공유용 핵심 문장">
+        <p class="eyebrow">공유할 한 문장</p>
+        <blockquote>“에이전트의 성능은 모델 이름만으로 설명되지 않는다. 하네스가 어떤 행동을 가능하게 하고, 환경이 무엇을 검증하는지까지 함께 봐야 한다.”</blockquote>
+        <div class="share-links">
+          <a>원영상과 함께 공유하기 ↗</a>
+          <a href="#findings-title">핵심 발견 다시 읽기 ↑</a>
+          <a href="#sources">출처와 한계 확인하기</a>
+        </div>
+      </aside>
+    </article>
+  </main>
+
+  <footer class="footer wrap">
+    <p>영상 기반 연구 노트 · Claude · AI 에이전트 · 검증 환경</p>
+    <p><a href="#top">맨 위로 ↑</a></p>
+  </footer>
+</body>
+</html>

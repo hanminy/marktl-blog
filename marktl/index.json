@@ -1,7 +1,24 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-26T12:21:40.702Z",
+  "updatedAt": "2026-10-31T12:09:17.013Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-claude-opus-5-5%EB%8A%94-%EC%99%9C-%EC%9D%B4%EB%A0%87%EA%B2%8C-%EC%A2%8B%EC%95%84%EC%A1%8C%EC%9D%84%EA%B9%8C-%EC%9A%94%EC%95%BD/",
+      "excerpt": "Claude Opus 5.5는 왜 이렇게 좋아졌을까? 영상 정보 채널 : sudoremove 게시일 : 2026 10 31 길이 : 31:44 링크 : https://www.youtube.com/watch?v=721BOyjkbX4 <div style=\"position: relative; width: 100%; padding bottom: 56.25%; height: 0; overflow: hidden;\" <iframe styl",
+      "shortId": "11f1kxy",
+      "slug": "yt-claude-opus-5-5는-왜-이렇게-좋아졌을까-요약",
+      "sourcePath": "02_research/AI/Sudoremove/yt_Claude Opus 5.5는 왜 이렇게 좋아졌을까_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료",
+        "AI에이전트",
+        "Claude"
+      ],
+      "title": "Claude Opus 5.5는 왜 이렇게 좋아졌을까?",
+      "updatedAt": "2026-10-31T12:09:17.013Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/11f1kxy/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-ep-120-%EA%B0%80%EC%B9%98%EB%8A%94-%EC%96%B4%EB%94%94%EB%A1%9C-%EA%B0%80%EB%8A%94%EA%B0%80-ai-%EC%8B%9C%EC%9E%A5-%EC%A1%B0%EC%A0%95-coreweave-%EC%9C%84%EA%B8%B0%EC%99%80-operation-loop-%EC%9A%94%EC%95%BD/",
