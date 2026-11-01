@@ -1,7 +1,24 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-31T12:09:17.013Z",
+  "updatedAt": "2026-11-01T12:12:06.533Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-state-of-ai-report-2026-%EC%98%AC%ED%95%B4-ai-1%EB%85%84-%EC%B4%9D%EC%A0%95%EB%A6%AC-%EC%9A%94%EC%95%BD/",
+      "excerpt": "State of AI Report 2026, 올해 AI 1년 총정리 영상 정보 채널 : sudoremove 게시일 : 2026 11 01 길이 : 48:34 링크 : https://www.youtube.com/watch?v=ss2XPDb1y0Y 출연 : JB, JC (라이브 스트림 형식, 시청자 채팅 질의응답 포함) <div style=\"position: relative; width: 100%; padding bottom: 5",
+      "shortId": "174fn1m",
+      "slug": "yt-state-of-ai-report-2026-올해-ai-1년-총정리-요약",
+      "sourcePath": "02_research/AI/Sudoremove/yt_State of AI Report 2026, 올해 AI 1년 총정리_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료",
+        "AI트렌드",
+        "StateofAI"
+      ],
+      "title": "State of AI Report 2026, 올해 AI 1년 총정리",
+      "updatedAt": "2026-11-01T12:12:06.533Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/174fn1m/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-claude-opus-5-5%EB%8A%94-%EC%99%9C-%EC%9D%B4%EB%A0%87%EA%B2%8C-%EC%A2%8B%EC%95%84%EC%A1%8C%EC%9D%84%EA%B9%8C-%EC%9A%94%EC%95%BD/",
