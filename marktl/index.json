@@ -1,7 +1,25 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-05T12:21:27.953Z",
+  "updatedAt": "2026-11-06T12:16:50.670Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-gemini-4-argon-%EC%8B%9C%EB%AE%AC%EB%A0%88%EC%9D%B4%EC%85%98%EC%97%90%EC%84%9C-%EB%B0%B0%EC%9A%B4-%EB%8F%99%EC%9E%91%EC%9D%84-%ED%98%84%EC%8B%A4%EB%A1%9C-%EC%98%AE%EA%B8%B0%EB%8A%94-%EB%B2%95-%EC%9A%94%EC%95%BD/",
+      "excerpt": "Gemini 4 Argon 시뮬레이션에서 배운 동작을 현실로 옮기는 법 영상 정보 채널 : sudoremove (@sudoremove) 게시일 : 2026 11 05 길이 : 35분 42초 (2,142초) 챕터 : 25개 링크 : https://www.youtube.com/watch?v=9GA2RSkEv9U <div style=\"position: relative; width: 100%; padding bottom: 56.25%",
+      "shortId": "1jrntdo",
+      "slug": "yt-gemini-4-argon-시뮬레이션에서-배운-동작을-현실로-옮기는-법-요약",
+      "sourcePath": "02_research/AI/Sudoremove/yt_Gemini 4 Argon 시뮬레이션에서 배운 동작을 현실로 옮기는 법_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료",
+        "로보틱스",
+        "VLA",
+        "Real2Sim"
+      ],
+      "title": "Gemini 4 Argon 시뮬레이션에서 배운 동작을 현실로 옮기는 법",
+      "updatedAt": "2026-11-06T12:16:50.670Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/1jrntdo/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-ep-121-anthropic-s-1-%ED%95%B4%EB%B6%80-%EC%9C%84%ED%97%98-%EC%9A%94%EC%9D%B8%EC%9D%B4-%EC%9D%B8%EB%A5%98%EC%9D%98-%EB%AF%B8%EB%9E%98%EC%9D%B8-%EC%A3%BC%EC%8B%9D-%EC%9A%94%EC%95%BD/",
