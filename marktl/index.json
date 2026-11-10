@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-09T12:16:34.556Z",
+  "updatedAt": "2026-11-10T12:11:02.479Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-%ED%8C%8C%EC%9D%B8%ED%8A%9C%EB%8B%9D-%EA%B0%80%EB%8A%A5%ED%95%9C-%EC%98%A4%ED%94%88%EC%9B%A8%EC%9D%B4%ED%8A%B8-%EB%AA%A8%EB%8D%B8-thinking-machines-inkling-2-small-%EC%9A%94%EC%95%BD/",
+      "excerpt": "파인튜닝 가능한 오픈웨이트 모델 Thinking Machines Inkling 2 Small 영상 정보 채널 : sudoremove (@sudoremove) 게시일 : 2026 11 09 길이 : 7분 49초 (469초) 챕터 : 9개 링크 : https://www.youtube.com/watch?v= i1qCyWl5aY <div style=\"position: relative; width: 100%; padding bottom",
+      "shortId": "1io3i1o",
+      "slug": "yt-파인튜닝-가능한-오픈웨이트-모델-thinking-machines-inkling-2-small-요약",
+      "sourcePath": "02_research/AI/Sudoremove/yt_파인튜닝 가능한 오픈웨이트 모델 - Thinking Machines Inkling 2 Small_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료",
+        "LLM",
+        "오픈웨이트",
+        "ThinkingMachines",
+        "파인튜닝"
+      ],
+      "title": "파인튜닝 가능한 오픈웨이트 모델 | Thinking Machines Inkling 2 Small",
+      "updatedAt": "2026-11-10T12:11:02.479Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/1io3i1o/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-ep-122-%EA%B2%B0%EA%B5%AD-%EA%B8%B0%EC%9A%B8%EA%B8%B0%EA%B0%80-%EB%AC%B8%EC%A0%9C%EB%8B%A4-metr-%EB%B3%B4%EA%B3%A0%EC%84%9C-weight-space-programming-agent-market-%EC%9A%94%EC%95%BD/",

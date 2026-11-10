@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>얼마나 똑똑한가, 얼마나 더 배울 수 있는가 — Inkling 2 Small 연구 노트</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      --paper: #f7f5ef;
+      --surface: #fffefa;
+      --ink: #172c35;
+      --muted: #586970;
+      --line: #d6dcd6;
+      --accent: #b4472d;
+      --teal: #21675e;
+      --soft-teal: #e8efea;
+      --soft-orange: #f4e9de;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "AppleMyungjo", "Batang", serif;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 28px; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 20px;
+      line-height: 1.85;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--teal); text-decoration-thickness: 1px; text-underline-offset: 5px; }
+    a:hover { color: var(--accent); }
+    a:focus-visible { outline: 3px solid var(--accent); outline-offset: 5px; }
+    ::selection { background: #dce8d9; }
+    h1, h2, h3, p, figure, blockquote { margin: 0; }
+    h1, h2, h3 { text-wrap: balance; }
+    h1 { font-family: var(--serif); font-size: clamp(42px, 5.7vw, 76px); line-height: 1.3; font-weight: 700; letter-spacing: -.055em; }
+    h2 { font-size: clamp(30px, 3.6vw, 43px); line-height: 1.4; letter-spacing: -.045em; }
+    h3 { font-size: 24px; line-height: 1.5; letter-spacing: -.025em; }
+    p + p { margin-top: 22px; }
+    strong { font-weight: 750; }
+    small { font-size: 16px; }
+    .wrap { max-width: 1180px; margin: auto; padding: 0 40px; }
+    .masthead { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 25px 0; border-bottom: 1px solid var(--ink); font-size: 14px; letter-spacing: .1em; }
+    .masthead b { letter-spacing: .16em; }
+    .masthead span { color: var(--muted); }
+    .hero { padding: 74px 0 48px; }
+    .eyebrow { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; color: var(--accent); font-size: 14px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; margin-bottom: 25px; }
+    .eyebrow::before { content: ""; width: 30px; height: 2px; background: var(--accent); }
+    .hero-subtitle { margin-top: 20px; color: var(--teal); font-size: 24px; font-weight: 650; letter-spacing: -.025em; }
+    .deck { max-width: 850px; margin-top: 28px; color: var(--muted); font-size: clamp(21px, 2.2vw, 25px); line-height: 1.8; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 30px; padding-top: 22px; border-top: 1px solid var(--line); font-size: 15px; color: var(--muted); }
+    .status { margin-bottom: 42px; padding: 19px 24px; background: var(--soft-orange); border-left: 3px solid var(--accent); font-size: 17px; line-height: 1.8; }
+    .status strong { color: #8e371f; }
+    .abstract { display: grid; grid-template-columns: 160px 1fr; gap: 32px; padding: 35px 0 42px; border-top: 1px solid var(--line); }
+    .label { font-size: 13px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; color: var(--teal); }
+    .abstract .label { padding-top: 7px; }
+    .abstract p { max-width: 830px; }
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--ink); color: white; margin: 4px 0 20px; }
+    .metric { padding: 30px 25px; border-right: 1px solid #42545c; }
+    .metric:last-child { border-right: 0; }
+    .metric .num { display: block; font-size: clamp(32px, 3.8vw, 45px); line-height: 1.3; font-weight: 750; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+    .metric .unit { font-size: 20px; font-weight: 400; }
+    .metric .name { display: block; margin-top: 10px; color: #dce6e5; font-size: 16px; }
+    .metric .sub { display: block; margin-top: 4px; color: #b8cacb; font-size: 14px; }
+    .fineprint { color: var(--muted); font-size: 15px; line-height: 1.8; }
+    .reading-layout { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 42px; margin-top: 64px; }
+    .contents { align-self: start; position: sticky; top: 28px; font-size: 15px; }
+    .contents ol { list-style: none; margin: 17px 0 0; padding: 0; counter-reset: contents; }
+    .contents li { counter-increment: contents; border-top: 1px solid var(--line); }
+    .contents a { display: block; padding: 12px 0; color: var(--muted); text-decoration: none; }
+    .contents a::before { content: "0" counter(contents) " "; margin-right: 8px; color: var(--teal); font-size: 12px; font-weight: 800; }
+    .contents a:hover { color: var(--accent); }
+    .article-body { min-width: 0; }
+    .section { padding-bottom: 70px; margin-bottom: 57px; border-bottom: 1px solid var(--line); }
+    .section-heading { margin-bottom: 28px; }
+    .section-heading .label { display: block; margin-bottom: 12px; }
+    .section p { max-width: 820px; }
+    .finding-list { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+    .finding-list li { display: grid; grid-template-columns: 40px 1fr; gap: 17px; padding: 24px 0; border-bottom: 1px solid var(--line); }
+    .finding-list li:last-child { border-bottom: 0; padding-bottom: 0; }
+    .finding-list .index { color: var(--accent); font-family: var(--serif); font-size: 29px; line-height: 1.6; }
+    .finding-list h3 { margin-bottom: 8px; }
+    .finding-list p { color: var(--muted); font-size: 19px; }
+    .pullquote { margin: 42px 0; padding: 30px 0 30px 28px; border-left: 4px solid var(--teal); }
+    .pullquote p { font-family: var(--serif); font-size: clamp(27px, 3vw, 37px); line-height: 1.65; letter-spacing: -.035em; }
+    .pullquote footer { margin-top: 15px; color: var(--muted); font-size: 14px; }
+    figure.evidence { margin: 32px 0; }
+    .image-frame { background: #e6e9e5; border: 1px solid var(--line); padding: 8px; }
+    .evidence img { display: block; width: 100%; height: auto; }
+    figcaption { margin-top: 12px; color: var(--muted); font-size: 15px; line-height: 1.75; }
+    .fig-number { color: var(--teal); font-weight: 800; margin-right: 7px; }
+    .time-link { white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .note { padding: 23px 26px; margin: 28px 0; background: var(--soft-teal); font-size: 18px; line-height: 1.8; }
+    .note strong { color: var(--teal); }
+    .note p + p { margin-top: 12px; }
+    .timeline { margin: 33px 0; list-style: none; padding: 0; }
+    .timeline li { position: relative; padding: 0 0 30px 75px; min-height: 95px; }
+    .timeline li::before { content: ""; position: absolute; left: 23px; top: 45px; bottom: 0; width: 1px; background: var(--line); }
+    .timeline li:last-child { padding-bottom: 0; }
+    .timeline li:last-child::before { display: none; }
+    .phase { position: absolute; left: 0; top: 0; width: 48px; height: 43px; display: grid; place-items: center; background: var(--ink); color: white; font-size: 14px; font-weight: 800; }
+    .timeline h3 { font-size: 23px; }
+    .timeline p { margin-top: 8px; color: var(--muted); font-size: 18px; }
+    .timeline .data { display: block; margin-top: 5px; font-size: 16px; color: var(--teal); font-weight: 700; }
+    .comparison { display: grid; grid-template-columns: 1fr 1fr; margin: 30px 0; border: 1px solid var(--line); background: var(--surface); }
+    .comparison > div { padding: 26px; }
+    .comparison > div + div { border-left: 1px solid var(--line); }
+    .comparison .big { display: block; font-size: 40px; line-height: 1.4; font-weight: 750; letter-spacing: -.04em; }
+    .comparison .big span { font-size: 19px; font-weight: 400; }
+    .comparison p { font-size: 17px; color: var(--muted); margin-top: 9px; }
+    .table-wrap { overflow-x: auto; margin: 29px 0 14px; border: 1px solid var(--line); background: var(--surface); }
+    table { width: 100%; border-collapse: collapse; font-size: 17px; line-height: 1.6; }
+    caption { text-align: left; padding: 19px 21px; font-weight: 750; color: var(--ink); background: var(--soft-teal); }
+    th, td { padding: 15px 18px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    thead th { font-size: 14px; color: var(--muted); background: #f0f2ed; }
+    tbody th { font-weight: 600; }
+    tr:last-child td, tr:last-child th { border-bottom: 0; }
+    .numeric { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .highlight-row { background: #eef3eb; }
+    .chart { margin: 30px 0; padding: 27px; background: var(--surface); border: 1px solid var(--line); }
+    .chart h3 { font-size: 22px; }
+    .legend { display: flex; gap: 20px; flex-wrap: wrap; margin: 12px 0 25px; font-size: 14px; color: var(--muted); }
+    .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 7px; background: var(--teal); }
+    .legend .token-key::before { background: var(--accent); }
+    .bar-group { margin-top: 23px; }
+    .bar-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .bar-row { display: grid; grid-template-columns: 1fr 55px; align-items: center; gap: 12px; margin-top: 7px; }
+    .bar-track { height: 13px; background: #edf0eb; }
+    .bar { height: 100%; background: var(--teal); }
+    .bar.tokens { background: var(--accent); }
+    .bar-value { font-size: 14px; line-height: 1.3; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+    .chart figcaption { margin-top: 24px; }
+    .formula { display: block; margin: 15px 0; padding: 16px 19px; background: #f0eee7; font-family: var(--sans); font-size: 17px; font-variant-numeric: tabular-nums; }
+    .two-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 29px 0; }
+    .card { padding: 24px; border: 1px solid var(--line); background: var(--surface); }
+    .card .label { display: block; margin-bottom: 10px; }
+    .card h3 { font-size: 22px; margin-bottom: 12px; }
+    .card p { font-size: 18px; color: var(--muted); }
+    .plain-list { padding-left: 1.15em; margin: 22px 0; }
+    .plain-list li { padding-left: 5px; margin-bottom: 14px; }
+    .subhead { margin-top: 36px; margin-bottom: 16px; }
+    .source-list { padding: 0; margin: 24px 0 0; list-style: none; }
+    .source-list li { padding: 23px 0; border-top: 1px solid var(--line); }
+    .source-list h3 { font-size: 20px; margin-bottom: 8px; }
+    .source-list p { font-size: 17px; color: var(--muted); }
+    .tag { display: inline-block; padding: 2px 9px; margin-right: 8px; color: var(--teal); background: var(--soft-teal); font-size: 12px; font-weight: 750; vertical-align: 2px; }
+    .tag.secondary { background: var(--soft-orange); color: #904129; }
+    .closing { background: var(--ink); color: #fffefa; padding: 44px; margin-bottom: 45px; }
+    .closing .label { color: #a5d0bf; }
+    .closing h2 { margin: 16px 0 22px; font-size: 34px; }
+    .closing p { color: #d9e3e1; }
+    .closing ul { list-style: none; padding: 0; margin: 25px 0 0; }
+    .closing li { padding: 15px 0 15px 30px; border-top: 1px solid #46575c; position: relative; font-size: 18px; }
+    .closing li::before { content: "□"; position: absolute; left: 0; color: #a5d0bf; }
+    .share { padding: 28px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-bottom: 50px; }
+    .share p { margin-top: 12px; font-size: 19px; }
+    .share .fineprint { font-size: 14px; }
+    .page-footer { display: flex; justify-content: space-between; gap: 24px; padding: 26px 0 42px; font-size: 14px; color: var(--muted); }
+    @media (min-width: 1400px) {
+      .wrap { max-width: 1260px; }
+      .reading-layout { grid-template-columns: 210px minmax(0, 1fr); gap: 65px; }
+    }
+    @media (max-width: 900px) {
+      .reading-layout { grid-template-columns: 1fr; gap: 42px; margin-top: 45px; }
+      .contents { position: static; }
+      .contents ol { display: grid; grid-template-columns: 1fr 1fr; column-gap: 24px; }
+      .abstract { grid-template-columns: 1fr; gap: 14px; }
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .metric:nth-child(2) { border-right: 0; }
+      .metric:nth-child(-n+2) { border-bottom: 1px solid #42545c; }
+    }
+    @media (max-width: 600px) {
+      .wrap { padding: 0 22px; }
+      .masthead { font-size: 11px; gap: 12px; }
+      .hero { padding-top: 46px; padding-bottom: 30px; }
+      .hero-subtitle { font-size: 21px; }
+      .meta { gap: 7px 17px; font-size: 14px; }
+      .status { padding: 18px; font-size: 16px; margin-bottom: 28px; }
+      .metric { padding: 24px 18px; }
+      .metric .num { font-size: 34px; }
+      .metric .name { font-size: 15px; }
+      .metric .sub { font-size: 13px; }
+      .section { padding-bottom: 43px; margin-bottom: 40px; }
+      .two-cards { grid-template-columns: 1fr; }
+      .comparison > div { padding: 19px; }
+      .comparison .big { font-size: 32px; }
+      .comparison .big span { display: block; font-size: 17px; }
+      .note, .chart { padding: 21px; }
+      .pullquote { padding-left: 20px; }
+      .timeline li { padding-left: 63px; }
+      th, td { padding: 13px 12px; }
+      .closing { padding: 28px 23px; }
+      .closing h2 { font-size: 29px; }
+      .page-footer { flex-direction: column; gap: 8px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+    @media print {
+      body { background: white; color: black; font-size: 12pt; }
+      .wrap { max-width: none; padding: 0; }
+      .hero { padding-top: 25px; }
+      h1 { font-size: 32pt; }
+      h2 { font-size: 24pt; }
+      .reading-layout { display: block; }
+      .contents, .share, .page-footer a { display: none; }
+      .metrics, .closing { background: #f0f2ed; color: black; }
+      .metric .name, .metric .sub, .closing p, .closing .label { color: #333; }
+      .section { margin-bottom: 25px; padding-bottom: 25px; }
+      figure, .card, .note, tr { break-inside: avoid; }
+      .table-wrap { overflow: visible; }
+      a { color: inherit; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="파인튜닝 가능한 오픈웨이트 모델 | Thinking Machines Inkling 2 Small">
+<meta property="og:description" content="파인튜닝 가능한 오픈웨이트 모델 Thinking Machines Inkling 2 Small 영상 정보 채널 : sudoremove (@sudoremove) 게시일 : 2026 11 09 길이 : 7분 49초 (469초) 챕터 : 9개 링크 : https://www.youtube.com/watch?v= i1qCyWl5aY &lt;div style=&quot;position: relative; width: 100%; padding bottom">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/1io3i1o/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/1io3i1o/assets/i1qcywl5ay-ts-00-00-06.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="파인튜닝 가능한 오픈웨이트 모델 | Thinking Machines Inkling 2 Small">
+<meta name="twitter:description" content="파인튜닝 가능한 오픈웨이트 모델 Thinking Machines Inkling 2 Small 영상 정보 채널 : sudoremove (@sudoremove) 게시일 : 2026 11 09 길이 : 7분 49초 (469초) 챕터 : 9개 링크 : https://www.youtube.com/watch?v= i1qCyWl5aY &lt;div style=&quot;position: relative; width: 100%; padding bottom">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/1io3i1o/assets/i1qcywl5ay-ts-00-00-06.jpg">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-%ED%8C%8C%EC%9D%B8%ED%8A%9C%EB%8B%9D-%EA%B0%80%EB%8A%A5%ED%95%9C-%EC%98%A4%ED%94%88%EC%9B%A8%EC%9D%B4%ED%8A%B8-%EB%AA%A8%EB%8D%B8-thinking-machines-inkling-2-small-%EC%9A%94%EC%95%BD/">
+</head>
+<body>
+  <div class="wrap">
+    <header class="masthead" id="top">
+      <b>MODEL / RESEARCH NOTES</b>
+      <span>영상 기반 리서치 · 2026.11.10</span>
+    </header>
+
+    <main>
+      <article aria-labelledby="article-title">
+        <header class="hero">
+          <div class="eyebrow">Open weights · Post-training · Fine-tunability</div>
+          <h1 id="article-title">얼마나 똑똑한가,<br>얼마나 더 배울 수 있는가</h1>
+          <p class="hero-subtitle">Thinking Machines Inkling 2 Small이 던진 다음 질문</p>
+          <p class="deck">전체 594B, 활성 17B. 이름은 ‘Small’이지만 규모는 작지 않음. 더 눈여겨볼 대목은 완성된 모델의 점수보다 <strong>추가 학습에 얼마나 잘 반응하는지</strong>를 평가했다는 점. 학습 파이프라인과 강화학습 규모를 따라가며, 이 지표가 모델 선택에 갖는 의미를 살펴봄.</p>
+          <div class="meta">
+            <span>정리일 <time datetime="2026-11-10">2026.11.10</time></span>
+            <span>원본 영상 <time datetime="2026-11-09">2026.11.09</time> · 7분 49초</span>
+            <span>출처 <a>sudoremove</a></span>
+            <a>원본 영상 보기 ↗</a>
+          </div>
+        </header>
+
+        <aside class="status" aria-label="자료 범위와 공개 상태">
+          <strong>영상 시점의 기록.</strong> 이 글은 제공된 영상 분석 노트를 재구성한 자료이며, 공식 원문·현재 배포 상태를 별도로 검증한 보고서는 아님. 영상 속 가중치 공개는 추가 안전성 평가 후로 <strong>보류(pending)</strong>된 상태. ‘오픈웨이트’는 당시 발표된 방침을 뜻함.
+        </aside>
+
+        <section class="abstract" aria-labelledby="abstract-title">
+          <h2 class="label" id="abstract-title">Abstract / 초록</h2>
+          <div>
+            <p>영상에 제시된 학습 과정은 8.4T 토큰의 초기 사전학습, 고품질·롱컨텍스트 데이터로 이어지는 후속 단계, 그리고 9일의 공동 RL 실행으로 구성됨. 공식 글 화면에는 NVFP4 네이티브 학습과 단계별 데이터 규모까지 소개됨.</p>
+            <p>핵심은 <strong>파인튜닝 적합성(Fine-tunability)</strong>. 투자 분석 과제에서 학습 스텝과 추정 비용에 따른 보상 향상을 비교함. 이는 학습 플랫폼 Tinker의 사업 방향과 연결되지만, 단일 과제·자사 플랫폼 평가라는 한계가 있어 범용적인 우위로 확대하기는 어려움.</p>
+          </div>
+        </section>
+
+        <div class="metrics" aria-label="영상에 제시된 주요 수치">
+          <div class="metric">
+            <span class="num">594<span class="unit">B</span></span>
+            <span class="name">전체 파라미터</span>
+            <span class="sub">활성 17B · 멀티모달 MoE</span>
+          </div>
+          <div class="metric">
+            <span class="num">68<span class="unit">시간</span></span>
+            <span class="name">H1 사전학습</span>
+            <span class="sub">8.4T 토큰 · NVFP4</span>
+          </div>
+          <div class="metric">
+            <span class="num">9<span class="unit">일</span></span>
+            <span class="name">메인 RL 실행</span>
+            <span class="sub">2,048 GPU · 3T+ 토큰</span>
+          </div>
+          <div class="metric">
+            <span class="num">3<span class="unit">시드</span></span>
+            <span class="name">파인튜닝 평가 평균</span>
+            <span class="sub">투자 분석 과제 · Tinker</span>
+          </div>
+        </div>
+        <p class="fineprint">수치는 제공된 노트의 자막·화면 판독 기준. B = 10억, T = 1조. 68시간은 전체 학습 기간이 아닌 H1 한 단계의 소요 시간.</p>
+
+        <div class="reading-layout">
+          <nav class="contents" aria-label="글 목차">
+            <span class="label">In this report</span>
+            <ol>
+              <li><a href="#findings">핵심 발견</a></li>
+              <li><a href="#training">학습 파이프라인</a></li>
+              <li><a href="#rl">RL의 규모와 구성</a></li>
+              <li><a href="#finetunability">추가 학습의 가치</a></li>
+              <li><a href="#access">공개 상태와 가격</a></li>
+              <li><a href="#sources">출처와 검증 한계</a></li>
+              <li><a href="#implications">실무에 남는 질문</a></li>
+            </ol>
+          </nav>
+
+          <div class="article-body">
+            <section class="section" id="findings" aria-labelledby="findings-title">
+              <header class="section-heading">
+                <span class="label">01 / Key findings</span>
+                <h2 id="findings-title">이 모델에서 읽어야 할 세 가지</h2>
+              </header>
+              <ol class="finding-list">
+                <li>
+                  <span class="index">1</span>
+                  <div>
+                    <h3>모델 크기보다 학습 과정의 공개가 눈에 띔</h3>
+                    <p>594B·활성 17B라는 사양에 더해, 단계별 토큰 수와 컨텍스트 길이, 하드웨어와 정밀도, RL 실행 규모가 제시됨. 결과물뿐 아니라 만들어진 경로를 살펴볼 단서가 늘어남.</p>
+                  </div>
+                </li>
+                <li>
+                  <span class="index">2</span>
+                  <div>
+                    <h3>RL의 작업 비중은 토큰으로 다시 봐야 함</h3>
+                    <p>코딩은 롤아웃의 38.5%지만 토큰의 65.0%를 차지. 작업 횟수와 생성 토큰 양은 다른 분포를 보이며, 예산을 계획할 때 둘을 구분할 필요.</p>
+                  </div>
+                </li>
+                <li>
+                  <span class="index">3</span>
+                  <div>
+                    <h3>‘학습 후 얼마나 좋아지는가’가 평가축으로 등장</h3>
+                    <p>동일 플랫폼에서 추가 RL을 수행한 뒤, 스텝·비용에 따른 보상 곡선을 비교. 다만 투자 분석 한 과제의 결과이므로 다른 도메인으로의 일반화는 미검증.</p>
+                  </div>
+                </li>
+              </ol>
+
+              <figure class="evidence">
+                <div class="image-frame">
+                  <img src="assets/i1qcywl5ay-ts-00-00-06.jpg" width="640" height="360" alt="영상 00분 06초에 표시된 Introducing Inkling 2 Small 발표 페이지. Try on Tinker와 Model card 버튼이 보이는 화면.">
+                </div>
+                <figcaption><span class="fig-number">FIG. 01</span><a class="time-link">00:06 ↗</a> · 공식 발표 페이지 화면. 표시된 발표일은 2026년 11월 5일. ‘Small’이라는 이름이 더 큰 후속 모델을 시사한다는 설명은 진행자의 예상이며, 확정된 로드맵으로 취급하지 않음.</figcaption>
+              </figure>
+            </section>
+
+            <section class="section" id="training" aria-labelledby="training-title">
+              <header class="section-heading">
+                <span class="label">02 / Training pipeline</span>
+                <h2 id="training-title">68시간 뒤에도,<br>학습은 계속됨</h2>
+              </header>
+              <p>‘8.4T 토큰을 68시간에 학습’이라는 수치는 강한 인상을 남김. 그러나 이는 H1에 해당하는 기록. 뒤에는 고품질 데이터, 긴 컨텍스트, 추론·에이전트 궤적을 중심으로 한 H2~H4가 이어짐.</p>
+
+              <figure class="evidence">
+                <div class="image-frame">
+                  <img src="assets/i1qcywl5ay-ts-00-01-00.jpg" width="640" height="360" loading="lazy" alt="영상 01분 00초의 Training Inkling 2 Small 화면. H1 사전학습의 8.4T 토큰, 68시간, NVFP4 설명과 내부 코드 데이터 평가 그래프.">
+                </div>
+                <figcaption><span class="fig-number">FIG. 02</span><a class="time-link">01:00 ↗</a> · H1 설명. GB300 NVL72 랙, 높은 expert parallelism, NVFP4 네이티브 학습이 언급됨. 구체적인 NVFP4 레시피는 후속 글에서 공개 예정으로 소개됨.</figcaption>
+              </figure>
+
+              <ol class="timeline" aria-label="H1부터 H4까지의 학습 단계">
+                <li>
+                  <span class="phase">H1</span>
+                  <h3>자연어·코드·이미지로 기반 학습</h3>
+                  <span class="data">8.4T 토큰 · 68시간 · GB300 NVL72 · NVFP4</span>
+                  <p>혼합 데이터를 사용하는 초기 사전학습 단계. 전체 GPU 수는 노트에서 확인되지 않음.</p>
+                </li>
+                <li>
+                  <span class="phase">H2</span>
+                  <h3>더 높은 품질과 긴 컨텍스트</h3>
+                  <span class="data">3.8T 토큰 · 512K 컨텍스트</span>
+                  <p>더 고품질의 신규 데이터를 투입. H1+H2의 토큰 합계는 12.2T.</p>
+                </li>
+                <li>
+                  <span class="phase">H3</span>
+                  <h3>추론·에이전트 궤적으로 확장</h3>
+                  <span class="data">320B 토큰 · 1M 컨텍스트</span>
+                  <p>추론과 에이전트 궤적에 사전학습 데이터 리플레이를 병행.</p>
+                </li>
+                <li>
+                  <span class="phase">H4</span>
+                  <h3>최고 품질의 에이전트 궤적 집중</h3>
+                  <span class="data">약 34B 토큰</span>
+                  <p>H3·H4 혼합물은 대부분 Kimi K3와 자사 모델 등 이전 모델에서 샘플링한 궤적을 정확성·품질 기준으로 필터링한 것으로 설명됨.</p>
+                </li>
+              </ol>
+
+              <figure class="evidence">
+                <div class="image-frame">
+                  <img src="assets/i1qcywl5ay-ts-00-02-30.jpg" width="640" height="360" loading="lazy" alt="영상 02분 30초의 H2, H3, H4 학습 설명. 컨텍스트 확장과 추론 및 에이전트 궤적 데이터 구성이 제시된 화면.">
+                </div>
+                <figcaption><span class="fig-number">FIG. 03</span><a class="time-link">02:30 ↗</a> · 후속 학습 단계. 진행자는 이를 다른 연구의 annealing 구간과 연결해 해석하며, 사전학습과 후속 학습의 명칭 경계가 고정적이지 않다고 설명.</figcaption>
+              </figure>
+
+              <div class="note">
+                <strong>4bit 학습이라는 주장과 재현 가능성은 별개.</strong>
+                <p>영상 속 공식 글은 NVFP4 네이티브 학습을 명시. 다만 정밀도 운용과 학습 안정화의 구체적 레시피는 이 자료에 없음. 모델 전체의 모든 연산이 동일한 4bit로 수행됐다고 확장 해석하거나, 같은 결과를 재현할 수 있다고 판단하기는 어려움.</p>
+              </div>
+
+              <h3 class="subhead">보조 근거: 내부 코드 데이터 평가</h3>
+              <p>화면의 bits-per-byte 그래프는 낮을수록 좋은 지표로 제시됨. 내부 코드 데이터의 컷오프는 2026년 6월. 아래 값은 360p 화면에서 읽은 근삿값이며, 범용 코딩 성능 순위와는 구분해야 함.</p>
+              <div class="table-wrap">
+                <table>
+                  <caption>사전학습 체크포인트의 내부 코드 평가</caption>
+                  <thead><tr><th scope="col">모델</th><th scope="col" class="numeric">bits-per-byte ↓</th></tr></thead>
+                  <tbody>
+                    <tr class="highlight-row"><th scope="row">Inkling 2 Small</th><td class="numeric">약 0.203</td></tr>
+                    <tr><th scope="row">Kimi K3.1 Pro</th><td class="numeric">약 0.207</td></tr>
+                    <tr><th scope="row">DeepSeek V4 Pro Base</th><td class="numeric">약 0.234</td></tr>
+                    <tr><th scope="row">GLM-5.3</th><td class="numeric">약 0.236</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="fineprint">진행자의 ‘GB300 수천 장’ 역산과 과거 Kimi의 약 20T 토큰 비교는 각각 추정·기억에 따른 언급. 검증된 하드웨어 규모나 통제된 비교로 사용하지 않음.</p>
+            </section>
+
+            <section class="section" id="rl" aria-labelledby="rl-title">
+              <header class="section-heading">
+                <span class="label">03 / Reinforcement learning</span>
+                <h2 id="rl-title">RL은 9일.<br>토큰의 65%는 코딩에</h2>
+              </header>
+              <p>메인 RL은 <strong>1,075 스텝, 1,700만 회 이상의 롤아웃, 3T 이상의 토큰</strong>을 사용하는 단일 공동 실행으로 설명됨. 이전 Inkling에서 추론 RL과 에이전트 RL을 따로 수행한 뒤 multi-teacher distillation으로 합쳤던 방식과 대비됨.</p>
+
+              <div class="comparison" aria-label="H1과 메인 RL의 소요 시간 비교">
+                <div>
+                  <span class="label">H1 pretraining</span>
+                  <span class="big">68 <span>시간</span></span>
+                  <p>8.4T 토큰<br>GPU 수는 이 자료에서 미확인</p>
+                </div>
+                <div>
+                  <span class="label">Main RL run</span>
+                  <span class="big">216 <span>시간 · 9일</span></span>
+                  <p>3T+ 토큰<br>2,048 GPU</p>
+                </div>
+              </div>
+              <p class="fineprint">단순 시간 환산: 9 × 24 = 216시간, 216 ÷ 68 ≈ 3.18배. 경과 시간의 비교일 뿐, GPU 수·활용률·연산 구성이 다른 두 단계의 총연산량이나 비용 비율을 뜻하지 않음. H2~H4 시간도 포함하지 않음.</p>
+
+              <figure class="evidence">
+                <div class="image-frame">
+                  <img src="assets/i1qcywl5ay-ts-00-03-24.jpg" width="640" height="360" loading="lazy" alt="영상 03분 24초의 메인 RL 실행 규모 표. GPU 2,048개, 9일, 17M 이상의 롤아웃, 3T 이상의 토큰이 표시된 화면.">
+                </div>
+                <figcaption><span class="fig-number">FIG. 04</span><a class="time-link">03:24 ↗</a> · 메인 RL 규모. Compute는 10²³ FLOPs 규모로 판독됐으나 정확한 계수는 불확실하여 옮기지 않음.</figcaption>
+              </figure>
+
+              <h3 class="subhead">롤아웃 횟수와 토큰 양은 다른 이야기</h3>
+              <p>코딩은 횟수 비중보다 토큰 비중이 큼. 반대로 비전과 툴 사용은 횟수 비중에 비해 토큰 비중이 작음. 이 차이는 태스크별 평균 궤적 길이의 차이를 읽는 단서가 됨.</p>
+
+              <figure class="chart" aria-labelledby="mix-chart-title">
+                <h3 id="mix-chart-title">대표 세 범주의 비중 비교</h3>
+                <div class="legend"><span>롤아웃 비중</span><span class="token-key">토큰 비중</span></div>
+                <div class="bar-group">
+                  <div class="bar-title">Coding</div>
+                  <div class="bar-row"><div class="bar-track"><div class="bar"></div></div><span class="bar-value">38.5%</span></div>
+                  <div class="bar-row"><div class="bar-track"><div class="bar tokens"></div></div><span class="bar-value">65.0%</span></div>
+                </div>
+                <div class="bar-group">
+                  <div class="bar-title">Vision</div>
+                  <div class="bar-row"><div class="bar-track"><div class="bar"></div></div><span class="bar-value">13.9%</span></div>
+                  <div class="bar-row"><div class="bar-track"><div class="bar tokens"></div></div><span class="bar-value">3.0%</span></div>
+                </div>
+                <div class="bar-group">
+                  <div class="bar-title">Tool use and general agents</div>
+                  <div class="bar-row"><div class="bar-track"><div class="bar"></div></div><span class="bar-value">17.1%</span></div>
+                  <div class="bar-row"><div class="bar-track"><div class="bar tokens"></div></div><span class="bar-value">2.3%</span></div>
+                </div>
+                <figcaption>원본 표의 수치로 재구성. 모든 막대는 0~100%의 동일 척도이며, 선택한 세 범주만 표시. 전체 분포는 아래 표 참조.</figcaption>
+              </figure>
+
+              <div class="table-wrap">
+                <table>
+                  <caption>RL training task mix — 전체 구성</caption>
+                  <thead><tr><th scope="col">카테고리</th><th scope="col" class="numeric">롤아웃</th><th scope="col" class="numeric">토큰</th></tr></thead>
+                  <tbody>
+                    <tr class="highlight-row"><th scope="row">Coding</th><td class="numeric">38.5%</td><td class="numeric">65.0%</td></tr>
+                    <tr><th scope="row">Office and knowledge work</th><td class="numeric">9.1%</td><td class="numeric">13.3%</td></tr>
+                    <tr><th scope="row">STEM and reasoning</th><td class="numeric">7.0%</td><td class="numeric">7.6%</td></tr>
+                    <tr><th scope="row">Web and app building</th><td class="numeric">4.7%</td><td class="numeric">7.2%</td></tr>
+                    <tr><th scope="row">Vision</th><td class="numeric">13.9%</td><td class="numeric">3.0%</td></tr>
+                    <tr><th scope="row">Tool use and general agents</th><td class="numeric">17.1%</td><td class="numeric">2.3%</td></tr>
+                    <tr><th scope="row">Search</th><td class="numeric">2.0%</td><td class="numeric">1.4%</td></tr>
+                    <tr><th scope="row">Chat, safety and epistemics</th><td class="numeric">7.8%</td><td class="numeric">0.2%</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="fineprint">노트에 옮겨진 표시값 기준 합계는 롤아웃 100.1%, 토큰 100.0%. 롤아웃 합계 차이는 반올림 가능성이 있으나 원자료와 별도 대조하지 않음.</p>
+
+              <div class="note">
+                <strong>해석의 경계: 짧은 궤적 ≠ 높은 학습 효율.</strong>
+                <p>두 비중이 같은 롤아웃 집합과 토큰 집계 기준을 사용한다면, 다음 비율로 전체 평균 대비 태스크별 평균 토큰 길이를 추정할 수 있음.</p>
+                <span class="formula">상대 평균 길이 = 토큰 비중 ÷ 롤아웃 비중</span>
+                <p>코딩은 약 1.69배, 비전은 약 0.22배, 툴 사용은 약 0.13배. 이 계산은 표시값에 따른 파생 해석이며, 성능 향상량이나 실제 학습 비용을 나타내지는 않음.</p>
+              </div>
+
+              <figure class="evidence">
+                <div class="image-frame">
+                  <img src="assets/i1qcywl5ay-ts-00-04-00.jpg" width="640" height="360" loading="lazy" alt="영상 04분 00초의 RL training task mix 표와 보상 설계 설명. 태스크별 롤아웃 비중과 토큰 비중을 비교하는 화면.">
+                </div>
+                <figcaption><span class="fig-number">FIG. 05</span><a class="time-link">04:00 ↗</a> · 진행자는 비전의 토큰 비중에 관한 초기 발언을 곧 정정. 표는 ‘비전의 롤아웃 비중 대비 토큰 비중이 작다’는 설명을 지지함.</figcaption>
+              </figure>
+
+              <h3 class="subhead">태스크마다 다른 보상, 비동기 실행</h3>
+              <ul class="plain-list">
+                <li><strong>코딩:</strong> 숨겨진 유닛 테스트와 프로그램 검사.</li>
+                <li><strong>문서·툴 사용:</strong> 루브릭 기반 LLM judge.</li>
+                <li><strong>STEM·비전 QA:</strong> 참조 답안 기반 평가.</li>
+                <li><strong>웹앱:</strong> 렌더링 스크린샷을 비교하는 pairwise 보상 모델.</li>
+              </ul>
+              <p>비동기 RL에는 오래된 정책으로 생성된 데이터의 지연(staleness)을 견디기 위한 score-centering 변형이 사용된 것으로 소개됨. 화면에서 이를 Tinker의 <strong>StableReinforce objective</strong>와 연결하지만, 이 노트만으로 목적함수와 구현을 재현할 수는 없음.</p>
+            </section>
+
+            <section class="section" id="finetunability" aria-labelledby="finetunability-title">
+              <header class="section-heading">
+                <span class="label">04 / Fine-tunability</span>
+                <h2 id="finetunability-title">완성된 점수에서<br>배우는 곡선으로</h2>
+              </header>
+              <p>진행자가 가장 주목한 대목은 ‘Evaluating Model Finetunability’. 학습 전의 점수만 비교하는 대신, 같은 과제로 추가 학습했을 때 보상이 어떻게 달라지는지 제시한 실험임.</p>
+
+              <blockquote class="pullquote">
+                <p>모델 선택의 다음 질문은<br>“내 과제를 배우면,<br>얼마나 더 좋아지는가?”</p>
+                <footer>공개된 평가에서 도출한 이 글의 핵심 질문 · 직접 인용 아님</footer>
+              </blockquote>
+
+              <div class="two-cards">
+                <div class="card">
+                  <span class="label">Evaluation design</span>
+                  <h3>같은 과제, 같은 플랫폼</h3>
+                  <p>Tinker 고객의 금융 분석 업무와 유사한 투자 분석 과제. 모든 비교 모델에 같은 방식의 RL 파인튜닝을 적용하고 3개 시드의 평균을 제시.</p>
+                </div>
+                <div class="card">
+                  <span class="label">Two axes</span>
+                  <h3>스텝과 비용을 함께 비교</h3>
+                  <p>가로축은 학습 스텝 0~200과 추정 학습 비용 $500~$8,000. 세로축은 학습에 쓰지 않은 평가 데이터의 루브릭 보상.</p>
+                </div>
+              </div>
+
+              <figure class="evidence">
+                <div class="image-frame">
+                  <img src="assets/i1qcywl5ay-ts-00-05-12.jpg" width="640" height="360" loading="lazy" alt="영상 05분 12초의 파인튜닝 적합성 평가 그래프 두 개. 학습 스텝 및 추정 학습 비용에 따른 held-out 루브릭 보상을 비교하는 화면.">
+                </div>
+                <figcaption><span class="fig-number">FIG. 06</span><a class="time-link">05:12 ↗</a> · 노트에 따르면 Inkling 2 Small 곡선이 두 그래프에서 가장 위에 위치. 비교 대상은 Inkling-Small, Inkling, GLM 5.3 Flash, DeepSeek V4.1 Flash 1017, Qwen 3.5 397B. 정확한 보상값·오차 범위는 이 자료에서 판독·확인하지 않음.</figcaption>
+              </figure>
+
+              <p>이 평가 방식은 학습 플랫폼의 가치와 맞물림. Tinker를 통해 학습을 제공하는 회사라면, 고객에게 중요한 것은 출발점의 성능뿐 아니라 <strong>추가 예산으로 얻을 수 있는 개선</strong>이기 때문. 다만 ‘학습을 파는 사업 모델’이라는 연결은 진행자의 해석이며, 해당 그래프만으로 사업 전체를 설명할 수는 없음.</p>
+
+              <div class="note">
+                <strong>관찰과 원인 설명을 분리할 필요.</strong>
+                <p>그래프에서 높은 보상을 보인다는 관찰만으로 그 원인이 적은 사전학습 토큰 수라고 결론 내릴 수 없음. 모델 크기·구조·초기 성능·데이터·보상 설계 등 여러 변인이 함께 달라질 수 있음.</p>
+                <p>‘과도하게 사전학습한 모델은 파인튜닝하면 깨진다’는 연결은 진행자도 루머 수준이라고 명시. H1+H2 약 12T와 파인튜닝 적합성의 인과관계는 미검증.</p>
+              </div>
+
+              <h3 class="subhead">이 결과가 말해주는 것과 남겨둔 것</h3>
+              <p>확인 가능한 범위는 <strong>제시된 투자 분석 과제와 Tinker의 평가 조건에서 나타난 곡선</strong>. 여러 도메인에 걸친 재현성, 실제 업무 품질, 학습 전후 개선 폭의 정밀 비교, 비용 추정의 세부 가정은 독립적으로 확인할 필요. 3시드 평균은 유용한 정보지만, 그 자체로 통계적 유의성까지 보장하지 않음.</p>
+            </section>
+
+            <section class="section" id="access" aria-labelledby="access-title">
+              <header class="section-heading">
+                <span class="label">05 / Availability &amp; pricing</span>
+                <h2 id="access-title">공개 방침과 실제 배포는<br>구분해서 읽기</h2>
+              </header>
+              <p>영상의 공식 발표 화면에는 자사와 파트너의 추가 안전성 평가 이후로 가중치 공개를 보류한다는 문장이 보임. 따라서 이 시점의 ‘오픈웨이트 모델’을 곧바로 내려받아 쓸 수 있는 모델로 읽으면 안 됨.</p>
+
+              <figure class="evidence">
+                <div class="image-frame">
+                  <img src="assets/i1qcywl5ay-ts-00-00-24.jpg" width="640" height="360" loading="lazy" alt="영상 00분 24초의 롱컨텍스트 및 사실성 벤치마크 표와 Safety and alignment 절. 추가 안전성 평가 후 가중치를 공개한다는 설명이 있는 화면.">
+                </div>
+                <figcaption><span class="fig-number">FIG. 07</span><a class="time-link">00:24 ↗</a> · 비교 표에는 GLM-5.3-Flash, Muse Spark Open, Mistral Large 4, Kimi K3가 등장. 노트는 HLE-Diamond 28.7%, LongBench v2 70.6% 등을 옮겼으나 360p 판독값이므로 정밀한 순위 판단의 근거로 삼지 않음.</figcaption>
+              </figure>
+
+              <h3 class="subhead">가격은 제3자 화면의 기록</h3>
+              <p>영상 마지막의 AI Twitter Recap은 공식 발표 페이지가 아닌 제3자 뉴스레터. 아래 가격과 ‘Tinker 즉시 사용 가능’, ‘다음 주 가중치 공개 예정’, Artificial Analysis Intelligence Index 31 등의 정보는 이 화면에서 온 전언이며 공식 자료와 대조되지 않음.</p>
+
+              <div class="table-wrap">
+                <table>
+                  <caption>제3자 뉴스레터에 표시된 Tinker 가격</caption>
+                  <thead><tr><th scope="col">구분</th><th scope="col" class="numeric">USD / 1M 토큰</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">입력</th><td class="numeric">$0.30</td></tr>
+                    <tr><th scope="row">캐시 입력</th><td class="numeric">$0.03</td></tr>
+                    <tr><th scope="row">출력</th><td class="numeric">$1.00</td></tr>
+                    <tr><th scope="row">학습</th><td class="numeric">$1.50</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="fineprint">현재 가격 안내가 아닌 영상 화면의 기록. 진행자는 ‘1빌리언 토큰당’이라고 말했으나, 화면 단위는 <strong>per 1M tokens, 즉 100만 토큰당</strong>. 청구 범위와 부대 비용은 이 자료에서 확인되지 않음.</p>
+
+              <figure class="evidence">
+                <div class="image-frame">
+                  <img src="assets/i1qcywl5ay-ts-00-06-50.jpg" width="640" height="360" loading="lazy" alt="영상 06분 50초의 AI Twitter Recap 뉴스레터 화면. 모델 사양, 공개 예정 정보와 100만 토큰당 가격이 제시된 제3자 요약.">
+                </div>
+                <figcaption><span class="fig-number">FIG. 08</span><a class="time-link">06:50 ↗</a> · 제3자 요약 페이지. 학습 가격이 출력 가격과 크게 차이 나지 않아 비싸지 않다는 평가는 진행자의 판단이며, 실제 업무의 총비용 비교는 아님.</figcaption>
+              </figure>
+            </section>
+
+            <section class="section" id="sources" aria-labelledby="sources-title">
+              <header class="section-heading">
+                <span class="label">06 / Source notes</span>
+                <h2 id="sources-title">무엇을 근거로 읽었는가</h2>
+              </header>
+              <p>이 글의 직접 입력은 제공된 Obsidian 분석 노트. 아래의 수집·검사 과정은 <strong>원본 노트가 기록한 방법</strong>이며, 이 HTML을 작성하면서 다시 수행한 검증은 아님.</p>
+
+              <ul class="source-list">
+                <li>
+                  <h3><span class="tag">기본 출처</span>영상·자막·메타데이터</h3>
+                  <p><a>sudoremove의 「파인튜닝 가능한 오픈웨이트 모델 | Thinking Machines Inkling 2 Small」</a>. 노트 기준 게시일 2026년 11월 9일, 길이 469초, 챕터 9개. 한국어 수동 자막 전체와 설명란·메타데이터를 사용한 것으로 기록됨.</p>
+                </li>
+                <li>
+                  <h3><span class="tag">화면 속 공식 자료</span>발표·학습 설명·평가 그래프</h3>
+                  <p>Thinking Machines의 ‘Introducing Inkling 2 Small’, ‘Training Inkling 2 Small’, ‘Evaluating Model Finetunability’ 내용이 영상에 제시됨. 본문은 공식 웹 원문을 직접 대조한 결과가 아니라, 영상 화면과 노트의 판독을 통해 전달한 내용. 원문 URL이 제공되지 않아 임의의 링크를 추가하지 않음.</p>
+                </li>
+                <li>
+                  <h3><span class="tag secondary">제3자 전언</span>가격·출시 시점·외부 지표</h3>
+                  <p>AI Twitter Recap 화면의 가격, ‘다음 주’ 공개 일정, Intelligence Index는 공식 자료와 구분. 현재 유효성은 미검증. 화면 오른쪽 라이브 채팅은 시청자 발언이므로 근거에서 제외.</p>
+                </li>
+                <li>
+                  <h3><span class="tag secondary">진행자 의견</span>시장 지위와 후속 모델 전망</h3>
+                  <p>‘미국계 오픈웨이트 최고 모델 후보’, 더 큰 모델의 Muse 경쟁 가능성, 첫 Inkling과 회사 성과에 대한 평가는 진행자의 의견. Mira Murati·Lilian Weng 등 OpenAI 출신 인물을 언급한 회사 배경 설명과 함께 제시되지만, 이 글의 독립 검증 결론에는 포함하지 않음.</p>
+                </li>
+              </ul>
+
+              <h3 class="subhead">프레임 수집과 판독의 한계</h3>
+              <p>노트에 따르면 1080p·720p 스트림 요청은 HTTP 403으로 거부됐고 로그인 쿠키는 사용하지 않음. 접근 가능한 영상은 <strong>640×360, 포맷 18</strong>뿐이어서 작은 글씨와 그래프 수치에 판독 오차 가능성이 있음. 본문의 이미지는 해당 8개 프레임을 보존한 것.</p>
+
+              <div class="note">
+                <strong>원본 노트에 기록된 선정 절차</strong>
+                <p>3초 간격 156장 샘플링 → 6초 간격 접촉 시트 육안 검토 → ffmpeg 장면 전환 검출과 챕터 경계 확인 → 12개 후보 비교 → 중복 4장 제외 → 최종 8장 선정.</p>
+                <p>장면 전환 검출은 threshold 0.25에서 0개, 0.12에서 6개. 후보의 평균 밝기는 모두 200 이상, 표준편차는 88 이상으로 기록됨. 차분이 1~2 수준인 01:24·04:54·05:48·06:48 프레임은 하이라이트 위치만 다른 사실상 중복 장면으로 제외.</p>
+              </div>
+              <p class="fineprint">밝기·표준편차와 차분 검사는 흑화면·중복 선별의 보조 지표. 텍스트 판독의 정확성을 보증하지는 않음. 원본 로그, 차분 정의와 전체 추출 명령은 이 문서에 포함되지 않아 수집 절차의 완전한 재현에는 추가 자료가 필요.</p>
+            </section>
+
+            <section id="implications" aria-labelledby="implications-title">
+              <div class="closing">
+                <span class="label">07 / Implications</span>
+                <h2 id="implications-title">다음 모델을 고를 때,<br>작은 학습 실험도 함께</h2>
+                <p>이 사례가 제안하는 실용적인 변화는 명확함. 공개 벤치마크에 더해, 내 과제에서 추가 학습의 이득을 측정할 필요. RL의 소요 시간과 태스크별 토큰 분포는 예산 설계의 단서가 되지만, 다른 업무에 그대로 적용할 비용 공식은 아님.</p>
+                <ul aria-label="도입 전 확인 목록">
+                  <li><strong>배포 조건 확인:</strong> 가중치의 실제 공개 여부, 라이선스, 실행 가능한 하드웨어를 확인할 것.</li>
+                  <li><strong>내 과제로 평가:</strong> 학습 전 성능과 고정 예산 학습 후 성능을 같은 평가 데이터에서 비교할 것.</li>
+                  <li><strong>비용을 분해:</strong> 롤아웃 횟수·길이뿐 아니라 도구 실행, 보상 계산, 검증 비용까지 기록할 것.</li>
+                  <li><strong>반복과 일반화 확인:</strong> 여러 시드와 별도 평가 과제로 성능 향상 및 기존 능력의 회귀를 점검할 것.</li>
+                </ul>
+              </div>
+
+              <p>비전 기반 현장 판단이나 에이전트·로봇 도메인에서도 같은 질문을 던질 수 있음. 다만 영상의 비전 토큰 비중이 낮다는 이유만으로 학습 효과나 총비용을 낙관할 근거는 부족함. 도메인별 보상과 실제 성능 향상을 따로 측정해야 함.</p>
+              <p><strong>좋은 출발점과 잘 배우는 모델은 서로 다른 평가 대상.</strong> Inkling 2 Small에 관한 이 기록의 가치는 두 질문을 나란히 놓았다는 데 있음. 다음 선택에서는 모델의 현재 점수와 함께, 제한된 예산 안에서 무엇을 더 배울 수 있는지도 확인할 필요.</p>
+
+              <aside class="share" aria-label="공유용 요약">
+                <span class="label">Share note / 복사해 공유할 요약</span>
+                <p>Inkling 2 Small이 던진 질문은 “얼마나 똑똑한가” 다음의 “얼마나 더 배울 수 있는가”. 68시간의 H1, 9일의 RL, 투자 분석 파인튜닝 평가를 통해 학습 과정의 가치를 살펴봄. 단, 단일 과제의 자사 평가이며 영상 시점의 가중치 공개는 보류 상태.</p>
+                <p class="fineprint">출처: sudoremove 영상 · 2026.11.09 / 분석 노트 정리 · 2026.11.10</p>
+              </aside>
+            </section>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <footer class="page-footer">
+      <span>영상 기반 연구 노트 · 수치, 해석, 미검증 정보를 구분해 재구성</span>
+      <a href="#top">처음으로 ↑</a>
+    </footer>
+  </div>
+</body>
+</html>
