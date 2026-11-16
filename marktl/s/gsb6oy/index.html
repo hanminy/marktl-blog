@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>AI가 AI를 고치는 시대, 사람은 무엇을 설계할까 — AI Frontier Korea EP 123 리서치 노트</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      --paper: #f7f5ef;
+      --surface: #fffefb;
+      --ink: #202d34;
+      --muted: #5d686d;
+      --line: #d9ddd5;
+      --green: #235d50;
+      --green-light: #eaf0e8;
+      --orange: #ac482b;
+      --orange-light: #f6ece3;
+      --night: #1c3437;
+      --serif: "Noto Serif CJK KR", "Noto Serif KR", "Source Han Serif K", "Batang", Georgia, serif;
+      --sans: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-padding-top: 24px; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 21px;
+      line-height: 1.85;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--green); text-underline-offset: 5px; text-decoration-thickness: 1px; }
+    a:hover { color: var(--orange); }
+    a:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--orange); outline-offset: 5px; }
+    ::selection { background: #dce8d9; }
+    .skip { position: absolute; left: 16px; top: -100px; z-index: 5; background: white; padding: 12px 20px; }
+    .skip:focus { top: 16px; }
+    .wrap { width: min(1180px, calc(100% - 80px)); margin-inline: auto; }
+    .reading { width: min(800px, 100%); margin-inline: auto; }
+    .masthead {
+      padding: 27px 0;
+      border-bottom: 1px solid var(--ink);
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .12em;
+    }
+    .masthead a { text-decoration: none; color: var(--ink); }
+    .masthead span:last-child { color: var(--muted); font-weight: 500; letter-spacing: .04em; }
+    .hero { padding: 74px 0 54px; }
+    .eyebrow {
+      margin: 0 0 24px;
+      color: var(--orange);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+    h1, h2, h3, h4 { line-height: 1.35; overflow-wrap: anywhere; }
+    h1 {
+      max-width: 1050px;
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(44px, 5.6vw, 76px);
+      font-weight: 800;
+      letter-spacing: -.055em;
+      line-height: 1.23;
+    }
+    .dek { max-width: 840px; margin: 30px 0; font-size: 25px; line-height: 1.7; color: var(--muted); letter-spacing: -.025em; }
+    .byline { display: flex; flex-wrap: wrap; gap: 10px 22px; color: var(--muted); font-size: 15px; margin-top: 30px; }
+    .byline strong { color: var(--ink); }
+    .hero-bottom { display: grid; grid-template-columns: .9fr 1.1fr; gap: 44px; align-items: center; margin-top: 48px; }
+    .hero-bottom figure { margin: 0; }
+    .abstract { padding: 28px 0; border-top: 3px solid var(--green); }
+    .abstract h2 { font-size: 19px; margin: 0 0 18px; font-family: var(--sans); letter-spacing: 0; }
+    .abstract p { margin: 0; font-size: 21px; }
+    .provenance { background: var(--surface); padding: 25px 30px; border: 1px solid var(--line); border-left: 4px solid var(--orange); margin-top: 34px; }
+    .provenance p { margin: 0; font-size: 17px; color: var(--muted); line-height: 1.8; }
+    .provenance strong { color: var(--ink); }
+    .findings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); margin: 24px 0 48px; }
+    .finding { background: var(--surface); padding: 32px 28px; }
+    .finding .index { display: block; font-size: 13px; letter-spacing: .1em; font-weight: 700; color: var(--green); margin-bottom: 15px; }
+    .finding h3 { font-size: 23px; letter-spacing: -.025em; margin: 0 0 14px; }
+    .finding p { font-size: 18px; color: var(--muted); margin: 0; }
+    .toc { padding: 24px 0 32px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); margin-bottom: 76px; }
+    .toc > p { margin: 0 0 16px; font-size: 14px; font-weight: 800; letter-spacing: .1em; }
+    .toc ol { display: grid; grid-template-columns: repeat(4, 1fr); list-style: none; margin: 0; padding: 0; gap: 12px 24px; }
+    .toc a { display: block; font-size: 17px; text-decoration: none; }
+    .toc span { color: var(--orange); margin-right: 8px; font-size: 13px; }
+    .chapter { margin: 0 0 100px; }
+    .chapter-head { max-width: 800px; margin: 0 auto 34px; }
+    .chapter-no { font-size: 14px; color: var(--orange); letter-spacing: .13em; font-weight: 800; margin: 0 0 16px; }
+    h2 { font-family: var(--serif); font-size: clamp(31px, 3.3vw, 44px); letter-spacing: -.04em; margin: 0 0 24px; }
+    h3 { font-size: 27px; letter-spacing: -.025em; margin: 44px 0 18px; }
+    h4 { font-size: 21px; margin: 0 0 12px; }
+    p { margin: 0 0 24px; }
+    .lead { font-size: 23px; color: var(--muted); margin-bottom: 0; }
+    strong { font-weight: 750; }
+    .label { display: inline-block; color: var(--green); font-size: 13px; font-weight: 750; letter-spacing: .04em; margin-bottom: 10px; }
+    .label.caution { color: var(--orange); }
+    .note { margin: 30px 0; padding: 24px 28px; background: var(--green-light); font-size: 19px; }
+    .note p:last-child { margin-bottom: 0; }
+    .note.warm { background: var(--orange-light); }
+    .note strong { color: var(--green); }
+    .note.warm strong { color: #8f3d25; }
+    .source-ref { font-size: 14px; vertical-align: super; white-space: nowrap; margin-left: 3px; }
+    figure { margin: 36px 0; min-width: 0; }
+    figure img { width: 100%; height: auto; display: block; border: 1px solid var(--line); background: #e9eae6; }
+    figcaption { margin-top: 13px; font-size: 16px; line-height: 1.75; color: var(--muted); }
+    figcaption strong { color: var(--ink); font-weight: 700; }
+    .time { display: inline-block; font-variant-numeric: tabular-nums; font-size: 13px; letter-spacing: .035em; font-weight: 750; text-decoration: none; margin-right: 9px; color: var(--orange); }
+    .gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px; margin: 36px 0 44px; align-items: start; }
+    .gallery figure { margin: 0; }
+    .figure-wide { max-width: 900px; margin: 40px auto; }
+    .quote { margin: 48px auto; padding: 32px 0 30px 30px; border-left: 4px solid var(--orange); max-width: 800px; }
+    .quote p { font-family: var(--serif); font-size: clamp(27px, 3vw, 37px); line-height: 1.6; letter-spacing: -.04em; margin: 0 0 16px; }
+    .quote cite { font-family: var(--sans); font-size: 15px; font-style: normal; color: var(--muted); }
+    .metric-band { background: var(--night); color: #fffef8; display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; padding: 38px; margin: 36px 0; }
+    .metric-band .value { display: block; font-size: 45px; font-weight: 750; line-height: 1.2; font-variant-numeric: tabular-nums; letter-spacing: -.04em; }
+    .metric-band .unit { font-size: 23px; }
+    .metric-band p { font-size: 17px; margin: 14px 0 0; color: #d8e4df; }
+    .metric-band small { display: block; color: #a9c6bb; margin-top: 8px; font-size: 14px; line-height: 1.6; }
+    .table-wrap { overflow-x: auto; margin: 30px 0 12px; border: 1px solid var(--line); background: var(--surface); }
+    table { width: 100%; border-collapse: collapse; font-size: 17px; line-height: 1.65; font-variant-numeric: tabular-nums; }
+    caption { text-align: left; padding: 21px 23px; font-size: 18px; font-weight: 750; color: var(--ink); background: #eeeee6; }
+    th, td { padding: 17px 20px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    thead th { color: var(--green); font-size: 15px; background: #f5f7f1; }
+    tbody th { font-weight: 650; }
+    tbody tr:last-child > * { border-bottom: 0; }
+    .numeric td, .numeric thead th:not(:first-child) { text-align: right; }
+    .numeric td { white-space: nowrap; }
+    .focus-row { background: #f0f4ea; }
+    .table-note { color: var(--muted); font-size: 15px; line-height: 1.8; margin: 12px 0 28px; }
+    .two-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 32px 0; }
+    .card { padding: 28px; background: var(--surface); border: 1px solid var(--line); }
+    .card p { font-size: 19px; margin-bottom: 0; }
+    .card h3 { font-size: 24px; margin: 0 0 14px; }
+    .card ul { font-size: 18px; margin-bottom: 0; padding-left: 22px; }
+    ul, ol { padding-left: 1.25em; margin: 20px 0 28px; }
+    li { padding-left: 5px; margin-bottom: 12px; }
+    .flow { margin: 36px 0; padding: 32px; border: 1px solid var(--line); background: var(--surface); }
+    .flow > p { font-size: 14px; font-weight: 750; color: var(--green); letter-spacing: .08em; margin-bottom: 22px; }
+    .flow ol { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; list-style: none; margin: 0; padding: 0; }
+    .flow li { margin: 0; padding: 17px 0 0; border-top: 2px solid var(--green); }
+    .flow li strong { display: block; font-size: 21px; margin-bottom: 8px; }
+    .flow li span { display: block; font-size: 16px; color: var(--muted); }
+    .flow .step { font-size: 13px; color: var(--orange); font-weight: 750; margin-bottom: 10px; }
+    .flow figcaption { margin-top: 22px; }
+    .lessons { list-style: none; counter-reset: lesson; padding: 0; margin: 32px 0; }
+    .lessons li { counter-increment: lesson; border-top: 1px solid var(--line); padding: 23px 0 23px 52px; margin: 0; position: relative; font-size: 19px; }
+    .lessons li::before { content: counter(lesson, decimal-leading-zero); position: absolute; top: 25px; left: 0; color: var(--orange); font-size: 14px; font-weight: 750; }
+    .lessons strong { display: block; font-size: 21px; margin-bottom: 7px; }
+    code { font-size: .85em; background: #eaece5; padding: .15em .35em; border-radius: 3px; overflow-wrap: anywhere; }
+    .copy-block { border: 1px solid var(--line); padding: 25px 28px; background: var(--surface); }
+    .copy-block p:last-child { margin-bottom: 0; }
+    .prompt { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: 17px; line-height: 1.8; word-break: normal; }
+    .ending { background: var(--night); color: #f8f7ef; padding: 54px 56px; margin: 56px 0; }
+    .ending h2 { font-size: 35px; }
+    .ending p { color: #dbe5df; }
+    .ending .eyebrow { color: #c5d7b8; }
+    .ending p:last-child { margin-bottom: 0; }
+    .checklist { list-style: none; padding: 0; }
+    .checklist li { padding: 16px 0 16px 34px; position: relative; border-top: 1px solid #476062; font-size: 20px; }
+    .checklist li::before { content: "□"; position: absolute; left: 0; color: #d4e7bd; }
+    .sources { padding-top: 50px; border-top: 1px solid var(--ink); margin-bottom: 60px; }
+    .sources h2 { font-size: 32px; }
+    .sources h3 { font-size: 23px; margin-top: 34px; }
+    .sources p, .sources li { font-size: 17px; line-height: 1.85; color: var(--muted); }
+    .sources strong { color: var(--ink); }
+    .source-list { list-style: none; padding: 0; }
+    .source-list li { padding: 20px 0; border-bottom: 1px solid var(--line); margin: 0; }
+    .source-list .source-id { display: block; color: var(--green); font-size: 13px; font-weight: 750; letter-spacing: .08em; margin-bottom: 6px; }
+    .footer { border-top: 1px solid var(--ink); padding: 26px 0 40px; display: flex; justify-content: space-between; gap: 24px; color: var(--muted); font-size: 14px; }
+    .footer a { white-space: nowrap; }
+
+    @media (max-width: 900px) {
+      .wrap { width: calc(100% - 48px); }
+      .hero-bottom { grid-template-columns: 1fr; gap: 12px; }
+      .hero-bottom figure { max-width: 720px; }
+      .toc ol { grid-template-columns: repeat(2, 1fr); }
+      .findings { grid-template-columns: 1fr; }
+      .finding { padding: 25px 28px; }
+      .flow ol { grid-template-columns: repeat(2, 1fr); }
+      .metric-band { padding: 28px; gap: 22px; }
+      .metric-band .value { font-size: 36px; }
+    }
+    @media (max-width: 620px) {
+      body { font-size: 20px; line-height: 1.85; }
+      .wrap { width: calc(100% - 36px); }
+      .masthead { align-items: flex-start; font-size: 12px; padding: 20px 0; }
+      .masthead span:last-child { max-width: 115px; text-align: right; }
+      .hero { padding: 44px 0 32px; }
+      h1 { font-size: 43px; }
+      .dek { font-size: 22px; }
+      .abstract p { font-size: 20px; }
+      .byline { gap: 7px 15px; font-size: 14px; }
+      .hero-bottom { margin-top: 32px; }
+      .provenance { padding: 21px; }
+      .findings { margin-bottom: 32px; }
+      .toc { margin-bottom: 54px; }
+      .toc ol { gap: 14px; }
+      .toc a { font-size: 15px; }
+      .chapter { margin-bottom: 70px; }
+      .chapter-head { margin-bottom: 26px; }
+      h2 { font-size: 32px; }
+      h3 { font-size: 25px; }
+      .lead { font-size: 21px; }
+      .gallery, .two-cards { grid-template-columns: 1fr; gap: 28px; }
+      .gallery { margin: 30px 0; }
+      .metric-band { grid-template-columns: 1fr; padding: 28px; gap: 25px; }
+      .metric-band > div + div { border-top: 1px solid #476062; padding-top: 25px; }
+      .metric-band .value { font-size: 43px; }
+      .quote { padding-left: 23px; }
+      .quote p { font-size: 28px; }
+      .flow { padding: 24px; }
+      .flow ol { grid-template-columns: 1fr; gap: 18px; }
+      .flow li { padding-top: 12px; }
+      th, td { padding: 14px; }
+      .table-wrap table { min-width: 600px; }
+      .note { padding: 22px; }
+      .ending { padding: 32px 24px; margin-inline: -6px; }
+      .ending h2 { font-size: 29px; }
+      .footer { flex-direction: column; gap: 10px; }
+    }
+    @media print {
+      body { background: white; color: black; font-size: 11pt; }
+      .wrap { width: 100%; }
+      .skip, .toc, .footer a { display: none; }
+      .hero { padding-top: 25px; }
+      h1 { font-size: 32pt; }
+      h2 { font-size: 23pt; }
+      h3 { font-size: 17pt; }
+      .chapter { margin-bottom: 35px; }
+      figure, .card, .note, tr { break-inside: avoid; }
+      .metric-band, .ending { background: #f0f2ef; color: black; }
+      .metric-band p, .metric-band small, .ending p, .ending .eyebrow { color: #333; }
+      .table-wrap { overflow: visible; }
+      .table-wrap table { min-width: 0; font-size: 9pt; }
+      a { color: inherit; }
+      .sources p, .sources li, figcaption { font-size: 9pt; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="EP 123. 한 치 앞도 모르는 미래: 젠슨 황 사임, Fable 5.2, weight-space programming">
+<meta property="og:description" content="EP 123. 한 치 앞도 모르는 미래: 젠슨 황 사임, Fable 5.2, weight space programming 영상 정보 채널 : AI Frontier Korea (노정석) 게시일 : 2026 11 15 길이 : 1시간 13분 11초 (4,391초) 출연 : 노정석, 최승준, 박종현 / 편집: 김유진 녹화 시점 : 2026년 11월 15일(일) 아침 (도입부 발언 기준) 링크 : https://www.youtube.">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/gsb6oy/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/gsb6oy/assets/a54sspl5iq0-ts-00-01-00.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="EP 123. 한 치 앞도 모르는 미래: 젠슨 황 사임, Fable 5.2, weight-space programming">
+<meta name="twitter:description" content="EP 123. 한 치 앞도 모르는 미래: 젠슨 황 사임, Fable 5.2, weight space programming 영상 정보 채널 : AI Frontier Korea (노정석) 게시일 : 2026 11 15 길이 : 1시간 13분 11초 (4,391초) 출연 : 노정석, 최승준, 박종현 / 편집: 김유진 녹화 시점 : 2026년 11월 15일(일) 아침 (도입부 발언 기준) 링크 : https://www.youtube.">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/gsb6oy/assets/a54sspl5iq0-ts-00-01-00.jpg">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-ep-123-%ED%95%9C-%EC%B9%98-%EC%95%9E%EB%8F%84-%EB%AA%A8%EB%A5%B4%EB%8A%94-%EB%AF%B8%EB%9E%98-%EC%A0%A0%EC%8A%A8-%ED%99%A9-%EC%82%AC%EC%9E%84-fable-5-2-weight-space-programming-%EC%9A%94%EC%95%BD/">
+</head>
+<body>
+  <a class="skip" href="#article">본문으로 바로가기</a>
+  <div class="wrap" id="top">
+    <header class="masthead">
+      <a href="#top" aria-label="기사 처음으로">FRONTIER / RESEARCH NOTES</a>
+      <span>EP 123 · 2026.11.15</span>
+    </header>
+
+    <main id="article">
+      <article>
+        <header class="hero">
+          <p class="eyebrow">AI Frontier Korea · 영상 기반 리서치 리포트</p>
+          <h1>AI가 AI를 고치는 시대,<br>사람은 무엇을 설계할까</h1>
+          <p class="dek">연구 가속의 기대, 벌어지는 사용 격차, 그리고 가중치 직접 편집의 한계. 변화의 속도보다 오래 남는 질문은 “무엇을 만들까”에서 “어떻게 검증하고 개선할까”로 옮겨감.</p>
+          <div class="byline">
+            <span><strong>원영상</strong> AI Frontier Korea (노정석)</span>
+            <span><strong>출연</strong> 노정석 · 최승준 · 박종현</span>
+            <span><strong>영상 편집</strong> 김유진</span>
+            <span><time datetime="2026-11-15">2026년 11월 15일</time> · 73분 11초</span>
+          </div>
+
+          <div class="hero-bottom">
+            <section class="abstract" aria-labelledby="abstract-title">
+              <h2 id="abstract-title">초록 — 이번 대화를 읽는 관점</h2>
+              <p>이번 회차는 NVIDIA 리더십에 관한 논의에서 출발해 AI 연구 자동화와 기업의 사용 패턴, 모델 가중치를 직접 바꾸는 실험으로 이어짐. 그중 가장 구체적인 대비는 <strong>주입한 문답의 높은 정답률과 개선되지 않은 미관측 문제 성능</strong>. 이 간극을 중심으로, 엔지니어의 역할과 학습·평가 환경의 가치를 다시 읽음.</p>
+            </section>
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-01-00.jpg" width="640" height="360" alt="한치도 앞을 알기 어려운이라는 제목과 Fable 5.2 관련 자료가 열린 오프닝 화면">
+              <figcaption><a class="time">00:01:00 ↗</a><strong>한 치 앞도 모르는 미래.</strong> 화면은 Fable 5.2 자료지만, 대화는 NVIDIA를 둘러싼 소식으로 시작됨.</figcaption>
+            </figure>
+          </div>
+
+          <aside class="provenance" aria-label="이 글의 근거와 검증 범위">
+            <p><strong>읽기 전: 영상 기록과 사실 검증을 구분함.</strong> 이 글은 제공된 한국어 자막·장면 분석 노트를 재구성한 기사임. 사건, 모델 출시, 기업 일정, 연구 수치를 외부 원문과 독립 대조하지 않음. 특히 Jensen Huang의 사임 및 관련 일정은 <strong>영상에서 제시된 주장</strong>으로 다룸. 아래의 “화면 기록”도 실제 세계의 사실이 검증됐다는 의미는 아님. <a href="#sources">출처와 한계 보기</a></p>
+          </aside>
+        </header>
+
+        <section aria-label="핵심 발견">
+          <div class="findings">
+            <div class="finding">
+              <span class="index">KEY FINDING 01</span>
+              <h3>가속 신호는 강하지만,<br>같은 종류의 숫자는 아님</h3>
+              <p>METR의 1.9배, 칩 도입 약 3일, 연산 효율 곡선은 서로 다른 측정값. 하나의 보편적 가속률로 합치기 어려움.</p>
+            </div>
+            <div class="finding">
+              <span class="index">KEY FINDING 02</span>
+              <h3>100% 암기와<br>일반화는 다른 성취</h3>
+              <p>가중치 편집 후 주입 문답은 최대 100%. 안 본 문제는 0.4% 유지. 새로운 지식을 넣는 일과 능력을 넓히는 일의 차이가 드러남.</p>
+            </div>
+            <div class="finding">
+              <span class="index">KEY FINDING 03</span>
+              <h3>다음 자산은<br>개선이 반복되는 환경</h3>
+              <p>사용량 확대만으로 성과가 보장되지는 않음. 목표·검증·피드백을 연결하는 엔지니어링이 후반부의 핵심 제안.</p>
+            </div>
+          </div>
+        </section>
+
+        <nav class="toc" aria-label="기사 목차">
+          <p>IN THIS REPORT</p>
+          <ol>
+            <li><a href="#power"><span>01</span>후원자의 공백</a></li>
+            <li><a href="#acceleration"><span>02</span>연구 가속의 근거</a></li>
+            <li><a href="#models"><span>03</span>모델과 제품의 경계</a></li>
+            <li><a href="#adoption"><span>04</span>사용량과 사용 격차</a></li>
+            <li><a href="#weights"><span>05</span>가중치에 지식 쓰기</a></li>
+            <li><a href="#style"><span>06</span>화풍 편집과 기술적 한계</a></li>
+            <li><a href="#environments"><span>07</span>신경 컴퓨터와 RL 환경</a></li>
+            <li><a href="#implications"><span>08</span>무엇을 준비할 것인가</a></li>
+          </ol>
+        </nav>
+
+        <section class="chapter" id="power" aria-labelledby="power-title">
+          <header class="chapter-head">
+            <p class="chapter-no">01 / CAPITAL &amp; COMPUTE</p>
+            <h2 id="power-title">인물의 공백 뒤에 있는<br>자본과 컴퓨트의 문제</h2>
+            <p class="lead">오프닝의 핵심 질문은 NVIDIA 한 회사의 미래를 넘어, open-weight 생태계를 누가 지원할 것인가에 놓여 있음.</p>
+          </header>
+
+          <div class="reading">
+            <p>출연진은 Jensen Huang의 갑작스러운 사임을 전제로 대화를 시작함. 영상에서 언급한 NVIDIA 실적 발표일은 11월 17일, Anthropic IPO 예상일은 11월 19일. 이 일정들의 근접성을 짚지만, 원인이나 배후를 확인한 것은 아니라고 선을 그음.<a class="source-ref" href="#source-1">[1]</a></p>
+            <p>노정석의 해석에서 NVIDIA는 OpenAI·Anthropic 중심 구도를 견제하며 오픈소스와 네오클라우드에 자본을 공급해 온 회사. 이른바 “Bank of NVIDIA”의 중심에 있던 의사결정자가 사라지면, 칩 공급뿐 아니라 <strong>투자와 생태계 지원의 연속성</strong>까지 흔들릴 수 있다는 우려임.</p>
+          </div>
+
+          <figure class="figure-wide">
+            <img src="assets/a54sspl5iq0-ts-00-06-00.jpg" width="640" height="360" loading="lazy" alt="Nvidia and the World Without Jensen이라는 SemiAnalysis 기사 카드와 중국 모델의 하드웨어 접근 관련 자료">
+            <figcaption><a class="time">00:06:00 ↗</a><strong>리더십에서 공급망으로.</strong> SemiAnalysis 카드와 관련 게시물을 바탕으로 open-weight 지원, 수출 통제, 아시아 생산 기반에 관한 논의가 이어짐. 카드에 실린 주장 자체는 독립 검증하지 않음.</figcaption>
+          </figure>
+
+          <div class="reading">
+            <div class="two-cards">
+              <section class="card">
+                <span class="label">출연진의 산업 해석</span>
+                <h3>오픈 모델의 자금줄</h3>
+                <p>네오클라우드 투자, 영상에서 진행 중이라고 언급한 Hugging Face 인수, 한국 스타트업 지원의 향방을 함께 우려함. 임시 경영진의 투자 성향도 전언으로 제시됨.</p>
+              </section>
+              <section class="card">
+                <span class="label caution">전언·법적 상태 미확인</span>
+                <h3>물리적 기반의 지정학</h3>
+                <p>중국의 약 1.5GW급 Blackwell 접근 추정과 원격 접속 통제 목적의 RASA 법안을 언급함. 설계는 미국, 생산과 메모리·운영 인력은 아시아에 집중됐다는 구조적 관점으로 연결됨.</p>
+              </section>
+            </div>
+            <p>여기서 남는 질문은 분명함. <strong>모델 개발의 진입 비용과 경쟁 구도는 알고리즘만으로 결정되지 않음.</strong> 칩, 전력, 자본, 공급망에 대한 접근성이 연구의 출발선을 바꿈. 다만 특정 인물의 복귀나 기업 투자 지속 여부는 영상 속 전망이며, 확인된 후속 결과로 읽어서는 안 됨.</p>
+            <aside class="note warm">
+              <p><strong>검증 경계.</strong> 사임 배경에 관한 사생활·정보기관·배후설과 여러 해킹 사건은 근거가 확인되지 않은 전언이므로 본문에서 재전파하지 않음. 00:00~17:17의 공유 화면은 대체로 정적이어서, 해당 구간의 논점은 제공된 자막 기록에 의존함.</p>
+            </aside>
+          </div>
+        </section>
+
+        <section class="chapter" id="acceleration" aria-labelledby="acceleration-title">
+          <header class="chapter-head">
+            <p class="chapter-no">02 / THE ACCELERATION CLAIM</p>
+            <h2 id="acceleration-title">AI 연구의 가속을 말하는<br>세 가지 서로 다른 근거</h2>
+            <p class="lead">벤치마크 추세, 학습 효율, 실제 엔지니어링 사례. 대화는 이 세 층위의 증거를 엮어 “AI가 AI 연구를 바꾸는 시점”을 묻고 있음.</p>
+          </header>
+
+          <div class="reading">
+            <h3>첫째, 내부 모델까지 포함한 성능 추세</h3>
+            <p>영상에 제시된 METR 그래프는 2026년 10월 기준 벤치마크 점수의 성장 속도가 2025년 10월 이전 대비 <strong>1.9배</strong>로 보인다고 표시함. 95% 신뢰구간은 <strong>1.5~2.8배</strong>. 여기에는 내부 모델과 내부 벤치마크가 포함된다는 조건이 붙음.<a class="source-ref" href="#source-2">[2]</a></p>
+            <p>최승준은 Fable 5.2를 “Model 3 Early” 체크포인트와 연결하고, 공개판의 AI 연구·개발 능력이 제한됐다는 해석을 소개함. 내부에 Model 4가 있다는 주장도 이어짐. 이 연결은 영상에서 시스템 카드와 업계 해석을 설명한 내용으로, 이 기사에서 원문을 대조한 결과는 아님.</p>
+          </div>
+
+          <div class="gallery">
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-17-30.jpg" width="640" height="360" loading="lazy" alt="내부 모델과 벤치마크를 포함할 때 성장률이 1.9배로 나타난다는 METR 그래프">
+              <figcaption><a class="time">00:17:30 ↗</a><strong>1.9배의 조건.</strong> 내부 모델·벤치마크를 포함한 점수 성장률의 비교. 모든 연구 업무의 속도 증가를 직접 측정한 값은 아님.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-18-15.jpg" width="640" height="360" loading="lazy" alt="Anthropic의 AI 연구개발 가속에 관한 METR 평가 카드와 비공식 한국어 번역문">
+              <figcaption><a class="time">00:18:15 ↗</a><strong>평가의 출처.</strong> 「Independent Assessment of AI R&amp;D Acceleration at Anthropic」과 비공식 번역. 출연자는 약 11일의 현장 접근을 바탕으로 작성됐다고 설명함.</figcaption>
+            </figure>
+          </div>
+
+          <div class="reading">
+            <h3>둘째, 같은 성능에 필요한 연산량의 감소</h3>
+            <p>Anthropic IPO 로드쇼 자료로 소개된 그래프는 학습 완료 시점에 따른 compute 효율 배수를 표시함. 가로축은 2024년 7월부터 2026년 10월까지, 세로축은 로그 스케일. 출연진은 로그 축에서도 위로 휘는 네 점을 <strong>알고리즘 효율 개선 자체가 빨라지는 신호</strong>로 읽음.</p>
+            <p>Jacob Coxon으로 소개된 인물의 게시물은 이 곡선을 초지수적 발전으로 해석하면서도, 지능 폭발을 엄밀히 증명하는 것은 아니라고 단서를 붙임. 핵심 주장은 알고리즘 개선이 반드시 천재적 통찰만을 요구하지 않으며, 그 개선 작업도 자동화될 수 있다는 것.</p>
+          </div>
+
+          <div class="gallery">
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-18-45.jpg" width="640" height="360" loading="lazy" alt="AI Futures의 타임라인 업데이트와 Jacob Coxon 게시물 카드">
+              <figcaption><a class="time">00:18:45 ↗</a><strong>예측이 앞당겨졌다는 전언.</strong> AI Futures 업데이트와 Coxon 게시물이 함께 소개됨. 예측 변화는 관측 결과와 구분할 필요.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-19-30.jpg" width="640" height="360" loading="lazy" alt="Anthropic IPO 로드쇼 영상 페이지와 여러 장의 섹션 썸네일">
+              <figcaption><a class="time">00:19:30 ↗</a><strong>로드쇼라는 맥락.</strong> 회사 소개, 연구, 컴퓨팅, 기업 전략을 묶은 약 40분 영상으로 설명됨. 기업이 제시하는 자료라는 성격도 함께 고려해야 함.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-19-45.jpg" width="640" height="360" loading="lazy" alt="학습 완료 시점에 따라 로그 축에서도 위로 휘는 compute 효율 그래프">
+              <figcaption><a class="time">00:19:45 ↗</a><strong>연산 효율 곡선.</strong> pre-training의 sample efficiency 맥락으로 소개됨. 세로축의 세부 값은 낮은 해상도로 정확히 판독하지 못함.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-20-15.jpg" width="640" height="360" loading="lazy" alt="알고리즘 개선의 가속과 자동화 가능성을 설명하는 Coxon 게시물 한국어 번역">
+              <figcaption><a class="time">00:20:15 ↗</a><strong>해석과 단서.</strong> Mythos를 단발적 도약이 아닌 곡선 위의 한 점으로 해석함. 동시에 지능 폭발의 증명은 아니라고 명시.</figcaption>
+            </figure>
+          </div>
+
+          <div class="reading">
+            <h3>셋째, 칩 도입 작업의 압축</h3>
+            <p>가장 직관적인 사례는 AMD MI355X 관련 작업. 화면 주석에 따르면 Claude Mythos Preview가 <strong>Anthropic 모델 하나의 프로덕션 처리를 쓸 만한 성능으로 올리는 데 약 3일</strong>이 걸렸다고 제시됨. 비교 대상인 6~12개월은 과거 경험에 기반한 추정치임.</p>
+            <p>박종현은 이를 “300일을 3일로” 줄인 약 100배의 변화로 표현함. 다만 이는 발언상의 근사 계산. 전체 GPU 소프트웨어 스택을 완성한 시간이나, 동일 조건으로 통제한 생산성 실험의 결과로 확대하면 안 됨.</p>
+          </div>
+
+          <div class="gallery">
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-21-25.jpg" width="640" height="360" loading="lazy" alt="Anthropic 로드쇼 한국어 번역 HTML과 컴퓨팅 효율 관련 발언">
+              <figcaption><a class="time">00:21:25 ↗</a><strong>로드쇼 번역본.</strong> 연구·모델 훈련 단계의 효율 개선과 기업 비전을 함께 담은 자료. 화면은 최승준이 제작한 로컬 HTML.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-22-15.jpg" width="640" height="360" loading="lazy" alt="새 칩 도입에 Mythos 활용 시 약 3일, 기존 방식 약 6개월에서 12개월이 걸린다는 비교 그래프">
+              <figcaption><a class="time">00:22:15 ↗</a><strong>약 3일 대 6~12개월.</strong> 특정 모델의 MI355X 프로덕션 처리 사례와 과거 경험 기반 추정의 비교.</figcaption>
+            </figure>
+          </div>
+
+          <div class="reading">
+            <div class="table-wrap" role="region" aria-label="가속 근거의 의미와 한계" tabindex="0">
+              <table>
+                <caption>세 근거가 말하는 것, 아직 말하지 못하는 것</caption>
+                <thead><tr><th scope="col">근거</th><th scope="col">영상에서 제시한 의미</th><th scope="col">해석의 경계</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">METR 1.9배</th><td>벤치마크 점수 성장 추세의 가속</td><td>내부 모델·벤치마크 포함. 업무 생산성 배수와 동일하지 않음.</td></tr>
+                  <tr><th scope="row">Compute 효율 곡선</th><td>같은 성능에 필요한 연산량 감소</td><td>정확한 축 값·산식 미대조. 네 점만으로 장기 추세 확정 불가.</td></tr>
+                  <tr><th scope="row">MI355X 약 3일</th><td>특정 포팅·최적화 과제의 기간 단축</td><td>단일 사례. 기준 기간은 과거 경험에 따른 추정.</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>2027년은 전망이고, 준비는 현재의 과제</h3>
+            <p>Dwarkesh Patel의 글은 수학 영역의 진전과 내부자들과의 논의를 계기로 전망을 수정한 사례로 소개됨. 영상에 제시된 글의 중심 전망은 <strong>2030년까지 초지능</strong>. 출연진은 이를 AI Futures·METR 주변 논의와 연결해 2027년에 AI 연구의 “알파고 모멘트”가 올 수 있다는 분위기를 전함.</p>
+            <p>Ajeya Cotra의 인용은 더 조건적임. AI가 역량 발전 속도를 거의 두 배로 높이고, 그 가속이 매끄럽게 이어진다고 가정하면 단순 모델상 1년 안의 극단적 초지능이 도출된다는 주장. 본인의 중앙값 전망은 그만큼 이르지 않다고도 밝힘. <strong>가정에 따른 외삽과 개인의 중심 예측을 분리해서 읽을 필요</strong>가 있음.</p>
+          </div>
+
+          <div class="gallery">
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-24-00.jpg" width="640" height="360" loading="lazy" alt="Dwarkesh Patel의 2030년까지 초지능을 예상하는 이유에 관한 글 한국어 번역">
+              <figcaption><a class="time">00:24:00 ↗</a><strong>전망의 수정.</strong> 2026년 11월 14일 글로 소개됨. continual learning의 부재를 중시하던 관점에서 AI 연구 자동화 가능성에 더 무게를 두는 방향.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-25-15.jpg" width="640" height="360" loading="lazy" alt="AI가 AI 연구를 가속한다는 Ajeya Cotra의 주장과 단서가 담긴 번역 화면">
+              <figcaption><a class="time">00:25:15 ↗</a><strong>빠른 시나리오와 불확실성.</strong> “1년”은 가속이 지속된다는 가정의 결과이며, 글쓴이의 중앙값과는 구별됨.</figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <section class="chapter" id="models" aria-labelledby="models-title">
+          <header class="chapter-head">
+            <p class="chapter-no">03 / MODELS BECOME PRODUCTS</p>
+            <h2 id="models-title">한 번의 모델 업데이트가<br>제품의 경계를 옮길 때</h2>
+            <p class="lead">학습 효율, 검색 안의 생성, 게임의 연출. 이번 회차에서 모델의 변화는 벤치마크를 넘어 기존 서비스의 역할을 다시 묻는 계기로 등장함.</p>
+          </header>
+
+          <div class="reading">
+            <h3>4비트 학습에서 검색 속 제작까지</h3>
+            <p>Thinking Machines의 Inkling 2 Small은 weights 공개와 end-to-end 4-bit 학습 사례로 소개됨. 최승준은 첫 H1 stage에서 <strong>8T 토큰을 68시간</strong>에 처리했다고 설명함. 총 연산량이 늘어도 낮은 정밀도 연산의 처리 특성 덕분에 실제 학습 시간이 짧아질 수 있다는 취지임. 하드웨어 구성과 세부 산식은 제공 노트에 없어 재현 가능한 속도 비교로 쓰기는 어려움.<a class="source-ref" href="#source-3">[3]</a></p>
+            <p>이어 등장하는 Gemini 4 Hydrogen은 에이전트 작업용 모델로 소개됨. Google 검색 AI 모드에서 Three.js 자이로이드 시각화를 한 번에 생성하는 시연은, 검색 결과를 읽는 경험이 결과물을 만드는 경험으로 확장되는 사례로 다뤄짐. 해당 모델이 AI 모드에 들어갔다는 연결은 출연자가 소개한 이야기이며, 시연만으로 확인되는 사실은 아님.</p>
+          </div>
+
+          <div class="gallery">
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-26-15.jpg" width="640" height="360" loading="lazy" alt="Inkling 2 Small 한국어 소개와 End-to-End 4-Bit Training 블로그 카드">
+              <figcaption><a class="time">00:26:15 ↗</a><strong>정밀도와 효율.</strong> 출연진은 32비트·BF16·8비트·4비트로 이어지는 흐름을 설명함. 4비트당 비트 패턴은 16개지만, 실제 수치 표현은 양자화 방식에 좌우됨.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-28-45.jpg" width="640" height="360" loading="lazy" alt="Gemini 4 Hydrogen 소개 카드와 Claude Sonnet 5.5 및 GPT-6.1 Terra 비교 벤치마크">
+              <figcaption><a class="time">00:28:45 ↗</a><strong>작업마다 다른 우위.</strong> 공개 화면의 벤치마크 표. 아래 값은 제공 노트의 360p 판독값을 옮겼으며 원문과 대조하지 않음.</figcaption>
+            </figure>
+          </div>
+
+          <div class="table-wrap numeric" role="region" aria-label="영상에 표시된 Gemini 4 Hydrogen 벤치마크 비교표" tabindex="0">
+            <table>
+              <caption>화면 기록 · Gemini 4 Hydrogen 비교</caption>
+              <thead>
+                <tr><th scope="col">벤치마크</th><th scope="col">Gemini 4 Hydrogen</th><th scope="col">Claude Sonnet 5.5</th><th scope="col">GPT-6.1 Terra</th></tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">SWE-sweep</th><td>13.5%</td><td>3.1%</td><td>5.8%</td></tr>
+                <tr><th scope="row">Terminal-Bench 4.1</th><td>57.0%</td><td>63.9%</td><td>—</td></tr>
+                <tr><th scope="row">Agents’ Last Exam v1.1</th><td>71.6%</td><td>60.4%</td><td>69.8%</td></tr>
+                <tr><th scope="row">AutomationBench-AA</th><td>76.1%</td><td>71.8%</td><td>60.2%</td></tr>
+                <tr><th scope="row">Vending-Bench 2</th><td>$14,549</td><td>$11,165</td><td>$9,107</td></tr>
+                <tr><th scope="row">OSWorld 2.1</th><td>77.6%</td><td>83.9%</td><td>74.2%</td></tr>
+                <tr><th scope="row">Terminal-Bench-Science 0.1</th><td>51.4%</td><td>59.9%</td><td>58.3%</td></tr>
+                <tr><th scope="row">HLE-Diamond</th><td>58.8%</td><td>53.3%</td><td>47.3%</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="table-note">출처: 00:28:45 화면에 대한 제공 노트의 판독. “—”는 화면상 값 부재. 평가 설정·실행 횟수·오차 범위가 확인되지 않아 종합 순위로 재계산하지 않음.</p>
+
+          <div class="gallery">
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-29-15.jpg" width="640" height="360" loading="lazy" alt="Google AI 모드가 생성한 청록색 자이로이드 구조와 조절 슬라이더가 있는 화면">
+              <figcaption><a class="time">00:29:15 ↗</a><strong>검색에서 제작으로.</strong> Three.js와 레이마칭 셰이더를 사용한 생성 결과. 출연자는 당시 multi-turn 수정은 안 된다고 설명함. 본 기사에는 시연 이미지만 보존함.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-30-00.jpg" width="640" height="360" loading="lazy" alt="2027년 AI 연구의 알파고 모멘트와 먼저 도달하기의 게임을 묻는 Notion 소제목">
+              <figcaption><a class="time">00:30:00 ↗</a><strong>먼저 도달하기의 게임인가.</strong> 모델 격차가 경쟁 우위로 얼마나 오래 남을지, 반대로 한 번의 도약이 격차를 얼마나 키울지에 관한 토론.</figcaption>
+            </figure>
+          </div>
+
+          <div class="reading">
+            <h3>기능을 쌓는 속도와 모델이 흡수하는 속도</h3>
+            <p>박종현은 수개월간 만든 영상 편집 기능이 Opus 5.5 등장 후 한 번에 가능해졌다는 경험을 전함. 최승준은 Fable 5.2가 게임·3D 생성에서 그래픽을 넘어 <strong>연출과 게임성</strong>을 다루기 시작했다고 평가함. 이는 출연자들의 사용 경험이며, 통제된 제품 비교 결과는 아님.</p>
+            <p>노정석은 현재 모델의 빈틈을 보완하는 소프트웨어만으로 오래가는 우위를 만들기 어려워졌다고 봄. 대신 검증이 단순하지 않거나 물리적 세계와 연결된 자산으로 관심을 옮겼다고 설명함. 대화 후반의 RL 환경 논의는 이 고민의 연장선에 있음.</p>
+          </div>
+
+          <div class="gallery">
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-35-00.jpg" width="640" height="360" loading="lazy" alt="effort와 승인 및 코드 소유권 등의 항목을 안내하는 Claude Fable 5.2 프롬프팅 카드">
+              <figcaption><a class="time">00:35:00 ↗</a><strong>도구를 넘어 역할로.</strong> Fable 5.2의 연출 능력에 관한 사용 소감과 함께, 자율성·승인·진행 보고를 다루는 가이드가 소개됨.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-37-00.jpg" width="640" height="360" loading="lazy" alt="Claude Fable 5.2 프롬프팅 문서의 코드 소유자를 밝히기 절">
+              <figcaption><a class="time">00:37:00 ↗</a><strong>코드의 소유자를 밝히기.</strong> 화면 속 가이드는 장기 유지보수 책임을 부여하는 지시를 제시함. 관련 테스트의 세부 수치는 판독 불확실.</figcaption>
+            </figure>
+          </div>
+
+          <div class="reading">
+            <div class="copy-block">
+              <span class="label">화면에 제시된 프롬프트 · 복사용</span>
+              <p class="prompt" lang="en">You are the owner and long-term maintainer of this codebase, and its design is up to you.</p>
+            </div>
+            <p class="table-note">영상 속 가이드의 예시를 보존한 것. 출연진은 이를 모델이 역할에 따른 자율성을 학습했다는 신호로 해석함.</p>
+          </div>
+        </section>
+
+        <section class="chapter" id="adoption" aria-labelledby="adoption-title">
+          <header class="chapter-head">
+            <p class="chapter-no">04 / THE USAGE DIVIDE</p>
+            <h2 id="adoption-title">더 많이 쓰는데 덜 성장한다면,<br>무엇을 측정해야 할까</h2>
+            <p class="lead">지출, 사용량, 채택률, 성과는 서로 다른 지표. Ramp 자료를 둘러싼 논의는 이 차이를 선명하게 보여 줌.</p>
+          </header>
+
+          <div class="reading">
+            <p>노정석이 소개한 Ramp는 약 8만 5천 개 기업이 사용하는 법인카드·장부 서비스이며, 실리콘밸리 스타트업 집중도가 높다고 설명됨. 영상 속 자료에서 토큰 지출의 월간 성장률은 7월 <strong>42%</strong> 증가 뒤 8월 <strong>1.05%</strong>, 9월 <strong>0.22%</strong>로 둔화됨. 반면 사용량 곡선은 계속 상승함.<a class="source-ref" href="#source-4">[4]</a></p>
+            <p>출연진은 이 차이를 토큰 가격 하락으로 해석함. 화면에서 읽은 블렌디드 단가는 100만 토큰당 약 <strong>$1.20에서 $0.65</strong>로 감소. 다만 블렌디드 단가에는 모델 구성과 사용 방식의 변화도 반영될 수 있으므로, 동일 모델의 가격표가 그 비율만큼 내렸다는 뜻과는 구분해야 함.</p>
+          </div>
+
+          <div class="metric-band" aria-label="영상 속 Ramp 자료의 주요 수치">
+            <div>
+              <span class="value">$1.20 <span class="unit">→</span> $0.65</span>
+              <p>100만 토큰당 블렌디드 단가</p>
+              <small>7월 말 → 10월 초 · 차트 판독값</small>
+            </div>
+            <div>
+              <span class="value">55.9<span class="unit">%</span></span>
+              <p>9월 전체 AI 유료 채택률</p>
+              <small>해당 자료의 기업 표본 기준</small>
+            </div>
+            <div>
+              <span class="value">$9,568</span>
+              <p>상위 1% 기업의 인당 월 지출</p>
+              <small>9월 · 전월 대비 +11.7%</small>
+            </div>
+          </div>
+
+          <div class="gallery">
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-39-00.jpg" width="640" height="360" loading="lazy" alt="두 달 연속 토큰 지출 성장이 정체됐다는 Ramp AI Index 요약 슬라이드">
+              <figcaption><a class="time">00:39:00 ↗</a><strong>달러 기준 둔화.</strong> 8월 1.05%, 9월 0.22% 성장. 소개된 글은 이를 이례적으로 오래가는 둔화로 평가함.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-40-30.jpg" width="640" height="360" loading="lazy" alt="상승하는 토큰 사용량과 평탄한 AI 지출을 나란히 보여주는 슬라이드">
+              <figcaption><a class="time">00:40:30 ↗</a><strong>사용은 계속 증가.</strong> 지출은 10월 초에야 8월 초 고점을 1.5% 넘었다는 설명. 슬라이드는 계절성만으로 설명하기 어렵다고 주장함.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-41-05.jpg" width="640" height="360" loading="lazy" alt="프런티어 모델 가격 하락과 토큰당 블렌디드 단가를 설명하는 슬라이드">
+              <figcaption><a class="time">00:41:05 ↗</a><strong>지출과 사용량을 갈라놓는 단가.</strong> 전체 약 $0.65, Anthropic 약 $0.8, OpenAI 약 $0.5로 판독됨. 모두 100만 토큰당 값.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-41-30.jpg" width="640" height="360" loading="lazy" alt="전체와 Anthropic 및 OpenAI의 기업 AI 채택률을 보여주는 S곡선 슬라이드">
+              <figcaption><a class="time">00:41:30 ↗</a><strong>채택의 다음 지표.</strong> 전체 55.9%, Anthropic 43.8%, OpenAI 40.6%. 여러 서비스를 함께 쓰는 기업이 있어 수치를 합산할 수 없음.</figcaption>
+            </figure>
+          </div>
+
+          <div class="reading">
+            <h3>채택률 이후에는 사용 강도의 차이가 남음</h3>
+            <p>9월 채택률의 전월 대비 변화는 전체 <strong>+0.62%p</strong>, Anthropic <strong>+0.25%p</strong>, OpenAI <strong>+1.12%p</strong>로 제시됨. xAI는 +0.6%p, Mistral은 미국 기업의 1% 미만이라고 소개됨. 출연진은 신규 고객 수보다 기존 고객의 사용 강도가 중요해지는 구간으로 해석함. 다만 표본의 절반을 넘었다는 사실만으로 전체 시장이 포화됐다고 단정할 수는 없음.</p>
+            <p>집중도는 더 극적임. 슬라이드는 <strong>관측된 OpenAI·Anthropic 지출의 약 80%가 1%의 기업에서 발생</strong>한다고 제시함. 이를 두 회사 전체 매출의 80%로 일반화할 근거는 제공되지 않음. 상위 1%의 9월 인당 월 지출 $9,568은 전월보다 늘었지만, 7월 고점 $9,873보다 3.1% 낮음.</p>
+          </div>
+
+          <figure class="figure-wide">
+            <img src="assets/a54sspl5iq0-ts-00-42-00.jpg" width="640" height="360" loading="lazy" alt="상위 1퍼센트와 상위 10퍼센트 및 중앙값 기업의 AI 지출 추이를 비교한 패널">
+            <figcaption><a class="time">00:42:00 ↗</a><strong>격차인가, 시차인가.</strong> 상위 1%의 지출 반등과 상위 10%·중앙값의 상승을 제시함. 중앙값이 몇 분기 뒤 따라올 것이라는 해석은 노정석의 전망.</figcaption>
+          </figure>
+
+          <div class="reading">
+            <p>노정석은 상위 기업을 “compute를 태워 금을 찾는 대항해시대”의 주체로 묘사함. 아직 수익 모델이 없는 투자 기업이 많이 포함됐다는 설명도 덧붙임. 여기에는 두 가지 해석이 공존함. 사용 확대가 뒤따를 선행 지표일 수 있고, 동시에 수요가 소수 기업에 집중돼 있다는 위험 신호일 수도 있음.</p>
+          </div>
+
+          <blockquote class="quote">
+            <p>“코딩의 시대는 끝났지만<br>엔지니어의 시대는 살아 있다.”</p>
+            <cite>노정석 · 상위 기업의 AI 사용과 엔지니어 역할에 관한 대화</cite>
+          </blockquote>
+
+          <div class="reading">
+            <p>발언의 배경은 무제한에 가까운 생성의 부작용. AI만으로 기업용 패키지를 만들다 보면 코드와 테스트가 함께 비대해지고, 회귀 테스트가 오래 걸리며, 불필요한 복잡성이 쌓인다는 경험을 전함. 더 많은 토큰이 항상 더 나은 결과로 이어지지는 않는다는 것.</p>
+            <p>여기서 제안하는 역할이 <strong>loop architect / loop engineer</strong>. 기능별 직함보다 문제 정의, 실행, 평가, 수정의 반복을 끝까지 연결하는 사람이 중요해진다는 주장임. 판단의 기준은 생성량이 아니라 <strong>문제 해결의 완결성</strong>에 있음.</p>
+          </div>
+        </section>
+
+        <section class="chapter" id="weights" aria-labelledby="weights-title">
+          <header class="chapter-head">
+            <p class="chapter-no">05 / WEIGHT-SPACE PROGRAMMING</p>
+            <h2 id="weights-title">가중치에 지식을 써 넣었지만,<br>새 문제를 푸는 능력은 늘지 않았다</h2>
+            <p class="lead">후반부의 중심은 박종현의 실험. 모델이 다른 모델의 가중치를 읽고 수정하면, 없던 지식을 배운 것으로 볼 수 있을까.</p>
+          </header>
+
+          <div class="reading">
+            <p>Weight-space programming은 신경망 가중치를 읽고 쓸 수 있는 프로그램처럼 다루는 접근으로 소개됨. 이 실험에서 편집자 LLM은 어느 층의 어떤 값을 바꿀지 분석하고 수정안을 구성함. 입력 문장을 바꾸는 프롬프팅과 달리 <strong>모델 파일 자체가 바뀌며</strong>, 통상적인 경사하강법 기반 학습과는 수정의 결정 방식이 다름.<a class="source-ref" href="#source-5">[5]</a></p>
+            <p>화면에 소개된 원논문은 MIT CSAIL의 「Sparks of Weight-Space Programming: LLMs can natively read &amp; write neural network weights」로, 날짜는 2026년 11월 2일. 노트에 따르면 GPT-6 Astra가 Qwen3.5-0.8B의 가중치 일부를 고쳐 GSM8K 점수를 <strong>13.8에서 67.1</strong>로 높인 사례가 제시됨. 출연자는 이를 잘못된 추론 루프를 고친 결과로 설명하며, 없던 능력을 추가한 것은 아니라는 한계도 전달함.</p>
+          </div>
+
+          <div class="gallery">
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-49-00.jpg" width="640" height="360" loading="lazy" alt="가중치를 직접 고쳐 보았다는 박종현의 실험 노트와 두 편집 모델의 신경망 시각화">
+              <figcaption><a class="time">00:49:00 ↗</a><strong>작은 팀이 만드는 연구 도구.</strong> 박종현은 환경 구성·편집·시각화를 포함한 실험을 이틀에 걸쳐 진행했다고 설명함.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-51-00.jpg" width="640" height="360" loading="lazy" alt="Weight-Space Programming의 정의와 MIT CSAIL 논문 결과를 설명하는 실험 노트">
+              <figcaption><a class="time">00:51:00 ↗</a><strong>수리에서 지식 주입으로.</strong> 원논문의 결과를 출발점으로, 없던 사실과 눈에 보이는 화풍도 넣을 수 있는지 질문함.</figcaption>
+            </figure>
+          </div>
+
+          <div class="reading">
+            <aside class="note warm">
+              <p><strong>원논문 수치 불일치.</strong> 수정 비율은 화면에 <strong>0.016%</strong>, 자막 발언에는 <strong>0.061%</strong>로 기록됨. 이 글은 화면 표기를 보존하되 어느 값이 정확한지는 확정하지 않음. 아래 재현 실험의 0.65%·0.61%와는 별개의 수치임.</p>
+            </aside>
+
+            <h3>실험 A — 삼국지 문답 200개를 넣기</h3>
+            <p>삼국지 퀴즈 18,314문제에서 난이도별 40개씩, 총 <strong>200문제</strong>를 주입 대상으로 선택함. 답은 대부분 두 글자 인명. 편집 전 정답률은 0.8B 모델 3%, 9B 모델 14%로 소개됨. 정답을 프롬프트에 제공하면 0.8B도 95%를 맞혀, 적어도 주어진 답을 읽고 재현하는 능력은 이미 있음을 확인한 구성.</p>
+            <p>평가는 주입 문답에만 머물지 않음. 같은 사실을 다른 문장으로 묻는 45문제, 안 본 삼국지 문제, 일반 상식, 그리고 일반 질문 300개의 답이 편집 전과 글자까지 동일한지를 함께 측정함. 이 설계가 암기와 일반화, 기존 동작 보존을 구분하게 해 줌.</p>
+          </div>
+
+          <figure class="flow" aria-labelledby="weight-flow-title">
+            <p id="weight-flow-title">실험의 논리 · 무엇을 바꾸고 무엇을 확인했나</p>
+            <ol>
+              <li><span class="step">01 / INPUT</span><strong>문답 선택</strong><span>삼국지 200문제와 정답을 주입 대상으로 지정</span></li>
+              <li><span class="step">02 / INSPECT</span><strong>활성화 분석</strong><span>문제 풀이 중 반응하는 층과 뉴런을 관찰</span></li>
+              <li><span class="step">03 / EDIT</span><strong>가중치 수정</strong><span>편집자 LLM이 위치와 수정 값을 결정</span></li>
+              <li><span class="step">04 / EVALUATE</span><strong>전이·보존 평가</strong><span>변형 문장, 새 문제, 상식, 기존 답을 비교</span></li>
+            </ol>
+            <figcaption>영상에 설명된 실험 흐름을 정리한 도식. 세부 편집 알고리즘과 실행 코드를 재현한 도식은 아님.</figcaption>
+          </figure>
+
+          <div class="gallery">
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-52-30.jpg" width="640" height="360" loading="lazy" alt="삼국지 지식 주입 실험의 데이터 구성과 Qwen3.5-0.8B 층별 시각화">
+              <figcaption><a class="time">00:52:30 ↗</a><strong>대상 모델과 데이터.</strong> Qwen3.5-0.8B는 24개 층, 층마다 MLP 뉴런 3,584개로 표시됨. 9B는 개인 GPU에서 다룰 수 있는 더 큰 비교 대상으로 설명됨.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-53-45.jpg" width="640" height="360" loading="lazy" alt="Fable 5.2는 19층, GPT-6 Astra는 23층을 수정한 결과를 나란히 비교한 3D 시각화">
+              <figcaption><a class="time">00:53:45 ↗</a><strong>서로 다른 위치 선택.</strong> Fable 5.2는 19층 MLP, Astra는 23층 MLP를 선택함. 화면의 반올림 수치보다 아래 최종 결과표를 우선함.</figcaption>
+            </figure>
+          </div>
+
+          <div class="reading">
+            <div class="table-wrap numeric" role="region" aria-label="두 편집자의 가중치 수정 위치 비교" tabindex="0">
+              <table>
+                <caption>Qwen3.5-0.8B · 어디를 얼마나 고쳤나</caption>
+                <thead><tr><th scope="col">편집 항목</th><th scope="col">Fable 5.2</th><th scope="col">GPT-6 Astra</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">수정 위치 · 화면 표기</th><td>19층 MLP</td><td>23층 MLP</td></tr>
+                  <tr><th scope="row">재배선 뉴런 / 층 전체</th><td>614 / 3,584</td><td>456 / 3,584</td></tr>
+                  <tr><th scope="row">바뀐 값</th><td>약 491만 개</td><td>약 460만 개</td></tr>
+                  <tr><th scope="row">전체 가중치 대비 비율</th><td>0.65%</td><td>0.61%</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="table-note">층 번호는 제공된 화면 표기를 그대로 사용. 실험 설명은 Astra의 위치를 마지막 층으로 부름.</p>
+
+            <h3>높아진 정답률보다 중요한 것은, 오르지 않은 정답률</h3>
+            <p>결과는 뚜렷함. 주입한 200문제의 정답률은 Fable 편집 후 <strong>94.5%</strong>, Astra 편집 후 <strong>100%</strong>. 그러나 같은 사실의 다른 표현에서는 각각 <strong>40.0%</strong>, <strong>26.7%</strong>로 낮아짐. 안 본 문제의 정답률은 편집 전후 <strong>0.4%</strong>로 동일함.</p>
+          </div>
+
+          <div class="table-wrap numeric" role="region" aria-label="삼국지 지식 주입 실험 최종 결과" tabindex="0">
+            <table>
+              <caption>실험 A 결과 · 암기, 표현 전이, 기존 동작 보존</caption>
+              <thead><tr><th scope="col">평가 항목</th><th scope="col">편집 전</th><th scope="col">Fable 5.2</th><th scope="col">GPT-6 Astra</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">주입한 문답 · 200문제</th><td>3.0%</td><td>94.5%</td><td>100%</td></tr>
+                <tr><th scope="row">같은 사실, 다른 문장 · 45문제</th><td>4.4%</td><td>40.0%</td><td>26.7%</td></tr>
+                <tr class="focus-row"><th scope="row">안 본 문제 · 표에 제시된 500문제</th><td>0.4%</td><td>0.4%</td><td>0.4%</td></tr>
+                <tr><th scope="row">일반 상식 · 40문제</th><td>30.0%</td><td>27.5%</td><td>30.0%</td></tr>
+                <tr><th scope="row">일반 질문 답 유지율 · 300문제</th><td>100%</td><td>66.7%</td><td>82.0%</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="table-note">출처: 00:57:30 최종 결과표. 앞선 실험 설명은 안 본 문제 832개를 언급하지만, 이 표는 500개를 제시함. 두 집합의 관계는 제공 노트만으로 확정할 수 없음. “답 유지율”은 편집 전 문자열과의 일치율이며 정답률과 다름.</p>
+
+          <div class="gallery">
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-56-00.jpg" width="640" height="360" loading="lazy" alt="박망 전투 관련 질문의 답이 제갈량에서 조운으로 바뀌고 특정 뉴런의 활동이 표시된 화면">
+              <figcaption><a class="time">00:56:00 ↗</a><strong>한 문답의 변화.</strong> 답이 “제갈량”에서 “조운”으로 바뀐 사례. 특정 뉴런을 기억 소자로 보는 설명은 출연자의 해석이며, 독립적인 인과 검증 결과는 아님.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-57-30.jpg" width="640" height="360" loading="lazy" alt="편집 전과 Fable 5.2 및 GPT-6 Astra의 삼국지 정답률과 답 유지율을 비교하는 최종 표">
+              <figcaption><a class="time">00:57:30 ↗</a><strong>일반화의 경계.</strong> 주입 문답에는 강하지만 표현이 달라지면 성능 하락. 미관측 문제의 개선은 나타나지 않음.</figcaption>
+            </figure>
+          </div>
+
+          <blockquote class="quote">
+            <p>“외우게는 했지만<br>가르치지는 못했다.”</p>
+            <cite>박종현의 실험 결론 · 주입 성능과 일반화 성능의 차이</cite>
+          </blockquote>
+
+          <div class="reading">
+            <p>Fable 편집은 표현이 달라진 질문에서 더 높은 성능을 보였고, Astra 편집은 기존 답을 더 많이 보존함. 이 결과는 <strong>주입·전이·보존 사이의 절충</strong>을 보여 줌. 마지막 층을 고쳤기 때문에 보존이 더 좋았다는 설명은 가능한 해석이지만, 편집 위치만 바꾼 통제 실험은 제시되지 않아 인과관계로 확정할 수 없음.</p>
+            <p>박종현의 평가는 과장되지 않음. 기존 fine-tuning에서도 나타나는 암기·간섭 문제를 넘어선 것은 아니며, 과거에 다루기 어려웠던 수정 방법 하나를 더 확보한 수준이라는 것. 그럼에도 모델이 편집 위치를 고르고 검증까지 수행했다는 점은 연구 도구의 변화로 볼 만함.</p>
+          </div>
+        </section>
+
+        <section class="chapter" id="style" aria-labelledby="style-title">
+          <header class="chapter-head">
+            <p class="chapter-no">06 / STYLE, QUANTIZATION &amp; LIMITS</p>
+            <h2 id="style-title">그림의 화풍도<br>가중치에 새길 수 있을까</h2>
+            <p class="lead">두 번째 실험은 정답이 뚜렷한 문답에서 벗어남. 같은 프롬프트를 유지한 채, 가중치만 바꿔 이중섭의 화풍에 가까운 그림을 만들려는 시도.</p>
+          </header>
+
+          <div class="reading">
+            <p>대상은 NVFP4로 양자화한 MiniMax H3 Image. 제공 노트에 따르면 RTX 5090에서 VRAM 약 <strong>14GB</strong>를 사용하고, <strong>2048×2048 이미지 한 장에 약 3초</strong>가 걸리는 구성으로 소개됨. 측정 조건 전체는 제공되지 않음.</p>
+            <p>프롬프트는 <code>an ink wash painting of a bull</code>처럼 유지하고 화가 이름을 넣지 않음. 이중섭 작품 6점을 목표로 삼아, 편집 때마다 같은 프롬프트와 시드로 결과를 생성하고 평가함. 본 실험에 앞서 Stable Diffusion 1.5로 두 차례 연습했다고 설명됨.</p>
+          </div>
+
+          <div class="gallery">
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-58-00.jpg" width="640" height="360" loading="lazy" alt="수묵화 프롬프트를 그대로 두고 가중치만 바꾸는 MiniMax H3 Image 화풍 실험 설명">
+              <figcaption><a class="time">00:58:00 ↗</a><strong>프롬프트는 고정.</strong> 새 모델에 대한 편집자의 사전 지식이 제한될 수 있고, 화풍의 좋고 나쁨은 수학처럼 명확히 검증하기 어렵다는 점을 과제 선정 이유로 제시함.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-00-58-12.jpg" width="640" height="360" loading="lazy" alt="MiniMax 이미지 모델의 텍스트 인코더와 투영층 및 50개 트랜스포머 블록을 보여주는 Fable 편집 시각화">
+              <figcaption><a class="time">00:58:12 ↗</a><strong>Fable의 선택.</strong> 텍스트 투영 입구 쪽을 수정. 바뀐 값은 2,734만 개, 전체의 0.13%로 표시됨. 모델은 트랜스포머 블록 50개, 가중치 95.8%가 4비트인 구성.</figcaption>
+            </figure>
+          </div>
+
+          <div class="reading">
+            <h3>이름, 묘사, 가중치 편집의 비교</h3>
+            <p>결과판은 기본 수묵화 프롬프트, 화가 이름 추가, 작품 특징을 풀어 쓴 묘사 프롬프트, Fable 편집, Astra 편집의 다섯 방식을 비교함. 주제는 황소, 싸우는 수탉 두 마리, 길을 걷는 가족.</p>
+            <p>박종현은 Astra 편집 결과가 동양적인 선의 화풍에 더 가까워 보인다고 평가함. 이는 <strong>발표자의 정성적 판단</strong>. 블라인드 평가, 다수 평가자의 일치도, 여러 시드에 걸친 결과 분포는 제공 노트에 제시되지 않음.</p>
+          </div>
+
+          <figure class="figure-wide">
+            <img src="assets/a54sspl5iq0-ts-00-58-45.jpg" width="640" height="360" loading="lazy" alt="이중섭 작품 6점을 참고해 기본 모델과 이름 프롬프트 및 묘사 프롬프트와 두 가중치 편집 결과를 비교한 이미지 표">
+            <figcaption><a class="time">00:58:45 ↗</a><strong>다섯 방식, 세 주제.</strong> 참고 작품은 「황소」, 「흰 소」, 「싸우는 소」, 「투계」, 「길 떠나는 가족」, 「서귀포의 환상」으로 소개됨. 저해상도 캡처만으로 미세한 화풍 차이를 독립 판정하기는 어려움.</figcaption>
+          </figure>
+
+          <div class="reading">
+            <p>Astra는 처음에 Fable과 비슷한 위치를 시도했다가, 트랜스포머 내부와 변조층·출력부 등으로 편집 범위를 옮겼다고 설명됨. 수정량은 <strong>8,346만 개, 0.40%</strong>. Fable보다 더 넓게 고쳤다는 사실이 곧 우수한 방법임을 뜻하지는 않음. 평가 기준과 탐색 비용까지 함께 봐야 함.</p>
+          </div>
+
+          <div class="gallery">
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-01-01-15.jpg" width="640" height="360" loading="lazy" alt="여러 트랜스포머 블록과 VAE 디코더를 수정한 GPT-6 Astra의 이미지 모델 편집 과정">
+              <figcaption><a class="time">01:01:15 ↗</a><strong>Astra의 탐색.</strong> adaLN 계열과 VAE 디코더 출력부 등이 표시됨. 전체 텐서 목록은 360p 화면에서 확실하게 판독하지 못함.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-01-02-00.jpg" width="640" height="360" loading="lazy" alt="가중치 편집 실험에서 배운 일곱 가지를 정리한 결론 페이지">
+              <figcaption><a class="time">01:02:00 ↗</a><strong>실험이 남긴 제약.</strong> 암기와 수리, 편집 위치, 기존 능력 보존, 양자화 모델 재저장의 문제를 정리한 화면.</figcaption>
+            </figure>
+          </div>
+
+          <div class="reading">
+            <h3>“적게 바꿨다”는 표현이 숨기는 것</h3>
+            <ol class="lessons">
+              <li><strong>암기와 수리에 가까운 결과</strong>문답은 들어갔지만 새 문제 해결 능력은 늘지 않음. 원논문에서 소개된 한계와 비슷한 양상으로 해석됨.</li>
+              <li><strong>작은 편집보다 좁은 편집</strong>언어 모델에서 바뀐 값의 비율은 약 0.6%지만, 실험 노트가 “감지 행렬”이라 부른 대상의 변화량은 원래 크기의 2.8배(Fable), 30배(Astra)로 제시됨. 크기 계산에 사용한 norm은 제공 노트만으로 확인되지 않음.</li>
+              <li><strong>위치와 보존 성능의 연관</strong>이번 사례에서는 마지막 층을 고른 Astra의 기존 답 유지율이 82%, Fable은 약 67%. 층의 효과와 편집 방식의 효과를 분리한 결과는 아님.</li>
+              <li><strong>넣는 것보다 지키는 일이 어려움</strong>두 편집자의 첫 후보는 주입에는 성공했지만 기존 능력을 손상시켰다고 보고됨. 보존 평가가 실험의 필수 부분.</li>
+              <li><strong>감지 문턱에는 절충이 존재</strong>문턱을 낮추면 다른 표현에도 반응하지만 관련 없는 일반 질문에서도 켜질 수 있다는 관찰. 전이와 오작동을 함께 평가해야 함.</li>
+              <li><strong>양자화가 편집을 지울 수 있음</strong>노트에서는 2% 규모의 수정이 4비트 재저장 후 사라지고, 20% 규모 수정도 약 40% 깎였다고 설명함. 해당 비율의 상세 정의는 미제공. 편집이 비양자화 입구·변조층·출구로 몰린 이유로 제시됨.</li>
+              <li><strong>프롬프트 대비 추가 이득을 입증해야 함</strong>실험자의 결론은 “프롬프트로 되는 일은 가중치로 해도 프롬프트만큼만 된다”는 것. 가중치 수정의 비용과 부작용을 정당화할 이득이 별도로 필요.</li>
+            </ol>
+
+            <aside class="note">
+              <p><strong>Continual learning의 후보, 아직은 후보.</strong> 박종현은 상호작용 중 가중치를 효율적으로 갱신할 수 있다면 지속 학습의 다른 경로가 될 수 있다고 전망함. 다만 이번 실험은 소규모 탐색이며, 화풍 실험은 24시간 미만의 토이 실험으로 설명됨. 장기 기억 누적, 반복 편집의 안정성, 비용 우위는 입증되지 않음.</p>
+            </aside>
+          </div>
+        </section>
+
+        <section class="chapter" id="environments" aria-labelledby="environments-title">
+          <header class="chapter-head">
+            <p class="chapter-no">07 / BUILD THE ENVIRONMENT</p>
+            <h2 id="environments-title">다음 작업물은 코드만이 아니라,<br>학습할 수 있는 환경</h2>
+            <p class="lead">컴파일러를 담은 신경망, 컨테이너 속 로봇 실험, 집을 옮긴 시뮬레이터. 마지막 사례들은 자동화의 다음 병목이 어디에 있는지 묻고 있음.</p>
+          </header>
+
+          <div class="reading">
+            <h3>고정 신경망 안에 컴파일러 넣기</h3>
+            <p>최승준의 “신경 컴퓨터”는 소스 바이트를 메모리에 넣으면 <strong>가중치가 고정된 ReLU 네트워크</strong>가 렉싱·파싱·바이트코드 생성을 수행하고, 같은 실행 엔진에서 코드를 실행하는 구성으로 설명됨. ByteBeat, Lambda, Shader를 지원하며 WebGPU 병렬 실행 화면도 제시됨.<a class="source-ref" href="#source-6">[6]</a></p>
+            <p>이 사례는 앞선 지식 주입과 성격이 다름. 결정론적 프로그램의 동작을 신경망 형태로 구성하는 작업으로 소개됐으며, 지속적인 학습이나 새로운 지능의 획득을 보여 주는 실험은 아님. 출연자가 강조하는 변화는 <strong>이런 구현을 요청하고 완성하는 데 드는 부담의 감소</strong>.</p>
+          </div>
+
+          <div class="gallery">
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-01-06-45.jpg" width="640" height="360" loading="lazy" alt="신경 컴퓨터의 WebGPU 병렬 실행 결과와 소용돌이 모양 셰이더 출력">
+              <figcaption><a class="time">01:06:45 ↗</a><strong>병렬 실행.</strong> 컴파일된 신경망으로 화소 셀을 실행한 셰이더 결과와 대조 수치 표. 세부 수치는 이 글에서 재전사하지 않음.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-01-07-20.jpg" width="640" height="360" loading="lazy" alt="고정 가중치 신경망이 원시 소스를 렉싱하고 파싱해 실행한다는 설명과 Shader 코드 탭">
+              <figcaption><a class="time">01:07:20 ↗</a><strong>소스에서 실행까지.</strong> Level 5 내부 인터프리터와 Level 6 코드 해석기 직접 실행이 표시됨. 원시 소스는 입력 데이터, 컴파일·실행 로직은 고정 네트워크에 담긴 구성.</figcaption>
+            </figure>
+          </div>
+
+          <div class="reading">
+            <h3>시뮬레이션의 진입 비용이 내려갈 때</h3>
+            <p>최승준은 ChatGPT dot 컨테이너의 CPU 환경에 MuJoCo 4를 설치하고 실험했다고 설명함. 미로 경로를 학습한 신경망과 공개 사전 학습 Microduck 보행 정책을 결합하고, Filament PBR로 렌더링한 녹화 영상을 제시함. 모든 동작을 처음부터 RL로 학습한 사례로 읽어서는 안 됨.</p>
+            <p>박종현은 휴대폰으로 집을 촬영한 뒤 Blender에 3D 환경을 만들고, 로봇을 배치하고 가구까지 바꾸는 real-to-sim 작업을 하룻밤에 수행한 경험을 전함. 시뮬레이터 피드백과 영상을 비교하며 맞췄다는 설명이지만, 물리 정확도나 현실 전이 성능을 정량 검증한 결과는 제공되지 않음.</p>
+          </div>
+
+          <div class="gallery">
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-01-07-45.jpg" width="640" height="360" loading="lazy" alt="ChatGPT dot 대화 안에 미로 실험 영상 패널과 결과 파일이 첨부된 화면">
+              <figcaption><a class="time">01:07:45 ↗</a><strong>컨테이너 속 실험.</strong> planner+RL 라벨의 미로 영상과 결과 파일이 표시됨. 실행 환경과 학습 설정 전체는 노트에 포함되지 않음.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/a54sspl5iq0-ts-01-08-00.jpg" width="640" height="360" loading="lazy" alt="MuJoCo 물리 리플레이와 Filament 렌더링을 사용한 Microduck의 세 벽 사이 이동 장면">
+              <figcaption><a class="time">01:08:00 ↗</a><strong>경로·방향·보행의 결합.</strong> 격자 최단경로를 교사로 학습한 경로 선택과 사전 학습 보행 정책을 조합함. 실시간이 아닌 녹화 영상. 화면에는 Microduck 모델·형상의 CC BY-NC-SA 4.0 조건이 표시됨.</figcaption>
+            </figure>
+          </div>
+
+          <div class="reading">
+            <h3>업무의 암묵지를 평가 가능한 환경으로</h3>
+            <p>노정석은 이 사례들을 <strong>RL environment를 만드는 일</strong>로 연결함. 회사 업무는 재고, 고객 불평, 사람의 반응, 전문가 판단처럼 얽힌 요소가 많음. 성공 여부를 판정하는 verifier가 작동하도록 환경을 구성하는 일은 모델이 한 번에 끝내기 어렵다는 주장.</p>
+            <p>대화는 물리 공간을 학습 환경으로 바꾸고, 그 안에서 생성되는 데이터를 새로운 가치로 만드는 가능성까지 확장됨. “로봇 꽃집” 같은 구체적인 공간과, AfterQuery·Mercor가 언급된 데이터 생성 시장을 예로 들며 일반인도 참여할 수 있는 일로 발전해야 한다고 제안함. 시장 구조나 수익성은 이 회차에서 검증되지 않음.</p>
+          </div>
+
+          <figure class="flow" aria-labelledby="environment-flow-title">
+            <p id="environment-flow-title">대화에서 도출한 설계 관점 · 환경이 자산이 되는 과정</p>
+            <ol>
+              <li><span class="step">01 / OBSERVE</span><strong>현장을 기록</strong><span>상태, 행동, 제약, 사람의 판단 근거를 수집</span></li>
+              <li><span class="step">02 / REPRESENT</span><strong>환경으로 표현</strong><span>시뮬레이터·업무 절차·데이터 구조로 재구성</span></li>
+              <li><span class="step">03 / VERIFY</span><strong>결과를 평가</strong><span>성공 조건과 실패 사례를 판정 가능한 형태로 정의</span></li>
+              <li><span class="step">04 / IMPROVE</span><strong>반복하고 보정</strong><span>실험 결과를 실제 현장과 비교해 환경과 정책을 수정</span></li>
+            </ol>
+            <figcaption>기사의 해석 도식. 시뮬레이터나 평가 함수 하나만 있다고 RL 환경 전체가 완성되는 것은 아니며, 행동·상태 전이·보상·현실 검증을 함께 설계해야 함.</figcaption>
+          </figure>
+
+          <figure class="figure-wide">
+            <img src="assets/a54sspl5iq0-ts-01-09-45.jpg" width="640" height="360" loading="lazy" alt="RL 환경과 새로운 일의 가능성을 이야기하는 세 출연자의 마무리 대화 화면">
+            <figcaption><a class="time">01:09:45 ↗</a><strong>환경을 만드는 일의 가치.</strong> 이 구간은 공유 자료 없이 출연자 얼굴만 표시됨. 전문가의 판단을 평가·피드백 환경으로 바꾸자는 논지는 자막 기록에 근거함.</figcaption>
+          </figure>
+        </section>
+
+        <section class="chapter" id="implications" aria-labelledby="implications-title">
+          <header class="chapter-head">
+            <p class="chapter-no">08 / IMPLICATIONS</p>
+            <h2 id="implications-title">예측의 날짜보다,<br>오늘의 검증 구조를 바꾸는 일</h2>
+            <p class="lead">이번 회차에서 가져갈 실천적 메시지는 특정 연도의 초지능 전망보다 구체적임. 더 빨리 만들 수 있다면, 무엇을 얼마나 잘 검증할지도 함께 바뀌어야 함.</p>
+          </header>
+
+          <div class="reading">
+            <span class="label">아래는 영상의 논점에서 도출한 편집적 제안</span>
+            <h3>연구 계획 — 일정의 전제를 자주 확인</h3>
+            <p>포팅·커널 최적화·실험 환경 구축처럼 숙련 인력의 긴 작업 시간을 전제로 한 계획은 작은 재실험으로 갱신할 가치가 있음. 단일 성공 사례의 배수를 조직 전체 일정에 적용하기보다, 실제 과제의 품질·검토 시간·실패율을 함께 측정하는 접근이 적절함.</p>
+
+            <h3>모델 편집 — 주입 성공을 완료 기준으로 삼지 않기</h3>
+            <p>가중치 변경의 평가는 최소한 주입 문답, 표현 변형, 미관측 문제, 기존 능력 보존으로 나눌 필요. 반복 편집 후의 누적 간섭과 저장·재로딩 후 효과 유지도 별도 확인 대상. 이번 실험이 보여 주는 것은 높은 암기 성능과 제한된 전이이지, 지속 학습의 완성이 아님.</p>
+
+            <h3>조직 운영 — 지출 대신 해결된 문제를 보기</h3>
+            <p>AI 지출은 가격과 사용량, 모델 구성의 곱으로 움직임. 비용이 늘거나 줄었다는 사실만으로 활용 수준을 평가하기 어려움. 완료한 과제, 재작업, 사람이 검토한 시간, 운영 장애 같은 결과 지표와 연결해야 사용 격차의 실체를 볼 수 있음.</p>
+
+            <h3>현장·로봇 연구 — 시뮬레이션과 현실의 차이를 자산화</h3>
+            <p>환경을 빨리 만드는 능력은 시작점. 실제 관측과 시뮬레이션의 차이, 센서 오차, 접촉·마찰, 사람의 반응을 기록하고 보정하는 과정이 환경의 품질을 결정함. “만들 수 있음”과 “학습 결과가 현장에서도 유효함” 사이를 잇는 작업이 남음.</p>
+          </div>
+
+          <aside class="ending" aria-labelledby="ending-title">
+            <p class="eyebrow">A PRACTICAL ENDING</p>
+            <h2 id="ending-title">다음 실험에서는,<br>모델보다 먼저 성공 조건을 적어 보기</h2>
+            <p>가중치에 답을 넣는 일과 문제를 풀게 하는 일은 달랐음. 토큰을 더 쓰는 일과 조직의 성과를 높이는 일도 다를 수 있음. 이 차이를 드러내는 환경을 만드는 것이 이번 대화가 제안하는 엔지니어의 다음 역할.</p>
+            <ul class="checklist">
+              <li>바꾸려는 행동과 성공 판정 기준을 한 문장으로 정의</li>
+              <li>시킨 문제, 표현을 바꾼 문제, 처음 보는 문제를 나눠 평가</li>
+              <li>기존에 잘하던 일을 망가뜨리지 않았는지 확인</li>
+              <li>실험 비용·검토 시간·현실 적용 결과를 함께 기록</li>
+            </ul>
+            <p>미래의 날짜를 맞히지 못해도 준비할 수 있음. 관측하고, 판단하고, 수정한 결과가 다음 실험에 남도록 만드는 일부터 시작하면 됨.</p>
+          </aside>
+
+          <div class="reading">
+            <div class="copy-block" aria-label="공유용 요약">
+              <span class="label">공유용 요약 · 그대로 복사할 수 있는 문장</span>
+              <p>AI가 AI를 고치는 시대, 사람은 무엇을 설계할까. AI Frontier Korea EP 123에 소개된 가중치 편집 실험은 주입 문답에서 최대 100%를 기록했지만, 안 본 문제는 0.4%에 머물렀다. 다음 과제는 더 많은 생성만이 아니라, 학습과 검증이 반복되는 환경을 만드는 일이다.</p>
+            </div>
+            <p class="table-note"><a>원영상 보기 · AI Frontier Korea EP 123 ↗</a> · 수치와 사건의 검증 범위는 아래 출처 노트에 명시.</p>
+          </div>
+        </section>
+
+        <section class="sources" id="sources" aria-labelledby="sources-title">
+          <div class="reading">
+            <p class="eyebrow">SOURCE NOTES &amp; METHODOLOGY</p>
+            <h2 id="sources-title">출처, 기록 방법, 남아 있는 불확실성</h2>
+            <p><strong>이 기사의 직접 입력은 사용자가 제공한 Obsidian 노트.</strong> 영상·논문·블로그 원문을 새로 열람하거나 실험을 재현한 보고서가 아님. 아래 외부 문헌명은 해당 노트가 영상 속에서 식별한 자료이며, 원문 주소가 제공되지 않은 자료에는 추정 URL을 붙이지 않음.</p>
+
+            <ul class="source-list">
+              <li id="source-1">
+                <span class="source-id">[1] 원영상 · 전체 논의의 출처</span>
+                <strong>「EP 123. 한 치 앞도 모르는 미래: 젠슨 황 사임, Fable 5.2, weight-space programming」</strong><br>
+                AI Frontier Korea (노정석). 제공 메타데이터상 게시일 2026-11-15, 길이 1시간 13분 11초(4,391초). 노정석·최승준·박종현 출연, 김유진 편집. 도입부 발언에 따른 녹화 시점은 같은 날 아침.<br>
+                <a>YouTube 원영상 ↗</a>
+              </li>
+              <li id="source-2">
+                <span class="source-id">[2] 연구 가속 · 17:30–25:15</span>
+                <strong>METR 평가, Anthropic 로드쇼, 예측 업데이트</strong><br>
+                「Independent Assessment of AI R&amp;D Acceleration at Anthropic」 및 화면상 2026-11-05 비공식 한국어 번역; Anthropic IPO 로드쇼와 최승준의 번역본; Jacob Coxon으로 표기된 인물의 게시물; AI Futures 「Q3.5 Timelines Update」; Dwarkesh Patel의 2026-11-14 글; Ajeya Cotra 「AI is dramatically accelerating AI research right now」. 모두 영상 내 간접 인용.
+              </li>
+              <li id="source-3">
+                <span class="source-id">[3] 모델·제품·프롬프팅 · 26:15–37:00</span>
+                <strong>Thinking Machines, Google, Claude 문서로 소개된 자료</strong><br>
+                「Inkling 2 Small 소개」(화면상 2026-11-05), 「End-to-End 4-Bit Training」, 「Introducing Gemini 4 Hydrogen」, 「Claude Fable 5.2 프롬프팅」. 모델 명칭·출시 여부·벤치마크 조건·문서 내용을 외부 원문과 독립 확인하지 않음.
+              </li>
+              <li id="source-4">
+                <span class="source-id">[4] 기업 사용 데이터 · 39:00–42:00 이후</span>
+                <strong>「Ramp AI Index · Cracks in the AI Thesis Part 3 요약」</strong><br>
+                노정석이 제시한 PowerPoint와 발언을 통해 기록된 수치. 미국 스타트업 중심 표본이라는 설명에 유의. 채택률은 시장점유율이 아니며, 표본 내 지출 집중도는 공급자의 전체 매출 집중도와 같지 않음. 원 데이터·표본 추출·가중 방식은 미확인.
+              </li>
+              <li id="source-5">
+                <span class="source-id">[5] 가중치 편집 · 49:00–01:02:00 이후</span>
+                <strong>박종현 「가중치를 직접 고쳐 보았다: Weight-Space Programming 실험 노트」</strong><br>
+                화면상 aifrontier.kr, 2026-11-14. 원논문으로 MIT CSAIL 「Sparks of Weight-Space Programming: LLMs can natively read &amp; write neural network weights」(2026-11-02)를 소개함. 본문 실험 수치는 제공 노트의 화면 판독과 자막 요약에 근거. 코드·데이터·평가 프롬프트·시드·실행 로그는 이 기사에서 확인하지 않음.
+              </li>
+              <li id="source-6">
+                <span class="source-id">[6] 신경 컴퓨터·로봇 환경 · 01:06:45–마무리</span>
+                <strong>최승준의 로컬 신경 컴퓨터, dot 컨테이너 실험, 박종현의 real-to-sim 경험</strong><br>
+                로컬 페이지 Neural_Computer_Self_Compiling.html, 미로 및 Microduck 녹화 영상, 출연자 구두 설명에 근거. 실행 성능·물리 정확도·현실 전이 결과는 재검증하지 않음. 자료에 표시된 Microduck 라이선스와 본 기사 이미지의 이용 권한은 서로 별개이며, 이 글은 추가 이용 허락을 부여하지 않음.
+              </li>
+            </ul>
+
+            <h3>자막과 장면은 어떻게 기록됐나</h3>
+            <p>제공 노트에 따르면 발언 요약과 인용에는 <strong>화자 표기가 포함된 한국어 수동 자막</strong>을 사용함. 로그인 쿠키 없이 확보한 영상은 Android 클라이언트의 format 18, 360p(640×360). 1080p(137)·720p(136)는 다운로드 시 HTTP 403이 발생했고, mweb·iOS·TV 등의 대안도 실패했다고 기록됨.</p>
+            <p>장면 후보는 <strong>5초 간격 그리드 878장</strong>과 <strong>임계값 0.25의 장면 전환 검출 30개</strong>로 구성. 밝기·분산·인접 프레임 차이·±0.5초 전환량 검사와 육안 검토를 거쳐 로딩 화면, 가림, 중복 슬라이드, 전환 프레임을 제외하고 39장을 남겼다고 설명됨. 전환 지표가 높았던 19:30, 26:15, 57:30, 58:00은 추가 확인했다고 기록됨. <strong>이 기사는 제공된 39장 모두를 보존함.</strong></p>
+
+            <h3>해석할 때 유지해야 할 구분</h3>
+            <ul>
+              <li><strong>화면 기록:</strong> 표·그래프·문서에 무엇이 표시됐는지에 대한 제공 노트의 판독. 원자료가 옳다는 독립 검증은 아님.</li>
+              <li><strong>출연자의 해석:</strong> 초지수 성장, 사용자 격차의 시차, 특정 뉴런의 기억 역할, AI 연구의 알파고 모멘트 등. 관측과 예측을 분리해 읽어야 함.</li>
+              <li><strong>기사의 도출:</strong> 지표를 나눠 평가하고 검증 환경을 설계하자는 제안, 두 개의 과정 도식. 새로운 실험 결과가 아니라 제공 내용의 종합.</li>
+              <li><strong>미검증 사항:</strong> 인물 거취, 기업 일정, 법안 상태, 모델 출시·내부 체크포인트, 소문과 사건의 배경. 영상 시점 이후의 결과를 반영한 현황 기사가 아님.</li>
+            </ul>
+
+            <h3>수치와 재현성의 남은 한계</h3>
+            <p>작은 글씨가 있는 METR 모델 라벨, 연산 효율 그래프 축, 프롬프팅 가이드의 세부 수치, Astra 텐서 목록은 일부만 판독됨. Gemini 비교표와 실험 표도 원문 대조 없이 옮김. 가중치 수정 비율 <strong>0.016% 대 0.061%</strong>, 미관측 문제 수 <strong>832개 대 최종 표 500개</strong>의 차이는 해소되지 않은 상태로 표시함.</p>
+            <p>00:00~17:17은 공유 화면이 대체로 정적이며, 01:08:30 이후는 출연자 얼굴만 나옴. 이 구간의 논지를 화면에 보이는 자료가 직접 입증하는 것으로 취급하지 않음. 영상에서 언급한 향후 관전 포인트인 Anthropic IPO, Jensen의 복귀 여부, OpenAI의 대응 역시 <strong>녹화 당시의 전망과 관심사</strong>로 한정함.</p>
+          </div>
+        </section>
+      </article>
+    </main>
+
+    <footer class="footer">
+      <span>AI Frontier Korea EP 123 · 제공된 연구 노트를 재구성한 편집 기사 · 39개 장면 보존</span>
+      <a href="#top">처음으로 ↑</a>
+    </footer>
+  </div>
+</body>
+</html>
