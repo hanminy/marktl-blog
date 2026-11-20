@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>성공률 66%, 로봇은 얼마나 기다렸나 | CoRL 2026에서 읽은 Astra</title>
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #faf8f2;
+      --ink: #202d29;
+      --green: #173e37;
+      --mint: #c4e6cf;
+      --muted: #52615b;
+      --line: #cbd2c7;
+      --accent: #984321;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "AppleMyungjo", Batang, serif;
+      --sans: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--paper); scroll-padding-top: 1.5rem; }
+    body { margin: 0; color: var(--ink); font: 1.25rem/1.78 var(--sans); word-break: keep-all; overflow-wrap: anywhere; }
+    a { color: var(--green); text-decoration-thickness: 1px; text-underline-offset: .23em; }
+    a:hover { text-decoration-thickness: 2px; }
+    a:focus-visible { outline: 3px solid #af522d; outline-offset: 4px; }
+    .skip { position: absolute; top: .5rem; left: .5rem; transform: translateY(-180%); padding: .4rem 1rem; background: white; z-index: 2; }
+    .skip:focus { transform: none; }
+    .wrap { width: min(71rem, 90%); margin-inline: auto; }
+    .reading { max-width: 45rem; }
+    h1, h2, h3, p, figure, blockquote, ol, ul { margin: 0; }
+    h1, h2, .pull { font-family: var(--serif); }
+    h1, h2, h3 { text-wrap: balance; }
+    h1 { margin: 1.5rem 0; color: #fffdf4; font-size: clamp(2.9rem, 6.5vw, 5.8rem); line-height: 1.16; letter-spacing: -.065em; }
+    h1 span { display: block; color: var(--mint); }
+    h2 { margin-bottom: 1.2rem; font-size: clamp(2rem, 4vw, 3.45rem); line-height: 1.25; letter-spacing: -.055em; }
+    h3 { margin-bottom: .65rem; font-size: 1.42rem; line-height: 1.4; letter-spacing: -.035em; }
+    p + p { margin-top: .85rem; }
+    .hero { background: var(--green); color: #f1f2e9; padding: clamp(2rem, 5vw, 4.5rem) 0; }
+    .hero-grid { display: grid; grid-template-columns: 1.65fr 1fr; align-items: center; gap: clamp(2rem, 5vw, 5rem); }
+    .kicker, .chapter, .meta, figcaption, .fine, nav, .sources { font-size: 1rem; }
+    .kicker, .chapter { font-weight: 750; letter-spacing: .06em; }
+    .kicker { color: var(--mint); }
+    .chapter { color: var(--accent); margin-bottom: .75rem; }
+    .deck { max-width: 37rem; font-size: clamp(1.25rem, 2vw, 1.55rem); line-height: 1.65; }
+    .meta { margin-top: 1.65rem; color: #c9d9d0; }
+    .hero figure { border-top: 2px solid var(--mint); padding-top: .85rem; }
+    .hero figcaption, .hero figcaption a { color: #d7e5db; }
+    img { display: block; width: 100%; height: auto; background: #e0e5dc; }
+    figcaption { padding-top: .62rem; line-height: 1.55; color: var(--muted); }
+    figcaption a { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; margin-right: .35em; }
+    nav { border-bottom: 1px solid var(--line); }
+    nav .wrap { display: flex; flex-wrap: wrap; gap: .55rem 1.6rem; padding-block: 1rem; }
+    nav a { font-weight: 650; }
+    .intro, .section, .ending { padding-block: clamp(2.8rem, 6vw, 5.2rem); }
+    .section, .ending { border-top: 1px solid var(--line); }
+    .abstract { display: grid; grid-template-columns: 1fr 3fr; gap: 1.5rem; }
+    .abstract h2 { font-size: 1.65rem; }
+    .findings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; margin-top: 2.3rem; }
+    .finding { border-top: 3px solid var(--green); padding-top: .8rem; }
+    .finding b { display: block; color: var(--green); font: 700 clamp(1.8rem, 3.5vw, 3rem)/1.35 var(--serif); }
+    .finding p { margin-top: .4rem; }
+    .gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.6rem; margin-top: 1.8rem; }
+    .gallery + .reading, .subhead { margin-top: 2.5rem; }
+    .table-panel { margin-block: 1.8rem; background: #edf1e9; padding: clamp(1rem, 3vw, 2rem); border-radius: .35rem; }
+    table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+    caption { text-align: left; font-weight: 750; margin-bottom: 1rem; }
+    th, td { padding: .7rem .45rem; border-bottom: 1px solid #bfcbbe; text-align: right; }
+    th:first-child { text-align: left; }
+    thead th { color: var(--muted); font-size: 1rem; vertical-align: bottom; }
+    .fine { margin-top: .85rem; line-height: 1.65; color: var(--muted); }
+    .pull { margin: 2rem 0; padding: .6rem 0 .6rem 1.4rem; border-left: 4px solid var(--accent); font-size: clamp(1.55rem, 3vw, 2.3rem); line-height: 1.5; }
+    .pull cite { display: block; font: normal 1rem/1.6 var(--sans); color: var(--muted); margin-top: .6rem; }
+    .timing { background: var(--green); color: white; margin-block: 1.7rem; padding: clamp(1.3rem, 3.5vw, 2.5rem); }
+    .timing strong { color: var(--mint); font-size: clamp(2.4rem, 5vw, 4rem); line-height: 1.2; }
+    .bar { display: flex; height: 1.05rem; margin: 1rem 0; background: #eeab79; }
+    .bar span { width: 97%; background: var(--mint); border-right: 2px solid var(--green); }
+    .timing p { max-width: 47rem; }
+    .layers { display: grid; grid-template-columns: 1fr 1fr; margin-top: 1.7rem; border: 1px solid var(--line); }
+    .layers div { padding: 1.3rem; }
+    .layers div + div { background: #e7eee4; }
+    .layers b { display: block; color: var(--green); }
+    .checks { padding-left: 1.5rem; }
+    .checks li { padding-left: .35rem; margin: .7rem 0; }
+    .share { margin-top: 2rem; padding: 1.3rem 1.5rem; background: #f1e9da; }
+    .share h3 { color: var(--accent); font-size: 1rem; }
+    .sources { background: #e9ede5; padding-block: 2.7rem; line-height: 1.75; }
+    .sources h2 { font-size: 1.6rem; }
+    .sources p { max-width: 55rem; }
+    .back { display: inline-block; margin-top: 1.2rem; }
+    @media (max-width: 760px) {
+      .hero-grid, .abstract, .findings, .layers { grid-template-columns: 1fr; }
+      .hero figure { max-width: 33rem; }
+      .abstract { gap: .3rem; }
+      .findings { gap: 1.1rem; }
+      .finding b { font-size: 2rem; }
+      .gallery { gap: 1rem; }
+    }
+    @media (max-width: 560px) {
+      .gallery { grid-template-columns: 1fr; gap: 1.5rem; }
+      .table-panel { padding: .85rem .65rem; }
+      th, td { padding: .65rem .2rem; font-size: 1rem; }
+      thead th { font-size: .86rem; }
+    }
+    @media print {
+      body { font-size: 12pt; }
+      .wrap { width: 100%; }
+      .hero, .timing, .sources { background: white; color: black; }
+      .hero *, .timing strong { color: black !important; }
+      nav, .skip, .back { display: none; }
+      .section, .intro, .ending { padding-block: 1.5rem; }
+      figure, table, .timing, .layers { break-inside: avoid; }
+      h2, h3 { break-after: avoid; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="로봇 연구자들이 Astra를 받아들이는 법 (CoRL 2026)">
+<meta property="og:description" content="로봇 연구자들이 Astra를 받아들이는 법 (CoRL 2026) 영상 정보 채널 : sudoremove 게시일 : 2026 11 19 길이 : 12:06 링크 : https://www.youtube.com/watch?v=PrYdKRkxBs8 형식 : CoRL 2026(Austin, 11/9–11/12) 공개 녹화에서 여러 연사의 발언을 짧게 잘라 하나의 흐름으로 엮은 편집 영상. 화면에 한/영 자막과 연사 이름·소속, 원본 세">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/k5bvk1/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/k5bvk1/assets/prydkrkxbs8-ts-00-00-58.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="로봇 연구자들이 Astra를 받아들이는 법 (CoRL 2026)">
+<meta name="twitter:description" content="로봇 연구자들이 Astra를 받아들이는 법 (CoRL 2026) 영상 정보 채널 : sudoremove 게시일 : 2026 11 19 길이 : 12:06 링크 : https://www.youtube.com/watch?v=PrYdKRkxBs8 형식 : CoRL 2026(Austin, 11/9–11/12) 공개 녹화에서 여러 연사의 발언을 짧게 잘라 하나의 흐름으로 엮은 편집 영상. 화면에 한/영 자막과 연사 이름·소속, 원본 세">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/k5bvk1/assets/prydkrkxbs8-ts-00-00-58.jpg">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-%EB%A1%9C%EB%B4%87-%EC%97%B0%EA%B5%AC%EC%9E%90%EB%93%A4%EC%9D%B4-astra%EB%A5%BC-%EB%B0%9B%EC%95%84%EB%93%A4%EC%9D%B4%EB%8A%94-%EB%B2%95-corl-2026-%EC%9A%94%EC%95%BD/">
+</head>
+<body>
+  <a class="skip" href="#abstract">본문으로 이동</a>
+  <main id="top">
+    <article>
+      <header class="hero">
+        <div class="wrap hero-grid">
+          <div>
+            <p class="kicker">로봇학습 연구 리포트 · CoRL 2026</p>
+            <h1>성공률 66%,<span>로봇은 얼마나 기다렸나</span></h1>
+            <p class="deck">범용 모델 GPT-6 Astra가 로봇 전용 모델을 앞섰다는 발표가 나왔다. 같은 발표에서 한 에피소드의 시계를 들여다보자, 로봇이 실제로 움직인 시간은 5.2초였다.</p>
+            <p class="meta">오스틴 CoRL 2026 현장 발언 · sudoremove 편집 영상 분석<br>영상 게시 <time datetime="2026-11-19">2026년 11월 19일</time> · 12분 6초</p>
+          </div>
+          <figure>
+            <img src="assets/prydkrkxbs8-ts-00-05-44.jpg" alt="Hang Zhao의 슬라이드에 추론 대기와 로봇 움직임을 구분한 에피소드 타임라인이 표시돼 있다.">
+            <figcaption><a>05:44</a> Hang Zhao가 공개한 직접 정책 실행 기록. 회색은 모델이 생각한 시간, 주황색은 로봇이 움직인 시간이다.</figcaption>
+          </figure>
+        </div>
+      </header>
+
+      <nav aria-label="기사 목차">
+        <div class="wrap">
+          <a href="#abstract">초록</a><a href="#scores">벤치마크</a><a href="#research">연구 현장</a><a href="#clock">시간과 안전</a><a href="#data">현장 데이터</a><a href="#implications">시사점</a><a href="#sources">자료와 한계</a>
+        </div>
+      </nav>
+
+      <div class="wrap">
+        <section class="intro" id="abstract" aria-labelledby="abstract-title">
+          <div class="abstract">
+            <h2 id="abstract-title">초록</h2>
+            <p class="reading">CoRL 2026 공개 녹화를 엮은 영상은 Jim Fan의 ‘겨울’ 농담에서 시작해 ‘여름’이라는 인사로 끝난다. 그 사이 연구자들의 의견이 갈린 지점은 Astra의 점수보다 <strong>그 점수가 어떤 일을 맡길 근거가 되는가</strong>였다. 시뮬레이션 성적, 연구 에이전트의 활용, 현장 제어 사례를 함께 읽으면 범용 모델이 넓힌 가능성과 로봇에서 따로 검증해야 할 조건이 보인다.</p>
+          </div>
+          <div class="findings" aria-label="발표에서 읽은 핵심 결과">
+            <div class="finding"><b>66%와 28%</b><p>RoboLab-120에서 발표된 Astra 직접 정책과 로봇 전용 모델 π0.5의 성공률.</p></div>
+            <div class="finding"><b>18.6초</b><p>Astra 직접 정책의 시연 사례에서 모델을 한 번 호출하는 데 걸린 시간.</p></div>
+            <div class="finding"><b>300일 → 103일</b><p>Gemini Robotics 두 버전의 개발 기간. 발표자들은 단축 요인으로 연구 에이전트 Argon을 꼽았다.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="scores" aria-labelledby="scores-title">
+          <p class="chapter">벤치마크 · 충격의 출처</p>
+          <h2 id="scores-title">금문교 그림에서 로봇 벤치마크까지</h2>
+          <div class="reading">
+            <p>NVIDIA의 Jim Fan은 Astra를 처음 본 로봇 연구자들의 심정을 ‘슬픔의 다섯 단계’에 빗댔다. 결과를 골라 발표했을 거라는 부정, 그래도 내 모션 플래너는 필요하지 않겠느냐는 협상, 그리고 수용. 오프닝 화면에 뜬 문구는 <span lang="en">“Winter is coming”</span>이었다.</p>
+            <p>CMU의 Guanya Shi가 소개한 장면에는 조금 다른 유머가 있다. 사용자가 금문교를 그려 달라고 하자 로봇 팔이 캔버스에 그림을 남겼다. 로봇공학의 ‘ChatGPT 모먼트’를 기다리는 동안, GPT 쪽에서 먼저 로봇을 움직이는 순간이 찾아왔다는 것이다.</p>
+          </div>
+          <div class="gallery">
+            <figure><img loading="lazy" src="assets/prydkrkxbs8-ts-00-00-58.jpg" alt="밤의 왕 밈과 ‘WINTER IS COMING’ 문구를 띄운 Jim Fan의 키노트."><figcaption><a>00:58</a> Jim Fan의 키노트. ‘겨울’은 연구자들이 느낀 충격을 표현한 농담이다.</figcaption></figure>
+            <figure><img loading="lazy" src="assets/prydkrkxbs8-ts-00-01-15.jpg" alt="Guanya Shi의 슬라이드에 로봇 팔이 그린 금문교 그림 여러 장이 보인다."><figcaption><a>01:15</a> Guanya Shi가 소개한 금문교 그림. 슬라이드는 사용자 시도 날짜를 9월 8일로 표기한다.</figcaption></figure>
+          </div>
+          <h3 class="subhead">같은 Astra라도 행동을 내는 방식에 따라 점수가 달랐다</h3>
+          <div class="table-panel">
+            <table>
+              <caption>Hang Zhao의 발표 슬라이드에 표시된 시뮬레이션 결과</caption>
+              <thead><tr><th scope="col">평가 지표</th><th scope="col">GPT-6 Astra</th><th scope="col">π0.5</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">RoboLab-120 성공률</th><td><strong>66%</strong> 직접 정책<br><strong>75%</strong> 에이전트 방식</td><td>28%</td></tr>
+                <tr><th scope="row">RoboDojo 점수</th><td><strong>22.5</strong></td><td>6.9</td></tr>
+              </tbody>
+            </table>
+            <p class="fine">직접 정책은 모델이 관측에서 행동을 바로 출력하는 방식이다. 에이전트 방식은 도구 호출과 결과 확인을 반복할 수 있다. RoboDojo의 수치는 점수이며, 백분율로 환산할 근거는 영상에 제시되지 않는다.</p>
+          </div>
+          <div class="gallery">
+            <figure><img loading="lazy" src="assets/prydkrkxbs8-ts-00-01-48.jpg" alt="Hang Zhao가 RoboLab-120과 RoboDojo에서 Astra와 π0.5의 결과를 비교한 슬라이드."><figcaption><a>01:48</a> Hang Zhao(Tsinghua/Galaxea)의 비교. RoboLab-120에서 두 모델의 직접 비교 수치 차이는 38%포인트다.</figcaption></figure>
+            <figure><img loading="lazy" src="assets/prydkrkxbs8-ts-00-05-16.jpg" alt="Ken Goldberg가 1931년 괴델의 불완전성 정리를 소개한 강연 슬라이드."><figcaption><a>05:16</a> Ken Goldberg(UC Berkeley)는 수학계가 괴델의 결과를 받아들이는 데 걸린 시간을 예로 들어, 로봇공학도 전환기에 들어섰는지 묻는다.</figcaption></figure>
+          </div>
+        </section>
+
+        <section class="section" id="research" aria-labelledby="research-title">
+          <p class="chapter">연구 현장 · 모델에 맡긴 일</p>
+          <h2 id="research-title">로봇 팔을 움직이고, 다음 실험을 설계하고</h2>
+          <div class="reading">
+            <p>Google DeepMind의 Wentao Yuan이 설명한 제어 루프는 손목 카메라에서 시작한다. 에이전트가 이미지를 보고 명령 코드를 작성하면 로봇이 움직인다. 다음 이미지가 도착하면 그 결과를 보고 다음 행동을 고른다. 이 구조에서 시각·언어·행동 모델(VLA)은 상위 에이전트가 필요할 때 호출하는 도구다. 검색이나 코드 실행처럼, 로봇을 움직이는 기능도 선택지 하나가 된다.</p>
+            <p>Kanishka Rao의 발표에서는 에이전트가 연구자의 작업에 들어간다. Gemini 4 Argon은 실제 실패 장면을 디지털 트윈으로 옮겨 분석하고, 원인에 대한 가설을 만들어 시뮬레이터에서 개선안을 시험하는 과정에 쓰였다. Rao는 부스에서 시연한 동작 중 일부도 이 과정을 거쳤을 수 있다고 설명했다.</p>
+          </div>
+          <div class="gallery">
+            <figure><img loading="lazy" src="assets/prydkrkxbs8-ts-00-03-09.jpg" alt="Agentic Robotics 워크숍에서 Wentao Yuan이 로봇 에이전트의 제어 방식을 설명하는 장면."><figcaption><a>03:09</a> Yuan의 설명에 따른 순서. 손목 카메라 관측 → 명령 실행 → 새 이미지 확인. 저해상도 화면의 세부 도식은 판독하기 어렵다.</figcaption></figure>
+            <figure><img loading="lazy" src="assets/prydkrkxbs8-ts-00-03-37.jpg" alt="Gemini 4 Argon이 Gemini Robotics 2.5 개발에 기여했다고 밝힌 슬라이드."><figcaption><a>03:37</a> Rao가 소개한 실제 장면 → 시뮬레이션 → 실제 로봇으로 이어지는 연구 루프.</figcaption></figure>
+            <figure><img loading="lazy" src="assets/prydkrkxbs8-ts-00-03-59.jpg" alt="Gemini Robotics 2.5의 개발 기간을 103일로 표시한 슬라이드."><figcaption><a>03:59</a> Yuan에 따르면 Gemini Robotics 2 개발에는 300일, 2.5에는 103일이 걸렸다. Argon이 단독으로 줄인 일수는 제시되지 않았다.</figcaption></figure>
+            <figure><img loading="lazy" src="assets/prydkrkxbs8-ts-00-04-15.jpg" alt="Lightwheel이 재료 실측부터 검토와 배포까지 훈련 환경을 보정하는 단계를 제시한 슬라이드."><figcaption><a>04:15</a> Christian Ureno(Lightwheel). 에이전트가 환경을 만들고 시험하며, 시뮬레이션 엔지니어가 단계마다 검토한다.</figcaption></figure>
+          </div>
+          <div class="reading">
+            <h3>시뮬레이터가 현실과 맞는지는 어떻게 아는가</h3>
+            <p>Lightwheel의 사례에서 검토 대상은 구체적이다. SimFoundry로 부품의 마찰·강성·감쇠를 실측하고, 호스·케이블·개스킷의 변형을 공학 시뮬레이션과 대조한다. Newton에서는 강체·변형체·입자 솔버가 한 타임스텝 안에서 힘을 교환하도록 접촉을 계산한다. 환경을 자동으로 생성해도, 무엇을 현실적인 움직임으로 인정할지는 이 측정과 검토에 달려 있다.</p>
+          </div>
+          <div class="gallery">
+            <figure><img loading="lazy" src="assets/prydkrkxbs8-ts-00-04-52.jpg" alt="프론티어 모델과 로봇 모델을 나란히 놓고 로봇공학의 다음 방향을 묻는 Kanishka Rao의 슬라이드."><figcaption><a>04:52</a> Rao는 앞으로 1년간 프론티어 모델이 더 많은 로봇 작업을 맡을 것으로 전망했다. 현재 모델의 속도와 연산 부담도 함께 짚었다.</figcaption></figure>
+            <div>
+              <h3>프론티어 지능이 맡을 범위</h3>
+              <p>Rao는 지각하고 추론하고 행동하는 능력이 발전하면, 사람에게 쉬운 신체 활동이 기계에는 유독 어렵다는 모라벡의 역설도 흔들릴 것으로 보았다. XDOF의 Philipp Wu 역시 로봇공학이 기다리던 전환이 원리적으로는 이미 왔다고 해석했다. 뒤이은 연사들이 따져 물은 것은 그 능력을 <em>제시간에, 반복해서</em> 쓸 수 있느냐였다.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="clock" aria-labelledby="clock-title">
+          <p class="chapter">실행 기록 · 시간과 안전</p>
+          <h2 id="clock-title">모델이 답을 내는 동안에도 현장의 시계는 간다</h2>
+          <div class="reading">
+            <p>처음에 66%를 제시한 Hang Zhao가 뒤이어 보여 준 것은 한 에피소드의 타임라인이었다. Astra를 직접 정책으로 실행한 이 사례는 약 4분이 걸렸다. 슬라이드에 표시된 총 움직임은 5.2초. 로봇은 대부분의 시간을 다음 명령을 기다리는 데 썼다.</p>
+          </div>
+          <div class="timing">
+            <strong>97%</strong> 대기
+            <div class="bar" aria-hidden="true"><span></span></div>
+            <p>발표자가 한 에피소드에 대해 제시한 대기 비율. 모델 호출당 18.6초가 걸렸다. 이 타임라인만으로 전체 벤치마크의 평균 대기 시간을 추정할 수는 없다.</p>
+          </div>
+          <blockquote class="pull reading"><span lang="en">“A real robot can’t wait for the model.”</span><cite>Hang Zhao · 05:44 발표 슬라이드</cite></blockquote>
+          <div class="reading">
+            <p>MIT의 Leslie Kaelbling은 이를 생활 속 시간으로 옮겼다. 한 시간 반 뒤에 정답이 나와도 버스는 이미 떠났고 저녁은 타 버렸을 수 있다. Dexmate의 Tianyu Li는 물리적 실수의 비용을 짚었다. 코드 변경은 되돌릴 수 있지만, 물체와 충돌한 로봇에는 <code>git revert</code>가 없다. 위험을 감지하고 반응하는 기능이 로봇 가까이에 있어야 하는 이유다.</p>
+          </div>
+          <div class="gallery">
+            <figure><img loading="lazy" src="assets/prydkrkxbs8-ts-00-06-09.jpg" alt="‘Safety needs a local response’라는 제목의 Dexmate 발표 슬라이드."><figcaption><a>06:09</a> Tianyu Li는 원격 추론이 진행되는 동안에도 현장에서 즉각 반응할 수 있어야 한다고 설명한다.</figcaption></figure>
+            <figure><img loading="lazy" src="assets/prydkrkxbs8-ts-00-06-32.jpg" alt="아틀라스 휴머노이드의 클라우드 추론 계층과 온보드 제어 계층을 나눈 Boston Dynamics의 구성도."><figcaption><a>06:32</a> Alberto Rodriguez(Boston Dynamics)가 공개한 아틀라스의 행동 제어 구조.</figcaption></figure>
+          </div>
+          <h3 class="subhead">아틀라스에서 어려웠던 판단은 ‘이제 다음 일을 해도 되는가’였다</h3>
+          <div class="reading">
+            <p>Rodriguez에 따르면 시험한 프론티어 시각·언어 모델(VLM) 가운데 작업 완료와 다음 목표 전환을 필요한 신뢰도로 판정한 모델은 없었다. 슬라이드는 시험 모델의 성공률 상한을 80~85% 수준으로 설명하고, 실패 사례를 이용한 미세조정이 필요했다고 적었다. 이는 아틀라스의 해당 판단 과제에서 나온 수치다.</p>
+          </div>
+          <div class="layers" aria-label="아틀라스의 계층별 역할">
+            <div><b>System 2 · 클라우드</b>자연어 인터페이스, 추론 VLM, 작업 진행을 관리하는 Job Harness가 상위 판단을 맡는다.</div>
+            <div><b>System 1+0 · 로봇 탑재</b>액션 모델과 전신 제어기가 상위 목표를 로봇의 움직임으로 옮긴다.</div>
+          </div>
+          <div class="gallery">
+            <figure><img loading="lazy" src="assets/prydkrkxbs8-ts-00-07-04.jpg" alt="Tianyu Li가 대형 모델을 지원하는 로봇 시스템의 필요성을 설명하는 슬라이드."><figcaption><a>07:04</a> Li가 제시한 설계 목표는 로봇 전체가 작업을 안정적이고 효율적으로 끝내는 것이다. NVIDIA의 Jonathan Tremblay도 로봇 문제에 맞춘 기술이 필요하다고 보았다.</figcaption></figure>
+            <figure><img loading="lazy" src="assets/prydkrkxbs8-ts-00-08-10.jpg" alt="학회 셋째 날 패널에서 물리 AI와 전문 모델의 역할을 논의하는 장면."><figcaption><a>08:10</a> Fei-Fei Li(Stanford/World Labs)는 고차 추론인 System 2에 미해결 문제가 남았다고 보았다. Lisa Su(AMD)는 응용별 비용·전력·지연에서 전문 모델의 이점을 짚었다.</figcaption></figure>
+          </div>
+        </section>
+
+        <section class="section" id="data" aria-labelledby="data-title">
+          <p class="chapter">배포 데이터 · 현장에서 배우는 것</p>
+          <h2 id="data-title">더 강한 모델도 공장에서는 새로 배운다</h2>
+          <div class="reading">
+            <p>Walden Robotics의 Russ Tedrake는 베이스 모델이 빠르게 좋아진다는 전제에서 회사를 설계했다고 말했다. 그의 전망에서 중간 학습용 데이터는 널리 구할 수 있게 되고 필요한 양도 줄어든다. 반면 어느 공장의 어떤 작업에서 실패했는지를 담은 배포 데이터는 더 귀해진다. 아무리 능숙한 매니퓰레이터라도 처음 들어간 공장에서는 현장을 배워야 한다는 설명이다.</p>
+          </div>
+          <div class="gallery">
+            <figure><img loading="lazy" src="assets/prydkrkxbs8-ts-00-07-27.jpg" alt="Russ Tedrake가 Astra와 베이스 모델의 발전을 전제로 한 Walden Robotics의 전략을 설명하는 장면."><figcaption><a>07:27</a> Tedrake가 구분한 중간 학습 데이터와 배포 데이터. 후자의 가치는 특정 현장을 경험해야 얻을 수 있다는 데 있다.</figcaption></figure>
+            <figure><img loading="lazy" src="assets/prydkrkxbs8-ts-00-09-12.jpg" alt="Vincent Vanhoucke가 진행하는 토론에서 로봇 벤치마크와 실제 작업 신뢰도를 다루는 장면."><figcaption><a>09:12</a> Vincent Vanhoucke가 RoboDojo 성과를 화두로 던지자 Chelsea Finn과 Pulkit Agrawal은 신뢰도와 접촉 데이터로 논의를 옮긴다.</figcaption></figure>
+          </div>
+          <div class="reading">
+            <h3>한 시간 동안 몇 번이나 성공했는가</h3>
+            <p>Chelsea Finn(Stanford/PI)은 코딩 에이전트가 신뢰도에 맞춰 개선된 뒤에야 상업적으로 유용해졌다는 점을 들었다. 로봇에서도 대량의 로봇 데이터로 반복 수행의 신뢰도를 높여야 한다는 주장이다. Pulkit Agrawal(MIT/EKA)은 접촉이 많은 조작과 물체의 동역학을 지목했다. 모델이 폭넓은 지식을 학습했어도 이런 상호작용을 담은 데이터는 부족하다고 보았다.</p>
+            <p>Agrawal이 제안한 지표는 <strong>처리량</strong>이다. 이를 운용 단위로 풀어 쓰면, 같은 관측 구간에서 <strong>시간당 시도 횟수 × 성공한 시도의 비율 = 시간당 성공 건수</strong>다. 모델 호출을 기다린 시간까지 관측 구간에 넣으면, 대기와 실패가 각각 작업량을 얼마나 줄였는지 살펴볼 수 있다.</p>
+          </div>
+        </section>
+
+        <section class="ending" id="implications" aria-labelledby="implications-title">
+          <p class="chapter">시사점 · 다음 현장 시험</p>
+          <h2 id="implications-title">성공 판정 옆에 남겨야 할 기록</h2>
+          <div class="reading">
+            <p>이 논의를 굴착기나 건설 장비의 현장 시험에 적용한다면, 범용 모델에는 상위 작업 계획과 실패 판정 보조를 맡기고 즉각적인 제어와 안전 반응은 온보드에서 처리하는 설계를 검토할 수 있다. 해당 장비에서 검증된 결과는 아니며, 발표 사례에서 도출한 설계 가설이다. 시험 기록에는 다음 세 항목이 함께 있어야 이 가설을 평가할 수 있다.</p>
+            <ol class="checks">
+              <li><strong>작업 시간과 대기 비율.</strong> 작업 시작부터 완료까지 걸린 시간, 모델 호출별 지연, 전체 시간 중 대기가 차지한 비율을 기록한다.</li>
+              <li><strong>판정 오류와 실패 비용.</strong> 끝나지 않은 작업을 완료로 판정한 횟수와 현장에서 되돌릴 수 없는 실패의 비율을 구분한다.</li>
+              <li><strong>접촉 조건과 처리량.</strong> 어떤 물체와 접촉할 때 실패했는지 배포 기록에 남기고, 같은 조건에서 시간당 성공 건수를 비교한다.</li>
+            </ol>
+          </div>
+          <div class="gallery">
+            <figure><img loading="lazy" src="assets/prydkrkxbs8-ts-00-11-29.jpg" alt="Jim Fan의 고양이 밈에 여섯 번째 단계 ‘CELEBRATION’이 추가된 슬라이드."><figcaption><a>11:29</a> Jim Fan이 슬픔의 다섯 단계에 보탠 여섯 번째 단계, ‘축하’.</figcaption></figure>
+            <figure><img loading="lazy" src="assets/prydkrkxbs8-ts-00-11-58.jpg" alt="불꽃 옆의 로봇 팔 사진으로 키노트를 마무리하는 Jim Fan."><figcaption><a>11:58</a> 불꽃 옆 로봇 팔과 함께 돌아온 첫 장면의 문구. 이번 계절은 여름이다.</figcaption></figure>
+          </div>
+          <div class="reading">
+            <p>CMU의 Yonatan Bisk가 걱정한 것은 연구자들이 과제를 다루기 쉽게 만드는 동안 로봇공학의 흥미로운 부분까지 덜어냈을 가능성이었다. Jim Fan은 같은 순간에서 더 많은 사람이 연구에 들어올 기회를 보았다. 그가 마지막에 꺼낸 비유는 무너진 정원의 담장이었다.</p>
+            <p>금문교를 그리게 한 사람이 다음 실험에서 그 그림을 몇 분 만에, 몇 번이나 다시 그릴 수 있는지 묻는다면 어떨까. 낮아진 진입 장벽과 현장 연구의 깊이는 그 질문 안에 함께 들어 있다.</p>
+            <aside class="share" aria-labelledby="share-title">
+              <h3 id="share-title">공유용 한 문장</h3>
+              <p>CoRL 2026에서 Astra는 성공률 66%로 주목받았다. 같은 발표의 한 시연에서 로봇은 작업 시간의 97%를 기다렸다. 현장의 질문은 한 시간에 몇 번이나 성공할 수 있느냐다.</p>
+            </aside>
+          </div>
+        </section>
+      </div>
+
+      <footer class="sources" id="sources">
+        <div class="wrap">
+          <h2>자료와 판독 한계</h2>
+          <p><strong>출처.</strong> sudoremove가 2026년 11월 19일 게시한 12분 6초 편집 영상. 11월 9~12일 오스틴에서 열린 CoRL 2026의 공개 녹화에서 여러 세션의 발언을 발췌했다. 본문의 시각 링크는 편집본 기준이다. 각 발언의 앞뒤 맥락은 영상 설명란에 연결된 Day 1~3 라이브 녹화에서 확인할 수 있다. <a>sudoremove 영상 보기</a></p>
+          <p><strong>수치와 해석.</strong> 벤치마크 점수, 대기 시간, 개발 일수, 아틀라스의 성공률은 발표 슬라이드 또는 연사의 설명에서 옮긴 값이다. 원 실험의 조건과 결과는 독립 검증하지 않았다. ‘충격에서 수용으로’라는 흐름은 편집본의 구성이며 학회 참가자 전체의 합의를 나타내는 조사 결과는 아니다.</p>
+          <p><strong>자막과 화면.</strong> 수동 자막이 없어 영어 원본 자동 자막(en-orig)을 사용했다. 고유명사의 인식 오류는 문맥과 슬라이드를 바탕으로 Astra, Argon, π0.5, GPT, Moravec’s paradox 등으로 정리했다. 한국어 자동 번역 자막 요청은 HTTP 429, 1080p 스트림 요청은 HTTP 403 응답을 받았다. 캡처에는 로그인 쿠키 없이 받은 360p 영상(format 18, mweb 클라이언트)을 사용해 일부 슬라이드의 작은 글자는 판독하기 어렵다.</p>
+          <p><strong>날짜 표기.</strong> Astra 출시일은 Jim Fan의 발언에서 9월 3일, Guanya Shi의 슬라이드에서 9월 4일로 서로 다르다.</p>
+          <a class="back" href="#top">기사 처음으로 ↑</a>
+        </div>
+      </footer>
+    </article>
+  </main>
+</body>
+</html>

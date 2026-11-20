@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-16T12:19:34.836Z",
+  "updatedAt": "2026-11-20T12:09:42.298Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-%EB%A1%9C%EB%B4%87-%EC%97%B0%EA%B5%AC%EC%9E%90%EB%93%A4%EC%9D%B4-astra%EB%A5%BC-%EB%B0%9B%EC%95%84%EB%93%A4%EC%9D%B4%EB%8A%94-%EB%B2%95-corl-2026-%EC%9A%94%EC%95%BD/",
+      "excerpt": "로봇 연구자들이 Astra를 받아들이는 법 (CoRL 2026) 영상 정보 채널 : sudoremove 게시일 : 2026 11 19 길이 : 12:06 링크 : https://www.youtube.com/watch?v=PrYdKRkxBs8 형식 : CoRL 2026(Austin, 11/9–11/12) 공개 녹화에서 여러 연사의 발언을 짧게 잘라 하나의 흐름으로 엮은 편집 영상. 화면에 한/영 자막과 연사 이름·소속, 원본 세",
+      "shortId": "k5bvk1",
+      "slug": "yt-로봇-연구자들이-astra를-받아들이는-법-corl-2026-요약",
+      "sourcePath": "02_research/AI/Sudoremove/yt_로봇 연구자들이 Astra를 받아들이는 법 (CoRL 2026)_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료",
+        "로봇학습",
+        "CoRL2026",
+        "Astra",
+        "VLA"
+      ],
+      "title": "로봇 연구자들이 Astra를 받아들이는 법 (CoRL 2026)",
+      "updatedAt": "2026-11-20T12:09:42.298Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/k5bvk1/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-ep-123-%ED%95%9C-%EC%B9%98-%EC%95%9E%EB%8F%84-%EB%AA%A8%EB%A5%B4%EB%8A%94-%EB%AF%B8%EB%9E%98-%EC%A0%A0%EC%8A%A8-%ED%99%A9-%EC%82%AC%EC%9E%84-fable-5-2-weight-space-programming-%EC%9A%94%EC%95%BD/",
