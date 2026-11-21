@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>가중치만 보고 게임을 맞힐 수 있을까? | MIT Weight-Space Programming 해설</title>
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f8f6ef;
+      --surface: #fffef9;
+      --ink: #202d29;
+      --muted: #505e57;
+      --green: #173e37;
+      --mint: #e5eee6;
+      --lime: #def29c;
+      --rust: #994027;
+      --rule: #c6cec1;
+      --serif: "Noto Serif KR", "AppleMyungjo", "Batang", serif;
+      --sans: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-padding-top: 1rem; }
+    body {
+      margin: 0; color: var(--ink); background: var(--paper);
+      font: 400 clamp(1.25rem, 1.18rem + .28vw, 1.4rem)/1.83 var(--sans);
+      word-break: keep-all; overflow-wrap: break-word;
+    }
+    h1, h2, h3, p, figure, blockquote { margin: 0; }
+    a { color: var(--green); text-underline-offset: .2em; text-decoration-thickness: 1px; }
+    a:hover { text-decoration-thickness: 2px; }
+    a:focus-visible { outline: 3px solid #b15d2d; outline-offset: 4px; }
+    .wrap { width: min(72rem, calc(100% - 3rem)); margin-inline: auto; }
+    .skip { position: absolute; left: 1rem; top: -8rem; z-index: 2; padding: .4rem 1rem; background: white; }
+    .skip:focus { top: 1rem; }
+    .mast { background: var(--green); color: #fffef7; border-bottom: .5rem solid var(--lime); }
+    .folio { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: .4rem 1.2rem; padding: 1.2rem 0; border-bottom: 1px solid #658077; font-size: 1rem; }
+    .folio b { color: var(--lime); }
+    .hero { padding: clamp(3rem, 7vw, 6.5rem) 0 3.5rem; }
+    .kicker, .label { display: block; font-size: .93rem; font-weight: 750; letter-spacing: .065em; }
+    .kicker { color: var(--lime); }
+    h1, h2, .pull p { font-family: var(--serif); letter-spacing: -.055em; }
+    h1 { margin: 1rem 0 1.5rem; font-size: clamp(2.75rem, 6.6vw, 5.9rem); line-height: 1.19; }
+    .deck { max-width: 49rem; color: #e5eee7; font-size: clamp(1.3rem, 2vw, 1.65rem); line-height: 1.65; }
+    .byline { margin-top: 2.25rem; color: #c5d9cc; font-size: 1rem; }
+    .mast a { color: inherit; }
+    .toc { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; padding-block: 1.15rem; border-bottom: 1px solid var(--rule); }
+    .toc a { font-size: 1.03rem; font-weight: 700; }
+    .section { padding: clamp(2.75rem, 6vw, 5.25rem) 0; border-bottom: 1px solid var(--rule); }
+    .label { color: var(--rust); margin-bottom: .55rem; }
+    h2 { max-width: 60rem; font-size: clamp(2rem, 4.25vw, 3.5rem); line-height: 1.3; }
+    h3 { margin: 2.25rem 0 .65rem; font-size: clamp(1.35rem, 2.4vw, 1.7rem); line-height: 1.45; letter-spacing: -.035em; }
+    .prose { max-width: 48rem; }
+    .prose p + p, .prose ul { margin-top: 1rem; }
+    h2 + .prose, .lead { margin-top: 1.4rem; }
+    .lead { max-width: 49rem; font-size: 1.13em; }
+    .findings, .plates { display: grid; gap: 1.25rem; margin-top: 1.8rem; }
+    .findings { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .finding { padding: 1.25rem 1.35rem 1.45rem; background: var(--mint); border-top: 3px solid var(--green); }
+    .finding h3 { color: var(--green); margin: 0 0 .5rem; }
+    .finding p { font-size: 1.16rem; line-height: 1.7; }
+    .stat { display: block; font: 650 clamp(2.15rem, 4vw, 3.4rem)/1.25 var(--serif); letter-spacing: -.055em; }
+    .plates { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .plate { min-width: 0; align-self: start; background: var(--surface); border: 1px solid var(--rule); }
+    .plate img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: contain; background: #202a27; }
+    figcaption { padding: .85rem 1rem 1.1rem; color: var(--muted); font-size: 1.02rem; line-height: 1.65; }
+    .stamp { display: inline-block; margin-right: .45em; color: var(--rust); font: 700 .93em/1.5 ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+    .wide { max-width: 48rem; margin-top: 1.8rem; }
+    .equation { margin: 1.5rem 0; padding: 1.1rem 1.4rem; border-left: 4px solid var(--green); background: var(--mint); }
+    .equation code { display: block; font-size: clamp(1.05rem, 2.35vw, 1.5rem); }
+    .equation small { display: block; color: var(--muted); font-size: 1rem; }
+    .tablebox { margin: 1.5rem 0; overflow-x: auto; border: 1px solid var(--rule); background: var(--surface); }
+    table { width: 100%; border-collapse: collapse; font-size: 1.12rem; line-height: 1.55; }
+    caption { padding: 1rem 1.15rem; font-weight: 750; text-align: left; color: var(--green); }
+    th, td { padding: .8rem 1rem; text-align: left; vertical-align: top; border-top: 1px solid var(--rule); }
+    thead th { background: var(--green); color: white; font-weight: 650; }
+    tbody th { font-weight: 650; }
+    .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .best { background: var(--mint); }
+    .aside { max-width: 51rem; margin: 1.5rem 0; padding: 1.15rem 1.4rem; border-left: 4px solid var(--rust); background: #f4eade; }
+    .aside strong { color: #7c3522; }
+    .pull { margin: 2.25rem 0 0; padding: clamp(1.5rem, 4vw, 3rem); color: #fffef5; background: var(--green); }
+    .pull p { max-width: 49rem; font-size: clamp(1.6rem, 3.4vw, 2.65rem); line-height: 1.5; }
+    .pull footer { margin-top: .8rem; font-size: 1rem; color: var(--lime); }
+    .notes { padding-left: 1.4rem; }
+    .notes li + li { margin-top: .8rem; }
+    .share { max-width: 48rem; margin: 1.75rem 0 0; padding: 1.3rem 1.5rem; border: 1px solid var(--green); background: var(--surface); }
+    .share h3 { margin: 0 0 .45rem; font-size: 1.05rem; color: var(--green); }
+    .end { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .6rem 2rem; padding: 1.3rem 0 2.5rem; font-size: 1rem; }
+    @media (max-width: 48rem) {
+      .wrap { width: calc(100% - 2.25rem); }
+      .findings, .plates { grid-template-columns: 1fr; }
+      .finding { padding: 1rem 1.15rem; }
+      .stat { display: inline; margin-right: .35em; }
+      th, td { padding: .65rem .7rem; }
+      .tablebox table { min-width: 31rem; }
+    }
+    @media print {
+      body { font-size: 12pt; background: white; }
+      .wrap { width: 100%; }
+      .toc, .skip, .end { display: none; }
+      .section, .hero { padding: 1.5rem 0; }
+      .mast, .pull, thead th { color: black; background: white; }
+      .mast *, .pull footer { color: black; }
+      .plate, .finding, tr, .pull { break-inside: avoid; }
+      .tablebox { overflow: visible; }
+      h2, h3, caption { break-after: avoid; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="MIT Weight Space Programming 해설">
+<meta property="og:description" content="MIT Weight Space Programming 해설 영상 정보 채널 : sudoremove (@sudoremove) 게시일 : 2026 11 19 길이 : 35분 20초 (2,120초) 링크 : https://www.youtube.com/watch?v=wpozdGPdlYY &lt;div style=&quot;position: relative; width: 100%; padding bottom: 56.25%; height: 0; over">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/1czn4gc/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/1czn4gc/assets/wpozdgpdlyy-ts-00-00-25.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MIT Weight Space Programming 해설">
+<meta name="twitter:description" content="MIT Weight Space Programming 해설 영상 정보 채널 : sudoremove (@sudoremove) 게시일 : 2026 11 19 길이 : 35분 20초 (2,120초) 링크 : https://www.youtube.com/watch?v=wpozdGPdlYY &lt;div style=&quot;position: relative; width: 100%; padding bottom: 56.25%; height: 0; over">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/1czn4gc/assets/wpozdgpdlyy-ts-00-00-25.jpg">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-mit-weight-space-programming-%ED%95%B4%EC%84%A4-%EC%9A%94%EC%95%BD/">
+</head>
+<body id="top">
+  <a class="skip" href="#abstract">본문으로 이동</a>
+  <article>
+    <header class="mast">
+      <div class="wrap">
+        <div class="folio"><b>연구 해설</b><span>기계학습 · 해석가능성</span></div>
+        <div class="hero">
+          <p class="kicker" lang="en">Sparks of Weight-Space Programming</p>
+          <h1>가중치만 보고<br>게임을 맞힐 수 있을까?</h1>
+          <p class="deck">벽돌깨기 게임을 배운 신경망에는 패들이 다닌 자리가 한 줄로 남았다. 이 흔적을 읽는 일에서 출발해, 답을 끝내지 못하는 언어 모델의 가중치를 고치는 일까지 따라가 본다.</p>
+          <p class="byline"><a>sudoremove</a> 영상 해설 · <time datetime="2026-11-19">2026년 11월 19일</time> 공개 · <a>원본 영상 35분 20초</a></p>
+        </div>
+      </div>
+    </header>
+
+    <div class="wrap">
+      <nav class="toc" aria-label="기사 목차">
+        <a href="#abstract">초록</a><a href="#read">가중치 읽기</a><a href="#circuits">회로 찾기</a><a href="#write">정책 고쳐 쓰기</a><a href="#math">수학 점수</a><a href="#memory">지식 주입</a><a href="#style">화풍 편집</a><a href="#implications">시사점</a><a href="#sources">출처와 한계</a>
+      </nav>
+
+      <main>
+        <section class="section" id="abstract" aria-labelledby="abstract-title">
+          <span class="label">초록 · 핵심 발견</span>
+          <h2 id="abstract-title">‘읽었다’와 ‘고쳤다’에는 서로 다른 증거가 필요하다</h2>
+          <div class="prose">
+            <p>가중치 공간 프로그래밍은 신경망에 저장된 숫자를 조사하고, 원하는 동작에 맞게 그 값을 직접 쓰는 방법이다. 영상은 MIT CSAIL의 연구 블로그에 소개된 GPT-6 Astra 실험을 해설하고, 게스트가 같은 접근을 지식 주입과 화풍 편집에 적용한 결과를 덧붙인다. 편집 과정의 공통 조건은 역전파 없이 값을 바꾼다는 것. 편집자에게 허용한 단서와 실행 횟수는 실험마다 달랐다.</p>
+          </div>
+          <div class="findings">
+            <div class="finding"><h3><span class="stat">7/7</span> 작은 모델의 과제 판독</h3><p>입출력의 의미를 알려 준 게임 네 종류와 출력층 패턴을 제시한 도형 세 종류를 모두 식별. 원의 내부가 채워지는 세부 동작은 놓쳤다.</p></div>
+            <div class="finding"><h3><span class="stat">+40.2%p</span> Qwen의 수학 점수</h3><p>모델 실행을 50회 허용한 조건에서 MATH-500 점수가 7.9%에서 48.1%로 상승. 답안을 끝내지 못하는 비율도 함께 줄었다.</p></div>
+            <div class="finding"><h3><span class="stat">40%</span> 바꿔 물었을 때의 정답률</h3><p>게스트의 삼국지 퀴즈 원문에서는 편집 후 최고 100%를 기록. 표현을 바꾼 문항에서는 4%에서 40%로 올랐다.</p></div>
+          </div>
+          <div class="plates">
+            <figure class="plate"><img src="assets/wpozdgpdlyy-ts-00-00-25.jpg" width="640" height="360" alt="연구 영문 제목과 가중치 읽기·고치기·쓰기를 소개하는 영상 표지"><figcaption><span class="stamp">00:25</span>진행자가 만든 38장 분량의 한국어 해설 슬라이드 표지. 원 연구의 공개일은 2026년 11월 2일로 표기돼 있다.</figcaption></figure>
+            <figure class="plate"><img src="assets/wpozdgpdlyy-ts-00-02-19.jpg" width="640" height="360" alt="작은 신경망의 성공 사례와 대형 모델 결과의 조건을 모은 개요 슬라이드"><figcaption><span class="stamp">02:19</span>개요 슬라이드는 과제 식별, 모델 실행을 동반한 편집, 가중치만으로 구분에 실패한 사례를 함께 제시한다.</figcaption></figure>
+          </div>
+        </section>
+
+        <section class="section" id="read" aria-labelledby="read-title">
+          <span class="label">판독 실험 · 게임 정책망과 도형 생성기</span>
+          <h2 id="read-title">패들이 지나간 자리가 한 줄로 남았다</h2>
+          <div class="prose">
+            <p>10×10 게임판에서 내 캐릭터, 움직이는 물체, 보상 대상, 장애물, 직전 화면을 다섯 채널로 기록하면 입력은 500개의 숫자가 된다. 네 게임의 정책망은 모두 같은 구조로 PPO 10억 스텝을 학습했다. Astra에게 주어진 것은 각 채널과 행동의 의미, 그리고 학습을 마친 가중치였다. 게임 화면과 후보 목록은 주어지지 않았다.</p>
+            <p>정책망의 구조는 <strong>500 → 32 → 32 → 5</strong>이며 은닉층의 활성화 함수는 tanh다. 편향을 포함한 층별 매개변수는 16,032개, 1,056개, 165개로 합계 17,253개. 프롬프트에는 채널별로 큰 값이 어디에 몰렸는지, 출력층은 어느 행동을 구분하는지 근거 숫자를 적으라는 단서가 있었다.</p>
+          </div>
+          <div class="plates">
+            <figure class="plate"><img loading="lazy" src="assets/wpozdgpdlyy-ts-00-02-56.jpg" width="640" height="360" alt="10×10 게임판의 다섯 입력 채널과 다섯 행동 출력"><figcaption><span class="stamp">02:56</span>정지·위·아래·왼쪽·오른쪽 중 한 행동을 선택하는 정책망. 게임이 달라도 입력 형식은 같다.</figcaption></figure>
+            <figure class="plate"><img loading="lazy" src="assets/wpozdgpdlyy-ts-00-03-41.jpg" width="640" height="360" alt="가중치의 공간 분포와 행동별 차이를 근거로 답하라는 프롬프트"><figcaption><span class="stamp">03:41</span>도구 없이 한 번에 답하는 조건. 진행자는 질문의 표현 자체가 어디를 살펴볼지 알려 준다고 짚었다.</figcaption></figure>
+          </div>
+          <h3>왜 가중치에 위치가 남을까?</h3>
+          <div class="prose">
+            <div class="equation"><code>∂L/∂W₁[i,j] = xᵢ × δⱼ</code><small>xᵢ는 입력 칸의 값, δⱼ는 은닉 유닛 j로 전달된 오차 신호.</small></div>
+            <p>물체가 한 번도 나타나지 않은 칸은 입력값이 늘 0이어서 위 식의 기울기도 0이다. 이 망에서 첫 층 가중치 절댓값의 중앙값은 0.067이었고, 행동 선택에 관여한 일부 연결은 절댓값이 1~6까지 커졌다. 입력별 가중치 크기를 게임판 위에 다시 놓으면 물체가 어느 범위에서 움직였는지 추론할 수 있다.</p>
+            <p>Breakout에서는 내 캐릭터 채널의 8행, 공 채널의 1~7행, 보상 채널의 1~3행이 두드러졌다. 입력 405번에 연결된 두 유닛의 값은 각각 4.066과 −4.013. 바닥의 패들, 그 위를 오가는 공, 맨 위의 벽돌이라는 해석은 출력층에서도 맞아떨어졌다. 크게 구분되는 행동은 왼쪽과 오른쪽이었다.</p>
+          </div>
+          <div class="plates">
+            <figure class="plate"><img loading="lazy" src="assets/wpozdgpdlyy-ts-00-06-00.jpg" width="640" height="360" alt="입력값과 기울기의 관계 및 8행에 모인 패들 채널 가중치"><figcaption><span class="stamp">06:00</span>패들이 움직인 행은 주변의 작은 초기값과 구별된다. 가중치 크기는 위치를 짐작하는 단서이며 출현 횟수의 직접 측정값은 아니다.</figcaption></figure>
+            <figure class="plate"><img loading="lazy" src="assets/wpozdgpdlyy-ts-00-06-14.jpg" width="640" height="360" alt="패들·공·벽돌·장애물 채널의 위치별 가중치 지도"><figcaption><span class="stamp">06:14</span>여러 채널을 포개어 읽으면 한 줄의 의미가 분명해진다. Astra가 보고한 Breakout 판정의 확신도는 99%였다.</figcaption></figure>
+          </div>
+          <figure class="plate wide"><img loading="lazy" src="assets/wpozdgpdlyy-ts-00-08-07.jpg" width="640" height="360" alt="Breakout, Pong, Pac-Man, Freeway의 가중치 지도 비교"><figcaption><span class="stamp">08:07</span>출력층의 행동 차이도 게임별로 달랐다. Breakout은 좌우 67.0, Pong은 상하 35.9, Pac-Man은 네 방향 38~62. Freeway에서는 위쪽 행동의 편향 3.14가 단서였다.</figcaption></figure>
+
+          <h3>도형은 맞혔다. 원의 속은 비어 있었을까?</h3>
+          <div class="prose">
+            <p>약 2.3만 개 가중치를 가진 소형 디퓨전 모델 세 개에서도 출력층에 남은 곡선과 직선 조각으로 원·사각형·삼각형을 구별했다. Astra가 보고한 확신도는 각각 84%, 77%, 88%였다. 그런데 직접 그린 예시에서 원의 가운데를 비워 두었다.</p>
+            <p>출력 패턴을 하나씩 보면 폭 1~2칸짜리 띠처럼 보인다. 실제 생성에서는 은닉 유닛 28개의 출력이 겹쳐 원의 안쪽까지 채워졌다. 부분을 정확히 읽고도 여러 부분이 동시에 작동한 결과는 놓칠 수 있음을 보여 주는 사례다.</p>
+          </div>
+          <div class="plates">
+            <figure class="plate"><img loading="lazy" src="assets/wpozdgpdlyy-ts-00-08-53.jpg" width="640" height="360" alt="원·사각형·삼각형 생성기의 출력층에서 읽은 선 조각"><figcaption><span class="stamp">08:53</span>곡선 조각, 가로·세로선, 두 사선과 바닥선이 각 도형의 단서였다.</figcaption></figure>
+            <figure class="plate"><img loading="lazy" src="assets/wpozdgpdlyy-ts-00-09-04.jpg" width="640" height="360" alt="Astra가 예상한 테두리 원과 실제 모델이 생성한 채워진 원의 비교"><figcaption><span class="stamp">09:04</span>예상 그림과 생성 결과의 차이. 판독 단계에서는 모델 실행이 금지돼 있었다.</figcaption></figure>
+          </div>
+        </section>
+
+        <section class="section" id="circuits" aria-labelledby="circuits-title">
+          <span class="label">회로 분석 · 글자 단위 트랜스포머</span>
+          <h2 id="circuits-title">글자 이름을 가려도 복사 회로는 찾을 수 있을까?</h2>
+          <div class="prose">
+            <p>Python 코드, 로마자로 쓴 일본 문학, 영어 위키백과를 각각 학습한 모델에서 임베딩과 출력층을 제거했다. 어느 벡터가 어느 글자인지 연결해 주는 표가 사라진 셈이다. 남은 가중치는 708만 개. 네 블록에 여섯 개씩 있는 어텐션 헤드를 조사할 때는 Python으로 행렬곱·특잇값 분해(SVD)·고유값 계산을 수행할 수 있었다. 샌드박스와 6~11회 결과를 주고받았으며, 입력을 넣어 모델을 실행하는 것은 금지됐다.</p>
+            <p>조사 대상은 <strong>앞 토큰의 정보를 옮기는 헤드</strong>와 <strong>그 정보를 복사에 활용하는 헤드</strong>의 연결이었다. 먼저 쿼리·키(QK) 행렬의 위치 반응과 RoPE 회전 패턴을 살폈다. 이어 두 헤드의 행렬을 조합하고, 현재 글자와 앞에서 전달된 글자가 일치하는 대각선에 얼마나 점수가 모이는지 비교했다.</p>
+          </div>
+          <div class="plates">
+            <figure class="plate"><img loading="lazy" src="assets/wpozdgpdlyy-ts-00-10-51.jpg" width="640" height="360" alt="학습 텍스트가 다른 세 모델에서 임베딩과 출력층을 제거한 실험 구성"><figcaption><span class="stamp">10:51</span>학습 텍스트의 종류와 순서, 헤드 24개의 역할을 묻는 설정. 작은 게임망 판독보다 계산 도구의 허용 범위가 넓었다.</figcaption></figure>
+            <figure class="plate"><img loading="lazy" src="assets/wpozdgpdlyy-ts-00-14-43.jpg" width="640" height="360" alt="언어별 previous-token head와 copy head의 연결 점수"><figcaption><span class="stamp">14:43</span>가장 강한 쌍은 Python L2H2→L3H5(0.18), 로마자 L0H3→L3H3(2.73), 영어 L0H2→L3H1(0.83). L은 층, H는 헤드 번호다.</figcaption></figure>
+          </div>
+          <div class="prose">
+            <p class="lead">영상은 copy head 지목 결과를 6전 6회 성공으로 요약한다. 학습 텍스트를 판별할 때는 정보가 집중된 방향의 수도 단서였다. 글자 종류가 적은 로마자 모델에서는 상위 24개 방향에 집중되는 양상이 나타났다.</p>
+          </div>
+        </section>
+
+        <section class="section" id="write" aria-labelledby="write-title">
+          <span class="label">정책 편집 · 물리 시뮬레이터와 격자 게임</span>
+          <h2 id="write-title">경사로 앞에서 멈춘 차에 후진을 써넣다</h2>
+          <div class="prose">
+            <p>Kinetix의 차는 경사로를 향해 곧장 달리다가 멈췄다. PPO가 학습한 정책은 가속 거리를 확보하려고 먼저 뒤로 물러나는 행동을 찾지 못했다. Astra에게 정책 가중치 171,664개와 장면 설명, 실패 장면 녹화 한 편을 제공했다.</p>
+            <p>한 번의 응답으로 만든 51줄 편집은 차 위치·차 속도·바퀴 위치에서 출발한다. 여섯 개의 문턱 조건을 조합해 후진과 왼쪽 전속력 플래그를 켰다. 차가 오른쪽 끝(x = 3.8 부근)에 이르면 왼쪽으로 질주하고, 경사로를 넘은 뒤에는 원래 정책이 다시 운전한다. 바뀐 값은 6,073개, 전체의 약 3.5%. 성공률은 0%에서 평가 1,024회 중 1,024회 성공으로 올랐다.</p>
+          </div>
+          <div class="plates">
+            <figure class="plate"><img loading="lazy" src="assets/wpozdgpdlyy-ts-00-15-56.jpg" width="640" height="360" alt="Kinetix 차량의 경사로 실패 사례를 설명하는 원 연구 블로그 화면"><figcaption><span class="stamp">15:56</span>영상에서 원 블로그 본문을 직접 보여 주는 장면. 실패 에피소드 한 편이 진단 자료에 포함됐다.</figcaption></figure>
+            <figure class="plate"><img loading="lazy" src="assets/wpozdgpdlyy-ts-00-16-45.jpg" width="640" height="360" alt="입력 세 개와 문턱 조건 여섯 개로 후진과 가속을 제어하는 우회 회로"><figcaption><span class="stamp">16:45</span>입력 52·54·234번에서 행동 플래그 두 개로 이어지는 우회 경로. 기존 정책의 대부분은 그대로 쓰였다.</figcaption></figure>
+          </div>
+
+          <h3>빈 신경망에서 시작하면 게임 규칙이 성적을 가른다</h3>
+          <div class="prose"><p>다음 실험에서는 가중치가 모두 0인 600 → 32 → 32 → 6 신경망을 건넸다. Astra는 게임 규칙과 소스 코드만 읽고 한 번의 응답으로 정책을 작성했다. 게임을 미리 실행해 볼 기회는 없었다.</p></div>
+          <div class="tablebox" role="region" aria-label="게임 정책 점수 비교" tabindex="0">
+            <table><caption>정책별 1,000판 평균 점수 · 같은 행 안에서 비교</caption>
+              <thead><tr><th scope="col">게임</th><th scope="col" class="num">PPO 1억 스텝</th><th scope="col" class="num">PPO 5억 스텝</th><th scope="col" class="num">Astra</th></tr></thead>
+              <tbody>
+                <tr class="best"><th scope="row">Breakout</th><td class="num">15.8</td><td class="num">25.3</td><td class="num"><strong>517.4</strong></td></tr>
+                <tr><th scope="row">Seaquest</th><td class="num">5.6</td><td class="num">88.9</td><td class="num">53.1</td></tr>
+                <tr><th scope="row">Asterix</th><td class="num">25.8</td><td class="num">55.2</td><td class="num">53.2</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="prose">
+            <p>Breakout은 공이 떨어질 열을 계산해 패들을 미리 옮기는 규칙이 통했다. Seaquest와 Asterix에서는 한 열에 머물며 위험을 피하는 전략에 그쳐 PPO 5억 스텝 정책보다 낮은 점수를 받았다.</p>
+            <p>9×9 바둑은 피드백 조건이 달랐다. 자막에 따르면 첫 설계 이후 패배한 기보를 읽고 가중치를 다듬는 과정을 50회 반복한 끝에 PPO 신경망을 이겼다. 이 결과는 대응 슬라이드 없이 자막으로만 전해진다.</p>
+          </div>
+          <figure class="plate wide"><img loading="lazy" src="assets/wpozdgpdlyy-ts-00-17-47.jpg" width="640" height="360" alt="가중치가 0인 정책망에 직접 설계한 세 게임의 점수표"><figcaption><span class="stamp">17:47</span>동일한 한 번의 설계 기회에서도 게임에 따라 성적 차이가 컸다.</figcaption></figure>
+        </section>
+
+        <section class="section" id="math" aria-labelledby="math-title">
+          <span class="label">언어 모델 편집 · Qwen과 Gemma</span>
+          <h2 id="math-title">수학 점수의 첫 단서는 끝나지 않은 답안 85개였다</h2>
+          <div class="prose">
+            <p>Qwen3.5-0.8B의 연습 답안 96개 중 85개가 32,768토큰 한도에 도달했다. 대부분 같은 구절을 반복하고 있었다. 이 관찰에서 검증할 가설이 나왔다. 반복을 줄여 모델이 답안을 끝낼 수 있게 하면, 이미 풀 수 있었던 문제에서 점수를 회복할 수 있을까?</p>
+            <p>Astra는 Python 커널로 가중치를 읽고 쓸 수 있었고, GSM8K·MATH 학습셋 문제로 모델을 실행할 수 있었다. 평가 문제는 제공하지 않았다. 경사 계산과 학습, 임베딩·출력층 편집은 금지됐다. 10회·25회·50회는 각각 별도로 시작한 실행 예산이다.</p>
+          </div>
+          <div class="tablebox" role="region" aria-label="Qwen 실행 예산별 결과" tabindex="0">
+            <table><caption>Qwen3.5-0.8B · 실행 예산별 편집 결과</caption>
+              <thead><tr><th scope="col">실행 예산</th><th scope="col">개입</th><th scope="col" class="num">MATH-500</th><th scope="col" class="num">토큰 한도 도달률</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">편집 전</th><td>원본 모델</td><td class="num">7.9%</td><td class="num">93%</td></tr>
+                <tr><th scope="row">10회</th><td>8~22층 행렬 30개에서 반복 방향 제거</td><td class="num">12.3%</td><td class="num">87%</td></tr>
+                <tr><th scope="row">25회</th><td>15층 어텐션 헤드 하나의 출력 제거</td><td class="num">14.1%</td><td class="num">86%</td></tr>
+                <tr class="best"><th scope="row">50회</th><td>15·19층 MLP의 열 128개 편집</td><td class="num"><strong>48.1%</strong></td><td class="num"><strong>33%</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="plates">
+            <figure class="plate"><img loading="lazy" src="assets/wpozdgpdlyy-ts-00-21-37.jpg" width="640" height="360" alt="Qwen 연습 답안 96개 중 85개가 토큰 한도에 걸렸다는 초기 진단"><figcaption><span class="stamp">21:37</span>85/96은 가설을 세울 때 본 연습 답안의 집계다. 위 표의 93%는 별도로 제시된 편집 전 평가 수치다.</figcaption></figure>
+            <figure class="plate"><img loading="lazy" src="assets/wpozdgpdlyy-ts-00-22-25.jpg" width="640" height="360" alt="서로 다른 층과 행렬을 편집한 세 번의 독립 실행 경로"><figcaption><span class="stamp">22:25</span>세 실행은 같은 문제를 진단하고 서로 다른 부위를 고쳤다. 한도 도달률이 가장 크게 줄어든 실행에서 점수도 가장 많이 올랐다.</figcaption></figure>
+          </div>
+          <h3>반복이 드문 모델에서는 0.9%p</h3>
+          <div class="prose">
+            <p>같은 규칙을 적용한 Gemma 3 270M은 처음부터 한도 도달률이 8.5%였다. 많은 오답은 답을 끝낸 뒤에도 남는 추론 실수였다. 5·10·25·50회 예산에서 평가 점수는 7.0~7.7%. 원본 6.8%에서 최고 0.9%p 상승했다. 두 모델의 차이는 Qwen에서 관측된 개선을 반복 결함의 완화로 해석할 근거가 된다.</p>
+          </div>
+          <blockquote class="pull"><p>“모델 안에 있는 것은 뜯어고칠 수 있지만 없는 것을 넣어 주지는 못했다.”</p><footer>Qwen과 Gemma의 수학 실험에 대한 진행자의 해석</footer></blockquote>
+          <div class="plates">
+            <figure class="plate"><img loading="lazy" src="assets/wpozdgpdlyy-ts-00-23-21.jpg" width="640" height="360" alt="Qwen과 Gemma의 편집 전후 수학 점수 및 반복 문제 비교"><figcaption><span class="stamp">23:21</span>대조군은 효과의 범위를 좁혀 준다. 다른 유형의 오류까지 같은 편집으로 고칠 수 있는지는 별도의 질문이다.</figcaption></figure>
+            <figure class="plate"><img loading="lazy" src="assets/wpozdgpdlyy-ts-00-24-40.jpg" width="640" height="360" alt="판독 규모, 기존 편집 기법, 부분 재현, 공개 로그에 관한 외부 논평 요약"><figcaption><span class="stamp">24:40</span>영상이 소개한 외부 논평. 작은 게임 판독의 부분 재현과 50회 실행을 거친 언어 모델 편집을 구분해 읽을 필요가 있다.</figcaption></figure>
+          </div>
+          <div class="aside"><strong>가중치 판독의 실패 사례도 있다.</strong> 사용자의 틀린 말에 동조하는 아첨 모델을 가중치만으로 식별하려 한 네 번의 시도는 모두 실패했다. 자막에 따르면 입력에 대한 어텐션 계산을 허용한 뒤에야 잘못된 대목에 집중하는 패턴을 찾았다. GSM8K 등 다른 평가에서도 Qwen 점수가 올랐다는 설명 역시 자막에만 있다.</div>
+        </section>
+
+        <section class="section" id="memory" aria-labelledby="memory-title">
+          <span class="label">게스트 실험 · 삼국지 지식 주입</span>
+          <h2 id="memory-title">문제를 바꿔 물으면 무엇이 남을까?</h2>
+          <div class="prose">
+            <p>게스트는 Qwen3.5-0.8B에 삼국지 지식을 써넣고 직접 만든 200문제로 평가했다. 원문의 정답률은 3%에서 Fable 약 95%, Astra 100%로 상승했다. 표현을 바꾼 문항에서는 4%에서 40%로 올랐다. 새 표현에도 편집 효과가 일부 이어졌지만, 원문에서 보인 성적과는 차이가 컸다.</p>
+            <p>결과 페이지의 지도에서 Claude Fable 5.2는 19층 MLP 뉴런 614개, GPT-6 Astra는 마지막 23층 뉴런 456개를 재배선했다. 뉴런 하나에는 여러 연결값이 딸려 있다. 자막에서 언급한 변경량 약 491만 개는 값의 개수다.</p>
+          </div>
+          <div class="plates">
+            <figure class="plate"><img loading="lazy" src="assets/wpozdgpdlyy-ts-00-26-16.jpg" width="640" height="360" alt="AI Frontier 페이지에서 Fable과 Astra가 편집한 Qwen의 층과 뉴런을 표시한 지도"><figcaption><span class="stamp">26:16</span>탑 하나는 모델 하나, 판 한 장은 한 층이다. 색 막대가 각 편집자가 선택한 뉴런을 표시한다.</figcaption></figure>
+            <figure class="plate"><img loading="lazy" src="assets/wpozdgpdlyy-ts-00-27-37.jpg" width="640" height="360" alt="삼국지 지식 편집 전후에 일반 질문의 응답을 비교하는 화면"><figcaption><span class="stamp">27:37</span>크레타 관광객 수 같은 일반 질문에서도 응답이 일부 달라졌다. 편집의 여파는 삼국지 문항 밖에도 남았다.</figcaption></figure>
+          </div>
+          <h3>Fable의 일곱 번 시도에서 달라진 것</h3>
+          <p class="prose">처음에는 행렬 전체를 바꾸고 보존할 질문을 지정했다. 보호 범위를 넓히면 주입률이 무너졌고, 보호 강도를 낮추면 일반 상식 점수가 떨어졌다. 두 성적을 함께 올린 변화는 덜 쓰이는 뉴런을 질문 감지기로 전환한 다섯 번째 시도였다.</p>
+          <div class="tablebox" role="region" aria-label="Fable의 지식 주입과 일반 상식 점수" tabindex="0">
+            <table><caption>Fable 5.2 · 시도별 삼국지 주입과 일반 상식 평가</caption>
+              <thead><tr><th scope="col">시도</th><th scope="col">편집 방법</th><th scope="col" class="num">주입</th><th scope="col" class="num">일반 상식</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">1차</th><td>19층 MLP 출력 행렬을 최소제곱으로 덮어쓰기</td><td class="num">93%</td><td class="num">7.5%</td></tr>
+                <tr><th scope="row">2차</th><td>일반 질문 107개를 보호 대상으로 지정</td><td class="num">93.5%</td><td class="num">5%</td></tr>
+                <tr><th scope="row">3차</th><td>보호 범위를 약 1,600개로 확대</td><td class="num">6%</td><td class="num">27.5%</td></tr>
+                <tr><th scope="row">4차</th><td>보호 강도를 100분의 1로 낮춤</td><td class="num">78%</td><td class="num">15%</td></tr>
+                <tr><th scope="row">5차</th><td>저활용 뉴런 614개를 기억 소자로 재배선</td><td class="num">94.5%</td><td class="num">27.5%</td></tr>
+                <tr><th scope="row">6차</th><td>기억 소자를 네 층에 분산</td><td class="num">74.5%</td><td class="num">27.5%</td></tr>
+                <tr class="best"><th scope="row">7차</th><td>한 층에 모으고 비운 뉴런의 기존 역할을 나머지 뉴런에 분담</td><td class="num"><strong>94%</strong></td><td class="num"><strong>30%</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <figure class="plate wide"><img loading="lazy" src="assets/wpozdgpdlyy-ts-00-29-56.jpg" width="640" height="360" alt="Fable의 일곱 편집 시도와 주입·일반 상식 점수를 나란히 놓은 결과표"><figcaption><span class="stamp">29:56</span>영상 요약에서는 Fable의 주입률을 약 95%로 소개하며, 시도별 표의 최종값은 94%다. 일반 상식 30%는 게스트 평가의 점수로, 전체 지식 중 보존된 비율을 뜻하지 않는다.</figcaption></figure>
+        </section>
+
+        <section class="section" id="style" aria-labelledby="style-title">
+          <span class="label">게스트 실험 · 이미지 모델의 화풍 편집</span>
+          <h2 id="style-title">황소 그림 옆에 프롬프트 대조군을 놓은 이유</h2>
+          <div class="prose">
+            <p>게스트는 이중섭 작품 여섯 점을 참조해 이미지 모델의 화풍을 편집했다. 편집자는 생성 결과를 계속 보며 다음 층을 골랐다. 같은 주제를 기본 모델, 작가 이름을 넣은 프롬프트, 화풍을 풀어 쓴 프롬프트로도 그렸다. 마지막 대조군 덕분에 그림에서 읽어 낸 정보를 글로 전달하는 것만으로 어디까지 가능한지 비교할 수 있었다.</p>
+            <p>화면상 모델에는 트랜스포머 블록 50개가 있었고 가중치의 95.8%가 4비트였다. 이 실험에서는 크기 2%의 편집이 재양자화할 때 사라졌고, 20% 편집도 변경분의 40%가 깎였다. 실제 수정은 양자화되지 않은 텍스트 투영·변조층·VAE에 집중됐다.</p>
+          </div>
+          <div class="plates">
+            <figure class="plate"><img loading="lazy" src="assets/wpozdgpdlyy-ts-00-31-09.jpg" width="640" height="360" alt="이미지 모델 층별 지도와 참조 작품 여섯 점, 편집 후 황소 이미지"><figcaption><span class="stamp">31:09</span>RTX 5090 한 장에서 추론한 실험. 모델명은 자동 자막에 ‘미니맥스 H3’로 들리며 정확한 표기는 미확인이다.</figcaption></figure>
+            <figure class="plate"><img loading="lazy" src="assets/wpozdgpdlyy-ts-00-31-49.jpg" width="640" height="360" alt="재양자화와 단계별 유사도 변동 등 이미지 편집 관찰을 요약한 화면"><figcaption><span class="stamp">31:49</span>Astra의 참조 작품 유사도는 15단계 0.794, 최종 20단계 0.776이었다. 편집 단계를 더 쌓아도 점수가 계속 오르지는 않았다.</figcaption></figure>
+          </div>
+          <figure class="plate wide"><img loading="lazy" src="assets/wpozdgpdlyy-ts-00-32-24.jpg" width="640" height="360" alt="황소, 싸우는 수탉, 길을 걷는 가족을 기본 모델·이름 프롬프트·묘사 프롬프트·Fable 편집·Astra 편집으로 비교한 격자"><figcaption><span class="stamp">32:24</span>같은 행을 왼쪽에서 오른쪽으로 읽으면 한 주제의 기본 출력, 이름 프롬프트, 묘사 프롬프트, Fable 편집, Astra 편집을 비교할 수 있다.</figcaption></figure>
+          <div class="prose">
+            <p class="lead">진행자들은 Astra 결과에서 동양화 느낌을, Fable 결과에서 유화 느낌을 더 강하게 받았으며 목표 화풍에는 충분히 이르지 못했다고 평했다. 게스트의 해석으로는 화풍 단어를 가중치에 넣은 편집은 프롬프트와 비슷하거나 뒤처졌고, 말로 옮기기 어려운 참조 그림의 통계를 반영했을 때 이점이 나타났다.</p>
+            <p>보고된 이미지 실험 시간은 세션당 27~56분, Fable API 비용은 세션당 6~9달러다. 삼국지 실험에서 언급한 월 200달러는 사용한 요금제 금액이다.</p>
+          </div>
+        </section>
+
+        <section class="section" id="implications" aria-labelledby="implications-title">
+          <span class="label">시사점</span>
+          <h2 id="implications-title">편집의 가치는 실패 원인을 얼마나 좁혔는지에서 드러난다</h2>
+          <div class="prose">
+            <p>패들이 다니는 행, 후진이 빠진 운전 정책, 같은 말을 되풀이하다 끝나는 답안에는 공통점이 있다. 관측한 흔적을 구체적인 동작과 연결할 수 있다. 이때는 편집 전후의 차이도 검사하기 쉽다. 차가 경사로를 넘었는지, 답안이 토큰 한도 전에 끝났는지 직접 셀 수 있기 때문이다.</p>
+            <p>영상에서 연구 자동화의 가능성을 본 지점도 여기에 있다. 범용 언어 모델이 가설을 세우고 측정 방법을 정한 뒤 가중치를 바꾸고 결과를 평가했다. 진행자들은 온디바이스 소형 모델의 국소 수정과 지속 학습을 후속 응용 가능성으로 꼽았다. 게스트 실험에서 드러난 일반화와 망각은 그런 응용에 남은 과제다.</p>
+          </div>
+          <h3>독립 재현이 닿은 범위</h3>
+          <div class="prose">
+            <ul class="notes">
+              <li>영상이 인용한 Matthew Honnibal의 논평은 숫자를 직접 읽는 작은 망의 실험과 Qwen을 50회 실행한 실험의 조건 차이를 지적한다. 후자는 숙련된 엔지니어의 진단 과정과도 닮았다.</li>
+              <li>Hacker News에서 제기된 비판은 10회 예산의 편집이 기존의 방향 제거 기법(directional ablation)과 같은 형태라는 점이다.</li>
+              <li>영상에 따르면 Simon Willison은 로컬 Qwen 27B로 게임 네 개 중 세 개를 식별했고 Freeway를 놓쳤다. 다른 모델로 확인된 범위는 게임 판독의 일부다. 정확한 모델 버전은 화면에서 읽기 어렵다.</li>
+            </ul>
+            <p>다음 가중치 편집 결과를 읽을 때는 세 가지를 함께 보면 좋다. <strong>편집자가 무엇을 볼 수 있었는가? 같은 조건의 대조군은 얼마나 달라졌는가? 질문을 바꾼 뒤에도 개선이 남았는가?</strong> 이 질문들이 있어야 7/7, 48.1%, 100%가 각각 무엇을 측정한 숫자인지 보인다.</p>
+          </div>
+          <aside class="share" aria-label="공유용 요약">
+            <h3>공유용 한 문장</h3>
+            <p>작은 게임망에서는 가중치에 남은 패들의 자리를 읽었고, Qwen에서는 50회 실행으로 반복 결함을 찾아 수학 점수를 7.9%에서 48.1%로 끌어올렸다.</p>
+          </aside>
+        </section>
+
+        <section class="section" id="sources" aria-labelledby="sources-title">
+          <span class="label">출처 노트</span>
+          <h2 id="sources-title">무엇을 보고 기록했나</h2>
+          <div class="prose">
+            <h3>연구, 영상, 게스트 실험의 관계</h3>
+            <p>이 글은 sudoremove의 35분 20초 영상에 대한 제공 노트를 재구성했다. 영상은 MIT CSAIL의 <cite lang="en">Sparks of Weight-Space Programming</cite>을 동료 심사 전 연구 블로그로 소개하며 프롬프트·응답·코드·평가 로그를 공개했다고 설명한다. 연구 수치는 진행자가 옮긴 슬라이드를 따랐고 원 블로그 및 로그와의 독립 대조는 이뤄지지 않았다. 삼국지·이미지 편집은 영상 후반 ‘AI Frontier’ 화면에서 소개한 게스트의 별도 실험이다. <a>전체 영상 보기</a></p>
+            <h3>자막과 화면의 근거 수준</h3>
+            <p>노트 작성자는 한국어 자동 생성 자막 약 4.6만 자, 영상 메타데이터·설명란·챕터, 원본 영상에서 추출한 프레임 24장을 사용했다. 수동 자막은 없었으며 고유명사는 가능한 경우 화면 철자를 따랐다. 바둑의 반복 개선, 아첨 모델의 어텐션 검사, Qwen의 다른 벤치마크 상승은 해당 비교 화면 없이 자막에 의존한다. 작은 망에서의 ‘계산 금지’ 역시 프롬프트 조건이어서 모델 내부의 계산 과정까지 확인하지는 못했다.</p>
+            <h3>프레임 선정과 판독 한계</h3>
+            <p>노트에 기록된 절차는 ffmpeg 장면 전환 검출(임계값 0.25)로 전환점 246개를 찾고, 안정 구간과 챕터 위치를 이용해 후보 250개를 고르는 것으로 시작했다. 휘도·표준편차·32×18 축소 영상 차분으로 걸러 낸 238장을 육안 검토했다. 이어 2,120초 전 구간을 1초 간격으로 조사해 슬라이드 구간 29개와 페이지 43개를 탐지했다. 로딩·커서 이동 등 중복 변형을 정리하고 32:24 비교 격자를 수동으로 보완해 최종 24장을 수록했다.</p>
+            <p>1080p·720p 다운로드는 HTTP 403으로 차단됐다. 실제 판독 자료는 Android 플레이어 클라이언트로 확보한 640×360 영상(약 87MB)이다. 제목·큰 숫자·표는 읽을 수 있었으나 작은 출처 줄, 3D 측면 패널, 채팅은 부분 판독만 가능했다. 원 블로그 저자명과 로그 저장소 주소는 확정할 수 없어 기재하지 않았다.</p>
+          </div>
+        </section>
+      </main>
+      <footer class="end"><span>MIT Weight-Space Programming 해설</span><a href="#top">기사 처음으로 ↑</a></footer>
+    </div>
+  </article>
+</body>
+</html>

@@ -1,7 +1,25 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-20T12:09:42.298Z",
+  "updatedAt": "2026-11-21T12:11:55.189Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-mit-weight-space-programming-%ED%95%B4%EC%84%A4-%EC%9A%94%EC%95%BD/",
+      "excerpt": "MIT Weight Space Programming 해설 영상 정보 채널 : sudoremove (@sudoremove) 게시일 : 2026 11 19 길이 : 35분 20초 (2,120초) 링크 : https://www.youtube.com/watch?v=wpozdGPdlYY <div style=\"position: relative; width: 100%; padding bottom: 56.25%; height: 0; over",
+      "shortId": "1czn4gc",
+      "slug": "yt-mit-weight-space-programming-해설-요약",
+      "sourcePath": "02_research/AI/Sudoremove/yt_MIT Weight Space Programming 해설_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료",
+        "LLM",
+        "해석가능성",
+        "가중치편집"
+      ],
+      "title": "MIT Weight Space Programming 해설",
+      "updatedAt": "2026-11-21T12:11:55.189Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/1czn4gc/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-%EB%A1%9C%EB%B4%87-%EC%97%B0%EA%B5%AC%EC%9E%90%EB%93%A4%EC%9D%B4-astra%EB%A5%BC-%EB%B0%9B%EC%95%84%EB%93%A4%EC%9D%B4%EB%8A%94-%EB%B2%95-corl-2026-%EC%9A%94%EC%95%BD/",
