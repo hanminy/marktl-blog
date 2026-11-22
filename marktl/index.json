@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-21T12:11:55.189Z",
+  "updatedAt": "2026-11-22T12:11:00.297Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-rag%EB%8A%94-%EB%B2%A1%ED%84%B0-db-4%EB%B9%84%ED%8A%B8-%EB%AF%B8%EB%A7%8C%EC%9D%80-%EC%93%B0%EB%A0%88%EA%B8%B0-2026%EB%85%84-ai-%EA%B0%9C%EB%B0%9C-%EC%83%81%EC%8B%9D-ox-%EC%9A%94%EC%95%BD/",
+      "excerpt": "RAG는 벡터 DB? 4비트 미만은 쓰레기? 2026년 AI 개발 상식 OX 영상 정보 채널 : sudoremove (@sudoremove) 게시일 : 2026 11 20 길이 : 37분 54초 (2,274초) 링크 : https://www.youtube.com/watch?v=4oFjRQdPvjo <div style=\"position: relative; width: 100%; padding bottom: 56.25%; heig",
+      "shortId": "v4o1yp",
+      "slug": "yt-rag는-벡터-db-4비트-미만은-쓰레기-2026년-ai-개발-상식-ox-요약",
+      "sourcePath": "02_research/AI/Sudoremove/yt_RAG는 벡터 DB, 4비트 미만은 쓰레기, 2026년 AI 개발 상식 OX_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료",
+        "LLM",
+        "RAG",
+        "양자화",
+        "멀티에이전트"
+      ],
+      "title": "RAG는 벡터 DB? 4비트 미만은 쓰레기? 2026년 AI 개발 상식 OX",
+      "updatedAt": "2026-11-22T12:11:00.297Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/v4o1yp/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-mit-weight-space-programming-%ED%95%B4%EC%84%A4-%EC%9A%94%EC%95%BD/",
