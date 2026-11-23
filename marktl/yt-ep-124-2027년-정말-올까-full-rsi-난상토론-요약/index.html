@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>연구가 10배 빨라지면, 다음 질문도 AI가 고를까? | 2027년 Full RSI 논쟁</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      --paper: #f8f5ed;
+      --ink: #182820;
+      --muted: #505e53;
+      --green: #184738;
+      --accent: #995031;
+      --rule: #c9cdbf;
+      --wash: #e8ede2;
+      --serif: "Noto Serif KR", "Nanum Myeongjo", "AppleMyungjo", "Batang", serif;
+      --sans: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-padding-top: 1.5rem; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font: 1.25rem/1.85 var(--sans); word-break: keep-all; overflow-wrap: anywhere; }
+    a { color: var(--green); text-underline-offset: .23em; text-decoration-thickness: 1px; }
+    a:hover { text-decoration-thickness: 2px; }
+    a:focus-visible { outline: 3px solid #b45d31; outline-offset: 4px; }
+    .skip { position: absolute; left: 1rem; top: -6rem; z-index: 2; padding: .5rem 1rem; background: white; }
+    .skip:focus { top: .5rem; }
+    .wrap { width: min(76rem, 90%); margin-inline: auto; }
+    .mast { border-bottom: 1px solid var(--rule); }
+    .mast .wrap, .meta, .foot { display: flex; align-items: baseline; flex-wrap: wrap; gap: .4rem 1.6rem; }
+    .mast .wrap, .foot { justify-content: space-between; padding-block: 1rem; }
+    .mast b { font-family: var(--serif); }
+    .tag, .kicker { font: 700 .82rem/1.6 var(--sans); letter-spacing: .1em; }
+    .kicker { color: var(--accent); margin: 0 0 1rem; }
+    .hero { padding-block: clamp(3.8rem, 9vw, 8rem) 3rem; border-bottom: 3px solid var(--green); }
+    h1, h2, h3, blockquote { font-family: var(--serif); text-wrap: balance; }
+    h1 { margin: 0; max-width: 17em; font-size: clamp(2.6rem, 6.6vw, 5.8rem); letter-spacing: -.065em; line-height: 1.14; }
+    h1 span { display: block; color: var(--green); }
+    .deck { max-width: 40em; margin: 1.65rem 0 2rem; font-size: clamp(1.3rem, 2.1vw, 1.65rem); line-height: 1.65; }
+    .meta, figcaption, .note, .foot { color: var(--muted); font-size: 1rem; line-height: 1.65; }
+    .layout { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: clamp(2rem, 5vw, 5rem); }
+    nav { align-self: start; position: sticky; top: 1.5rem; padding-block: 2.5rem; }
+    nav p { margin: 0 0 .7rem; }
+    nav a { display: block; border-top: 1px solid var(--rule); padding: .5rem 0; font-size: 1rem; text-decoration: none; }
+    nav a:hover { text-decoration: underline; }
+    article { min-width: 0; }
+    section { padding-block: clamp(2.6rem, 5vw, 4.6rem); border-bottom: 1px solid var(--rule); }
+    h2 { margin: 0 0 1.4rem; font-size: clamp(1.95rem, 3.6vw, 3.1rem); line-height: 1.27; letter-spacing: -.05em; }
+    h3 { margin: 2.2rem 0 .7rem; font-size: 1.5rem; line-height: 1.45; }
+    p { max-width: 38em; margin: .85rem 0; }
+    .findings { margin: 1.7rem 0 0; padding: 1.35rem 1.6rem 1.35rem 2.75rem; background: var(--wash); border-top: 3px solid var(--green); }
+    li + li { margin-top: .65rem; }
+    figure { margin: 1.65rem 0 0; }
+    figure img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: contain; background: #202922; border: 1px solid var(--rule); }
+    figcaption { padding: .65rem 0 .3rem; }
+    .stamp { display: inline-block; margin-right: .45em; color: var(--green); font: 700 .9rem/1.6 ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+    .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1.3rem; align-items: start; }
+    blockquote { margin: 2rem 0; padding: .25rem 0 .25rem 1.3rem; border-left: 4px solid var(--accent); color: var(--green); font-size: clamp(1.5rem, 2.8vw, 2.1rem); line-height: 1.55; }
+    blockquote p { margin: 0; }
+    blockquote footer { margin-top: .5rem; font: 1rem/1.6 var(--sans); color: var(--muted); }
+    table { border-collapse: collapse; width: 100%; margin: 1.7rem 0 .65rem; font-size: 1.08rem; line-height: 1.6; }
+    caption { text-align: left; font-weight: 700; padding-bottom: .65rem; }
+    th, td { text-align: left; vertical-align: top; padding: .85rem .7rem; border-bottom: 1px solid var(--rule); }
+    thead { background: var(--green); color: white; }
+    tbody th { color: var(--green); }
+    .share { margin-top: 2rem; padding: clamp(1.4rem, 4vw, 2.6rem); background: var(--green); color: #fff; }
+    .share h3 { margin: 0 0 .7rem; color: #d8e8cb; font: 700 1rem/1.6 var(--sans); }
+    .share p { font: 1.45rem/1.7 var(--serif); margin: 0; }
+    dl { margin: 1rem 0 0; }
+    dt { font-weight: 700; margin-top: 1.4rem; }
+    dd { margin: .3rem 0 0; max-width: 38em; }
+    @media (max-width: 850px) {
+      .layout { display: block; }
+      nav { position: static; display: flex; flex-wrap: wrap; gap: .4rem 1rem; padding: 1.1rem 0; border-bottom: 1px solid var(--rule); }
+      nav p { width: 100%; margin: 0; }
+      nav a { border: 0; padding: .15rem 0; text-decoration: underline; }
+    }
+    @media (max-width: 620px) {
+      .pair { grid-template-columns: 1fr; gap: 0; }
+      .wrap { width: 91%; }
+      th, td { padding: .65rem .35rem; }
+      .meta { gap: .4rem 1rem; }
+    }
+    @media print {
+      body { background: white; color: black; font-size: 12pt; }
+      .wrap { width: 100%; }
+      .layout { display: block; }
+      nav, .skip, .foot { display: none; }
+      .hero, section { padding-block: 1.5rem; }
+      h2, h3, caption { break-after: avoid; }
+      figure, tr, blockquote { break-inside: avoid; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="EP 124. 2027년, 정말 올까? Full RSI 난상토론">
+<meta property="og:description" content="EP 124. 2027년, 정말 올까? Full RSI 난상토론 영상 정보 채널 : AI Frontier Korea (노정석) 게시일 : 2026 11 22 길이 : 1시간 25분 8초 (5,108초) 출연 : 노정석, 최승준, 박종현, 이진원, 김성현, 장민석 / 편집: 김유진 녹화 시점 : 2026년 11월 21일(토) 아침 (도입부 발언 기준) 링크 : https://www.youtube.com/watch?v=woUuAH">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/6wexay/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/6wexay/assets/wouuahlkm7g-ts-00-00-30.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="EP 124. 2027년, 정말 올까? Full RSI 난상토론">
+<meta name="twitter:description" content="EP 124. 2027년, 정말 올까? Full RSI 난상토론 영상 정보 채널 : AI Frontier Korea (노정석) 게시일 : 2026 11 22 길이 : 1시간 25분 8초 (5,108초) 출연 : 노정석, 최승준, 박종현, 이진원, 김성현, 장민석 / 편집: 김유진 녹화 시점 : 2026년 11월 21일(토) 아침 (도입부 발언 기준) 링크 : https://www.youtube.com/watch?v=woUuAH">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/6wexay/assets/wouuahlkm7g-ts-00-00-30.jpg">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-ep-124-2027%EB%85%84-%EC%A0%95%EB%A7%90-%EC%98%AC%EA%B9%8C-full-rsi-%EB%82%9C%EC%83%81%ED%86%A0%EB%A1%A0-%EC%9A%94%EC%95%BD/">
+</head>
+<body id="top">
+  <a class="skip" href="#abstract">본문으로 바로가기</a>
+  <header class="mast">
+    <div class="wrap"><b>AI Frontier Korea 대담 읽기</b><span class="tag">연구 리포트 · EP 124</span></div>
+  </header>
+  <main class="wrap">
+    <header class="hero">
+      <p class="kicker">2027년 전망 / 재귀적 자기 개선</p>
+      <h1>연구가 10배 빨라지면,<span>다음 질문도 AI가 고를까?</span></h1>
+      <p class="deck">한 연구자는 실험 코드를 쓰고 결과를 모으는 시간이 거의 사라졌다고 했다. 다른 연구자는 모델에 무엇이 좋은 결과인지 가르칠 환경을 여전히 손으로 짓고 있었다. 2027년 ‘Full RSI’의 가능성을 가르는 거리가 두 사람의 일과 사이에 있다.</p>
+      <div class="meta"><span>원본 영상 게시 <time datetime="2026-11-22">2026. 11. 22.</time></span><span>출연자 6명 · 1시간 25분 8초</span><a>원본 대담 보기 ↗</a></div>
+    </header>
+
+    <div class="layout">
+      <nav aria-label="기사 목차">
+        <p class="tag">이 글의 순서</p>
+        <a href="#abstract">초록과 핵심 발견</a>
+        <a href="#taste">연구자의 안목</a>
+        <a href="#horizon">38시간의 의미</a>
+        <a href="#reward">보상과 검증</a>
+        <a href="#hardware">칩 설계의 시간</a>
+        <a href="#demand">수요와 독점</a>
+        <a href="#outlook">2027년의 관찰 기준</a>
+        <a href="#sources">출처와 방법</a>
+      </nav>
+
+      <article aria-label="2027년 Full RSI 대담 분석">
+        <section id="abstract">
+          <p class="kicker">초록</p>
+          <h2>실험을 맡긴 뒤, 어디까지 물러날 수 있을까</h2>
+          <p>재귀적 자기 개선(RSI, Recursive Self-Improvement)은 AI가 다음 AI를 만드는 연구에 기여하고, 그렇게 개선된 모델이 다시 연구 능력을 끌어올리는 과정을 뜻한다. 이 대담에서 <strong>Full RSI</strong>는 연구자가 매번 다음 가설과 성공 기준을 건네지 않아도 그 순환이 이어지는 경우를 가리킨다.</p>
+          <p>11월 21일 아침, 여섯 출연자는 연구실에서 이미 줄어든 시간과 아직 줄이기 어려운 시간을 비교했다. 1~2년 안에 일부 연구 과정이 스스로 돌아갈 수 있다는 기대는 여러 사람에게서 나왔다. 연구 전반의 완전 자동화나 현실의 여러 일을 수행하는 범용 인공지능(AGI)에 대해서는 전망이 갈렸다.</p>
+          <h3>핵심 발견</h3>
+          <ul class="findings">
+            <li><strong>먼저 줄어든 시간은 구현 시간.</strong> 사전학습 연구자 김성현의 ‘최소 10배’는 실험 외 업무에 대한 개인 체감이다. 어떤 가설에 비싼 연산을 쓸지는 여전히 연구자가 고른다.</li>
+            <li><strong>다음 병목은 검증 환경.</strong> 모델이 새 학습 문제를 만들더라도, 그 문제에서 높은 점수를 얻는 행동이 실제 목적에 맞는지 확인해야 한다.</li>
+            <li><strong>자동화의 속도는 결과를 기다리는 시간에 달려 있다.</strong> 칩 내부 연산기의 설계 후보는 빠르게 비교할 수 있다. 완성된 칩을 받아 고객이 써 보기까지는 이진원의 설명으로 3~4년이 걸린다.</li>
+          </ul>
+          <figure>
+            <img src="assets/wouuahlkm7g-ts-00-00-30.jpg" alt="최승준의 노션 페이지에 ‘Full RSI가 온다면?’이라는 제목과 토론 자료 두 건이 보인다.">
+            <figcaption><a class="stamp">00:00:30</a> 토론의 출발점. 최승준이 준비한 페이지에 a16z 인터뷰와 OpenAI의 모델 발표가 나란히 놓였다.</figcaption>
+          </figure>
+        </section>
+
+        <section id="taste">
+          <p class="kicker">연구 현장 · 사전학습</p>
+          <h2>실험 대기열이 비면 무엇을 넣을 것인가</h2>
+          <p>김성현에게 코딩 에이전트가 가져온 가장 큰 변화는 한 사람이 동시에 다룰 수 있는 실험의 수였다. 코드를 쓰고 결과를 수집·분석하는 시간은 체감상 거의 사라졌다. 연산 장비에서 실험이 돌아가는 시간은 그대로 든다. 이제 비용이 큰 결정은 여러 아이디어 중 <strong>어느 것에 다음 실험 기회를 줄지</strong> 고르는 일이다.</p>
+          <figure>
+            <img loading="lazy" src="assets/wouuahlkm7g-ts-00-05-30.jpg" alt="화상 대담에 참여한 여섯 명과 사전학습 연구 경험을 설명하는 김성현의 화면.">
+            <figcaption><a class="stamp">00:05:30</a> 김성현은 모델이 아이디어의 빈칸을 먼저 채울 때도 있지만, 그 제안이 들어맞는 비율은 체감상 절반 정도라고 설명했다.</figcaption>
+          </figure>
+          <p>박종현이 ‘연구 취향(research taste)’을 <strong>안목</strong>이라고 부른 이유가 여기에 있다. 지식의 끝에서는 실패 한 번을 보고 버릴 가설과 고쳐 볼 가설을 가려야 한다. 그는 모델이 적은 실패 사례에서 배우는 효율과 지속 학습 능력에 의문을 제기했다. 김성현은 반대 방향의 가능성도 소개했다. 초기 단계의 RSI가 먼저 일어나야 지속 학습 연구도 풀릴 수 있다는 견해다.</p>
+          <h3>능력 곡선과 수학 증명이 던진 서로 다른 질문</h3>
+          <div class="pair">
+            <figure>
+              <img loading="lazy" src="assets/wouuahlkm7g-ts-00-01-50.jpg" alt="a16z 영상에서 프론티어 모델의 능력 상승을 나타내는 곡선이 소개된다.">
+              <figcaption><span class="stamp">00:01:50</span> a16z 영상이 소개한 프론티어 모델의 능력 곡선.</figcaption>
+            </figure>
+            <figure>
+              <img loading="lazy" src="assets/wouuahlkm7g-ts-00-01-56.jpg" alt="같은 곡선에 연구 자동화와 물음표가 붙은 초지능이 손글씨로 표시돼 있다.">
+              <figcaption><span class="stamp">00:01:56</span> 2027년 이후의 가파른 경사에는 ‘연구 자동화’라는 전제가 붙는다. 오른쪽 끝의 초지능에는 물음표가 남아 있다.</figcaption>
+            </figure>
+          </div>
+          <p>출연자들이 가장 오래 붙든 사례는 수학이었다. 최승준은 기존 개념을 예상 밖의 방식으로 연결하는 능력과, 수학자가 연구할 새 개념이나 공리계를 제안하는 능력을 구분했다. 이진원이 보기에 전자의 진전만으로는 <em>무엇을 문제로 삼을지</em> 정하는 능력까지 판단하기 어렵다.</p>
+          <figure>
+            <img loading="lazy" src="assets/wouuahlkm7g-ts-00-02-45.jpg" alt="오일러 방정식, 나비에–스토크스 방정식, 일반화된 리만 가설을 함께 다룬 테렌스 타오의 블로그 화면.">
+            <figcaption><a class="stamp">00:02:45</a> 화면에 소개된 글은 오일러·나비에–스토크스 방정식의 유한 시간 특이점에 관한 결과와 일반화된 리만 가설에 관한 주장을 구분한다.</figcaption>
+          </figure>
+          <p>대담 설명에 따르면 앞의 두 결과에는 사람이 읽을 수 있는 증명과 Lean 형식화가 있었고, 일반화된 리만 가설 쪽에는 내부 AI 모델로 만들었다는 Lean 증명이 제시됐다. 이를 사람이 읽는 형태로 풀면 <strong>25만 페이지</strong>라는 것이 최승준의 전언이다. 원 노트는 증명 파일이나 수학계의 검증 결과를 따로 확인하지 않았다. 여기서 읽을 수 있는 논점은 증명의 성립 여부보다, 기계가 다룰 수 있는 산출물을 사람이 이해하고 평가하는 데 드는 시간이다.</p>
+        </section>
+
+        <section id="horizon">
+          <p class="kicker">근거 읽기 · 측정과 외삽</p>
+          <h2>그래프의 ‘38시간’은 어떻게 나왔나</h2>
+          <p>18분대에 등장한 그래프의 세로축은 모델이 <strong>80% 확률로 성공하는 코딩·머신러닝 연구 과제의 길이</strong>다. 과제 길이는 사람이 수행할 때 걸리는 시간을 기준으로 읽는다. 약 38시간이라는 표시는 모델이 연구실에서 그 시간 동안 자율적으로 일하는 모습을 관찰해 얻은 기록과는 측정 방식이 다르다.</p>
+          <figure>
+            <img loading="lazy" src="assets/wouuahlkm7g-ts-00-18-20.jpg" alt="80% 성공 기준 과제 길이 그래프. 3.1시간 측정값, 약 38시간 추정값과 기간별 추세선이 함께 표시돼 있다.">
+            <figcaption><a class="stamp">00:18:20</a> 최승준은 화면의 그래프가 METR 평가 자료를 이용한 제3자의 재구성이라고 명시했다. 점선은 외삽 구간이다.</figcaption>
+          </figure>
+          <table>
+            <caption>같은 그림에 담긴 세 종류의 수치</caption>
+            <thead><tr><th scope="col">표시</th><th scope="col">수치</th><th scope="col">산출 근거</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Claude Mythos Preview 초기판</th><td>3.1시간</td><td>그래프에 측정값으로 표기</td></tr>
+              <tr><th scope="row">Anthropic 내부 ‘Model 4’</th><td>약 38시간</td><td>AECI 점수에서 추출한 50% 성공 기준 시간을 6.3으로 나눠 80% 기준으로 환산</td></tr>
+              <tr><th scope="row">과제 길이의 배가 주기</th><td>7개월 → 3.3개월 → 1.7개월</td><td>2019~2025년, 2024~2026년 초, Opus 4.5 이후 순서. 마지막 구간은 추정값 포함</td></tr>
+            </tbody>
+          </table>
+          <p>연구 자동화 시점을 논하려면 이 그래프에서 두 번 더 나아가야 한다. 최근 구간의 기울기가 유지돼야 하고, 길어진 과제를 수행하는 능력이 다음 연구 과제 자체를 고르는 능력으로 이어져야 한다. 대담에서 2027년을 둘러싼 의견이 갈린 지점이다.</p>
+          <h3>평가를 마치기 전에 다음 모델이 나온다면</h3>
+          <p>최승준이 소개한 반대 운동은 자기 개선 주기가 짧아질 때 사람이 모델을 평가하고 정렬할 시간도 함께 줄어든다는 우려에서 출발했다. 그가 전한 집회 규모는 Anthropic 본사 앞 약 100명, 나스닥 앞 약 30명이다. 두 화면은 주최 측이 무엇에 반대했는지 보여 준다.</p>
+          <div class="pair">
+            <figure>
+              <img loading="lazy" src="assets/wouuahlkm7g-ts-00-17-15.jpg" alt="The MisAnthropic Statement와 Ban RSI 집회 안내 카드가 나란히 있는 자료 화면.">
+              <figcaption><span class="stamp">00:17:15</span> 성명과 집회 공지가 반대 대상으로 지목한 것은 AI를 이용한 다음 세대 AI의 개발이다.</figcaption>
+            </figure>
+            <figure>
+              <img loading="lazy" src="assets/wouuahlkm7g-ts-00-17-40.jpg" alt="흑백 시위 사진 위에 THEIR IPO. OUR LIVES. 문구가 적힌 Ban RSI 집회 안내 페이지.">
+              <figcaption><span class="stamp">00:17:40</span> 상장일에 맞춘 샌프란시스코 집회 안내. 사진 속 문구는 주최 측의 주장이다.</figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <section id="reward">
+          <p class="kicker">연구 현장 · 사후학습</p>
+          <h2>AI가 문제를 만들면, 그 문제의 빈틈은 누가 찾을까</h2>
+          <p>Gemini 사후학습 경험을 이야기한 장민석에게 강화학습(RL)의 어려움은 보상을 한 줄로 정의한 뒤에 시작된다. 행동과 결과 사이의 시간이 길어지면 어느 선택이 성패에 기여했는지 알아내기 어렵다. 환경에 허점이 있으면 모델은 실제 목적을 달성하지 않고도 점수를 얻는다. 이것이 <strong>보상 해킹(reward hacking)</strong>이다. 여러 작업을 한 모델로 처리할 때는 한 작업을 개선한 훈련이 다른 작업의 성능을 떨어뜨리기도 한다.</p>
+          <div class="pair">
+            <figure>
+              <img loading="lazy" src="assets/wouuahlkm7g-ts-00-26-40.jpg" alt="폴 크리스티아노 인터뷰와 코딩 에이전트에 의한 연구 가속을 다룬 OpenAI 자료 카드.">
+              <figcaption><a class="stamp">00:26:40</a> 연구 가속 자료와 폴 크리스티아노 인터뷰를 함께 놓고 RL의 효과와 실패 조건을 논의했다.</figcaption>
+            </figure>
+            <figure>
+              <img loading="lazy" src="assets/wouuahlkm7g-ts-00-37-45.jpg" alt="발각된 부정행위에 벌점을 주는 훈련의 결과를 논하는 크리스티아노 인터뷰 한국어 번역 화면.">
+              <figcaption><span class="stamp">00:37:45</span> 발견된 부정행위에 벌점을 주면 발각 가능성까지 따지는 행동이 선택될 수 있다는 사고실험. 실제 모델에서 관측했다는 보고는 아니다.</figcaption>
+            </figure>
+          </div>
+          <p>같은 현장을 두고 김성현은 한 발 더 낙관적으로 읽었다. 모델이 학습 환경을 직접 합성해 사람이 일일이 준비할 수 없던 과제까지 검증 대상으로 만들면, 다음 모델의 학습에 기여한 셈이다. 두 견해를 가르는 실험은 구체적이다. <strong>합성 환경에서 오른 점수가 그 환경 밖에서의 성공도 예측하는가?</strong></p>
+          <blockquote><p>“모델이 풀 수 있는 것과 검증할 수 있는 것 사이의 격차”</p><footer>김성현 · 환경 합성이 연구의 일부가 되는 이유를 설명하며, 30분대</footer></blockquote>
+          <p>검증의 경계는 이미 업무에서 드러난다. 노정석은 모델이 거듭 확인했다는 답을 믿고 전략을 실행했지만, 판단에 필요한 가이드는 해당 기관 내부의 500쪽짜리 PDF에 있었다고 했다. 답변을 반복해서 검토해도 접근하지 못한 문서는 나타나지 않는다. 필드로봇이나 건설 자동화에도 같은 질문을 적용할 수 있다. 시뮬레이션과 디지털 트윈은 반복 실험 비용을 줄여 준다. 현장 승인자는 그 환경이 어떤 조건을 빠뜨렸는지 판단할 근거가 필요하다.</p>
+        </section>
+
+        <section id="hardware">
+          <p class="kicker">반도체 · 설계와 검증의 시간차</p>
+          <h2>연산기 하나와 칩 한 개는 다른 시계로 움직인다</h2>
+          <figure>
+            <img loading="lazy" src="assets/wouuahlkm7g-ts-00-44-30.jpg" alt="장민석이 자리를 뜬 뒤 다섯 출연자가 메모리 수급과 반도체 설계를 논의한다.">
+            <figcaption><a class="stamp">00:44:30</a> 노정석이 DRAM 가격을 묻자, 이진원은 설계 자동화의 속도와 공급·투자 주기를 나누어 설명했다.</figcaption>
+          </figure>
+          <p>이진원이 2027년에 예상한 하드웨어 설계의 ‘Claude Code 모먼트’는 연산기 하나에서 시작한다. 후보 설계를 만든 뒤 전력·속도·면적을 비교하면 다음 후보를 고를 수 있다. 한편 첨단 칩은 초기 투자에 수억 달러가 들고 설계에서 고객 인도까지 3~4년이 걸린다는 게 그의 설명이다. 국소적인 최적화가 빨라져도 제조와 고객 평가의 결과를 받는 날짜는 별도로 남는다.</p>
+          <blockquote><p>“loop는 여러 겹이고 위계가 있다.”</p><footer>이진원 · 칩 내부 최적화와 제품 전체의 개발 주기를 구분하며</footer></blockquote>
+          <p>GPU 커널 이식 사례도 이 구분을 잘 보여 준다. 대담에서 소개된 Anthropic의 주장은 NVIDIA에서 AMD로 옮기는 일을 6개월에서 3일로 줄였다는 것이었다. 이진원은 대상이 특정 모델의 <strong>prefill</strong> 단계, 즉 입력을 한꺼번에 처리하는 부분이었다고 짚었다. 토큰을 하나씩 생성하는 <strong>decode</strong> 단계까지 포함한 전체 이식 기간으로 읽으면 성과의 범위가 달라진다.</p>
+          <div class="pair">
+            <figure>
+              <img loading="lazy" src="assets/wouuahlkm7g-ts-00-46-13.jpg" alt="대담에서 상장일 영상으로 소개한 Anthropic 게시물에 회사 로고가 보인다.">
+              <figcaption><span class="stamp">00:46:13</span> 대담에서 상장일 메시지로 소개한 Anthropic 게시물. 영상은 회사 로고로 시작한다.</figcaption>
+            </figure>
+            <figure>
+              <img loading="lazy" src="assets/wouuahlkm7g-ts-00-46-46.jpg" alt="같은 게시물 영상에서 별을 배경으로 지구가 떠 있는 장면.">
+              <figcaption><span class="stamp">00:46:46</span> 같은 영상의 33초 지점. 두 장면은 기업의 대외 메시지를 보여 주며 커널 성능을 측정한 자료와는 용도가 다르다.</figcaption>
+            </figure>
+          </div>
+          <h3>기술 메모 · 모델 내부에서 반복되는 것은 무엇인가</h3>
+          <p>Thinking Machines의 ‘Inkling 2 Mini’에서 <em>loop</em>는 모델 구조를 설명하는 말이다. 공개 페이지의 설명에 따르면 토큰 하나를 처리할 때 가운데 층을 세 번 통과하며 같은 파라미터를 재사용한다. 연구 과정 전체가 스스로 반복된다는 RSI와 구별해 읽을 대목이다.</p>
+          <div class="pair">
+            <figure>
+              <img loading="lazy" src="assets/wouuahlkm7g-ts-00-49-30.jpg" alt="Thinking Machines의 Introducing Inkling 2 Mini 페이지와 고리 모양 로고.">
+              <figcaption><span class="stamp">00:49:30</span> Inkling 2 Mini 소개 페이지를 열면서 논의가 모델 구조로 옮겨갔다.</figcaption>
+            </figure>
+            <figure>
+              <img loading="lazy" src="assets/wouuahlkm7g-ts-00-51-00.jpg" alt="토큰마다 가운데 층을 세 번 반복한다고 설명하는 Inkling 2 Mini 본문.">
+              <figcaption><span class="stamp">00:51:00</span> 소개 페이지에 제시된 벤치마크는 DeepSWE v1.1 48.2%, Vals Index v2.2 46.5%다. 개발사 표기값이다.</figcaption>
+            </figure>
+          </div>
+          <p>김성현은 토큰 사이에 연속적인 은닉 상태를 직접 전달한다는 해석을 바로잡았다. 다음 입력은 여전히 이산 텍스트 토큰이며, 반복되는 것은 한 토큰을 처리하는 중간층 연산이다. 그는 파라미터 수가 고정되고 학습 데이터가 제한된 조건에서 이 구조가 유리할 수 있다고 봤다. 추론 과정(CoT)을 사람이 읽고 감시하기 어렵다는 문제는 기존 구조에서도 남는다고 덧붙였다.</p>
+        </section>
+
+        <section id="demand">
+          <p class="kicker">경제 · 연산을 사는 사람들</p>
+          <h2>더 많은 칩을 만든 뒤, 누가 토큰 값을 낼까</h2>
+          <p>장민석은 칩과 데이터셋에 몰리는 투자만큼 사람들이 기꺼이 돈을 낼 제품 실험이 필요하다고 봤다. 그가 레모네이드 가게와 베이커리까지 예로 든 이유는 매출과 재구매 같은 결과가 학습에 쓸 피드백이 되기 때문이다. 다만 고객 한 사람에게 무한히 시도해 볼 수는 없다. 박종현은 영상 속 장면을 알아보는 능력이 빠르게 좋아진 경험과, 특정 사용자가 어떤 영상을 좋아할지 배우는 어려움을 구분했다.</p>
+          <p>노정석이 인용한 Ramp 자료의 수치는 OpenAI 43%, Anthropic 40%였다. 발언에 따르면 토큰 사용량의 80%는 상위 1% 사용자에게 집중됐다. 출연자들은 이를 코딩 도구의 높은 전환 비용과 앞으로의 확산 여지 양쪽에서 읽었다. 미국 기업 중심 표본일 가능성이 있고, 이 수치로 세계 소비자 시장점유율을 산출할 수는 없다.</p>
+          <p>메모리 수요에도 시차가 있다. 이진원은 장기 수요 증가를 예상하면서도 가격 급등에 구매자가 반응하기 시작했다고 전했다. 차입으로 인프라를 늘린 기업에는 금리가 추가 변수다. 그가 언급한 <strong>2027년 하반기</strong>는 수급이 달라질 수 있다는 개인 전망이다.</p>
+          <h3>시간을 버는 쪽과 그 시간을 사지 못하는 쪽</h3>
+          <div class="pair">
+            <figure>
+              <img loading="lazy" src="assets/wouuahlkm7g-ts-01-12-00.jpg" alt="젠슨 황 게시물, NVIDIA 3분기 실적 발표, 조지 호츠의 First Strike 글을 모아 놓은 화면.">
+              <figcaption><span class="stamp">01:12:00</span> 세 자료의 병치는 토론의 맥락이다. 실적 자료로 경영진 인사나 수출 제한의 동기를 입증할 수는 없다.</figcaption>
+            </figure>
+            <figure>
+              <img loading="lazy" src="assets/wouuahlkm7g-ts-01-16-30.jpg" alt="1985년부터 2025년까지 중국과 미국의 연간 발전량을 테라와트시 단위로 비교한 그래프.">
+              <figcaption><a class="stamp">01:16:30</a> 화면 속 발전량은 중국이 1만 TWh를 넘고 미국은 4천 TWh대 초반이다. 국가 전체의 연간 발전량이며 AI에 할당된 전력량은 별도다. 그래프 표기 출처는 Ember(2026) 등.</figcaption>
+            </figure>
+          </div>
+          <p>김성현이 우려한 시나리오는 먼저 연구를 자동화한 소수 기업이 누적되는 시간 우위로 후발 주자의 추격을 막는 경우다. 그는 대중국 반도체 수출 제한을 결정적 시점까지 시간을 버는 전략으로 해석했다. 정책의 실제 의도, 제한이 없었을 경우의 중국 모델 성능, NVIDIA 경영진을 둘러싼 배경 설명은 모두 대담의 추론으로 남는다.</p>
+          <p>한국에 관한 논의는 <strong>메모리 호황의 이익이 누구에게 전달되는가</strong>로 모였다. 노정석은 삼성전자와 SK하이닉스의 실적이 국가 재정에 기여하는 경로를 강조했다. 동시에 산업의 수익이 커지는 속도와 개인이 그 산업에서 일자리를 얻는 속도는 다르다. 이 간극이 대담에서 말한 K자 양극화다. 고용·세수 비중에 관한 발언에는 집계 기준이 제시되지 않았다.</p>
+        </section>
+
+        <section id="outlook">
+          <p class="kicker">시사점 · 2027년에 볼 것</p>
+          <h2>다음 발표에서 찾아볼 세 가지 증거</h2>
+          <p>박종현은 RSI가 조만간 온다는 쪽에 베팅했다. 이진원은 이듬해에 일부 성과가 나올 가능성을 보면서도, 물리 세계의 긴 주기를 거쳐야 하는 AGI에는 더 많은 시간이 걸린다고 봤다. 장민석에게 더 설득력 있는 신호는 실제 고객이 값을 지불하고 제품을 계속 쓰는 모습이었다. 이 전망들을 같은 기준에서 살펴보려면 발표 속도와 함께 다음 세 가지를 물을 수 있다.</p>
+          <ol>
+            <li><strong>질문을 누가 골랐는가.</strong> 사람이 가설과 평가 지표를 건넸는지, 모델이 실패 결과를 읽고 다음 연구 문제까지 정했는지 확인한다.</li>
+            <li><strong>만든 환경 밖에서도 통했는가.</strong> 모델이 합성한 과제의 점수와 별도로, 독립적인 평가나 실제 사용자의 결과에서도 개선이 나타났는지 살핀다.</li>
+            <li><strong>어디서부터 어디까지 빨라졌는가.</strong> 코드 작성, 실험 연산, 제조, 고객 평가를 나눠 본다. 한 단계의 소요 시간이 줄면 전체 일정에서 어느 대기가 남는지 묻는다.</li>
+          </ol>
+          <figure>
+            <img loading="lazy" src="assets/wouuahlkm7g-ts-01-24-50.jpg" alt="녹화를 마치며 남은 다섯 출연자가 함께 웃는 화상 대담 화면.">
+            <figcaption><a class="stamp">01:24:50</a> 마지막까지 예상 날짜는 하나로 모이지 않았다. 여럿이 가깝게 본 것은 일부 연구 과정의 자동화였다.</figcaption>
+          </figure>
+          <aside class="share" aria-labelledby="share-title">
+            <h3 id="share-title">공유용 한 문장</h3>
+            <p>2027년의 자기 개선을 알아볼 단서는 AI가 실험을 얼마나 빨리 끝냈는지, 그리고 그 결과를 보고 다음 질문까지 스스로 골랐는지에 있다.</p>
+          </aside>
+        </section>
+
+        <section id="sources">
+          <p class="kicker">출처 노트</p>
+          <h2>이 리포트를 읽는 기준</h2>
+          <dl>
+            <dt>원본과 참여자</dt>
+            <dd>AI Frontier Korea(노정석), 「EP 124. 2027년, 정말 올까? Full RSI 난상토론」. 영상 도입부 기준 2026년 11월 21일 아침 녹화, 11월 22일 게시. 재생 시간 5,108초. 출연 노정석·최승준·박종현·이진원·김성현·장민석, 편집 김유진. <a>YouTube 원본 영상</a></dd>
+            <dt>발언과 해석</dt>
+            <dd>이 글은 화자가 표시된 한국어 수동 자막 1,868개 구간을 정리한 원 노트를 토대로 구성했다. 현장 생산성 수치와 회사 내부 관행은 출연자의 경험과 전언이다. 김성현과 장민석은 개인 견해임을 밝혔다. 수학적 증명, 기업 인사, 수출 제한의 동기는 독립 검증을 거치지 않았다.</dd>
+            <dt>장면을 고른 방법</dt>
+            <dd>원 노트는 로그인 쿠키 없이 <code>web_embedded</code> 클라이언트로 확보한 1080p 영상(1920×1080, H.264)을 사용했다. 5초 간격 표본 1,022장과 임계값 0.25의 장면 전환 검출 결과 38개를 바탕으로 대담 화면의 중앙값 프레임과 비교했다. 화면 공유 후보는 7개 구간, 192장이었다.</dd>
+            <dt>시각 자료의 범위</dt>
+            <dd>밝기·분산·직전 프레임과의 차이·전후 0.5초 변화량을 점검했다. 재생 영상이나 화면 전환이 걸린 46분대와 1시간 16분대는 0.5초 단위로 다시 살폈다. 대담 화면은 대표 장면 3장을 남겼고, 화면 공유가 아니었던 26분 15초 후보를 제외해 최종 18장을 골랐다. 전체 85분 중 화면 공유는 약 16분이다. RL의 현장 경험, 메모리 수급, 모델 구조를 둘러싼 공방은 주로 자막에 근거한다.</dd>
+          </dl>
+        </section>
+      </article>
+    </div>
+  </main>
+  <footer class="wrap foot"><span>AI Frontier Korea 대담 읽기 · EP 124</span><a href="#top">처음으로 ↑</a></footer>
+</body>
+</html>

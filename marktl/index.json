@@ -1,7 +1,28 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-22T12:11:00.297Z",
+  "updatedAt": "2026-11-23T12:15:12.176Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-ep-124-2027%EB%85%84-%EC%A0%95%EB%A7%90-%EC%98%AC%EA%B9%8C-full-rsi-%EB%82%9C%EC%83%81%ED%86%A0%EB%A1%A0-%EC%9A%94%EC%95%BD/",
+      "excerpt": "EP 124. 2027년, 정말 올까? Full RSI 난상토론 영상 정보 채널 : AI Frontier Korea (노정석) 게시일 : 2026 11 22 길이 : 1시간 25분 8초 (5,108초) 출연 : 노정석, 최승준, 박종현, 이진원, 김성현, 장민석 / 편집: 김유진 녹화 시점 : 2026년 11월 21일(토) 아침 (도입부 발언 기준) 링크 : https://www.youtube.com/watch?v=woUuAH",
+      "shortId": "6wexay",
+      "slug": "yt-ep-124-2027년-정말-올까-full-rsi-난상토론-요약",
+      "sourcePath": "02_research/AI/노정석/yt_EP 124. 2027년, 정말 올까 - Full RSI 난상토론_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료",
+        "RSI",
+        "research-taste",
+        "RL-environment",
+        "Looped-Transformer",
+        "메모리반도체",
+        "K자양극화"
+      ],
+      "title": "EP 124. 2027년, 정말 올까? Full RSI 난상토론",
+      "updatedAt": "2026-11-23T12:15:12.176Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/6wexay/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-rag%EB%8A%94-%EB%B2%A1%ED%84%B0-db-4%EB%B9%84%ED%8A%B8-%EB%AF%B8%EB%A7%8C%EC%9D%80-%EC%93%B0%EB%A0%88%EA%B8%B0-2026%EB%85%84-ai-%EA%B0%9C%EB%B0%9C-%EC%83%81%EC%8B%9D-ox-%EC%9A%94%EC%95%BD/",
