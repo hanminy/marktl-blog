@@ -1,7 +1,26 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-23T12:15:12.176Z",
+  "updatedAt": "2026-11-27T12:19:27.775Z",
   "items": [
+    {
+      "artifactType": "research-report",
+      "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-%EB%A1%9C%EB%B4%87-%ED%95%99%ED%9A%8C%EB%8F%84-llm%EC%9D%B4-%EC%A7%91%EC%96%B4%EC%82%BC%EC%BC%B0%EB%8B%A4-corl-2026-%EB%A6%AC%EB%B7%B0-%EC%9A%94%EC%95%BD/",
+      "excerpt": "로봇 학회도 LLM이 집어삼켰다 [CoRL 2026 리뷰] 영상 정보 채널 : sudoremove 게시일 : 2026 11 27 길이 : 35:35 링크 : https://www.youtube.com/watch?v=3EQgZO6Kvyc 형식 : 두 진행자의 대담. CoRL 2026(미국 오스틴, 11/9–11/12)에 RLWRLD 소속으로 다녀온 진행자가 직접 정리한 현장 노트(Notion 형식 페이지)와 부스 촬영 영상을 화",
+      "shortId": "7sf8sh",
+      "slug": "yt-로봇-학회도-llm이-집어삼켰다-corl-2026-리뷰-요약",
+      "sourcePath": "02_research/AI/Sudoremove/yt_로봇 학회도 LLM이 집어삼켰다 (CoRL 2026 리뷰)_요약.md",
+      "tags": [
+        "youtube",
+        "연구자료",
+        "로봇학습",
+        "CoRL2026",
+        "Astra",
+        "에이전틱로보틱스"
+      ],
+      "title": "로봇 학회도 LLM이 집어삼켰다 [CoRL 2026 리뷰]",
+      "updatedAt": "2026-11-27T12:19:27.775Z",
+      "url": "https://hanminy.github.io/marktl-blog/marktl/s/7sf8sh/"
+    },
     {
       "artifactType": "research-report",
       "canonicalUrl": "https://hanminy.github.io/marktl-blog/marktl/yt-ep-124-2027%EB%85%84-%EC%A0%95%EB%A7%90-%EC%98%AC%EA%B9%8C-full-rsi-%EB%82%9C%EC%83%81%ED%86%A0%EB%A1%A0-%EC%9A%94%EC%95%BD/",

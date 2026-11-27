@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <title>로봇 학회에서 왜 Astra 이야기가 나왔을까 | CoRL 2026 현장 리뷰</title>
+  
+  
+  
+  
+  
+  
+  
+  
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f7f5ee;
+      --surface: #fffef9;
+      --ink: #172b2c;
+      --muted: #4d605e;
+      --teal: #0d5752;
+      --clay: #9f452c;
+      --rule: #c9d2c9;
+      --wash: #e4ede5;
+      --serif: "Nanum Myeongjo", "AppleMyungjo", "Batang", "Noto Serif CJK KR", serif;
+      --sans: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans CJK KR", system-ui, sans-serif;
+      --mono: ui-monospace, "SFMono-Regular", Consolas, monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-padding-top: 1.5rem; }
+    body {
+      margin: 0; background: var(--paper); color: var(--ink);
+      font: 1.25rem/1.8 var(--sans); word-break: keep-all; overflow-wrap: anywhere;
+      -webkit-text-size-adjust: 100%;
+    }
+    a { color: var(--teal); text-decoration-thickness: 1px; text-underline-offset: .24em; }
+    a:hover { text-decoration-thickness: 2px; }
+    a:focus-visible { outline: 3px solid var(--clay); outline-offset: 4px; }
+    img { display: block; width: 100%; height: auto; }
+    figure, blockquote, h1, h2, h3, p, dl, dd { margin: 0; }
+    .shell { width: min(1160px, calc(100% - 3rem)); margin-inline: auto; }
+    .skip { position: absolute; left: .5rem; top: .5rem; padding: .4rem .8rem; background: white; transform: translateY(-160%); }
+    .skip:focus { transform: none; z-index: 2; }
+    .mast { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding: 1.1rem 0 .85rem; border-bottom: 2px solid var(--ink); }
+    .mast b { font-size: 1rem; letter-spacing: .04em; }
+    .mast span, .eyebrow, time.stamp { font: 600 .82rem/1.5 var(--mono); }
+    .mast span, .eyebrow { letter-spacing: .09em; }
+    .eyebrow { margin-bottom: .75rem; color: var(--clay); }
+    .hero { padding-block: clamp(3rem, 8vw, 6.5rem) 2rem; }
+    h1, h2, .pull { font-family: var(--serif); }
+    h1 { max-width: 15em; font-size: clamp(2.8rem, 6.2vw, 5.5rem); line-height: 1.16; letter-spacing: -.065em; text-wrap: balance; }
+    .excerpt { max-width: 40em; margin-top: 1.6rem; font-size: clamp(1.3rem, 2.3vw, 1.75rem); line-height: 1.65; color: var(--muted); }
+    .byline { display: flex; flex-wrap: wrap; gap: .3rem 1.5rem; padding-top: 1.6rem; font-size: .98rem; }
+    .cover { overflow: hidden; background: var(--ink); color: var(--surface); border-radius: .4rem; display: grid; grid-template-columns: minmax(0, 2fr) minmax(13rem, 1fr); align-items: center; }
+    .cover figcaption { padding: clamp(1.25rem, 3vw, 2.75rem); font-size: 1.12rem; }
+    .cover time { display: block; color: #b8dacf; margin-bottom: .65rem; }
+    nav { display: flex; flex-wrap: wrap; gap: .45rem 1.4rem; padding: 1rem 0; border-bottom: 1px solid var(--rule); font-size: 1rem; }
+    .chapter { margin-top: clamp(3.8rem, 8vw, 7rem); }
+    .chapter > header { border-top: 2px solid var(--ink); padding-top: 1.15rem; margin-bottom: 1.5rem; }
+    h2 { max-width: 24em; font-size: clamp(2rem, 4.2vw, 3.35rem); line-height: 1.27; letter-spacing: -.055em; text-wrap: balance; }
+    h3 { font-size: clamp(1.25rem, 2vw, 1.6rem); line-height: 1.45; letter-spacing: -.035em; }
+    .prose { max-width: 42em; }
+    .prose p + p, .prose h3 + p { margin-top: .85rem; }
+    .prose h3 { margin-top: 2rem; }
+    .abstract { display: grid; grid-template-columns: 1fr 3fr; gap: 1.6rem; align-items: start; margin-top: 3rem; }
+    .abstract h2 { font-size: 1.6rem; color: var(--teal); }
+    .findings, .metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); margin-top: 1.7rem; }
+    .findings > div, .metrics > div { background: var(--surface); padding: clamp(1.1rem, 2.5vw, 2rem); }
+    .findings dt { color: var(--teal); font-weight: 750; margin-bottom: .55rem; }
+    .findings dd, .metrics dd { font-size: 1.12rem; line-height: 1.65; }
+    .metrics dt { color: var(--clay); font: 700 clamp(2rem, 4.5vw, 3.8rem)/1.2 var(--serif); margin-bottom: .65rem; }
+    .note { max-width: 50em; color: var(--muted); margin-top: .8rem; font-size: 1rem; }
+    .gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.6rem; margin: 1.8rem 0; }
+    .gallery.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .frame img { border: 1px solid var(--rule); border-radius: .25rem; background: var(--wash); }
+    .frame figcaption { margin-top: .65rem; color: var(--muted); font-size: 1rem; line-height: 1.65; }
+    .stamp { color: var(--clay); white-space: nowrap; }
+    .frame .stamp { margin-right: .4em; }
+    .pull { border-inline-start: .27rem solid var(--clay); margin: 2rem 0; padding: .5rem 0 .5rem clamp(1rem, 3vw, 2rem); font-size: clamp(1.55rem, 3.1vw, 2.4rem); line-height: 1.45; max-width: 32em; }
+    .pull footer { font: 400 1rem/1.65 var(--sans); color: var(--muted); margin-top: .65rem; }
+    .table-wrap { margin-block: 1.75rem; }
+    table { width: 100%; border-collapse: collapse; background: var(--surface); text-align: left; font-size: 1.12rem; line-height: 1.65; }
+    caption { text-align: left; font-weight: bold; padding-bottom: .65rem; }
+    th, td { padding: 1rem 1.15rem; vertical-align: top; border-bottom: 1px solid var(--rule); }
+    thead { background: var(--teal); color: white; }
+    tbody th { width: 20%; color: var(--teal); }
+    .inset { background: var(--wash); padding: clamp(1.3rem, 3.5vw, 2.5rem); margin-block: 2rem; border-radius: .35rem; }
+    .inset h3 { margin-bottom: .6rem; }
+    .sources { padding-top: 1.25rem; border-top: 1px solid var(--rule); }
+    .sources h2 { font-size: 2rem; }
+    .sources ul { max-width: 52em; padding-left: 1.25em; font-size: 1.06rem; color: var(--muted); }
+    .sources li + li { margin-top: .55rem; }
+    .share { background: var(--ink); color: var(--surface); padding: clamp(1.5rem, 4vw, 3rem); margin-top: 3rem; }
+    .share h2 { font: 700 1rem/1.4 var(--sans); color: #b8dacf; margin-bottom: .75rem; }
+    .share p { max-width: 38em; font: 500 clamp(1.35rem, 2.7vw, 1.95rem)/1.65 var(--serif); user-select: all; }
+    .foot { display: flex; justify-content: space-between; gap: 1rem; padding-block: 1rem 2.2rem; font-size: 1rem; }
+    @media (max-width: 800px) {
+      .gallery.three { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .findings { grid-template-columns: 1fr; }
+      .cover { grid-template-columns: 1fr; }
+      .cover figcaption { padding: 1rem 1.25rem; }
+      .cover time { display: inline; margin-right: .55rem; }
+    }
+    @media (max-width: 620px) {
+      .shell { width: calc(100% - 2.2rem); }
+      .abstract, .gallery, .gallery.three, .metrics { grid-template-columns: 1fr; }
+      .abstract { gap: .6rem; }
+      .gallery { gap: 1.35rem; }
+      .metrics > div { display: grid; grid-template-columns: 7.4rem 1fr; gap: .65rem; align-items: baseline; }
+      .metrics dt { margin: 0; }
+      .mast span { letter-spacing: .02em; font-size: .72rem; }
+      table, tbody, tr, tbody th, td { display: block; }
+      thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+      tbody th { width: auto; padding-bottom: .25rem; border: 0; }
+      td { padding-top: 0; }
+    }
+    @media print {
+      body { background: white; font-size: 11pt; }
+      .shell { width: 100%; }
+      .chapter { margin-top: 2rem; }
+      .hero { padding-top: 2rem; }
+      .frame, .cover, .pull, tr, .metrics { break-inside: avoid; }
+      h2, h3 { break-after: avoid; }
+      .skip, nav, .foot { display: none; }
+    }
+  </style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="로봇 학회도 LLM이 집어삼켰다 [CoRL 2026 리뷰]">
+<meta property="og:description" content="로봇 학회도 LLM이 집어삼켰다 [CoRL 2026 리뷰] 영상 정보 채널 : sudoremove 게시일 : 2026 11 27 길이 : 35:35 링크 : https://www.youtube.com/watch?v=3EQgZO6Kvyc 형식 : 두 진행자의 대담. CoRL 2026(미국 오스틴, 11/9–11/12)에 RLWRLD 소속으로 다녀온 진행자가 직접 정리한 현장 노트(Notion 형식 페이지)와 부스 촬영 영상을 화">
+<meta property="og:url" content="https://hanminy.github.io/marktl-blog/marktl/s/7sf8sh/">
+<meta property="og:image" content="https://hanminy.github.io/marktl-blog/marktl/s/7sf8sh/assets/3eqgzo6kvyc-ts-00-00-03.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="로봇 학회도 LLM이 집어삼켰다 [CoRL 2026 리뷰]">
+<meta name="twitter:description" content="로봇 학회도 LLM이 집어삼켰다 [CoRL 2026 리뷰] 영상 정보 채널 : sudoremove 게시일 : 2026 11 27 길이 : 35:35 링크 : https://www.youtube.com/watch?v=3EQgZO6Kvyc 형식 : 두 진행자의 대담. CoRL 2026(미국 오스틴, 11/9–11/12)에 RLWRLD 소속으로 다녀온 진행자가 직접 정리한 현장 노트(Notion 형식 페이지)와 부스 촬영 영상을 화">
+<meta name="twitter:image" content="https://hanminy.github.io/marktl-blog/marktl/s/7sf8sh/assets/3eqgzo6kvyc-ts-00-00-03.jpg">
+<link rel="canonical" href="https://hanminy.github.io/marktl-blog/marktl/yt-%EB%A1%9C%EB%B4%87-%ED%95%99%ED%9A%8C%EB%8F%84-llm%EC%9D%B4-%EC%A7%91%EC%96%B4%EC%82%BC%EC%BC%B0%EB%8B%A4-corl-2026-%EB%A6%AC%EB%B7%B0-%EC%9A%94%EC%95%BD/">
+</head>
+<body>
+  <a class="skip" href="#abstract">본문으로 이동</a>
+  <main class="shell" id="top">
+    <div class="mast"><b>로봇학습 연구 노트</b><span lang="en">CoRL 2026 / AUSTIN</span></div>
+    <article>
+      <header class="hero">
+        <p class="eyebrow">현장 대담 리뷰 · 2026년 11월 9–12일, 미국 오스틴</p>
+        <h1>로봇 학회에서 왜 Astra 이야기가 나왔을까</h1>
+        <p class="excerpt">한 무대에서 Astra는 하노이 탑의 다음 동작을 그림으로 안내했다. 다른 부스에서 휴머노이드는 세탁기 문을 꾹 눌러 닫았다. 두 장면 사이에 올해 CoRL이 던진 질문이 있다. 로봇에게 어디까지 말로 지시할 수 있고, 어디부터 손이 알아서 해야 할까?</p>
+        <p class="byline"><span>원영상 · sudoremove</span><span>게시 <time datetime="2026-11-27">2026.11.27</time></span><span>대담 35분 35초</span></p>
+      </header>
+
+      <figure class="cover">
+        <img src="assets/3eqgzo6kvyc-ts-00-07-15.jpg" alt="CoRL 로고가 걸린 오스틴 메인홀의 Jim Fan 스폰서 토크 무대">
+        <figcaption><time class="stamp" datetime="PT7M15S">07:15</time>11월 9일 메인홀. Jim Fan은 범용 언어 모델 Astra의 등장에 로봇 연구자들이 보인 반응을 ‘애도 5단계’에 빗대며 이야기를 열었다.</figcaption>
+      </figure>
+
+      <nav aria-label="기사 목차">
+        <a href="#abstract">초록과 핵심 발견</a><a href="#hall">학회장의 시차</a><a href="#posters">포스터의 수치</a><a href="#control">부스의 제어 구조</a><a href="#hands">손과 데이터</a><a href="#bench">평가와 시사점</a><a href="#sources">출처 노트</a>
+      </nav>
+
+      <section id="abstract" aria-labelledby="abstract-title">
+        <div class="abstract">
+          <h2 id="abstract-title">초록</h2>
+          <p>CoRL 2026에 참석한 RLWRLD 소속 진행자가 현장에서 가장 자주 들었다는 모델 이름은 <strong>Astra</strong>였다. 정규 논문에는 시각·언어·행동 모델(VLA)과 월드 모델 연구가 쌓여 있었고, 현장 대화는 범용 모델이 이들에게 어떤 지시를 줄 수 있는지로 옮겨갔다. 이 글은 참석자의 노트, 포스터 앞 대화, 부스 촬영을 따라가며 그 변화가 실제 로봇에서 어떤 모습이었는지 살펴본다.</p>
+        </div>
+        <dl class="findings" aria-label="핵심 발견">
+          <div><dt>연구 동향을 읽는 두 시점</dt><dd>정규 논문과 학회 직전까지 모은 초기 결과 사이에 수개월의 시차가 있었다. 점심시간 포스터에서 최신 질문이 더 선명하게 드러났다.</dd></div>
+          <div><dt>계획과 제어의 분업</dt><dd>장면을 읽고 다음 행동을 고르는 모델 아래에, 움직임을 실행하는 정책과 접촉을 마무리하는 제어기를 두는 사례가 관찰됐다.</dd></div>
+          <div><dt>성공 한 번의 비용</dt><dd>NVIDIA 포스터 인터뷰에서는 에이전틱 방식의 비용이 직접 방식의 약 20배로 기록됐다. 실패 이력을 주는지에 따라서도 결과가 달라졌다.</dd></div>
+        </dl>
+      </section>
+
+      <section class="chapter" id="hall" aria-labelledby="hall-title">
+        <header><p class="eyebrow">현장 기록</p><h2 id="hall-title">논문이 쓰인 뒤, 학회장의 질문이 바뀌었다</h2></header>
+        <div class="prose">
+          <p>CoRL(Conference on Robot Learning)은 로봇이 시범을 모방하거나 시행착오를 거쳐 행동을 배우는 방법을 다루는 학회다. 진행자가 기억하는 전년 서울 행사의 장면은 Gemini Robotics의 셀카와 Dyna 양팔 로봇의 빠른 빨래 개기였다. 오스틴에서 그가 대담의 첫머리에 꺼낸 것은 로봇의 동작보다 복도에서 거듭 들은 모델 이름이었다.</p>
+          <p>진행자의 설명으로는 정규 논문은 대체로 학회 6~7개월 전에 쓰였고 Astra는 학회 약 두 달 전에 등장했다. 이 시차를 엿볼 수 있었던 자리가 <strong>Late Breaking Results</strong>였다. 학회 2주 전까지 받은 초기 결과를 ‘에이전틱 로보틱스’와 ‘Real2Sim2Real’로 묶어 점심시간에 포스터로 선보였다. 전자는 에이전트가 상황에 따라 로봇의 다음 행동을 고르는 접근, 후자는 실물과 시뮬레이션을 오가며 해법을 다듬는 접근이다.</p>
+        </div>
+
+        <div class="gallery three">
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-00-03.jpg" alt="CoRL 2026 리뷰와 오스틴 개최지를 소개하는 대담 오프닝"><figcaption><time class="stamp" datetime="PT3S">00:03</time>두 진행자의 대담. 한 사람이 현장 노트를 펴고 다른 사람이 질문한다.</figcaption></figure>
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-00-27.jpg" alt="CoRL 2026 한 줄 요약 자막"><figcaption><time class="stamp" datetime="PT27S">00:27</time>“로봇 학회도 LLM이 집어삼켰다”는 참석자가 체감한 대화의 밀도를 표현한 말이다.</figcaption></figure>
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-01-35.jpg" alt="Austin, Astra라는 제목과 학회 일정이 적힌 진행자의 현장 노트"><figcaption><time class="stamp" datetime="PT1M35S">01:35</time>대담의 바탕이 된 노트. 참석 동기, 포스터 인터뷰, 부스 영상이 한 문서에 담겼다.</figcaption></figure>
+        </div>
+
+        <div class="prose">
+          <h3>Jim Fan이 보여준 역할 분담</h3>
+          <p>스폰서 토크의 하노이 탑 시연에서 Astra는 화면 위에 가이드를 그렸고, NVIDIA의 GR00T 2가 그 가이드에 따라 움직였다. 노트에는 해당 과제를 별도로 학습하지 않은 ‘제로샷’ 시연으로 기록돼 있다. Jim Fan이 로봇의 빠른 행동 능력, 이른바 ‘System 1’에 여전히 연구할 것이 있다고 설명한 대목이다. Russ Tedrake의 토크에서도 Astra 이후 자신의 연구를 어떻게 이어갈지 고민하는 박사과정 학생의 이야기가 나왔다.</p>
+        </div>
+        <blockquote class="pull"><p lang="en">“Astra didn't shatter our dreams, but it shattered our walled gardens.”</p><footer>Jim Fan의 스폰서 토크를 옮긴 진행자 노트. 연구 분야 사이의 장벽이 허물어졌다는 표현이다.</footer></blockquote>
+        <div class="gallery">
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-06-38.jpg" alt="연사 발언과 포스터 인터뷰 수치를 모은 Astra Funeral 현장 노트"><figcaption><time class="stamp" datetime="PT6M38S">06:38</time>첫날 반응을 모은 노트. 포스터 앞에서 Danny Driess가 전한 놀라움의 대상은 변화의 속도였다.</figcaption></figure>
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-12-42.jpg" alt="GR00T 2와 Astra의 하노이 탑 시연을 정리한 노트와 관련 영상 썸네일"><figcaption><time class="stamp" datetime="PT12M42S">12:42</time>화면에 표시한 가이드가 두 모델을 잇는다. 아래에는 같은 채널의 연사 발언 편집본이 보인다.</figcaption></figure>
+        </div>
+        <p class="prose">대담에서는 GR00T 2의 학습 재료도 언급했다. 진행자에 따르면 원격으로 로봇을 조종해 얻은 시범과 구별되는 <strong>사람의 행동 데이터</strong>를 100만 시간 모아 40만 시간으로 선별했고, 그중 10만 시간을 공개했다. 모델 가중치 공개는 영상에서 향후 계획으로 소개됐다.</p>
+      </section>
+
+      <section class="chapter" id="posters" aria-labelledby="posters-title">
+        <header><p class="eyebrow">포스터 인터뷰</p><h2 id="posters-title">일을 쪼개면 로봇이 해낸다. 그 과정에는 얼마가 들까?</h2></header>
+        <div class="prose">
+          <p>Physical Intelligence(PI)의 π0.7은 “고구마를 에어프라이어에 넣어라”는 지시에 막혔다. 손잡이를 잡고 당기도록 일을 쪼개 지시하자 성공했다. 같은 로봇에서도 <strong>어떤 단위로 지시하는가</strong>가 이미 배운 움직임을 꺼내 쓰는 데 영향을 준 사례다.</p>
+          <p>PI의 Ashwin Balakrishna는 가능한 정보를 폭넓게 조건으로 주고 예측에 활용하자는 관점에서 VLA와 월드 액션 모델(WAM)의 구분을 느슨하게 봤다. Astra가 들어오면서 행동 데이터에 설명을 붙이는 작업도 수월해졌다고 했다. 한편 학습 경험이 없는 형태의 로봇 몸체로 π0.7을 옮겼을 때 곧바로 적절한 움직임이 나오지는 않았다고 전했다.</p>
+          <h3>NVIDIA Astronomy가 비교한 선택</h3>
+          <p>Astronomy 팀은 Astra를 제어에 쓰는 방식을 비교했다. 직접 행동을 출력하게 할 때와 에이전트가 중간 단계를 거치게 할 때, 또 이미지 일부를 잘라 보거나 역기구학(IK) 도구를 쓸 수 있게 할 때 어떤 차이가 생기는지 살폈다. 아래 수치는 Ashna Khetan과 나눈 대화를 진행자가 기록한 값이다.</p>
+        </div>
+        <dl class="metrics" aria-label="Astronomy 포스터 인터뷰에서 전한 실험 수치">
+          <div><dt>5만 달러</dt><dd>3주 실험의 총비용. 내부 API 할인을 적용한 금액으로 소개됐다.</dd></div>
+          <div><dt>약 20배</dt><dd>에이전틱 방식의 비용을 같은 비교의 직접 방식 비용으로 나눈 값.</dd></div>
+          <div><dt>−2%p</dt><dd>크롭·IK 도구를 제공한 조건에서 관찰된 성공률 차이. 단위는 퍼센트포인트다.</dd></div>
+        </dl>
+        <div class="gallery">
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-12-55.jpg" alt="Physical Intelligence와 NVIDIA Astronomy 연구자들의 포스터 인터뷰 기록"><figcaption><time class="stamp" datetime="PT12M55S">12:55</time>PI의 데이터 라벨링 경험과 Astronomy의 비용 비교가 한 화면에 정리돼 있다.</figcaption></figure>
+          <div class="inset">
+            <h3>도구와 실패 이력은 다른 정보다</h3>
+            <p>인터뷰에서 연구자가 강조한 것은 앞선 시도의 실패를 모델이 볼 수 있는지였다. 도구를 추가한 조건에서는 성공률이 소폭 낮아졌고, 실패 이력은 다음 행동을 고르는 데 중요했다고 했다. 노트에는 비교별 표본 수, 성공률 절댓값, 반복 측정의 편차가 없어 2%p 차이의 통계적 의미를 판단하기 어렵다.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter" id="control" aria-labelledby="control-title">
+        <header><p class="eyebrow">부스 비교 · 계획과 실행</p><h2 id="control-title">세탁기 문을 닫는 마지막 힘은 어디에서 나오나</h2></header>
+        <div class="prose">
+          <p>Dyna의 휴머노이드는 세탁기에서 수건을 꺼내 바구니로 옮겼다. 진행자가 눈여겨본 순간은 문이 거의 닫힌 뒤였다. 로봇은 문을 한 번 더 꾹 누르고 버튼을 눌러 모드를 복구했다. ‘문 닫기’라는 짧은 지시 안에는 이동 속도와 접촉력을 맞춰야 하는 동작이 들어 있다. 부스 엔지니어는 사람의 4분의 1 속도로 일한다면 고객이 구매할 이유를 묻게 된다고 했다.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>세 부스에서 다음 행동을 정하고 실행한 방식</caption>
+            <thead><tr><th scope="col">시스템</th><th scope="col">동작의 흐름과 근거</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Gemini Robotics 2.5</th><td>음성 지시를 받으면 계획 텍스트가 표시되고 로봇이 물체를 옮겼다. 상위 모델이 VLA에 지시한다는 설명은 이를 본 진행자의 해석이다. 상위 모델의 정체는 확인되지 않았다.</td></tr>
+              <tr><th scope="row">Dyna Robotics</th><td>부스 설명은 시각·언어 모델(S2) → 월드 모델(S1) → 전신제어(S0)의 세 층이었다. 세탁기 앞에서 본 속도와 문 닫기 동작은 이 구조로 수행한 사례다.</td></tr>
+              <tr><th scope="row">MicroAGI</th><td>상위 언어 모델이 장면을 해석해 궤적을 만들고 시뮬레이션에서 학습한 강화학습(RL) 정책이 움직임을 수행했다. 드라이버의 마지막 정렬과 볼트 체결은 고전제어가 맡았다는 현장 설명이다.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="gallery">
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-13-46.jpg" alt="사용자의 음성 지시와 로봇의 계획 텍스트를 함께 표시한 Gemini Robotics 화면"><figcaption><time class="stamp" datetime="PT13M46S">13:46</time>Gemini 부스에서는 관람객이 방금 한 말과 로봇이 세운 계획을 함께 읽을 수 있었다.</figcaption></figure>
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-15-00.jpg" alt="케이크와 상자를 옮기는 Apollo 휴머노이드 시연 기록"><figcaption><time class="stamp" datetime="PT15M">15:00</time>Apollo는 물체를 집어 옮겼다. 진행자가 본 끈 묶기에서는 상자를 중앙에 가지런히 두는 준비가 필요했다.</figcaption></figure>
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-17-54.jpg" alt="테이블 위 왕관과 모자 모양 물체 앞의 Franka 양팔 로봇"><figcaption><time class="stamp" datetime="PT17M54S">17:54</time>Franka 양팔 데모. 진행자는 행사장에서 Gemini Robotics를 사용한 데모를 네 개 봤다고 했다.</figcaption></figure>
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-18-38.jpg" alt="세탁기와 수건 바구니 앞에서 작업하는 Dyna 휴머노이드의 부스 기록"><figcaption><time class="stamp" datetime="PT18M38S">18:38</time>Dyna의 세탁 작업. 수건을 옮기는 구간과 문을 눌러 닫는 구간은 서로 다른 접촉 조건을 요구한다.</figcaption></figure>
+        </div>
+        <div class="prose">
+          <p>Gemini 부스에서는 관람객이 케이크를 수화로 표현해 달라고 하자 로봇이 손가락을 움직였고, 요청자는 “얼추 맞다”고 반응했다. 즉석 지시에 반응한 흥미로운 장면이다. 대담에는 수화 표현의 정확도나 손가락별 명령 경로를 확인한 기록은 없다.</p>
+          <p>MicroAGI에서는 캐스터 바퀴가 볼트를 가렸다. 이때 계획층이 한 일은 조임 힘을 결정하는 것보다 앞에 있었다. <strong>먼저 바퀴를 치워 볼트를 드러내는 것.</strong> 정밀 조립에서 상위 모델에 맡길 만한 판단이 무엇인지 보여주는 장면이다.</p>
+        </div>
+        <div class="gallery three">
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-22-05.jpg" alt="Sharpa 손으로 드라이버와 캐스터를 다루는 MicroAGI 시연 기록"><figcaption><time class="stamp" datetime="PT22M5S">22:05</time>MicroAGI의 드라이버 작업. 장애물을 치우는 판단과 마지막 체결의 담당이 구분돼 있었다.</figcaption></figure>
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-06-30.jpg" alt="Optimus와 Cybercab을 기록한 테슬라 부스 현장 노트"><figcaption><time class="stamp" datetime="PT6M30S">06:30</time>테슬라 부스의 Optimus는 과자를 집어 건넸다. 진행자는 오스틴에서 Cybercab도 약 다섯 번 탔다고 전했다.</figcaption></figure>
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-19-32.jpg" alt="Boston Dynamics의 Atlas 점검 부스 기록"><figcaption><time class="stamp" datetime="PT19M32S">19:32</time>Atlas 부스에는 네 손가락 핸드 픽스처가 있었다. 진행자는 현장에서 Atlas가 움직이는 모습까지 보지는 못했다.</figcaption></figure>
+        </div>
+      </section>
+
+      <section class="chapter" id="hands" aria-labelledby="hands-title">
+        <header><p class="eyebrow">하드웨어 · 촉각과 원격조작</p><h2 id="hands-title">로봇 손을 누르면 무엇이 기록될까</h2></header>
+        <div class="prose">
+          <p>Holiday Robotics 부스에서는 관람객이 Friday의 실리콘 손을 누를 수 있었다. 화면에는 손 모양의 촉각 지도가 뜨고, 진행자의 설명으로는 누른 위치에서 힘이 어느 방향으로 작용했는지까지 표시됐다. 손 아래쪽에 둔 모터가 유압으로 손가락을 구동하는 설계였다.</p>
+          <p>직원은 사흘간 관람객이 계속 만졌어도 센서가 고장 나지 않았다고 말했다. 양산 가격을 묻자 답은 품질 편차로 돌아왔다. 같은 손 한 대를 작동시키는 데서 같은 품질로 100대, 1,000대를 만드는 데까지가 남은 과제였다.</p>
+        </div>
+        <div class="gallery">
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-19-56.jpg" alt="Holiday Robotics Friday 휴머노이드와 유압 구동 손을 소개하는 화면"><figcaption><time class="stamp" datetime="PT19M56S">19:56</time>Friday의 유압 손. 내구성 이야기는 직원이 전한 부스 운영 경험이다.</figcaption></figure>
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-21-02.jpg" alt="관람객의 손가락 접촉에 대응해 모니터에 나타난 손 모양 촉각 지도"><figcaption><time class="stamp" datetime="PT21M2S">21:02</time>손 표면의 접촉을 시각화한 화면. 방향 표시와 센서의 실제 측정 정밀도는 별개의 확인 항목이다.</figcaption></figure>
+        </div>
+        <div class="prose">
+          <h3>조종하는 손과 따라 하는 손</h3>
+          <p>Sharpa는 사람이 외골격 글러브를 끼면 별도의 로봇 손이 손가락 움직임을 따라가는 구성이었다. 현장 설명에 따르면 두 장치의 관절 움직임이 일대일로 대응한다. 로봇이 물체에서 느낀 힘이 조작자의 손으로 돌아오는지는 확인되지 않았다.</p>
+          <p>UMI Arena에서 체험한 RoMeLa 장갑은 다른 선택을 했다. 사람이 손을 넣으면 동작을 보여주는 리더가 되고, 더미 손을 넣으면 물체를 잡는 그리퍼로도 쓸 수 있다. 진행자가 창의적이라고 꼽은 구성이지만 직접 껴 보니 조작은 예상보다 까다로웠다. 시범 데이터를 모을 때 장치의 자유도와 사람이 쉽게 반복할 수 있는 동작은 따로 살펴야 한다는 점을 떠올리게 한다.</p>
+        </div>
+        <div class="gallery">
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-22-58.jpg" alt="외골격 글러브로 Sharpa 촉각 핸드를 원격조작하는 장면"><figcaption><time class="stamp" datetime="PT22M58S">22:58</time>Sharpa의 외골격과 로봇 손. 조작자의 여러 손가락 움직임이 로봇 쪽으로 전달된다.</figcaption></figure>
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-23-45.jpg" alt="UMI Arena에서 체험한 노란 손가락이 달린 장갑형 장치"><figcaption><time class="stamp" datetime="PT23M45S">23:45</time>UMI Arena에서는 여러 그리퍼와 글러브를 직접 착용해 조작감을 비교할 수 있었다.</figcaption></figure>
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-24-28.jpg" alt="사람 손과 더미 손을 바꿔 끼울 수 있는 RoMeLa 장갑 소개"><figcaption><time class="stamp" datetime="PT24M28S">24:28</time>리더와 그리퍼의 형태를 합친 RoMeLa 장갑. 같은 구간에서 RAI의 ‘코알라’ 그리퍼도 소개된다.</figcaption></figure>
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-26-00.jpg" alt="여러 부스의 짧은 영상 가운데 등장한 Fauna Robotics의 작은 휴머노이드"><figcaption><time class="stamp" datetime="PT26M">26:00</time>Fauna의 작은 휴머노이드. 부스 모음에는 모델 가속 기업 Reactor, 월드 모델 안에서 원격조작하는 Amazon FAR, 손을 개발하는 Origami, 과제와 성공 기준을 설계하는 데이터 업체도 등장한다.</figcaption></figure>
+        </div>
+      </section>
+
+      <section class="chapter" id="bench" aria-labelledby="bench-title">
+        <header><p class="eyebrow">평가 · 시뮬레이션에서 실물까지</p><h2 id="bench-title">볼트 두 개, 제한 시간 70초</h2></header>
+        <div class="prose">
+          <p>냉장고 문 경첩에 볼트 두 개를 체결하려면 먼저 파워 드라이버를 집어야 한다. DexBench의 이 과제에는 <strong>70초의 제한 시간과 평가 120에피소드</strong>가 명시돼 있다. ‘로봇이 드라이버를 쓸 수 있다’는 설명을 읽을 때 어떤 물체, 몇 번의 체결, 얼마의 시간인지 따져볼 수 있는 사례다.</p>
+          <p>RLWRLD와 NVIDIA가 협업한 DexBench는 다섯 손가락의 산업 작업 능력을 시뮬레이션에서 평가한다. 화면에 제시된 구성은 Isaac Lab-Arena와 Newton 물리 엔진, RBY1 기반 몸체, 15개 과제와 3개 평가 축이다. <strong>16개 행동과 78개 기술</strong>은 산업 손재주를 나눈 분류 체계다. 과제 목록에는 리테일, 물류, 제조, 호텔 식음료 업무가 포함됐다.</p>
+        </div>
+        <div class="gallery">
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-03-33.jpg" alt="정밀 작업의 시뮬레이션 리허설을 소개하는 11월 9일 NVIDIA 블로그 캡처"><figcaption><time class="stamp" datetime="PT3M33S">03:33</time>진행자가 화면에 띄운 NVIDIA 블로그. CoRL 기간 공개한 협업을 시뮬레이션 리허설이라는 주제로 소개했다.</figcaption></figure>
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-04-32.jpg" alt="RLWRLD 투자 보도 옆에 표시된 DexBench의 16 Actions와 78 Skills"><figcaption><time class="stamp" datetime="PT4M32S">04:32</time>NVIDIA의 RLWRLD 투자 기사와 손재주 분류 체계. 진행자는 RLWRLD 소속으로 발표에 얽힌 경험을 설명했다.</figcaption></figure>
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-26-42.jpg" alt="15개 과제와 3개 평가 축을 소개하는 DexBench 홈페이지"><figcaption><time class="stamp" datetime="PT26M42S">26:42</time>DexBench 개요. 다른 로봇 몸체로의 교체는 대담에서 향후 가능성으로 언급됐다.</figcaption></figure>
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-27-26.jpg" alt="Power-Driver Screw Fastening 과제의 제한 시간과 평가 에피소드 수가 적힌 상세 화면"><figcaption><time class="stamp" datetime="PT27M26S">27:26</time>파워 드라이버 체결 과제. 120은 평가 에피소드 수이며, 이 화면에서 실제 성공 횟수는 제시되지 않았다.</figcaption></figure>
+        </div>
+        <div class="gallery">
+          <figure class="frame"><img loading="lazy" src="assets/3eqgzo6kvyc-ts-00-28-42.jpg" alt="Ken Goldberg 키노트에서 시뮬레이션 리허설과 실제 로봇의 파지 전략을 비교하는 화면"><figcaption><time class="stamp" datetime="PT28M42S">28:42</time>Ken Goldberg 키노트의 비교 화면. 시뮬레이션 46.6분과 실물 로봇 2.4분이 각각 표시됐다.</figcaption></figure>
+          <div class="inset">
+            <h3>리허설 뒤, 잡는 방법이 바뀌었다</h3>
+            <p>Goldberg의 시연에서 주목할 결과는 시뮬레이션 경험 뒤 실물의 파지 전략이 달라졌다는 점이다. 두 시간값은 서로 다른 단계에 붙은 표기다. 실물만으로 같은 과제를 수행한 대조 조건이 없어 이 숫자만으로 시간 절감률을 계산할 수는 없다.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter" id="implications" aria-labelledby="implications-title">
+        <header><p class="eyebrow">시사점</p><h2 id="implications-title">다음 시연에서는 실패한 직후를 보자</h2></header>
+        <div class="prose">
+          <p>후반 대담에서 진행자들은 집어 옮기기처럼 시뮬레이터에 구현하기 쉬운 과제와 케이블 타이처럼 민첩한 접촉이 필요한 실물 작업 사이의 간극을 짚었다. 에이전트가 벤치마크 점수를 끌어올려도, 접촉이 어긋난 순간 손이 얼마나 빨리 힘과 자세를 바꿀 수 있는지는 별도로 측정해야 한다.</p>
+          <p>정밀 조립이나 건설 로봇이라면 MicroAGI의 체결 장면을 출발점으로 삼을 수 있다. 볼트가 가려졌을 때는 장면을 다시 읽고 작업 순서를 바꾸는 능력이 필요하다. 드라이버가 볼트에 닿은 뒤에는 정렬 오차와 힘에 제때 반응해야 한다. 같은 체결 과제에서 <strong>완료율, 완료까지 걸린 시간, 재시도 횟수, 모델 호출 비용</strong>을 함께 기록하면 어느 단계에서 상위 모델의 판단이 값을 하는지 비교할 수 있다. 이는 현장 사례에서 도출한 평가 제안이다.</p>
+          <p>진행자는 연구자가 택할 세 방향으로 에이전트가 아직 못 하는 동작을 풀기, 할 수 있는 작업의 성공을 돕기, 일할 환경을 설계하기를 꼽았다. 대담은 다음 CoRL까지의 변화를 예상하는 ‘State of Robotics 2027’ 목록을 만들어 보자는 제안으로 끝났다. 그 예측을 읽을 때 떠올릴 만한 장면은 가려진 볼트다. 로봇이 한 번 멈춘 뒤 무엇을 보았고, 무엇을 바꾸었으며, 결국 체결까지 마쳤는가.</p>
+        </div>
+      </section>
+
+      <aside class="chapter sources" id="sources" aria-labelledby="sources-title">
+        <h2 id="sources-title">출처와 읽는 범위</h2>
+        <ul>
+          <li><strong>기본 자료</strong>　sudoremove의 35분 35초 대담, 한국어 수동 자막, 화면에 표시된 현장 노트와 부스 영상. 사진의 시각은 원영상 시작점을 기준으로 한다. <a>원영상 「로봇 학회도 LLM이 집어삼켰다 [CoRL 2026 리뷰]」</a></li>
+          <li><strong>관찰의 범위</strong>　Astra 언급 빈도는 한 참석자의 경험이다. 학회 전체 발표를 집계한 통계는 제시되지 않았다. DexBench 및 투자 발표에 관한 설명에는 협업 당사자인 RLWRLD 소속 진행자의 관점이 담겨 있다.</li>
+          <li><strong>인용과 수치</strong>　영어 인용은 화면 속 노트의 표기를 따랐다. 포스터 비용·성공률 차이·학습 데이터 시간은 노트와 구두 설명에 근거하며 원 논문, 실험 로그, 연사 발언 전문과의 독립 대조는 이뤄지지 않았다.</li>
+          <li><strong>이름과 관련 영상</strong>　자막의 음차는 화면 표기를 참고해 CoRL, RLWRLD, Jim Fan, GR00T 2, Sharpa, UMI, Russ Tedrake 등으로 정리했다. 후반에 언급된 Robot Dojo 최고 성능 모델의 이름은 자막만으로 특정하기 어렵다. 대담에서 안내한 관련 자료는 같은 채널의 「로봇 연구자들이 Astra를 받아들이는 법 (CoRL 2026)」 연사 편집본이다.</li>
+          <li><strong>프레임 추출 기록</strong>　원 노트에 따르면 yt-dlp 2026.07.04에서 HTTP 403이 발생해, 임시 격리 환경의 2026.10.21 버전으로 쿠키 없이 받은 1080p AV1 영상에서 장면을 추출했다.</li>
+        </ul>
+      </aside>
+
+      <aside class="share" aria-labelledby="share-title">
+        <h2 id="share-title">공유용 한 문단</h2>
+        <p>CoRL 2026의 한 참석자가 가장 자주 들은 모델 이름은 Astra였다. 오스틴의 시연에서 범용 모델은 하노이 탑의 다음 동작을 안내했고, 조립 로봇의 제어기는 드라이버를 볼트에 맞췄다. 두 능력을 함께 평가하려면 계획을 고치는 비용과 접촉을 마무리하는 시간까지 봐야 한다.</p>
+      </aside>
+    </article>
+    <footer class="foot"><span>CoRL 2026 현장 리뷰</span><a href="#top">맨 위로 ↑</a></footer>
+  </main>
+</body>
+</html>
